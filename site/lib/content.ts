@@ -1,4 +1,4 @@
-/** Gallery scroll — same order as the original site (files in `/homePageImages`). */
+/** Gallery scroll — same order as the original site; files in `site/public/homePageImages`. */
 export const GALLERY_IMAGES = [
   "/homePageImages/L1053430.jpg",
   "/homePageImages/L1053433.jpg",
@@ -15,7 +15,7 @@ export const GALLERY_IMAGES = [
   "/homePageImages/DSC07800.jpg",
 ] as const;
 
-/** Served from `/public` via symlink to repo `homePageImages` (see project root). */
+/** Served from `site/public/homePageImages`. */
 export const LOGO_URL =
   "https://images.squarespace-cdn.com/content/69b2766f53fe2311e30733fe/83068be0-15b6-42ca-8df7-126b99ef5aaa/rorubaruNewLogo.png?content-type=image%2Fpng";
 
@@ -71,7 +71,7 @@ export const EVENTS: SiteEvent[] = [
   },
 ];
 
-/** About page grid — files in `/aboutPageImages` (alphabetical). */
+/** About page grid — files in `site/public/aboutPageImages` (alphabetical). */
 export const ABOUT_PAGE_IMAGES: { src: string; n: string }[] = [
   { src: "/aboutPageImages/DSC07800.jpg", n: "01" },
   { src: "/aboutPageImages/DSC07910.jpg", n: "02" },
