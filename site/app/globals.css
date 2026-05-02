@@ -1,0 +1,132 @@
+@import "./styles/roru-header.css";
+@import "./styles/roru-site.css";
+@import "./styles/about-page.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --accent: #f54500;
+  --accent-muted: #f45a1f;
+  --surface: #000000;
+  --text: #f5f5f5;
+  --border: rgba(255, 255, 255, 0.16);
+  --border-slot: rgba(255, 255, 255, 0.18);
+  --ror-gap: 9px;
+
+  color-scheme: dark;
+}
+
+html.theme-night {
+  --surface: #000000;
+  --text: #f5f5f5;
+  --border: rgba(255, 255, 255, 0.16);
+  --border-slot: rgba(255, 255, 255, 0.18);
+
+  color-scheme: dark;
+}
+
+html.theme-day {
+  --surface: #f5f5f5;
+  --text: #000000;
+  --border: rgba(0, 0, 0, 0.16);
+  --border-slot: rgba(0, 0, 0, 0.16);
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--surface);
+  color: var(--text);
+  scroll-behavior: auto;
+  overscroll-behavior: none;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  background: var(--surface);
+  color: var(--text);
+  overscroll-behavior: none;
+  overflow-x: hidden;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  width: 100%;
+}
+
+body.is-section-transitioning,
+body.is-section-transitioning * {
+  cursor: wait;
+}
+
+body.is-section-transitioning {
+  pointer-events: none;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  color: inherit;
+}
+
+button {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+img,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+::selection {
+  background: var(--accent);
+  color: #000000;
+}
+
+@layer components {
+  .section-surface {
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  .roru-nav__menu-button {
+    @apply rounded-full border px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em];
+    border-color: color-mix(in srgb, currentColor 20%, transparent);
+  }
+}

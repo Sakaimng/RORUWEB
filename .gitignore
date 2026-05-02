@@ -1,0 +1,42 @@
+# Root repo — matches site/.gitignore patterns under site/
+
+# dependencies
+site/node_modules
+site/.pnp
+site/.pnp.*
+site/.yarn/*
+!site/.yarn/patches
+!site/.yarn/plugins
+!site/.yarn/releases
+!site/.yarn/versions
+
+# testing
+site/coverage
+
+# next.js
+site/.next/
+site/out/
+
+# production
+site/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env
+.env*
+site/.env*
+
+# vercel
+site/.vercel
+
+# typescript
+*.tsbuildinfo
+site/next-env.d.ts

@@ -1,0 +1,1150 @@
+/* RORU site-wide styles (theme, layout, sections, footer) */
+
+:root {
+  --fixed-footer-height: 100vh;
+}
+
+html.theme-day body {
+  background: #f5f5f5;
+  color: #000;
+}
+
+.eatapp-container {
+  padding: 10px !important;
+  border-radius: 0px !important;
+}
+
+#eatapp-widget {
+  position: fixed !important;
+  backdrop-filter: blur(12px);
+}
+
+html.theme-day #page-content {
+  background: #f5f5f5;
+  color: #000;
+}
+
+html.theme-night body {
+  background: #000;
+  color: #f5f5f5;
+}
+
+/* Main surfaces */
+html.theme-day .roru-hero,
+html.theme-day .roru-gallery-section,
+html.theme-day .roru-booking-section,
+html.theme-day .roru-gallery-sticky,
+html.theme-day .roru-booking-calendar,
+html.theme-day .roru-booking-slots,
+html.theme-day .roru-events-section,
+html.theme-day .roru-footer,
+html.theme-day .roru-about-hero,
+html.theme-day .roru-about-intro,
+html.theme-day .roru-about-story,
+html.theme-day .about-opera-section {
+  background: #f5f5f5 !important;
+  color: #000 !important;
+}
+
+html.theme-night .roru-hero,
+html.theme-night .roru-gallery-section,
+html.theme-night .roru-booking-section,
+html.theme-night .roru-gallery-sticky,
+html.theme-night .roru-booking-calendar,
+html.theme-night .roru-booking-slots,
+html.theme-night .roru-events-section,
+html.theme-night .roru-about-hero,
+html.theme-night .roru-about-intro,
+html.theme-night .roru-about-story,
+html.theme-night .about-opera-section {
+  background: #000 !important;
+  color: #f5f5f5 !important;
+}
+
+/* Typography + buttons + UI */
+html.theme-day .roru-hero__title,
+html.theme-day .roru-hero__text,
+html.theme-day .roru-booking-title h2,
+html.theme-day .roru-booking-option,
+html.theme-day .calendar-month,
+html.theme-day .calendar-weekdays span,
+html.theme-day .calendar-days button,
+html.theme-day .slots-title,
+html.theme-day .slot-btn,
+html.theme-day .roru-booking-note h3,
+html.theme-day .roru-booking-cta,
+html.theme-day .roru-events-heading h2,
+html.theme-day .roru-event-card__title,
+html.theme-day .roru-event-card__desc,
+html.theme-day .roru-event-card__date,
+html.theme-day .roru-event-card__status,
+html.theme-day .roru-events-tab,
+html.theme-day .calendar-nav,
+html.theme-day .roru-footer__label,
+html.theme-day .roru-about-sequence__index,
+html.theme-day p {
+  color: #000 !important;
+}
+
+html.theme-night .roru-hero__text,
+html.theme-night .roru-booking-title h2,
+html.theme-night .roru-booking-option,
+html.theme-night .calendar-month,
+html.theme-night .calendar-weekdays span,
+html.theme-night .calendar-days button,
+html.theme-night .slots-title,
+html.theme-night .slot-btn,
+html.theme-night .roru-booking-note h3,
+html.theme-night .roru-booking-cta,
+html.theme-night .roru-events-heading h2,
+html.theme-night .roru-event-card__title,
+html.theme-night .roru-event-card__desc,
+html.theme-night .roru-event-card__date,
+html.theme-night .roru-event-card__status,
+html.theme-night .roru-events-tab {
+  color: #f5f5f5 !important;
+}
+
+/* Borders */
+html.theme-day .roru-booking-calendar,
+html.theme-day .roru-booking-slots,
+html.theme-day .calendar-days button,
+html.theme-day .slot-btn {
+  border-color: rgba(0, 0, 0, 0.16) !important;
+}
+
+html.theme-night .roru-booking-calendar,
+html.theme-night .roru-booking-slots,
+html.theme-night .calendar-days button,
+html.theme-night .slot-btn,
+html.theme-night .party-select {
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+html.theme-day .slots-title,
+html.theme-day .party-label,
+html.theme-day .calendar-days button.is-selected,
+html.theme-day .slot-btn.is-selected,
+html.theme-day .roru-booking-cta {
+  color: #000 !important;
+  stroke: #000 !important;
+  fill: #000 !important;
+  border-color: #000 !important;
+}
+
+html.theme-day .calendar-days button.is-selected,
+html.theme-day .slot-btn.is-selected,
+html.theme-day .roru-booking-cta {
+  background: #000 !important;
+  color: #f5f5f5 !important;
+}
+
+html.theme-day img,
+html.theme-day video,
+html.theme-day picture,
+html.theme-night img,
+html.theme-night video,
+html.theme-night picture {
+  filter: none !important;
+  mix-blend-mode: normal !important;
+}
+
+/* above is theme related */
+
+.page-section .section-border {
+  background-color: transparent !important;
+}
+
+.section-background {
+  background: transparent !important;
+}
+
+.btn.btn--border.theme-btn--primary-inverse.sqs-button-element--primary {
+  background: transparent;
+}
+
+body.roru-loading #nav-logo-target {
+  opacity: 0;
+}
+
+.page-section.vertical-alignment--middle:not(.content-collection):not(.gallery-section):not(
+    .user-items-list-section
+  ):not(.editmode-changing-rowcount) {
+  align-items: end;
+}
+
+a {
+  text-decoration: none !important;
+}
+
+body {
+  margin: 0;
+}
+
+#siteWrapper {
+  display: none;
+}
+
+#page-content {
+  position: relative;
+  z-index: 9;
+  margin-bottom: 100vh;
+}
+
+.roru-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1;
+  background: #000;
+  color: #f5f5f5;
+}
+
+.roru-footer__grid {
+  box-sizing: border-box;
+}
+
+.roru-footer__layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  gap: clamp(36px, 7vw, 56px);
+  padding: clamp(24px, 4vw, 48px) 0 clamp(32px, 7vh, 72px);
+  box-sizing: border-box;
+}
+
+.roru-footer__info-rail {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 5vw, 48px);
+  justify-content: flex-start;
+  flex: 0 0 auto;
+  max-width: 42rem;
+  min-width: 0;
+}
+
+.roru-footer__logo-col {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.roru-footer__logo-link {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: 0;
+  text-decoration: none;
+}
+
+@media (max-width: 767px) {
+  .roru-footer__logo-link {
+    min-height: min(32vh, 260px);
+  }
+}
+
+.roru-footer__logo-svg {
+  display: block;
+}
+
+.roru-footer__col {
+  min-width: 0;
+}
+
+.roru-footer__label {
+  margin: 0 0 14px;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #f5f5f5;
+}
+
+.roru-footer__text,
+.roru-footer__link {
+  display: block;
+  margin: 0 0 16px;
+  font-size: clamp(16px, 1.2vw, 24px);
+  line-height: 1.15;
+  font-weight: 400;
+  color: #f5f5f5;
+  text-decoration: none;
+}
+
+.roru-footer__text:last-child,
+.roru-footer__link:last-child {
+  margin-bottom: 0;
+}
+
+.roru-footer__col .roru-footer__label + .roru-footer__link:last-child,
+.roru-footer__col .roru-footer__label + .roru-footer__text:last-child {
+  margin-bottom: 0;
+}
+
+.roru-footer__link {
+  color: #f45a1f;
+  transition: opacity 0.25s ease;
+}
+
+.roru-footer__link:hover {
+  opacity: 0.7;
+}
+
+@media (min-width: 768px) {
+  .roru-footer__layout {
+    grid-template-columns: minmax(0, 1fr) minmax(14rem, 22rem);
+    column-gap: clamp(48px, 10vw, 120px);
+    row-gap: 0;
+    align-items: start;
+    padding-top: clamp(48px, 8vw, 100px);
+    padding-bottom: clamp(56px, 12vh, 140px);
+  }
+
+  .roru-footer__logo-col {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+  }
+
+  .roru-footer__info-rail {
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    max-width: 22rem;
+    justify-self: end;
+    gap: clamp(28px, 4vw, 40px);
+  }
+
+  .roru-footer__logo-col .roru-footer__logo-link {
+    flex: 0 0 auto;
+    height: auto;
+    min-height: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .roru-footer__logo-col .roru-footer__logo-svg {
+    width: 100%;
+    height: auto;
+    max-height: min(88vh, 820px);
+  }
+}
+
+body::after {
+  content: "";
+  display: block;
+  height: var(--fixed-footer-height);
+  pointer-events: none;
+}
+
+#footer-sections {
+  display: none;
+}
+
+html,
+body {
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html.roru-preload #roru-loader-logo {
+  visibility: hidden;
+}
+
+html.roru-loading,
+body.roru-loading {
+  overflow: hidden !important;
+}
+
+#roru-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.roru-loader__logo-wrap {
+  width: 100%;
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+
+.roru-loader__inner {
+  width: min(80vw, 980px);
+  padding: 0 2.5vw;
+}
+
+#roru-loader-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.roru-loader-logo__stroke {
+  fill: none;
+  stroke: #f54500;
+  stroke-width: 2.25px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.roru-loader-logo__fill {
+  fill: #f54500;
+  stroke: none;
+}
+
+html.roru-preload #roru-loader {
+  opacity: 1;
+}
+
+html.roru-preload .homepage-reveal {
+  opacity: 0 !important;
+  transform: translateY(24px) !important;
+}
+
+.homepage-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  will-change: transform, opacity;
+}
+
+/* After entrance: avoid layout jump when GSAP clears inline styles (base .homepage-reveal would otherwise reapply). */
+.homepage-reveal.homepage-reveal--settled {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+.header-announcement-bar-wrapper {
+  position: fixed !important;
+  padding-left: 2vw !important;
+  padding-right: 2vw !important;
+  display: none;
+}
+
+/* Hero section */
+
+:root {
+  --roru-bg: #000;
+  --roru-orange: #f54500;
+  --roru-white: #f5f5f5;
+  --roru-gap: 9px;
+  --roru-pad: 90px;
+}
+
+.roru-hero {
+  min-height: 100vh;
+  background: var(--roru-bg);
+}
+
+.roru-hero__grid {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-rows: 1fr 1fr;
+  align-items: start;
+  gap: var(--roru-gap);
+  padding-top: max(4vw, var(--roru-fixed-nav-clear-bottom));
+  padding-left: 2vw;
+  padding-right: 2vw;
+  padding-bottom: 4vw;
+  box-sizing: border-box;
+}
+
+.roru__heroWrap {
+  grid-column: span 6;
+}
+
+.roru-hero__title {
+  grid-column: span 6;
+  align-self: start;
+  margin: 0;
+  color: var(--roru-orange);
+  font-size: clamp(44px, 7.2vw, 116px);
+  line-height: 0.95;
+  font-weight: 200;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  visibility: hidden;
+}
+
+.roru-hero__title .word-wrap {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.roru-hero__title .word {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+.roru-hero__HighlightText {
+  font-weight: 700;
+}
+
+.roru-hero__text {
+  grid-column: span 6;
+  margin: 0;
+  letter-spacing: 0.03em;
+  color: var(--roru-white);
+  font-size: clamp(22px, 3vw, 62px);
+  line-height: 1.08;
+  font-weight: 100;
+  max-width: none;
+  visibility: hidden;
+}
+
+.roru-hero__HighlightText,
+.roru-hero__body {
+  display: inline;
+}
+
+.word-wrap {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.roru-hero__text .word {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+/* Gallery section */
+
+.roru-gallery-section {
+  position: relative;
+  background: #000;
+  /* until JS sets exact widths — avoids flex: 0 0 calc(invalid) and zero scroll distance */
+  --gallery-item-width: clamp(180px, 28vw, 420px);
+  --gallery-item-width-mobile: min(90vw, 480px);
+}
+
+/*
+ * Position comes from the component: `sticky` on small screens (no pin), `md:relative` when ScrollTrigger pins.
+ * Do not set position here — it would fight Tailwind and break mobile horizontal scrub.
+ */
+.roru-gallery-sticky {
+  height: 100vh;
+  min-height: 100svh;
+  overflow: hidden;
+  background: #000;
+  z-index: 2;
+}
+
+.roru-gallery-track {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: 3px;
+  padding: 2vw;
+  box-sizing: border-box;
+  will-change: transform;
+}
+
+.roru-gallery-item {
+  flex: 0 0 var(--gallery-item-width);
+  aspect-ratio: 2 / 3;
+  margin: 0;
+  overflow: hidden;
+  will-change: transform, opacity;
+}
+
+.roru-gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+figure.roru-gallery-item {
+  margin: 0;
+}
+
+/* Booking section */
+
+.roru-booking-section {
+  min-height: 100vh;
+  background: #000;
+}
+
+.roru-booking-grid {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 9px;
+  padding: 2vw;
+  box-sizing: border-box;
+  align-items: start;
+}
+
+.roru-booking-options {
+  grid-column: span 3;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-self: start;
+  padding-top: 4vh;
+  z-index: 2;
+}
+
+.roru-booking-option {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.9fr) minmax(0, 1.4fr);
+  gap: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #f5f5f5;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.28;
+  transition: opacity 0.25s ease;
+}
+
+.roru-booking-option.is-active,
+.roru-booking-option:hover {
+  opacity: 1;
+}
+
+.roru-booking-option .label,
+.roru-booking-option .value {
+  font-size: clamp(28px, 3vw, 64px);
+  line-height: 0.92;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+}
+
+.roru-booking-option .label {
+  white-space: normal;
+}
+
+.roru-booking-option .value {
+  white-space: normal;
+}
+
+.roru-booking-title {
+  grid-column: span 3;
+  z-index: 1;
+  pointer-events: none;
+  padding-top: 4vh;
+}
+
+.roru-booking-title h2 {
+  letter-spacing: 0.03em;
+  text-indent: -0.5%;
+  margin: 0;
+  color: #f5f5f5;
+  font-size: clamp(56px, 7vw, 132px);
+  line-height: 0.82;
+  font-weight: 100;
+  text-align: left;
+}
+
+.roru-booking-calendar {
+  grid-column: span 3;
+  align-self: start;
+  padding-left: 18px;
+  border-left: 1px solid rgba(255, 255, 255, 0.16);
+  color: #f5f5f5;
+  min-width: 0;
+  min-height: 420px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.calendar-header {
+  display: grid;
+  grid-template-columns: 32px 1fr 32px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.calendar-month {
+  text-align: center;
+  font-size: clamp(18px, 1.4vw, 28px);
+  line-height: 1;
+  font-weight: 400;
+}
+
+.calendar-nav {
+  border: 0;
+  background: transparent;
+  color: #f5f5f5;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.calendar-weekdays,
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.calendar-weekdays span,
+.calendar-days button,
+.calendar-days span {
+  text-align: center;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.calendar-weekdays {
+  margin-bottom: 8px;
+}
+
+.calendar-days {
+  min-height: 280px;
+  align-content: start;
+}
+
+.calendar-days button,
+.calendar-days span {
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+}
+
+.calendar-days span.is-empty {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.calendar-days button {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  color: #f5f5f5;
+  cursor: pointer;
+}
+
+.calendar-days button.is-disabled {
+  opacity: 0.22;
+  cursor: default;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.calendar-days button.is-today {
+  border-color: #f54500;
+}
+
+.calendar-days button.is-selected,
+.slot-btn.is-selected {
+  background: #f54500;
+  border-color: #f54500;
+  color: #000;
+}
+
+.roru-booking-slots {
+  grid-column: span 3;
+  align-self: start;
+  min-width: 0;
+  min-height: 420px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.slots-title {
+  margin: 0 0 18px;
+  color: #f54500;
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+.slots-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(72px, 1fr));
+  gap: 9px;
+}
+
+.slot-btn {
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: transparent;
+  color: #f5f5f5;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.roru-booking-cta {
+  margin-top: 24px;
+  width: fit-content;
+  min-width: 120px;
+  padding: 14px 18px;
+  border: 0;
+  background: #f54500;
+  color: #000;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.roru-booking-note {
+  grid-column: span 6;
+  align-self: end;
+  justify-self: start;
+  margin-top: 20px;
+}
+
+.roru-booking-note h3 {
+  margin: 0;
+  color: rgba(245, 245, 245, 0.82);
+  font-size: 0.6em;
+  line-height: 1.24em;
+}
+
+.roru-booking-party {
+  grid-column: span 6;
+  margin-top: 24px;
+  margin-bottom: 24px;
+  max-width: 160px;
+}
+
+.party-label {
+  display: block;
+  margin-bottom: 10px;
+  color: #f54500;
+  font-size: 16px;
+  line-height: 1;
+  letter-spacing: 0.08em;
+}
+
+.party-select {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: #000;
+  color: #f5f5f5;
+  font-size: 16px;
+}
+
+/* Events */
+
+.roru-event-card__wrap {
+  grid-column: span 6;
+}
+
+.roru-event-card__image-link {
+  grid-column: span 6;
+}
+
+.roru-event-card__image-wrap {
+  margin-top: 18px;
+  width: 50%;
+}
+
+.roru-event-card__image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  aspect-ratio: 2 / 1;
+}
+
+.roru-events-section {
+  min-height: 100vh;
+  background: #000;
+}
+
+.roru-events-grid {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 9px;
+  padding: 2vw;
+  box-sizing: border-box;
+  align-items: end;
+}
+
+.roru-events-heading {
+  grid-column: span 6;
+}
+
+.roru-events-heading h2 {
+  letter-spacing: 0.03em;
+  text-indent: -0.3%;
+  margin: 0;
+  color: #f5f5f5;
+  font-size: clamp(56px, 7vw, 132px);
+  line-height: 0.82;
+  font-weight: 100;
+  text-align: left;
+}
+
+.roru-events-tabs {
+  grid-column: span 6;
+  justify-self: end;
+  display: flex;
+  gap: 18px;
+  align-self: start;
+}
+
+.roru-events-tab {
+  border: 0;
+  background: transparent;
+  color: #f5f5f5;
+  opacity: 0.35;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  padding: 0;
+}
+
+.roru-events-tab.is-active {
+  opacity: 1;
+}
+
+.roru-events-list {
+  grid-column: span 6;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 9px;
+  align-self: stretch;
+  align-content: start;
+}
+
+.roru-event-card {
+  grid-column: span 6;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  min-height: 320px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(245, 69, 0, 0.36);
+}
+
+.roru-event-card__meta {
+  grid-column: span 6;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.roru-event-card__date,
+.roru-event-card__status {
+  color: rgba(245, 245, 245, 0.72);
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.roru-event-card__body {
+  grid-column: span 6;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.roru-event-card__title {
+  margin-top: 6vh;
+  color: #f5f5f5;
+  font-size: clamp(24px, 2.2vw, 42px);
+  line-height: 0.96;
+  font-weight: 300;
+}
+
+.roru-event-card__desc {
+  margin: 0;
+  color: rgba(245, 245, 245, 0.82) !important;
+  font-size: clamp(14px, 1vw, 18px);
+  line-height: 1.28;
+  text-transform: none;
+}
+
+.roru-event-card__link {
+  margin-top: auto;
+  width: fit-content;
+  color: #f54500;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 14px;
+  line-height: 1;
+  letter-spacing: 0.06em;
+}
+
+@media (max-width: 1129px) {
+  .roru-event-card__image-link {
+    grid-column: span 6;
+  }
+
+  .roru-footer__grid {
+    min-height: auto;
+  }
+
+  .roru-footer__layout {
+    padding-top: 12px;
+    gap: 28px;
+  }
+
+  .roru-footer__info-rail {
+    gap: 24px;
+  }
+
+  .roru-footer__label {
+    margin-bottom: 18px;
+    font-size: 12px;
+  }
+
+  .roru-footer__text,
+  .roru-footer__link {
+    margin-bottom: 14px;
+    font-size: 16px;
+    line-height: 1.15;
+  }
+}
+
+@media (max-width: 767px) {
+  .roru-event-card__image-wrap {
+    width: 100%;
+  }
+
+  .roru-hero__grid {
+    /* Let title + copy size rows; avoids clipping long body against a fixed 50/50 split */
+    grid-template-rows: auto auto;
+    /* Below fixed .roru-nav — see --roru-fixed-nav-clear-bottom in roru-header.css */
+    padding-top: max(2.75rem, var(--roru-fixed-nav-clear-bottom));
+    padding-left: 2vw;
+    padding-right: 2vw;
+    /* Fixed reserve pill (~38px) + bottom dock (~2.5vh) + scroll comfort */
+    padding-bottom: max(10.5rem, 30vh, calc(env(safe-area-inset-bottom, 0px) + 6.5rem));
+    min-height: 100svh;
+    align-items: start;
+  }
+
+  /* Overrides max-width:1129px tight top; less bottom dead zone on small screens */
+  .roru-footer__layout {
+    padding-top: clamp(40px, 12vw, 56px);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + clamp(14px, 3.5vw, 22px));
+    gap: clamp(28px, 7vw, 44px);
+  }
+
+  .roru-events-heading {
+    grid-column: 1 / 7;
+  }
+
+  .roru-events-tabs {
+    grid-column: 1 / 7;
+    justify-self: start;
+    margin-top: 12px;
+  }
+
+  .roru-events-list {
+    grid-column: 1 / 7;
+  }
+
+  .roru-event-card {
+    grid-column: 1 / 7;
+    grid-template-columns: 1fr;
+  }
+
+  .roru-event-card__meta,
+  .roru-event-card__body {
+    grid-column: auto;
+  }
+
+  .roru-hero__title {
+    font-size: 4.2em;
+  }
+
+  .roru-booking-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .roru-booking-options {
+    grid-column: span 6;
+    padding-top: 0;
+  }
+
+  .roru-booking-title {
+    grid-column: span 6;
+    grid-row: 2 / 3;
+    justify-self: start;
+    margin-bottom: 12px;
+  }
+
+  .roru-booking-title h2 {
+    text-align: left;
+    font-size: clamp(48px, 16vw, 84px);
+  }
+
+  .roru-booking-calendar {
+    grid-column: span 6;
+    padding-top: 0;
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .roru-booking-slots {
+    grid-column: span 6;
+    padding-top: 0;
+    height: 100%;
+  }
+
+  .roru-booking-note {
+    grid-column: span 6;
+    margin-top: 18px;
+  }
+
+  .roru-booking-option .label,
+  .roru-booking-option .value {
+    font-size: 1.8em;
+  }
+
+  .slots-list {
+    grid-template-columns: repeat(2, minmax(72px, 1fr));
+  }
+
+  .roru-gallery-item {
+    flex: 0 0 var(--gallery-item-width-mobile);
+    aspect-ratio: 2 / 3;
+  }
+
+  .roru-loader__inner {
+    width: min(92vw, 620px);
+  }
+
+  .roru-loader-logo__stroke {
+    stroke-width: 1.85px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .homepage-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  #roru-loader {
+    display: none !important;
+  }
+
+  html.roru-loading,
+  body.roru-loading {
+    overflow: auto !important;
+  }
+}
