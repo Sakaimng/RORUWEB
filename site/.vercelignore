@@ -1,4 +1,4 @@
-# Shrink CLI upload size (build runs fresh on Vercel)
+# Shrink CLI uploads — patterns are relative to project root (`site/`).
 node_modules
 .next
 .next.nosync
@@ -6,19 +6,22 @@ node_modules
 *.log
 .env*
 
-# Local-only multi-GB event galleries (not in git)
-public/20260314 Invite only opening
-public/20260321 Six pack chef
-public/20260425 DELIA x RORUBARU
+# Local-only (~3GB) event galleries
+public/20260314 Invite only opening/**
+public/20260321 Six pack chef/**
+public/20260425 DELIA x RORUBARU/**
 
-# Large untracked hero/background JPGs (git uses homePageImages / aboutPageImages)
-public/About Desktop Home BG.jpg
-public/About Mobile Home BG.jpg
+# Full-res home JPG sources (deploy home-covers/ instead)
 public/Desktop Home Hero BG.jpg
 public/Mobile Home Hero BG.jpg
+public/About Desktop Home BG.jpg
+public/About Mobile Home BG.jpg
 public/Event Home Desktop BG.jpg
 public/Event Home Mobile BG.jpg
 public/Reserve Home Desktop.jpg
 public/Reserve Home Mobile.jpg
 public/Gallery Desktop Home BG.jpg
 public/Gallery Mobile Home BG.jpg
+
+# Source menu SVGs (built copies in public/menus/)
+public/Menus SVG/**

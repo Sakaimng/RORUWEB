@@ -1,4 +1,8 @@
-/** Event gallery manifests — images live under `site/public/<folder>`. */
+/**
+ * Event gallery manifests — images live under `site/public/<folder>` locally.
+ * Those folders are gitignored (~3GB). Production needs the same paths on the CDN
+ * or in `public/` via Blob/LFS; until then /events lightboxes work only in local dev.
+ */
 
 export type EventGalleryManifest = {
   id: string;

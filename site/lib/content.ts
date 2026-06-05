@@ -1,23 +1,23 @@
-/** Home overlay panel cover images — files in `site/public` (desktop + mobile pairs). */
+/** Home overlay covers — committed under `site/public/home-covers` (see `scripts/optimize-home-covers.sh`). */
 export const HOME_HERO_IMAGES = {
-  desktop: "/Desktop Home Hero BG.jpg",
-  mobile: "/Mobile Home Hero BG.jpg",
+  desktop: "/home-covers/Desktop Home Hero BG.jpg",
+  mobile: "/home-covers/Mobile Home Hero BG.jpg",
 } as const;
 
 /** Home overlay — About panel (after Reserve) links to `/about`. */
 export const HOME_ABOUT_COVER_IMAGES = {
-  desktop: "/About Desktop Home BG.jpg",
-  mobile: "/About Mobile Home BG.jpg",
+  desktop: "/home-covers/About Desktop Home BG.jpg",
+  mobile: "/home-covers/About Mobile Home BG.jpg",
 } as const;
 
 export const HOME_EVENTS_COVER_IMAGES = {
-  desktop: "/Event Home Desktop BG.jpg",
-  mobile: "/Event Home Mobile BG.jpg",
+  desktop: "/home-covers/Event Home Desktop BG.jpg",
+  mobile: "/home-covers/Event Home Mobile BG.jpg",
 } as const;
 
 export const HOME_RESERVE_COVER_IMAGES = {
-  desktop: "/Reserve Home Desktop.jpg",
-  mobile: "/Reserve Home Mobile.jpg",
+  desktop: "/home-covers/Reserve Home Desktop.jpg",
+  mobile: "/home-covers/Reserve Home Mobile.jpg",
 } as const;
 
 /** @deprecated Use HOME_EVENTS_COVER_IMAGES — kept for any external references. */

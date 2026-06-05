@@ -44,3 +44,19 @@ site/next-env.d.ts
 .env*.local
 
 site/.next.nosync/
+
+# Local-only public assets (see site/public/README-assets.md)
+site/public/20260314 Invite only opening/
+site/public/20260321 Six pack chef/
+site/public/20260425 DELIA x RORUBARU/
+site/public/Menus SVG/
+site/public/Desktop Home Hero BG.jpg
+site/public/Mobile Home Hero BG.jpg
+site/public/About Desktop Home BG.jpg
+site/public/About Mobile Home BG.jpg
+site/public/Event Home Desktop BG.jpg
+site/public/Event Home Mobile BG.jpg
+site/public/Reserve Home Desktop.jpg
+site/public/Reserve Home Mobile.jpg
+site/public/Gallery Desktop Home BG.jpg
+site/public/Gallery Mobile Home BG.jpg

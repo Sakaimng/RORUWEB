@@ -42,3 +42,24 @@ next-env.d.ts
 
 # iCloud-safe Next build dir (symlinked from .next)
 .next.nosync/
+
+# --- Local-only assets (keep out of Git + fast Vercel/Git deploys) ---
+# Full-res home panel sources; deploy `public/home-covers/` instead.
+/public/Desktop Home Hero BG.jpg
+/public/Mobile Home Hero BG.jpg
+/public/About Desktop Home BG.jpg
+/public/About Mobile Home BG.jpg
+/public/Event Home Desktop BG.jpg
+/public/Event Home Mobile BG.jpg
+/public/Reserve Home Desktop.jpg
+/public/Reserve Home Mobile.jpg
+/public/Gallery Desktop Home BG.jpg
+/public/Gallery Mobile Home BG.jpg
+
+# Event photo dumps (~3GB). See public/README-assets.md
+/public/20260314 Invite only opening/
+/public/20260321 Six pack chef/
+/public/20260425 DELIA x RORUBARU/
+
+# Figma/source SVG exports (runtime uses /menus/*.svg)
+/public/Menus SVG/

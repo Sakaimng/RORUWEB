@@ -25,10 +25,23 @@
     "site/.vercel": true,
     "**/*.tsbuildinfo": true
   },
+  "files.watcherExclude": {
+    "site/.next/**": true,
+    "site/node_modules/**": true,
+    "site/public/20260314 Invite only opening/**": true,
+    "site/public/20260321 Six pack chef/**": true,
+    "site/public/20260425 DELIA x RORUBARU/**": true,
+    "site/public/Menus SVG/**": true
+  },
   "search.exclude": {
     "site/.next": true,
     "site/node_modules": true,
     "site/package-lock.json": true,
-    "**/*.tsbuildinfo": true
-  }
+    "**/*.tsbuildinfo": true,
+    "site/public/20260314 Invite only opening": true,
+    "site/public/20260321 Six pack chef": true,
+    "site/public/20260425 DELIA x RORUBARU": true,
+    "site/public/Menus SVG": true
+  },
+  "git.ignoreLimitWarning": true
 }
