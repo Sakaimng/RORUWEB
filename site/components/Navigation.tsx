@@ -9,6 +9,7 @@ import { LanguageToggle } from "./LanguageToggle";
 import { TOCK_URL } from "@/lib/content";
 import { useI18n } from "@/lib/i18n";
 import { PAGE_TRANSITION_START_EVENT } from "@/lib/roru-session";
+import { scrollPageToTop } from "@/lib/scroll-to-top";
 
 function isActiveRoute(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
@@ -202,8 +203,8 @@ export function Navigation() {
       >
         <div className="relative h-full w-full">
           <div className="relative grid h-full w-full grid-cols-[1fr_auto_1fr] items-center px-[var(--roru-section-pad-x)] min-[1032px]:flex min-[1032px]:justify-normal">
-            {/* Left: mobile menu toggle / desktop nav links */}
-            <div className="flex min-w-0 items-center justify-start min-[1032px]:flex-1">
+            {/* Left: mobile menu toggle / desktop language + nav links */}
+            <div className="flex min-w-0 items-center justify-start gap-3 min-[1032px]:flex-1 min-[1032px]:gap-4">
               <button
                 type="button"
                 className="roru-nav-item inline-flex shrink-0 items-center justify-center overflow-hidden px-0 py-2 text-xs font-bold uppercase text-[var(--text)] transition-opacity hover:opacity-70 min-[1032px]:hidden"
@@ -214,6 +215,8 @@ export function Navigation() {
               >
                 <MenuToggleLabel open={menuOpen} />
               </button>
+
+              <LanguageToggle className="hidden min-[1032px]:inline-flex" />
 
               <nav
                 className="hidden flex-wrap items-center justify-start gap-x-3 gap-y-1 min-[1032px]:flex min-[1032px]:gap-x-4"
@@ -232,20 +235,23 @@ export function Navigation() {
               </nav>
             </div>
 
-            {/* Center: brand */}
+            {/* Center: brand — scroll to top of current page, not navigate home */}
             <div className={`justify-self-center ${brandPositionClassName}`}>
-              <Link
-                href="/"
+              <button
+                type="button"
                 className="roru-nav-item block leading-none text-[var(--text)]"
-                aria-label="RORUBARU home"
+                aria-label="Back to top"
+                onClick={() => {
+                  setMenuOpen(false);
+                  scrollPageToTop();
+                }}
               >
                 <NavLogo />
-              </Link>
+              </button>
             </div>
 
-            {/* Right: language toggle (desktop only) + reserve */}
+            {/* Right: reserve */}
             <div className="flex items-center justify-end gap-2 min-[1032px]:flex-1 sm:gap-3">
-              <LanguageToggle className="hidden min-[1032px]:inline-flex" />
               <a
                 href={TOCK_URL}
                 target="_blank"

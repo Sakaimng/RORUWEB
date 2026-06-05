@@ -6,6 +6,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { AboutHeroTitle } from "./AboutHeroTitle";
 import { AboutSequenceMarquee } from "./AboutSequenceMarquee";
 import { useI18n } from "@/lib/i18n";
+import { SCROLL_TO_TOP_EVENT } from "@/lib/scroll-to-top";
 
 /** Viewport width at which opera uses top horizontal gallery + bottom text stack */
 const OPERA_MOBILE_MAX_PX = 767;
@@ -350,6 +351,17 @@ export function AboutScrollScenes({ sequence, storyImages }: AboutScrollScenesPr
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [reduced, refreshDomRefs, goToSection, applyTextOpacitiesForSection, syncRefsToSection]);
+
+  useEffect(() => {
+    function onScrollToTop() {
+      if (sectionRef.current === 0) return;
+      setHeroLandingReplay((n) => n + 1);
+      syncRefsToSection(0);
+      applyTextOpacitiesForSection(0, true);
+    }
+    window.addEventListener(SCROLL_TO_TOP_EVENT, onScrollToTop);
+    return () => window.removeEventListener(SCROLL_TO_TOP_EVENT, onScrollToTop);
+  }, [syncRefsToSection, applyTextOpacitiesForSection]);
 
   useEffect(() => {
     if (reduced) return;

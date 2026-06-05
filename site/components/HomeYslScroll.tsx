@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { SCROLL_TO_TOP_EVENT } from "@/lib/scroll-to-top";
 
 const LOCK_MS = 850;
 const WHEEL_THRESHOLD = 18;
@@ -164,6 +165,12 @@ export function HomeYslScroll() {
     }
     window.addEventListener("roru:home-panel-step", onPanelStepRequest as EventListener);
 
+    function onScrollToTop() {
+      lockedRef.current = false;
+      indexRef.current = applyIndex(0);
+    }
+    window.addEventListener(SCROLL_TO_TOP_EVENT, onScrollToTop);
+
     return () => {
       window.clearTimeout(settleTimer);
       document.documentElement.classList.remove("roru-home-footer-active");
@@ -174,6 +181,7 @@ export function HomeYslScroll() {
       window.removeEventListener("touchend", onTouchEnd);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("roru:home-panel-step", onPanelStepRequest as EventListener);
+      window.removeEventListener(SCROLL_TO_TOP_EVENT, onScrollToTop);
     };
   }, []);
 
