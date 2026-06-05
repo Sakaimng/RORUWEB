@@ -1,23 +1,23 @@
-/** Home overlay covers — committed under `site/public/home-covers` (see `scripts/optimize-home-covers.sh`). */
+/** Home overlay covers — WebP in `site/public/home-covers` (`npm run assets:home-covers`). */
 export const HOME_HERO_IMAGES = {
-  desktop: "/home-covers/Desktop Home Hero BG.jpg",
-  mobile: "/home-covers/Mobile Home Hero BG.jpg",
+  desktop: "/home-covers/Desktop Home Hero BG.webp",
+  mobile: "/home-covers/Mobile Home Hero BG.webp",
 } as const;
 
 /** Home overlay — About panel (after Reserve) links to `/about`. */
 export const HOME_ABOUT_COVER_IMAGES = {
-  desktop: "/home-covers/About Desktop Home BG.jpg",
-  mobile: "/home-covers/About Mobile Home BG.jpg",
+  desktop: "/home-covers/About Desktop Home BG.webp",
+  mobile: "/home-covers/About Mobile Home BG.webp",
 } as const;
 
 export const HOME_EVENTS_COVER_IMAGES = {
-  desktop: "/home-covers/Event Home Desktop BG.jpg",
-  mobile: "/home-covers/Event Home Mobile BG.jpg",
+  desktop: "/home-covers/Event Home Desktop BG.webp",
+  mobile: "/home-covers/Event Home Mobile BG.webp",
 } as const;
 
 export const HOME_RESERVE_COVER_IMAGES = {
-  desktop: "/home-covers/Reserve Home Desktop.jpg",
-  mobile: "/home-covers/Reserve Home Mobile.jpg",
+  desktop: "/home-covers/Reserve Home Desktop.webp",
+  mobile: "/home-covers/Reserve Home Mobile.webp",
 } as const;
 
 /** @deprecated Use HOME_EVENTS_COVER_IMAGES — kept for any external references. */

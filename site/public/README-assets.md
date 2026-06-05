@@ -4,11 +4,11 @@
 
 | Path | Purpose |
 |------|---------|
-| `home-covers/` | Home hero + overlay panel backgrounds (~6MB total) |
+| `home-covers/` | Home hero + overlay panel WebPs (`npm run assets:home-covers`) |
 | `homePageImages/`, `aboutPageImages/` | WebP photography |
 | `menus/` | Menu page SVGs |
 | `event-poster/` | Event card thumbnails |
-| `event-galleries/` | Optimized `/events` covers + lightbox JPEGs (~120MB). Regenerate with `npm run assets:event-galleries`. |
+| `event-galleries/` | High-quality WebP for `/events` (~220MB). Regenerate with `npm run assets:event-galleries`. |
 
 ## Local only (grey in the editor = gitignored)
 

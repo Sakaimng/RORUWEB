@@ -4,6 +4,7 @@ import gsap from "gsap";
 import Image from "next/image";
 import { useLayoutEffect, useRef } from "react";
 import { HOME_HERO_IMAGES } from "@/lib/content";
+import { PREOPTIMIZED_IMAGE } from "@/lib/image-display";
 import { useI18n } from "@/lib/i18n";
 
 /** Renders the tagline as two lines, each line's words wrapped for the reveal animation. */
@@ -143,6 +144,8 @@ export function HeroSection() {
             priority
             sizes="(max-width: 767px) 0px, 100vw"
             className="roru-hero__media-img roru-hero__media-img--desktop"
+            fetchPriority="high"
+            {...PREOPTIMIZED_IMAGE}
           />
           <Image
             src={HOME_HERO_IMAGES.mobile}
@@ -151,6 +154,8 @@ export function HeroSection() {
             priority
             sizes="(max-width: 767px) 100vw, 0px"
             className="roru-hero__media-img roru-hero__media-img--mobile"
+            fetchPriority="high"
+            {...PREOPTIMIZED_IMAGE}
           />
         </div>
         <div className="roru-hero__center">
