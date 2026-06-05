@@ -1,0 +1,96 @@
+/* Menu page — dual SVG boards */
+
+.roru-menu-page {
+  --roru-menu-pad-x: 2vw;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  background: var(--surface);
+  color: var(--text);
+  padding-top: max(7rem, var(--roru-fixed-nav-clear-bottom));
+  padding-inline: var(--roru-menu-pad-x);
+  padding-bottom: 2vw;
+  min-height: 100svh;
+  letter-spacing: 0;
+}
+
+.roru-menu-page *,
+.roru-menu-page *::before,
+.roru-menu-page *::after {
+  letter-spacing: 0;
+  text-indent: 0;
+}
+
+#page-content:has(.roru-menu-page) {
+  padding: 0;
+}
+
+.roru-menu-page__header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(12px, 1.4vw, 22px);
+  width: 100%;
+  max-width: none;
+  margin: 0 0 clamp(40px, 6vw, 96px);
+  padding: 0;
+}
+
+.roru-menu-page__title {
+  margin: 0;
+  padding: 0;
+  color: var(--text);
+  font-size: clamp(56px, 9vw, 168px);
+  line-height: 0.86;
+  font-weight: 100;
+  text-transform: uppercase;
+}
+
+.roru-menu-page__boards {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(48px, 8vw, 120px);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.roru-menu-board {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.roru-menu-board__title {
+  margin: 0 0 clamp(18px, 2.5vw, 28px);
+  padding: 0;
+  font-size: clamp(28px, 3.2vw, 44px);
+  font-weight: 200;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.roru-menu-board__host {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.roru-menu-board__host--stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 6vw, 64px);
+}
+
+.roru-menu-board__host svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  color: var(--text);
+}
+
+.roru-menu-board__host--stack svg {
+  flex: 0 0 auto;
+}

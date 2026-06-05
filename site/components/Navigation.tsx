@@ -3,314 +3,297 @@
 import gsap from "gsap";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
-import { HongKongClock } from "./ThemeAndClock";
-import { SITE_ADDRESS_DOCK_LINE, SITE_MAP_URL, TOCK_URL } from "@/lib/content";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { NavLogo } from "./NavLogo";
+import { LanguageToggle } from "./LanguageToggle";
+import { TOCK_URL } from "@/lib/content";
+import { useI18n } from "@/lib/i18n";
 import { PAGE_TRANSITION_START_EVENT } from "@/lib/roru-session";
 
-function scrambleLabel(el: HTMLElement, original: string) {
-  const chars = "XO01";
-  const len = original.length;
-  const state = { t: 0 };
-  return gsap.to(state, {
-    t: 1,
-    duration: 0.42,
-    ease: "none",
-    onUpdate: () => {
-      const t = state.t;
-      let out = "";
-      for (let i = 0; i < len; i++) {
-        out += t > 0.85 ? original[i]! : chars[Math.floor(Math.random() * chars.length)]!;
-      }
-      el.textContent = out;
-    },
-  });
+function isActiveRoute(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+/** Crossfading MENU / CLOSE label for the mobile toggle (matches WSSC's swap animation). */
+function MenuToggleLabel({ open }: { open: boolean }) {
+  const menuRef = useRef<HTMLSpanElement>(null);
+  const closeRef = useRef<HTMLSpanElement>(null);
+  const openRef = useRef(open);
+  const hasMountedRef = useRef(false);
+
+  useLayoutEffect(() => {
+    const menu = menuRef.current;
+    const close = closeRef.current;
+    if (!menu || !close) return;
+
+    const showMenu = !open;
+
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      openRef.current = open;
+      gsap.set(menu, {
+        autoAlpha: showMenu ? 1 : 0,
+        y: 0,
+        pointerEvents: showMenu ? "auto" : "none",
+      });
+      gsap.set(close, {
+        autoAlpha: showMenu ? 0 : 1,
+        y: 0,
+        pointerEvents: showMenu ? "none" : "auto",
+      });
+      return;
+    }
+
+    if (openRef.current === open) return;
+    openRef.current = open;
+
+    const entering = showMenu ? menu : close;
+    const exiting = showMenu ? close : menu;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      gsap.set(menu, {
+        autoAlpha: showMenu ? 1 : 0,
+        y: 0,
+        pointerEvents: showMenu ? "auto" : "none",
+      });
+      gsap.set(close, {
+        autoAlpha: showMenu ? 0 : 1,
+        y: 0,
+        pointerEvents: showMenu ? "none" : "auto",
+      });
+      return;
+    }
+
+    gsap.killTweensOf([menu, close]);
+
+    gsap
+      .timeline({ defaults: { ease: "power2.inOut" } })
+      .to(exiting, { autoAlpha: 0, y: -7, duration: 0.14, ease: "power2.in" }, 0)
+      .fromTo(
+        entering,
+        { autoAlpha: 0, y: 7 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.22,
+          ease: "power3.out",
+          pointerEvents: "auto",
+        },
+        0.06
+      )
+      .set(exiting, { pointerEvents: "none" }, 0);
+  }, [open]);
+
+  return (
+    <span
+      className="relative inline-block min-w-[2.85rem] overflow-hidden text-center leading-none"
+      aria-hidden
+    >
+      <span ref={menuRef} className="absolute inset-0 flex items-center justify-center">
+        Menu
+      </span>
+      <span ref={closeRef} className="absolute inset-0 flex items-center justify-center">
+        Close
+      </span>
+      <span className="invisible">Close</span>
+    </span>
+  );
 }
 
 export function Navigation() {
   const pathname = usePathname();
-  const menuWrapRef = useRef<HTMLDivElement>(null);
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
-  /** Skip closing on first mount; then close flyout on real client navigations (mobile). */
-  const prevPathnameForMenuRef = useRef<string | null>(null);
+  const { t } = useI18n();
+  const [menuOpen, setMenuOpen] = useState(false);
 
+  /* Nav links — translated, except Appointment and Reserve Now (English). */
+  const links = [
+    { href: "/", label: t.nav.home },
+    { href: "/about", label: t.nav.about },
+    { href: "/events", label: t.nav.events },
+    { href: "/menu", label: t.nav.menus },
+    { href: "/reserve", label: "Appointment" },
+  ];
+
+  const mobileLinks = [
+    { href: "/", label: t.nav.home },
+    { href: "/about", label: t.nav.about },
+    { href: "/events", label: t.nav.events },
+    { href: "/menu", label: t.nav.menus },
+    { href: "/reserve", label: "Appointment" },
+  ];
+  const menuRef = useRef<HTMLElement>(null);
+  const previousPathnameRef = useRef(pathname);
+  const hasAnimatedMenuRef = useRef(false);
+
+  /* Close the flyout on real client navigations. */
   useEffect(() => {
-    const navTextTargets = [
-      ...document.querySelectorAll<HTMLElement>(".roru-nav__pill"),
-      ...document.querySelectorAll<HTMLElement>(".roru-nav__menu-button"),
-    ];
-
-    const cleanups: Array<() => void> = [];
-
-    navTextTargets.forEach((el) => {
-      const label = el.querySelector<HTMLElement>(".roru-nav__label");
-      if (!label) return;
-
-      const originalText = label.textContent?.trim() ?? "";
-      if (!originalText) return;
-
-      el.setAttribute("data-text", originalText);
-
-      const measuredWidth = label.getBoundingClientRect().width;
-      label.style.width = `${measuredWidth}px`;
-
-      let hoverTween: gsap.core.Tween | null = null;
-
-      const onEnter = () => {
-        el.classList.add("is-hovered");
-        hoverTween?.kill();
-        hoverTween = scrambleLabel(label, originalText);
-      };
-
-      const onLeave = () => {
-        el.classList.remove("is-hovered");
-        hoverTween?.kill();
-        label.textContent = originalText;
-      };
-
-      el.addEventListener("mouseenter", onEnter);
-      el.addEventListener("mouseleave", onLeave);
-      cleanups.push(() => {
-        el.removeEventListener("mouseenter", onEnter);
-        el.removeEventListener("mouseleave", onLeave);
-        hoverTween?.kill();
-      });
-    });
-
-    return () => cleanups.forEach((fn) => fn());
+    if (previousPathnameRef.current === pathname) return;
+    previousPathnameRef.current = pathname;
+    const timeout = window.setTimeout(() => setMenuOpen(false), 0);
+    return () => window.clearTimeout(timeout);
   }, [pathname]);
 
+  /* RORU page transitions also dismiss the flyout. */
   useEffect(() => {
-    const wrapMaybe = menuWrapRef.current;
-    const btnMaybe = menuButtonRef.current;
-    if (!wrapMaybe || !btnMaybe) return;
+    function onTransitionStart() {
+      setMenuOpen(false);
+    }
+    window.addEventListener(PAGE_TRANSITION_START_EVENT, onTransitionStart);
+    return () =>
+      window.removeEventListener(PAGE_TRANSITION_START_EVENT, onTransitionStart);
+  }, []);
 
-    const wrap = wrapMaybe;
-    const btn = btnMaybe;
+  /* Flag the open state on <html> (lets the footer blur behind the menu). */
+  useEffect(() => {
+    document.documentElement.classList.toggle("roru-mobile-menu-open", menuOpen);
+    return () =>
+      document.documentElement.classList.remove("roru-mobile-menu-open");
+  }, [menuOpen]);
 
-    const menuItems = gsap.utils.toArray<HTMLElement>("#roru-menu-items .roru-nav__pill");
-    if (!menuItems.length) return;
+  /* Mobile flyout open/close: full-height panel fades in with staggered items. */
+  useLayoutEffect(() => {
+    const menu = menuRef.current;
+    if (!menu) return;
 
-    const mq = window.matchMedia("(min-width: 768px)");
+    const items = Array.from(
+      menu.querySelectorAll<HTMLElement>(".roru-mobile-menu-item")
+    );
 
-    function openMenu() {
-      wrap.classList.add("is-open");
-      btn.setAttribute("aria-expanded", "true");
-      gsap.killTweensOf(menuItems);
-      gsap.fromTo(
-        menuItems,
-        {
-          opacity: 0,
-          x: window.innerWidth <= 767 ? 0 : 12,
-          y: window.innerWidth <= 767 ? -8 : 0,
-        },
-        {
-          opacity: 1,
-          x: 0,
-          y: 0,
-          duration: 0.42,
-          ease: "power3.out",
-          stagger: 0.05,
-        }
-      );
+    if (!hasAnimatedMenuRef.current) {
+      hasAnimatedMenuRef.current = true;
+      gsap.set(menu, { autoAlpha: 0 });
+      gsap.set(items, { autoAlpha: 0, y: 10 });
+      return;
     }
 
-    function closeMenu() {
-      btn.setAttribute("aria-expanded", "false");
-      gsap.killTweensOf(menuItems);
-      gsap.to(menuItems, {
-        opacity: 0,
-        x: window.innerWidth <= 767 ? 0 : 8,
-        y: window.innerWidth <= 767 ? -6 : 0,
-        duration: 0.2,
-        ease: "power2.in",
-        stagger: { each: 0.03, from: "end" },
-        onComplete: () => {
-          wrap.classList.remove("is-open");
-        },
-      });
+    gsap.killTweensOf([menu, ...items]);
+
+    if (menuOpen) {
+      gsap
+        .timeline({ defaults: { ease: "power3.out" } })
+        .to(menu, { autoAlpha: 1, duration: 0.3 }, 0)
+        .fromTo(
+          items,
+          { autoAlpha: 0, y: 10 },
+          { autoAlpha: 1, y: 0, duration: 0.34, stagger: 0.05 },
+          0.06
+        );
+      return;
     }
 
-    function setMenu(next: boolean) {
-      const isOpen = wrap.classList.contains("is-open");
-      if (next === isOpen) return;
-      if (next) openMenu();
-      else closeMenu();
-    }
+    gsap
+      .timeline({ defaults: { ease: "power2.inOut" } })
+      .to(items, { autoAlpha: 0, y: 8, duration: 0.16, stagger: 0.02 }, 0)
+      .to(menu, { autoAlpha: 0, duration: 0.26 }, 0.06);
+  }, [menuOpen]);
 
-    function onMenuClick() {
-      setMenu(!wrap.classList.contains("is-open"));
-    }
-
-    function onDocClick(e: MouseEvent) {
-      if (!wrap.contains(e.target as Node)) {
-        setMenu(false);
-      }
-    }
-
-    function onResize() {
-      if (mq.matches) return;
-      if (!wrap.classList.contains("is-open")) {
-        gsap.set(menuItems, {
-          opacity: 0,
-          x: window.innerWidth <= 767 ? 0 : 12,
-          y: window.innerWidth <= 767 ? -8 : 0,
-        });
-      }
-    }
-
-    function unbindMobile() {
-      btn.removeEventListener("click", onMenuClick);
-      document.removeEventListener("click", onDocClick);
-      window.removeEventListener("resize", onResize);
-    }
-
-    function bindMobile() {
-      btn.addEventListener("click", onMenuClick);
-      document.addEventListener("click", onDocClick);
-      window.addEventListener("resize", onResize);
-    }
-
-    function applyForMode() {
-      unbindMobile();
-      if (mq.matches) {
-        wrap.classList.remove("is-open");
-        btn.setAttribute("aria-expanded", "false");
-        gsap.killTweensOf(menuItems);
-        gsap.set(menuItems, { opacity: 1, x: 0, y: 0 });
-      } else {
-        bindMobile();
-        if (!wrap.classList.contains("is-open")) {
-          gsap.set(menuItems, {
-            opacity: 0,
-            x: window.innerWidth <= 767 ? 0 : 12,
-            y: window.innerWidth <= 767 ? -8 : 0,
-          });
-        }
-      }
-    }
-
-    mq.addEventListener("change", applyForMode);
-    applyForMode();
-
-    function onScrollCloseMenu() {
-      if (mq.matches) return;
-      if (!wrap.classList.contains("is-open")) return;
-      closeMenu();
-    }
-    window.addEventListener("scroll", onScrollCloseMenu, { passive: true });
-
-    function onPageTransitionStart() {
-      if (mq.matches) return;
-      if (!wrap.classList.contains("is-open")) return;
-      closeMenu();
-    }
-    window.addEventListener(PAGE_TRANSITION_START_EVENT, onPageTransitionStart);
-
-    if (!mq.matches) {
-      const prev = prevPathnameForMenuRef.current;
-      if (prev !== null && prev !== pathname && wrap.classList.contains("is-open")) {
-        closeMenu();
-      }
-      prevPathnameForMenuRef.current = pathname;
-    } else {
-      prevPathnameForMenuRef.current = pathname;
-    }
-
-    return () => {
-      window.removeEventListener("scroll", onScrollCloseMenu);
-      window.removeEventListener(PAGE_TRANSITION_START_EVENT, onPageTransitionStart);
-      mq.removeEventListener("change", applyForMode);
-      unbindMobile();
-    };
-  }, [pathname]);
+  /* Brand centered on desktop, left on mobile — matches WSSC layout. */
+  const brandPositionClassName =
+    "block shrink-0 min-[1032px]:absolute min-[1032px]:top-1/2 min-[1032px]:left-1/2 min-[1032px]:-translate-x-1/2 min-[1032px]:-translate-y-1/2";
 
   return (
     <>
-      <nav className="roru-nav" id="roru-nav" aria-label="Main">
-        <div className="roru-nav__left">
-          <div className="roru-nav__pill roru-nav__accent-pill roru-nav__pill--plain max-w-full min-w-0">
-            <HongKongClock />
-          </div>
-        </div>
+      <header
+        className="roru-nav m-0 h-16 w-full p-0 sm:h-20"
+        id="roru-nav"
+        aria-label="Main"
+      >
+        <div className="relative h-full w-full">
+          <div className="relative grid h-full w-full grid-cols-[1fr_auto_1fr] items-center px-[var(--roru-section-pad-x)] min-[1032px]:flex min-[1032px]:justify-normal">
+            {/* Left: mobile menu toggle / desktop nav links */}
+            <div className="flex min-w-0 items-center justify-start min-[1032px]:flex-1">
+              <button
+                type="button"
+                className="roru-nav-item inline-flex shrink-0 items-center justify-center overflow-hidden px-0 py-2 text-xs font-bold uppercase text-[var(--text)] transition-opacity hover:opacity-70 min-[1032px]:hidden"
+                aria-controls="roru-mobile-menu"
+                aria-expanded={menuOpen}
+                aria-label={menuOpen ? "Close menu" : "Menu"}
+                onClick={() => setMenuOpen((open) => !open)}
+              >
+                <MenuToggleLabel open={menuOpen} />
+              </button>
 
-        <div className="roru-nav__right">
-          <div className="roru-nav__menu-wrap" id="roru-menu-wrap" ref={menuWrapRef}>
-            <div className="roru-nav__menu-items" id="roru-menu-items">
+              <nav
+                className="hidden flex-wrap items-center justify-start gap-x-3 gap-y-1 min-[1032px]:flex min-[1032px]:gap-x-4"
+                aria-label="Primary"
+              >
+                {links.map(({ href, label }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    aria-current={isActiveRoute(pathname, href) ? "page" : undefined}
+                    className="roru-nav-item text-xs font-bold uppercase text-[var(--text)] transition-opacity hover:opacity-70"
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+
+            {/* Center: brand */}
+            <div className={`justify-self-center ${brandPositionClassName}`}>
               <Link
                 href="/"
-                className="roru-nav__pill"
-                aria-current={pathname === "/" ? "page" : undefined}
+                className="roru-nav-item block leading-none text-[var(--text)]"
+                aria-label="RORUBARU home"
               >
-                <span className="roru-nav__label">Home</span>
-              </Link>
-              <Link
-                href="/about"
-                className="roru-nav__pill"
-                aria-current={pathname === "/about" ? "page" : undefined}
-              >
-                <span className="roru-nav__label">About</span>
+                <NavLogo />
               </Link>
             </div>
 
-            <button
-              type="button"
-              className="roru-nav__menu-button"
-              id="roru-menu-button"
-              aria-expanded="false"
-              aria-controls="roru-menu-items"
-              ref={menuButtonRef}
-            >
-              <span className="roru-nav__label">Menu</span>
-            </button>
-
-            <a
-              href={TOCK_URL}
-              className="roru-nav__pill max-md:hidden"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <span className="roru-nav__label">Reserve now</span>
-            </a>
+            {/* Right: language toggle (desktop only) + reserve */}
+            <div className="flex items-center justify-end gap-2 min-[1032px]:flex-1 sm:gap-3">
+              <LanguageToggle className="hidden min-[1032px]:inline-flex" />
+              <a
+                href={TOCK_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="roru-nav-item shrink-0 px-0 py-2 text-xs font-bold uppercase text-[var(--text)] transition-opacity hover:opacity-70"
+              >
+                Reserve Now
+              </a>
+            </div>
           </div>
-        </div>
-      </nav>
 
-      <div
-        className="roru-nav-bottom"
-        id="roru-nav-bottom"
-        role="complementary"
-        aria-label="Location, brand, and reservation"
-      >
-        <a
-          className="roru-nav__pill roru-nav__accent-pill roru-nav__pill--plain roru-nav-bottom__address hidden md:inline-flex"
-          href={SITE_MAP_URL}
-          target="_blank"
-          rel="noreferrer"
-          title={SITE_ADDRESS_DOCK_LINE}
-        >
-          <span className="block min-w-0 max-w-[min(90vw,640px)] overflow-hidden text-ellipsis whitespace-nowrap text-left text-[9px] sm:text-[10px]">
-            {SITE_ADDRESS_DOCK_LINE}
-          </span>
-        </a>
-        <div
-          className="roru-nav__pill roru-nav__accent-pill roru-nav__pill--plain roru-nav-bottom__brand normal-case hidden md:flex"
-          aria-label="RORUBARU"
-        >
-          <span className="whitespace-nowrap text-[10px] tracking-[0.14em] sm:text-[11px]">
-            RORUBARU
-          </span>
+          {/* Mobile flyout — full-height panel: links centred, language toggle pinned bottom */}
+          <nav
+            ref={menuRef}
+            id="roru-mobile-menu"
+            className={`absolute top-full right-0 left-0 z-[45] h-[calc(100dvh-4rem)] overflow-hidden bg-transparent px-[var(--roru-section-pad-x)] sm:h-[calc(100dvh-5rem)] min-[1032px]:hidden ${
+              menuOpen ? "pointer-events-auto" : "pointer-events-none"
+            }`}
+            aria-label="Mobile"
+            aria-hidden={!menuOpen}
+          >
+            <div className="relative flex h-full flex-col items-center justify-center gap-2">
+              {mobileLinks.map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  aria-current={isActiveRoute(pathname, href) ? "page" : undefined}
+                  className="roru-mobile-menu-item block rounded-lg px-6 py-3 text-center text-base font-bold uppercase text-[var(--text)] transition-opacity hover:opacity-70"
+                >
+                  {label}
+                </Link>
+              ))}
+              <div className="roru-mobile-menu-item absolute right-0 bottom-[9vh] left-0 flex justify-center">
+                <LanguageToggle />
+              </div>
+            </div>
+          </nav>
         </div>
-        <a
-          href={TOCK_URL}
-          className="roru-nav__pill roru-nav-bottom__reserve flex md:hidden"
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Reserve a table"
-        >
-          <span className="roru-nav__label">Reserve now</span>
-        </a>
-      </div>
+      </header>
+
+      <button
+        type="button"
+        aria-label="Close menu"
+        onClick={() => setMenuOpen(false)}
+        className={`fixed inset-0 z-[998] bg-[color:color-mix(in_srgb,var(--surface)_82%,transparent)] backdrop-blur-3xl transition duration-300 min-[1032px]:hidden ${
+          menuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      />
     </>
   );
 }

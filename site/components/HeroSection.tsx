@@ -1,26 +1,25 @@
 "use client";
 
 import gsap from "gsap";
-import { useEffect, useRef } from "react";
+import Image from "next/image";
+import { useLayoutEffect, useRef } from "react";
+import { HOME_HERO_IMAGES } from "@/lib/content";
+import { useI18n } from "@/lib/i18n";
 
-const TITLE_A = "HONG KONG'S";
-const TITLE_B_FIRST = "ORIGINAL";
-const TITLE_B_REST = "HAND ROLL BAR";
-const HIGHLIGHT =
-  "ROLLED TO ORDER…SERVED AT ITS FRESHEST";
-const BODY =
-  "Hand rolls done right: premium ingredients, perfectly seasoned rice and nori flown in from Japan that's crisp to the bite. Grounded in tradition but never afraid to push boundaries, our menu is inspired by the flavours of our city and beyond. Take a seat and watch our chefs at work, as each roll is made to order and served fresh off the bar, ready to be enjoyed at its best.";
-
-function WordSpans({ text }: { text: string }) {
-  const words = text.split(/\s+/);
+/** Renders the tagline as two lines, each line's words wrapped for the reveal animation. */
+function TaglineLines({ lines }: { lines: readonly [string, string] }) {
   return (
     <>
-      {words.map((w, i) => (
-        <span key={`${w}-${i}`}>
-          {i > 0 ? " " : null}
-          <span className="word-wrap">
-            <span className="word">{w}</span>
-          </span>
+      {lines.map((line, li) => (
+        <span key={li} className="block">
+          {line.split(/\s+/).map((w, wi) => (
+            <span key={`${w}-${wi}`}>
+              {wi > 0 ? " " : null}
+              <span className="word-wrap">
+                <span className="word">{w}</span>
+              </span>
+            </span>
+          ))}
         </span>
       ))}
     </>
@@ -28,107 +27,136 @@ function WordSpans({ text }: { text: string }) {
 }
 
 export function HeroSection() {
+  const { t } = useI18n();
   const rootRef = useRef<HTMLElement>(null);
-  const ranRef = useRef(false);
+  const playedRef = useRef(false);
 
-  useEffect(() => {
-    function runAnimations() {
-      if (ranRef.current) return;
-      const root = rootRef.current;
-      if (!root) return;
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
 
-      const titles = root.querySelectorAll(".roru-hero__title");
-      const text = root.querySelector(".roru-hero__text");
-      if (!titles.length || !text) return;
+    const titleNode = root.querySelector<HTMLElement>(".roru-hero__title");
+    if (!titleNode) return;
+    const title: HTMLElement = titleNode;
 
-      titles.forEach((title) => {
-        gsap.set(title, { visibility: "visible" });
-        const words = title.querySelectorAll(".word");
-        gsap.set(words, { yPercent: 120, opacity: 0 });
-        gsap.to(words, {
-          yPercent: 0,
-          opacity: 1,
-          duration: 0.9,
-          ease: "expo.out",
-          stagger: 0.18,
-        });
+    const words = gsap.utils.toArray<HTMLElement>(".word", title);
+    if (!words.length) {
+      title.style.removeProperty("visibility");
+      return;
+    }
+
+    /** Lock the words to their visible resting state. The `.is-revealed` class hands the
+     *  final state to CSS so clearing the inline styles can't re-clip the words. */
+    function settle() {
+      gsap.killTweensOf([title, ...words]);
+      gsap.set([title, ...words], { clearProps: "all" });
+      title.classList.add("is-revealed");
+    }
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Pre-hide the title, THEN reveal visibility so there is never a flash before the fade-in.
+    if (!reduced) {
+      gsap.set(title, { opacity: 0 });
+      gsap.set(words, { opacity: 0 });
+    }
+    title.style.removeProperty("visibility");
+
+    if (reduced) {
+      settle();
+      return;
+    }
+
+    function play(instant = false) {
+      if (playedRef.current) return;
+      playedRef.current = true;
+
+      const tl = gsap.timeline({
+        onComplete: settle,
+        defaults: { ease: "power2.out", overwrite: "auto" },
       });
 
-      gsap.set(text, { visibility: "visible" });
-      const highlightWords = text.querySelectorAll(".roru-hero__HighlightText .word");
-      const bodyWords = text.querySelectorAll(".roru-hero__body .word");
-      gsap.set([...highlightWords, ...bodyWords], { yPercent: 120, opacity: 0 });
-
-      const tl = gsap.timeline();
-      tl.to(highlightWords, {
-        yPercent: 0,
-        opacity: 1,
-        duration: 0.8,
-        ease: "expo.out",
-        stagger: 0.08,
-      }).to(
-        bodyWords,
+      tl.fromTo(
+        title,
+        { opacity: 0 },
+        { opacity: 1, duration: instant ? 0.5 : 0.85 },
+        0
+      ).fromTo(
+        words,
+        { opacity: 0 },
         {
-          yPercent: 0,
           opacity: 1,
-          duration: 0.8,
-          ease: "expo.out",
+          duration: instant ? 0.45 : 0.7,
+          stagger: 0.12,
         },
-        "-=0.2"
+        instant ? 0.08 : 0.18
       );
-
-      ranRef.current = true;
     }
 
-    function onHero(e: Event) {
-      const ce = e as CustomEvent<{ instant?: boolean }>;
-      if (ce.detail?.instant) {
-        runAnimations();
-      } else {
-        setTimeout(() => runAnimations(), 80);
-      }
-    }
+    const loaderActive = () =>
+      document.documentElement.classList.contains("roru-loading") ||
+      document.documentElement.classList.contains("roru-preload");
 
+    function onHero(event: Event) {
+      const instant = (event as CustomEvent<{ instant?: boolean }>).detail?.instant;
+      play(Boolean(instant));
+    }
     window.addEventListener("roru:hero-animate", onHero as EventListener);
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      const root = rootRef.current;
-      if (root) {
-        root.querySelectorAll(".roru-hero__title, .roru-hero__text").forEach((el) => {
-          (el as HTMLElement).style.visibility = "visible";
-        });
-      }
+    // Play as soon as the intro loader is gone — don't depend solely on the (slower, sometimes
+    // missed) home-reveal event chain, which is what caused the pop-then-replay flicker.
+    let observer: MutationObserver | null = null;
+    if (loaderActive()) {
+      observer = new MutationObserver(() => {
+        if (!loaderActive()) {
+          observer?.disconnect();
+          observer = null;
+          play(true);
+        }
+      });
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+    } else {
+      play(false);
     }
 
-    return () => window.removeEventListener("roru:hero-animate", onHero as EventListener);
+    /* Backstop: PLAY (never pop) if nothing else triggered the entrance. */
+    const safety = window.setTimeout(() => play(false), 2500);
+
+    return () => {
+      window.removeEventListener("roru:hero-animate", onHero as EventListener);
+      window.clearTimeout(safety);
+      observer?.disconnect();
+    };
   }, []);
 
   return (
-    <section className="roru-hero section-surface text-[var(--text)]" ref={rootRef}>
-      <div className="homepage-reveal roru-hero__reveal w-full min-h-0">
-        <div className="roru-hero__grid grid min-h-[100vh] grid-cols-6 items-start gap-x-[9px] gap-y-[9px] max-md:gap-y-5 px-[2vw] pb-[2vw]">
-          <div className="roru__heroWrap col-span-6">
-            <h1 className="roru-hero__title m-0 text-[clamp(44px,7.2vw,116px)] font-extralight uppercase leading-[0.95] tracking-[-0.03em] text-[var(--accent)]">
-              <WordSpans text={TITLE_A} />
-            </h1>
-            <h1 className="roru-hero__title m-0 text-[clamp(44px,7.2vw,116px)] font-extralight uppercase leading-[0.95] tracking-[-0.03em] text-[var(--accent)]">
-              <WordSpans text={TITLE_B_FIRST} />
-              <span className="hidden md:inline" aria-hidden="true">
-                {" "}
-              </span>
-              <br className="md:hidden" aria-hidden="true" />
-              <WordSpans text={TITLE_B_REST} />
-            </h1>
-          </div>
-          <p className="roru-hero__text col-span-6 m-0 max-w-none text-[clamp(22px,3vw,62px)] font-extralight leading-[1.08] tracking-[0.03em] text-[var(--text)]">
-            <span className="roru-hero__HighlightText font-semibold uppercase">
-              <WordSpans text={HIGHLIGHT} />
-            </span>
-            <br />
-            <span className="roru-hero__body">
-              <WordSpans text={BODY} />
-            </span>
-          </p>
+    <section className="roru-hero roru-hero--ysl section-surface" ref={rootRef}>
+      <div className="homepage-reveal roru-hero__reveal">
+        <div className="roru-hero__media">
+          <Image
+            src={HOME_HERO_IMAGES.desktop}
+            alt=""
+            fill
+            priority
+            sizes="(max-width: 767px) 0px, 100vw"
+            className="roru-hero__media-img roru-hero__media-img--desktop"
+          />
+          <Image
+            src={HOME_HERO_IMAGES.mobile}
+            alt=""
+            fill
+            priority
+            sizes="(max-width: 767px) 100vw, 0px"
+            className="roru-hero__media-img roru-hero__media-img--mobile"
+          />
+        </div>
+        <div className="roru-hero__center">
+          <h1 className="roru-hero__title">
+            <TaglineLines lines={t.heroTagline} />
+          </h1>
         </div>
       </div>
     </section>

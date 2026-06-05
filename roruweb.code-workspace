@@ -1,0 +1,25 @@
+{
+  "folders": [
+    {
+      "name": "roruweb (site)",
+      "path": "site"
+    },
+    {
+      "name": "roruweb (repo root)",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "typescript.tsdk": "site/node_modules/typescript/lib",
+    "eslint.workingDirectories": [
+      { "directory": "site", "changeProcessCWD": true }
+    ],
+    "tailwindCSS.experimental.configFile": "site/tailwind.config.ts",
+    "css.lint.unknownAtRules": "ignore",
+    "files.exclude": {
+      "**/.next": true,
+      "**/node_modules": true,
+      "**/*.tsbuildinfo": true
+    }
+  }
+}

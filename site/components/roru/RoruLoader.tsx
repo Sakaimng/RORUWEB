@@ -2,9 +2,11 @@
 
 import gsap from "gsap";
 import { useEffect, useRef } from "react";
+import { afterReactHydration } from "@/lib/after-react-hydration";
 import { PATH_LINE_BOTTOM, PATH_LINE_TOP } from "@/lib/footer-logo-paths";
-import { runPostLoaderSequence, setupNavScrollLogic } from "@/lib/home-entrance";
-import { INTERNAL_NAV_KEY, SITE_ENTERED_KEY } from "@/lib/roru-session";
+import { runPostLoaderSequence, setupNavScrollLogic, applyNavEntranceInitial } from "@/lib/home-entrance";
+import { isMenuPath } from "@/lib/roru-path";
+import { INTERNAL_NAV_KEY, SITE_ENTERED_KEY, TRANSITION_PENDING_KEY } from "@/lib/roru-session";
 
 function getNavigationType(): string {
   if (typeof performance === "undefined") return "navigate";
@@ -34,11 +36,13 @@ function revealWithoutLoader(shouldAnimateNav: boolean) {
 
   if (loader) loader.remove();
 
-  document.querySelectorAll(".roru-hero__title, .roru-hero__text").forEach((el) => {
-    (el as HTMLElement).style.visibility = "hidden";
-  });
-
-  runPostLoaderSequence(shouldAnimateNav, false);
+  try {
+    if (sessionStorage.getItem(TRANSITION_PENDING_KEY) !== "1") {
+      runPostLoaderSequence(shouldAnimateNav, false);
+    }
+  } catch {
+    runPostLoaderSequence(shouldAnimateNav, false);
+  }
 }
 
 function LoaderLogoSvg() {
@@ -91,20 +95,21 @@ export function RoruLoader() {
 
   useEffect(() => {
     if (ranRef.current) return;
+
+    let cancelled = false;
+
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       document.documentElement.classList.remove("roru-preload");
+      document.querySelectorAll(".homepage-reveal:not(#roru-nav)").forEach((el) => {
+        el.classList.add("homepage-reveal--settled");
+      });
       document.querySelectorAll(".roru-hero__title, .roru-hero__text").forEach((el) => {
         (el as HTMLElement).style.visibility = "visible";
       });
       const nav = document.getElementById("roru-nav");
       const navBottom = document.getElementById("roru-nav-bottom");
       if (nav) {
-        gsap.set(nav, {
-          autoAlpha: 1,
-          y: 0,
-          pointerEvents: "auto",
-          clearProps: "transform",
-        });
+        applyNavEntranceInitial(nav, false);
         setupNavScrollLogic(nav);
       }
       if (navBottom) {
@@ -128,167 +133,179 @@ export function RoruLoader() {
     const hasEnteredSite = sessionStorage.getItem(SITE_ENTERED_KEY) === "1";
     const isInternalNavigation = sessionStorage.getItem(INTERNAL_NAV_KEY) === "1";
     const isReload = getNavigationType() === "reload";
+    const skipLoaderOnReload = isReload && isMenuPath();
 
-    const shouldRunLoader = !isInternalNavigation && (!hasEnteredSite || isReload);
+    const shouldRunLoader =
+      !isInternalNavigation && !skipLoaderOnReload && (!hasEnteredSite || isReload);
     const shouldAnimateNav = !isInternalNavigation && (!hasEnteredSite || isReload);
 
     if (!shouldRunLoader) {
-      revealWithoutLoader(shouldAnimateNav);
-      ranRef.current = true;
-      return;
-    }
-
-    const wrap = innerRef.current;
-    if (!wrap) return;
-
-    const loader = document.getElementById("roru-loader");
-    const loaderSvg = document.getElementById("roru-loader-logo");
-    const riseRect = document.getElementById("roru-loader-rise-rect");
-    const strokeRoot = wrap.querySelector("#roru-loader-strokes");
-    const topStrokes = gsap.utils.toArray<SVGPathElement>(
-      "#roru-loader-line-top .roru-loader-logo__stroke",
-      wrap
-    );
-    const bottomStrokes = gsap.utils.toArray<SVGPathElement>(
-      "#roru-loader-line-bottom .roru-loader-logo__stroke",
-      wrap
-    );
-    const revealItems = document.querySelectorAll(".homepage-reveal:not(#roru-nav)");
-    const nav = document.getElementById("roru-nav");
-    const navBottom = document.getElementById("roru-nav-bottom");
-
-    if (
-      !loader ||
-      !loaderSvg ||
-      !riseRect ||
-      !strokeRoot ||
-      !topStrokes.length ||
-      !bottomStrokes.length
-    ) {
-      revealWithoutLoader(shouldAnimateNav);
-      ranRef.current = true;
-      return;
-    }
-
-    document.documentElement.classList.add("roru-loading");
-    document.body.classList.add("roru-loading");
-
-    [...topStrokes, ...bottomStrokes].forEach((path) => {
-      const len = path.getTotalLength();
-      gsap.set(path, {
-        strokeDasharray: len,
-        strokeDashoffset: len,
+      afterReactHydration(() => {
+        if (cancelled || ranRef.current) return;
+        revealWithoutLoader(shouldAnimateNav);
+        ranRef.current = true;
       });
-    });
-
-    gsap.set(revealItems, { opacity: 0, y: 24 });
-    gsap.set(wrap, {
-      scale: 0.94,
-      transformOrigin: "50% 50%",
-    });
-    gsap.set(loaderSvg, { autoAlpha: 0 });
-
-    if (nav) {
-      gsap.set(nav, {
-        autoAlpha: 0,
-        y: -12,
-        pointerEvents: "none",
-      });
-    }
-    if (navBottom) {
-      gsap.set(navBottom, {
-        autoAlpha: 0,
-        y: 12,
-      });
+      return () => {
+        cancelled = true;
+      };
     }
 
-    requestAnimationFrame(() => {
-      const logoWrap = innerRef.current;
-      const loaderEl = document.getElementById("roru-loader");
-      if (!logoWrap || !loaderEl) {
-        revealWithoutLoader(true);
+    afterReactHydration(() => {
+      if (cancelled || ranRef.current) return;
+
+      const wrap = innerRef.current;
+      const loader = document.getElementById("roru-loader");
+      const loaderSvg = document.getElementById("roru-loader-logo");
+      const riseRect = document.getElementById("roru-loader-rise-rect");
+      if (!wrap) {
+        revealWithoutLoader(shouldAnimateNav);
+        ranRef.current = true;
+        return;
+      }
+      const strokeRoot = wrap.querySelector("#roru-loader-strokes");
+      const topStrokes = gsap.utils.toArray<SVGPathElement>(
+        "#roru-loader-line-top .roru-loader-logo__stroke",
+        wrap
+      );
+      const bottomStrokes = gsap.utils.toArray<SVGPathElement>(
+        "#roru-loader-line-bottom .roru-loader-logo__stroke",
+        wrap
+      );
+      const nav = document.getElementById("roru-nav");
+      const navBottom = document.getElementById("roru-nav-bottom");
+
+      if (
+        !loader ||
+        !loaderSvg ||
+        !riseRect ||
+        !strokeRoot ||
+        !topStrokes.length ||
+        !bottomStrokes.length
+      ) {
+        revealWithoutLoader(shouldAnimateNav);
         ranRef.current = true;
         return;
       }
 
-      document.documentElement.classList.remove("roru-preload");
+      document.documentElement.classList.add("roru-loading");
+      document.body.classList.add("roru-loading");
 
-      const tl = gsap.timeline();
-
-      tl.to(loaderSvg, {
-        autoAlpha: 1,
-        duration: 0.48,
-        ease: "power2.out",
-      })
-        .to(
-          topStrokes,
-          {
-            strokeDashoffset: 0,
-            duration: 0.74,
-            stagger: 0.058,
-            ease: "power2.inOut",
-          },
-          ">"
-        )
-        .to(
-          bottomStrokes,
-          {
-            strokeDashoffset: 0,
-            duration: 0.74,
-            stagger: 0.058,
-            ease: "power2.inOut",
-          },
-          "<0.09"
-        )
-        .to(
-          strokeRoot,
-          {
-            opacity: 0,
-            duration: 0.12,
-            ease: "power2.in",
-          },
-          ">-0.06"
-        )
-        .to(
-          riseRect,
-          {
-            attr: { y: 0, height: 136 },
-            duration: 0.65,
-            ease: "power3.out",
-          },
-          "<0.04"
-        )
-        .to(
-          logoWrap,
-          {
-            scale: 1,
-            duration: 0.58,
-            ease: "expo.out",
-          },
-          "<"
-        )
-        .set(loaderEl, {
-          clipPath: "inset(0% 0% 0% 0%)",
-          pointerEvents: "none",
-        })
-        .to(
-          loaderEl,
-          {
-            clipPath: "inset(0% 0% 100% 0%)",
-            duration: 0.82,
-            ease: "power3.inOut",
-          },
-          "+=0.12"
-        )
-        .add(() => {
-          loaderEl.remove();
-          document.documentElement.classList.remove("roru-loading");
-          document.body.classList.remove("roru-loading");
-          runPostLoaderSequence(true, true);
+      [...topStrokes, ...bottomStrokes].forEach((path) => {
+        const len = path.getTotalLength();
+        gsap.set(path, {
+          strokeDasharray: len,
+          strokeDashoffset: len,
         });
+      });
+      gsap.set(wrap, {
+        scale: 0.94,
+        transformOrigin: "50% 50%",
+      });
+      gsap.set(loaderSvg, { autoAlpha: 0 });
 
-      ranRef.current = true;
+      if (nav) {
+        applyNavEntranceInitial(nav, true);
+      }
+      if (navBottom) {
+        gsap.set(navBottom, {
+          autoAlpha: 0,
+          y: 12,
+        });
+      }
+
+      requestAnimationFrame(() => {
+        if (cancelled) return;
+        const logoWrap = innerRef.current;
+        const loaderEl = document.getElementById("roru-loader");
+        if (!logoWrap || !loaderEl) {
+          revealWithoutLoader(true);
+          ranRef.current = true;
+          return;
+        }
+
+        document.documentElement.classList.remove("roru-preload");
+
+        const tl = gsap.timeline();
+
+        tl.to(loaderSvg, {
+          autoAlpha: 1,
+          duration: 0.48,
+          ease: "power2.out",
+        })
+          .to(
+            topStrokes,
+            {
+              strokeDashoffset: 0,
+              duration: 0.74,
+              stagger: 0.058,
+              ease: "power2.inOut",
+            },
+            ">"
+          )
+          .to(
+            bottomStrokes,
+            {
+              strokeDashoffset: 0,
+              duration: 0.74,
+              stagger: 0.058,
+              ease: "power2.inOut",
+            },
+            "<0.09"
+          )
+          .to(
+            strokeRoot,
+            {
+              opacity: 0,
+              duration: 0.12,
+              ease: "power2.in",
+            },
+            ">-0.06"
+          )
+          .to(
+            riseRect,
+            {
+              attr: { y: 0, height: 136 },
+              duration: 0.65,
+              ease: "power3.out",
+            },
+            "<0.04"
+          )
+          .to(
+            logoWrap,
+            {
+              scale: 1,
+              duration: 0.58,
+              ease: "expo.out",
+            },
+            "<"
+          )
+          .set(loaderEl, {
+            clipPath: "inset(0% 0% 0% 0%)",
+            pointerEvents: "none",
+          })
+          .to(
+            loaderEl,
+            {
+              clipPath: "inset(0% 0% 100% 0%)",
+              duration: 0.82,
+              ease: "power3.inOut",
+            },
+            "+=0.12"
+          )
+          .add(() => {
+            loaderEl.remove();
+            document.documentElement.classList.remove("roru-loading");
+            document.body.classList.remove("roru-loading");
+            runPostLoaderSequence(true, true);
+          });
+
+        ranRef.current = true;
+      });
     });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (

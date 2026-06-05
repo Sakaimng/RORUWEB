@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import { EVENTS, type SiteEvent } from "@/lib/content";
 import { hkDateKey } from "@/lib/hk-date";
+import { useI18n } from "@/lib/i18n";
 
 function isEventPast(e: SiteEvent, today: string): boolean {
   const parts = e.eventDate.split(/[,\s]+/).map((s) => s.trim());
@@ -13,6 +14,7 @@ function isEventPast(e: SiteEvent, today: string): boolean {
 }
 
 export function EventsSection() {
+  const { t } = useI18n();
   const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
   const today = hkDateKey();
 
@@ -35,11 +37,11 @@ export function EventsSection() {
   const items = tab === "past" ? lists.past : lists.upcoming;
 
   return (
-    <section className="roru-events-section homepage-reveal section-surface border-t border-[color:rgba(245,69,0,0.2)]">
-      <div className="roru-events-grid grid min-h-screen grid-cols-6 items-end gap-[9px] px-[2vw] py-[min(8vh,80px)] text-[var(--text)]">
-        <div className="roru-events-heading col-span-6">
+    <section className="roru-events-section section-surface">
+      <div className="roru-events-grid grid min-h-screen grid-cols-6 items-end gap-[9px] text-[var(--text)]">
+        <div className="roru-events-heading col-span-6" data-roru-reveal="up">
           <h2 className="m-0 text-left text-[clamp(48px,7vw,132px)] font-thin uppercase leading-[0.82] tracking-[0.03em] indent-[-0.3%]">
-            Events
+            {t.events.heading}
           </h2>
         </div>
 
@@ -51,7 +53,7 @@ export function EventsSection() {
             }`}
             onClick={() => setTab("upcoming")}
           >
-            Upcoming
+            {t.events.upcoming}
           </button>
           <button
             type="button"
@@ -60,11 +62,11 @@ export function EventsSection() {
             }`}
             onClick={() => setTab("past")}
           >
-            Past
+            {t.events.past}
           </button>
         </div>
 
-        <div className="roru-events-list col-span-6 grid grid-cols-6 gap-[9px]">
+        <div className="roru-events-list col-span-6 grid grid-cols-6 gap-[9px]" data-roru-stagger>
           {items.length === 0 ? (
             <Empty tab={tab} />
           ) : (
@@ -77,22 +79,21 @@ export function EventsSection() {
 }
 
 function Empty({ tab }: { tab: "upcoming" | "past" }) {
+  const { t } = useI18n();
   return (
-    <article className="roru-event-card col-span-6 grid min-h-[280px] grid-cols-1 gap-[9px] border-t border-[color:rgba(245,69,0,0.36)] pt-[18px] md:min-h-[320px] md:grid-cols-6">
+    <article className="roru-event-card col-span-6 grid min-h-[280px] grid-cols-1 gap-[9px] border-t border-[color:rgba(245,69,0,0.36)] pt-[18px] md:min-h-[320px] md:grid-cols-6" data-roru-stagger-item>
       <div className="roru-event-card__meta col-span-6 flex flex-col gap-2.5">
-        <div className="text-sm text-[var(--text)] opacity-70">Archive</div>
+        <div className="text-sm text-[var(--text)] opacity-70">{t.events.archive}</div>
         <div className="text-sm text-[var(--text)] opacity-70">
-          {tab === "past" ? "Past" : "Upcoming"}
+          {tab === "past" ? t.events.past : t.events.upcoming}
         </div>
       </div>
       <div className="roru-event-card__wrap col-span-6">
         <h3 className="roru-event-card__title mt-[6vh] text-[clamp(24px,2.2vw,42px)] font-light leading-[0.96] text-[var(--text)]">
-          {tab === "past" ? "No Past Events Yet" : "More Events Soon"}
+          {tab === "past" ? t.events.emptyPastTitle : t.events.emptyUpcomingTitle}
         </h3>
         <p className="roru-event-card__desc mt-2 text-[clamp(14px,1vw,18px)] leading-snug text-[var(--text)] opacity-80">
-          {tab === "past"
-            ? "Past events will appear here once the archive is ready."
-            : "Upcoming events will appear here once the next programme is announced."}
+          {tab === "past" ? t.events.emptyPastDesc : t.events.emptyUpcomingDesc}
         </p>
       </div>
     </article>
@@ -100,14 +101,15 @@ function Empty({ tab }: { tab: "upcoming" | "past" }) {
 }
 
 function EventCard({ event }: { event: SiteEvent }) {
+  const { t } = useI18n();
   return (
-    <article className="roru-event-card col-span-6 grid min-h-[280px] grid-cols-1 gap-4 border-t border-[color:rgba(245,69,0,0.36)] pt-[18px] md:min-h-[320px] md:grid-cols-6 md:gap-[9px]">
+    <article className="roru-event-card col-span-6 grid min-h-[280px] grid-cols-1 gap-4 border-t border-[color:rgba(245,69,0,0.36)] pt-[18px] md:min-h-[320px] md:grid-cols-6 md:gap-[9px]" data-roru-stagger-item>
       <div className="roru-event-card__meta col-span-6 flex flex-col gap-2.5">
         <div className="roru-event-card__date text-sm text-[var(--text)] opacity-70">
           {event.date}
         </div>
         <div className="roru-event-card__status text-sm text-[var(--text)] opacity-70">
-          {event.status}
+          {event.status === "Past" ? t.events.past : t.events.upcoming}
         </div>
       </div>
 
@@ -122,11 +124,11 @@ function EventCard({ event }: { event: SiteEvent }) {
           {event.link !== "#" && (
             <a
               href={event.link}
-              className="roru-event-card__link mt-8 inline-block text-sm uppercase leading-none tracking-[0.06em] text-[var(--accent)]"
+              className="roru-event-card__link mt-8 inline-block text-sm uppercase leading-none tracking-[0.06em] text-[var(--text)]"
               target="_blank"
               rel="noreferrer"
             >
-              Details
+              {t.events.details}
             </a>
           )}
         </div>

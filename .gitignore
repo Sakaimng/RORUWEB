@@ -40,3 +40,7 @@ site/.vercel
 # typescript
 *.tsbuildinfo
 site/next-env.d.ts
+.vercel
+.env*.local
+
+site/.next.nosync/

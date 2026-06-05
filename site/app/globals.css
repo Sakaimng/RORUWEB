@@ -1,49 +1,45 @@
 @import "./styles/roru-header.css";
 @import "./styles/roru-site.css";
 @import "./styles/about-page.css";
+@import "./styles/menu-page.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --accent: #f54500;
-  --accent-muted: #f45a1f;
-  --surface: #000000;
-  --text: #f5f5f5;
-  --border: rgba(255, 255, 255, 0.16);
-  --border-slot: rgba(255, 255, 255, 0.18);
+  --roru-light: #f1f1f1;
+  --roru-dark: #121212;
+  --surface: var(--roru-dark);
+  --text: var(--roru-light);
+  --accent: var(--text);
+  --accent-muted: var(--text);
+  --border: color-mix(in srgb, var(--text) 16%, transparent);
+  --border-slot: color-mix(in srgb, var(--text) 18%, transparent);
   --ror-gap: 9px;
+  /** Horizontal inset for main sections (never exceed 2vw per side). */
+  --roru-section-pad-x: 2vw;
 
   color-scheme: dark;
-}
-
-html.theme-night {
-  --surface: #000000;
-  --text: #f5f5f5;
-  --border: rgba(255, 255, 255, 0.16);
-  --border-slot: rgba(255, 255, 255, 0.18);
-
-  color-scheme: dark;
-}
-
-html.theme-day {
-  --surface: #f5f5f5;
-  --text: #000000;
-  --border: rgba(0, 0, 0, 0.16);
-  --border-slot: rgba(0, 0, 0, 0.16);
-
-  color-scheme: light;
 }
 
 * {
   box-sizing: border-box;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* legacy Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 html {
   min-height: 100%;
   background: var(--surface);
   color: var(--text);
+  font-size: 0.75em !important;
   scroll-behavior: auto;
   overscroll-behavior: none;
   text-size-adjust: 100%;
@@ -55,6 +51,9 @@ body {
   margin: 0;
   background: var(--surface);
   color: var(--text);
+  font-size: inherit;
+  font-weight: 700;
+  text-transform: uppercase;
   overscroll-behavior: none;
   overflow-x: hidden;
   text-rendering: geometricPrecision;
@@ -82,6 +81,42 @@ input,
 textarea,
 select {
   font: inherit;
+}
+
+html body *,
+html body *::before,
+html body *::after {
+  font-size: inherit !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: normal !important;
+}
+
+html body:has(#page-content) #page-content.page-content,
+html body:has(#page-content) #page-content.page-content *,
+html body .roru-nav,
+html body .roru-nav *,
+html body .roru-footer,
+html body .roru-footer *,
+html body .roru-home-discover,
+html body .roru-home-discover * {
+  font-size: inherit !important;
+}
+
+html body .roru-home-discover__title {
+  font-size: 12px !important;
+  letter-spacing: 0 !important;
+}
+
+html body .roru-home-discover__button {
+  font-size: 12px !important;
+  letter-spacing: 0 !important;
+}
+
+html body .roru-nav-item,
+html body .roru-nav-item *,
+html body .roru-mobile-menu-item {
+  font-weight: 700 !important;
 }
 
 button,
@@ -115,18 +150,18 @@ video {
 }
 
 ::selection {
-  background: var(--accent);
-  color: #000000;
+  background: var(--text);
+  color: var(--surface);
+}
+
+/* Footer wordmark only — orange is not used elsewhere. */
+.roru-footer__logo-svg path {
+  fill: #f54500 !important;
 }
 
 @layer components {
   .section-surface {
     background: var(--surface);
     color: var(--text);
-  }
-
-  .roru-nav__menu-button {
-    @apply rounded-full border px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em];
-    border-color: color-mix(in srgb, currentColor 20%, transparent);
   }
 }

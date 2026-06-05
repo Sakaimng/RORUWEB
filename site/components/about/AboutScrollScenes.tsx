@@ -1,43 +1,20 @@
 "use client";
 
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AboutHeroTitle } from "./AboutHeroTitle";
 import { AboutSequenceMarquee } from "./AboutSequenceMarquee";
-
-gsap.registerPlugin(ScrollTrigger);
-
-/** Min track height ≈ 9× viewport (px); long runway so sticky does not release early */
-const OPERA_TRACK_MIN_VIEWPORTS = 9;
-/**
- * While on hero / intro, cap document scroll into the track so trackpad flings cannot
- * burn through the sticky parent before wheel steps reach the story pane.
- */
-const OPERA_SCROLL_CAP_HERO_INTRO_VH = 1.35;
-/** On story before exit, allow some native scroll but stay away from the track end */
-const OPERA_SCROLL_CAP_STORY_PRE_EXIT_VH = 6;
-const OPERA_SCROLL_END_MARGIN_VH = 2.5;
+import { useI18n } from "@/lib/i18n";
 
 /** Viewport width at which opera uses top horizontal gallery + bottom text stack */
 const OPERA_MOBILE_MAX_PX = 767;
 
-const INTRO_LINE_BLOCKS: string[] = [
-  "Roru Baru was born out of a love for hand rolls and the craft behind them. As Hong Kong's original hand roll bar we wanted to bring a new energy to the city,",
-  "inspired by the pace and spirit of Tokyo's dining culture. Our rolls are made to order and served fresh off the bar, always ready to be enjoyed at their best.",
-  "The details are at the heart of what we do. Warm rice, crisp nori flown in from Japan and seafood dressed with care.",
-  "The menu is focused, but we like to play with flavours inspired by local dishes and our travels abroad.",
-];
-
-const STORY_LINE_BLOCKS: string[] = [
-  "The vibe changes with the day.",
-  "Lunchtime is lively and perfect for a quick bite between meetings.",
-  "In the evening, the lights shift and the music goes up a notch. The space becomes somewhere to linger, enjoy a few tipples and soak in the energy.",
-  "Whether you join us for a quick lunch, relaxed dinner or a draught sake or two, you'll always be part of the action at our counter.",
-];
-
-const STORY_TEXT = STORY_LINE_BLOCKS.join(" ");
+/* Discrete stepper feel — mirrors the home/events panel scroller (HomeYslScroll):
+   one gesture = one scene change, then a lock until it settles. */
+const ABOUT_STEP_LOCK_MS = 850;
+const WHEEL_THRESHOLD = 18;
+const TOUCH_THRESHOLD = 44;
 
 type Item = { src: string; n: string; alt: string };
 type StoryImages = { large: string; top: string; bottom: string };
@@ -47,11 +24,14 @@ export type AboutScrollScenesProps = {
   storyImages: StoryImages;
 };
 
-function setTextPaneState(
-  el: HTMLElement,
-  visible: boolean,
-  immediate = false,
-) {
+/** Ask HomeYslScroll to step to the next/previous overlay panel (e.g. story → footer). */
+function requestHomePanelStep(direction: 1 | -1) {
+  window.dispatchEvent(
+    new CustomEvent("roru:home-panel-step", { detail: { direction } }),
+  );
+}
+
+function setTextPaneState(el: HTMLElement, visible: boolean, immediate = false) {
   gsap.killTweensOf(el);
   gsap.to(el, {
     opacity: visible ? 1 : 0,
@@ -84,9 +64,10 @@ function applyTextPaneOpacities(
 }
 
 function AboutOperaStoryLines() {
+  const { t } = useI18n();
   return (
     <span className="about-opera-story__text">
-      {STORY_LINE_BLOCKS.map((line, i) => (
+      {t.about.story.map((line, i) => (
         <span key={i} className="about-opera-story__line">
           <span className="about-opera-story__line-inner">{line}</span>
         </span>
@@ -96,9 +77,10 @@ function AboutOperaStoryLines() {
 }
 
 function AboutIntroLineBlocks() {
+  const { t } = useI18n();
   return (
     <div className="about-opera-intro__text">
-      {INTRO_LINE_BLOCKS.map((line, i) => (
+      {t.about.intro.map((line, i) => (
         <div key={i} className="about-opera-intro__line">
           <div className="about-opera-intro__line-inner">{line}</div>
         </div>
@@ -108,6 +90,7 @@ function AboutIntroLineBlocks() {
 }
 
 function AboutReducedMotionFallback({ sequence, storyImages }: AboutScrollScenesProps) {
+  const { t } = useI18n();
   return (
     <>
       <section className="roru-about-hero">
@@ -119,7 +102,7 @@ function AboutReducedMotionFallback({ sequence, storyImages }: AboutScrollScenes
       <section className="roru-about-intro">
         <div className="roru-about-intro__grid">
           <div className="roru-about-intro__text-wrap">
-            <h3 className="roru-about-intro__text">{INTRO_LINE_BLOCKS.join(" ")}</h3>
+            <h3 className="roru-about-intro__text">{t.about.intro.join(" ")}</h3>
           </div>
         </div>
       </section>
@@ -158,32 +141,12 @@ function AboutReducedMotionFallback({ sequence, storyImages }: AboutScrollScenes
             className="roru-about-story__content"
             style={{ paddingBottom: "clamp(1.5rem, 3vw, 3rem)" }}
           >
-            <h2 className="roru-about-story__title">{STORY_TEXT}</h2>
+            <h2 className="roru-about-story__title">{t.about.story.join(" ")}</h2>
           </div>
         </div>
       </section>
     </>
   );
-}
-
-function trackDocTop(track: HTMLElement): number {
-  return window.scrollY + track.getBoundingClientRect().top;
-}
-
-function isInTrackWindow(track: HTMLElement, y: number, padPx = 4): boolean {
-  const h = window.innerHeight;
-  const start = trackDocTop(track);
-  const end = start + track.offsetHeight - h;
-  return y >= start - padPx && y <= end + padPx;
-}
-
-const INTERNAL_STEP_LOCK_MS = 520;
-const MIN_WHEEL_DELTA = 16;
-const WHEEL_IDLE_MS = 620;
-const SECTION_EXIT_FADE_MS = 420;
-
-function bumpWheelIdle(untilRef: { current: number }) {
-  untilRef.current = Date.now() + WHEEL_IDLE_MS;
 }
 
 export function AboutScrollScenes({ sequence, storyImages }: AboutScrollScenesProps) {
@@ -198,14 +161,8 @@ export function AboutScrollScenes({ sequence, storyImages }: AboutScrollScenesPr
   const [galleryAxis, setGalleryAxis] = useState<"horizontal" | "vertical">("vertical");
   const sectionRef = useRef<0 | 1 | 2>(0);
   const [reduced, setReduced] = useState(false);
-  const sectionExitHiddenRef = useRef(false);
-  const wheelIdleUntilRef = useRef(0);
-  const lockScrollRef = useRef(false);
-  const animatingToRef = useRef<0 | 1 | 2 | null>(null);
-  const stepLockTimerRef = useRef<number | null>(null);
   const introInnersRef = useRef<HTMLDivElement[]>([]);
   const storyLineInnersRef = useRef<HTMLElement[]>([]);
-  const scrollClampRafRef = useRef<number | null>(null);
 
   const galleryItems = useMemo((): readonly Item[] => {
     const extras: Item[] = [
@@ -236,11 +193,6 @@ export function AboutScrollScenes({ sequence, storyImages }: AboutScrollScenesPr
     return () => mq.removeEventListener("change", sync);
   }, []);
 
-  useEffect(() => {
-    if (reduced) return;
-    ScrollTrigger.refresh();
-  }, [galleryAxis, reduced]);
-
   const refreshDomRefs = useCallback(() => {
     const introT = introTextRef.current;
     const storyT = storyTextRef.current;
@@ -268,69 +220,19 @@ export function AboutScrollScenes({ sequence, storyImages }: AboutScrollScenesPr
     [],
   );
 
-  const finishSettleTo = useCallback((t: 0 | 1 | 2) => {
-    animatingToRef.current = null;
-    lockScrollRef.current = false;
-    bumpWheelIdle(wheelIdleUntilRef);
-    syncRefsToSection(t);
-    // Opacity is already driven by goToSection; do not tween again here — a second pass
-    // after INTERNAL_STEP_LOCK_MS was killing/overwriting fades (especially wheel-up).
-  }, [syncRefsToSection]);
-
-  const restoreSectionAfterExit = useCallback(() => {
-    const stage = stageRootRef.current;
-    if (!stage) return;
-    sectionExitHiddenRef.current = false;
-    gsap.killTweensOf(stage);
-    stage.style.visibility = "visible";
-    stage.style.pointerEvents = "auto";
-    gsap.set(stage, { opacity: 0 });
-    syncRefsToSection(2);
-    applyTextOpacitiesForSection(2, true);
-    refreshDomRefs();
-    bumpWheelIdle(wheelIdleUntilRef);
-    gsap.to(stage, {
-      opacity: 1,
-      duration: SECTION_EXIT_FADE_MS / 1000,
-      ease: "power2.out",
-      overwrite: true,
-    });
-  }, [applyTextOpacitiesForSection, refreshDomRefs, syncRefsToSection]);
-
+  /** Crossfade to a scene. The stepper owns the gesture lock; this only swaps text. */
   const goToSection = useCallback(
     (next: 0 | 1 | 2) => {
-      if (lockScrollRef.current) return;
       const from = sectionRef.current;
       if (from === next) return;
-
       if (next === 0 && from !== 0) {
         setHeroLandingReplay((n) => n + 1);
       }
-
-      animatingToRef.current = next;
-      lockScrollRef.current = true;
-
       syncRefsToSection(next);
       applyTextOpacitiesForSection(next);
-
-      if (stepLockTimerRef.current) clearTimeout(stepLockTimerRef.current);
-
-      stepLockTimerRef.current = window.setTimeout(() => {
-        stepLockTimerRef.current = null;
-        finishSettleTo(next);
-      }, INTERNAL_STEP_LOCK_MS);
     },
-    [syncRefsToSection, applyTextOpacitiesForSection, finishSettleTo],
+    [syncRefsToSection, applyTextOpacitiesForSection],
   );
-
-  useLayoutEffect(() => {
-    if (reduced) return;
-    const track = trackRef.current;
-    if (!track) return;
-    const h = window.innerHeight;
-    const px = Math.max(Math.round(h * OPERA_TRACK_MIN_VIEWPORTS), 2400);
-    track.style.minHeight = `${px}px`;
-  }, [reduced]);
 
   useLayoutEffect(() => {
     if (reduced) return;
@@ -341,183 +243,113 @@ export function AboutScrollScenes({ sequence, storyImages }: AboutScrollScenesPr
     if (lines.length) gsap.set(lines, { yPercent: 100, opacity: 1 });
   }, [reduced, refreshDomRefs]);
 
-  useEffect(() => {
-    if (reduced) return;
-    refreshDomRefs();
-    applyTextOpacitiesForSection(0, true);
-    syncRefsToSection(0);
-  }, [reduced, refreshDomRefs, applyTextOpacitiesForSection, syncRefsToSection]);
-
+  /* Discrete scene stepper: one wheel/touch/key gesture advances exactly one scene
+     (hero → intro → story), then locks until it settles — the same behaviour as the
+     home & events panel scroller. At the story scene a further scroll asks
+     HomeYslScroll to step to the footer panel; scrolling back up reverses it. The
+     gallery stays put; only the text crossfades. */
   useEffect(() => {
     if (reduced) return;
     const track = trackRef.current;
-    const stage = stageRootRef.current;
-    if (!track || !stage) return;
+    if (!track) return;
 
     refreshDomRefs();
+    applyTextOpacitiesForSection(0, true);
+    syncRefsToSection(0);
 
-    const syncTrackMinHeight = () => {
-      const h = window.innerHeight;
-      const px = Math.max(Math.round(h * OPERA_TRACK_MIN_VIEWPORTS), 2400);
-      track.style.minHeight = `${px}px`;
+    const panelEl = () => track.closest<HTMLElement>(".roru-home-overlay-panel");
+    const aboutActive = () => panelEl()?.classList.contains("is-active") ?? false;
+
+    let locked = false;
+    let lockTimer: number | null = null;
+    let touchStartY: number | null = null;
+
+    const lock = () => {
+      locked = true;
+      if (lockTimer) clearTimeout(lockTimer);
+      lockTimer = window.setTimeout(() => {
+        locked = false;
+      }, ABOUT_STEP_LOCK_MS);
     };
-    syncTrackMinHeight();
 
-    const clampScrollIntoOpera = () => {
-      if (sectionExitHiddenRef.current) return;
-      const h = window.innerHeight;
-      if (h < 1) return;
-      const top = trackDocTop(track);
-      const y = window.scrollY;
-      const maxEnd = top + track.offsetHeight - h;
+    const step = (dir: 1 | -1) => {
+      if (locked) return;
       const s = sectionRef.current;
-      if (y < top - h * 0.2 || y > maxEnd + h * 0.25) return;
-
-      let capY = Number.POSITIVE_INFINITY;
-      if (s < 2) {
-        capY = top + OPERA_SCROLL_CAP_HERO_INTRO_VH * h;
-      } else {
-        const storyCap = top + OPERA_SCROLL_CAP_STORY_PRE_EXIT_VH * h;
-        const endCap = maxEnd - OPERA_SCROLL_END_MARGIN_VH * h;
-        capY = Math.min(storyCap, Math.max(top + 0.6 * h, endCap));
+      if (dir === 1) {
+        if (s < 2) {
+          goToSection((s + 1) as 0 | 1 | 2);
+          lock();
+        } else {
+          // Last scene → hand off to the next overlay panel (footer).
+          requestHomePanelStep(1);
+          lock();
+        }
+      } else if (s > 0) {
+        goToSection((s - 1) as 0 | 1 | 2);
+        lock();
       }
-
-      if (y > capY + 1) {
-        window.scrollTo({ top: Math.max(top, capY), behavior: "auto" });
-      }
-    };
-
-    const scheduleScrollClamp = () => {
-      if (scrollClampRafRef.current != null) return;
-      scrollClampRafRef.current = requestAnimationFrame(() => {
-        scrollClampRafRef.current = null;
-        clampScrollIntoOpera();
-      });
-    };
-
-    const onScroll = () => {
-      const y = window.scrollY;
-      const h = window.innerHeight;
-      const end = trackDocTop(track) + track.offsetHeight - h;
-
-      scheduleScrollClamp();
-
-      if (!isInTrackWindow(track, y, h * 0.12)) {
-        lockScrollRef.current = false;
-        animatingToRef.current = null;
-      }
-
-      if (sectionExitHiddenRef.current && y < end - h * 0.06) {
-        restoreSectionAfterExit();
-      }
+      // dir === -1 at hero (s === 0): nothing above the first panel.
     };
 
     const onWheel = (e: WheelEvent) => {
-      if (!isInTrackWindow(track, window.scrollY, window.innerHeight * 0.08)) return;
+      if (!aboutActive()) return;
+      if (Math.abs(e.deltaY) < WHEEL_THRESHOLD) return;
+      // Own the gesture so the panel scroller doesn't also fire.
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      step(e.deltaY > 0 ? 1 : -1);
+    };
 
-      const s = sectionRef.current;
-      const delta = e.deltaY;
-      const goingDown = delta > 0;
+    const onTouchStart = (e: TouchEvent) => {
+      if (aboutActive()) touchStartY = e.touches[0]?.clientY ?? null;
+    };
 
-      if (Math.abs(delta) < MIN_WHEEL_DELTA) return;
-
-      if (Date.now() < wheelIdleUntilRef.current) {
+    const onTouchMove = (e: TouchEvent) => {
+      if (aboutActive() && touchStartY != null) {
         e.preventDefault();
-        return;
-      }
-
-      if (lockScrollRef.current || animatingToRef.current != null) {
-        e.preventDefault();
-        return;
-      }
-
-      if (!goingDown && s === 2 && sectionExitHiddenRef.current) {
-        e.preventDefault();
-        restoreSectionAfterExit();
-        bumpWheelIdle(wheelIdleUntilRef);
-        return;
-      }
-
-      if (goingDown && s < 2) {
-        e.preventDefault();
-        goToSection((s + 1) as 0 | 1 | 2);
-        return;
-      }
-
-      if (!goingDown && s > 0) {
-        e.preventDefault();
-        goToSection((s - 1) as 0 | 1 | 2);
-        return;
-      }
-
-      if (goingDown && s === 2) {
-        if (sectionExitHiddenRef.current) return;
-
-        const st = stageRootRef.current;
-        if (!st) return;
-
-        e.preventDefault();
-        lockScrollRef.current = true;
-        animatingToRef.current = 2;
-        gsap.killTweensOf(st);
-        gsap.to(st, {
-          opacity: 0,
-          duration: SECTION_EXIT_FADE_MS / 1000,
-          ease: "power2.out",
-          overwrite: true,
-          onComplete: () => {
-            st.style.pointerEvents = "none";
-            st.style.visibility = "hidden";
-            sectionExitHiddenRef.current = true;
-            const exitY = trackDocTop(track) + track.offsetHeight - window.innerHeight + 2;
-            window.scrollTo({ top: exitY, behavior: "auto" });
-            animatingToRef.current = null;
-            lockScrollRef.current = false;
-            bumpWheelIdle(wheelIdleUntilRef);
-          },
-        });
-        return;
-      }
-
-      if (!goingDown && s === 0) {
-        return;
+        e.stopImmediatePropagation();
       }
     };
 
-    const ro = new ResizeObserver(() => {
-      syncTrackMinHeight();
-      ScrollTrigger.refresh();
-      refreshDomRefs();
-      applyTextOpacitiesForSection(sectionRef.current, true);
-      scheduleScrollClamp();
-    });
-    ro.observe(track);
+    const onTouchEnd = (e: TouchEvent) => {
+      const startY = touchStartY;
+      touchStartY = null;
+      if (!aboutActive() || startY == null) return;
+      const endY = e.changedTouches[0]?.clientY ?? null;
+      if (endY == null) return;
+      const delta = startY - endY;
+      if (Math.abs(delta) < TOUCH_THRESHOLD) return;
+      e.stopImmediatePropagation();
+      step(delta > 0 ? 1 : -1);
+    };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!aboutActive() || e.defaultPrevented) return;
+      if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") {
+        e.preventDefault();
+        step(1);
+      } else if (e.key === "ArrowUp" || e.key === "PageUp") {
+        e.preventDefault();
+        step(-1);
+      }
+    };
+
+    const capture = { capture: true } as AddEventListenerOptions;
     window.addEventListener("wheel", onWheel, { passive: false, capture: true });
-
-    const onR = () => {
-      syncTrackMinHeight();
-      ScrollTrigger.refresh();
-      scheduleScrollClamp();
-    };
-    window.addEventListener("load", onR, { once: true });
-    window.addEventListener("resize", onR);
-    onScroll();
+    window.addEventListener("touchstart", onTouchStart, { passive: true, capture: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: false, capture: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true, capture: true });
+    window.addEventListener("keydown", onKeyDown);
 
     return () => {
-      if (scrollClampRafRef.current != null) {
-        cancelAnimationFrame(scrollClampRafRef.current);
-        scrollClampRafRef.current = null;
-      }
-      if (stepLockTimerRef.current) clearTimeout(stepLockTimerRef.current);
-      ro.disconnect();
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("wheel", onWheel, { capture: true } as AddEventListenerOptions);
-      window.removeEventListener("load", onR);
-      window.removeEventListener("resize", onR);
+      if (lockTimer) clearTimeout(lockTimer);
+      window.removeEventListener("wheel", onWheel, capture);
+      window.removeEventListener("touchstart", onTouchStart, capture);
+      window.removeEventListener("touchmove", onTouchMove, capture);
+      window.removeEventListener("touchend", onTouchEnd, capture);
+      window.removeEventListener("keydown", onKeyDown);
     };
-  }, [reduced, refreshDomRefs, goToSection, applyTextOpacitiesForSection, syncRefsToSection, restoreSectionAfterExit]);
+  }, [reduced, refreshDomRefs, goToSection, applyTextOpacitiesForSection, syncRefsToSection]);
 
   useEffect(() => {
     if (reduced) return;
@@ -612,17 +444,17 @@ export function AboutScrollScenes({ sequence, storyImages }: AboutScrollScenesPr
             className="about-opera-stage about-opera-stage--unified"
             aria-label="About story in three scenes"
           >
+            <div
+              ref={heroTextRef}
+              className="about-opera-text-pane about-opera-text-pane--hero"
+            >
+              <AboutHeroTitle replaySignal={heroLandingReplay} />
+            </div>
             <div className="about-opera-layout">
               <aside className="about-opera-gallery-col">
                 <AboutSequenceMarquee items={galleryItems} axis={galleryAxis} />
               </aside>
               <div className="about-opera-text-col">
-                <div
-                  ref={heroTextRef}
-                  className="about-opera-text-pane about-opera-text-pane--hero"
-                >
-                  <AboutHeroTitle replaySignal={heroLandingReplay} mobileWordStack />
-                </div>
                 <div
                   ref={introTextRef}
                   className="about-opera-text-pane about-opera-text-pane--intro"

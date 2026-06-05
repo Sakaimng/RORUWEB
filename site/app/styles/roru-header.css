@@ -2,402 +2,125 @@
 
 html.roru-transition-pending,
 html.roru-transition-pending body {
-  background: #f54500 !important;
+  background: var(--surface) !important;
   overflow: hidden !important;
-}
-
-html.roru-transition-pending .roru-page-transition {
-  opacity: 1 !important;
 }
 
 .roru-page-transition {
   position: fixed;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  min-width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
+  inset: 0;
   z-index: 99999;
-  background: transparent;
+  background: var(--surface);
   pointer-events: none;
+  opacity: 0;
   visibility: hidden;
-  overflow: hidden;
 }
 
 .roru-page-transition.is-active,
 html.roru-transition-pending .roru-page-transition {
   visibility: visible;
+  pointer-events: auto;
 }
 
-/* Flex row: 24 equal columns, no gap, no % rounding cracks */
-.roru-page-transition__track {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  height: 100%;
-}
-
-.roru-page-transition__col {
-  position: relative;
-  flex: 1 1 0;
-  min-width: 0;
-  height: 100%;
-  overflow: hidden;
-  background: transparent;
-  box-sizing: border-box;
-  will-change: transform;
-  backface-visibility: hidden;
-}
-
-.roru-page-transition__col-fill {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background: #f54500;
-  will-change: transform;
-  backface-visibility: hidden;
-}
-
-/* 1.5px inside vertical strokes (same orange as fill), above fill */
-.roru-page-transition__col-edge {
-  position: absolute;
-  top: 0;
-  z-index: 1;
-  width: 1.5px;
-  height: 100%;
-  background: #f54500;
-  will-change: transform;
-  backface-visibility: hidden;
-  pointer-events: none;
-}
-
-.roru-page-transition__col-edge--left {
-  left: 0;
-}
-
-.roru-page-transition__col-edge--right {
-  right: 0;
+.roru-nav-logo {
+  -webkit-mask: url("/RORUBARU fill logo one line.svg") center / contain no-repeat;
+  mask: url("/RORUBARU fill logo one line.svg") center / contain no-repeat;
 }
 
 /* Nav tokens */
 :root {
-  --roru-nav-pad-x: 2vw;
+  --roru-nav-pad-x: var(--roru-section-pad-x);
   --roru-nav-pad-top: 3vh;
   --roru-nav-gap: 9px;
   --roru-nav-height: min(2vw, 34px);
   --roru-nav-radius: 999px;
-  --roru-nav-bg: rgba(0, 0, 0, 0.88);
-  --roru-nav-border: rgba(255, 255, 255, 0.18);
-  --roru-nav-fg: #f5f5f5;
+  --roru-nav-bg: rgba(18, 18, 18, 0.9);
+  --roru-nav-border: rgba(255, 255, 255, 0.14);
+  --roru-nav-fg: #f1f1f1;
   --roru-nav-ease: cubic-bezier(0.76, 0, 0.24, 1);
   /* Space from top of viewport to first hero content (safe area + fixed .roru-nav). Desktop default; mobile overrides. */
   --roru-fixed-nav-clear-bottom: calc(
     env(safe-area-inset-top, 0px) + var(--roru-nav-pad-top) + var(--roru-nav-height) + 12px
   );
+  /* Fixed .roru-nav-bottom (offset + pill row + safe area) — used by booking + hero spacing */
+  --roru-bottom-dock-clear: calc(env(safe-area-inset-bottom, 0px) + 2.5vh + 52px);
 }
 
+/* ===========================================================================
+   Site nav — plain transparent bar (WSSC style). Layout lives in Tailwind on
+   the markup; this file owns the fixed shell, item entrance hooks
+   (`.roru-nav-item` starts hidden — staggered fade-in from lib/home-entrance)
+   and the scroll-hide `.is-hidden` transform.
+   =========================================================================== */
 .roru-nav {
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
   width: 100%;
   z-index: 999;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: var(--roru-nav-pad-top) var(--roru-nav-pad-x) 0;
   box-sizing: border-box;
   pointer-events: none;
   transform: translateY(0);
-  transition: transform 0.5s var(--roru-nav-ease);
-  opacity: 0;
-}
-
-.roru-nav.is-hidden {
-  transform: translateY(calc(-100% - 12px));
-}
-
-.roru-nav__left,
-.roru-nav__right {
-  pointer-events: auto;
-}
-
-.roru-nav__label {
-  text-align: center;
-  display: inline-block;
-  white-space: nowrap;
-  min-width: max-content;
-  pointer-events: none;
-}
-
-.roru-nav__menu-button,
-.roru-nav__pill {
-  position: relative;
-  overflow: hidden;
-  padding: 0 14px;
-  text-transform: uppercase;
-  height: var(--roru-nav-height);
-  min-height: var(--roru-nav-height);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--roru-nav-radius);
-  border: 1px solid var(--roru-nav-border);
-  background: var(--roru-nav-bg);
-  color: var(--roru-nav-fg);
-  font-size: 11px;
-  line-height: 1;
-  letter-spacing: 0.06em;
-  text-decoration: none;
-  white-space: nowrap;
-  box-sizing: border-box;
-  mix-blend-mode: difference;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  transition:
-    background-color 0.28s cubic-bezier(0.76, 0, 0.24, 1),
-    color 0.28s cubic-bezier(0.76, 0, 0.24, 1),
-    border-color 0.28s cubic-bezier(0.76, 0, 0.24, 1);
-}
-
-.roru-nav__pill.is-hovered,
-.roru-nav__menu-button.is-hovered {
-  background-color: #f54500;
-  color: #000;
-  border-color: #f54500;
-}
-
-/* Orange “pill” variant: same chrome as Home / About, accent text. */
-a.roru-nav__accent-pill,
-div.roru-nav__accent-pill {
-  color: #f45a1f;
-  border-color: rgba(244, 90, 31, 0.55);
-  background: var(--roru-nav-bg);
-  mix-blend-mode: normal;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-}
-
-a.roru-nav__accent-pill:hover,
-div.roru-nav__accent-pill:hover {
-  background-color: #f54500;
-  border-color: #f54500;
-  color: #000;
-}
-
-a.roru-nav__accent-pill:hover *,
-div.roru-nav__accent-pill:hover * {
-  color: #000;
-}
-
-div.roru-nav__accent-pill.roru-nav__accent-pill--stacked {
-  text-transform: none;
-  height: auto;
-  min-height: var(--roru-nav-height);
-  padding-top: 5px;
-  padding-bottom: 5px;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 2px;
-  letter-spacing: 0.04em;
-}
-
-/* Clock + dock address + dock brand: no pill fill or stroke */
-.roru-nav__pill--plain,
-a.roru-nav__pill--plain.roru-nav__accent-pill,
-div.roru-nav__pill--plain.roru-nav__accent-pill {
-  height: auto;
-  min-height: 0;
-  padding-inline: 0;
-  border: none;
-  background: transparent;
-  box-shadow: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  mix-blend-mode: normal;
-}
-
-a.roru-nav__pill--plain.roru-nav__accent-pill:hover,
-div.roru-nav__pill--plain.roru-nav__accent-pill:hover {
-  background: transparent;
-  border: none;
-  color: #f45a1f;
-}
-
-a.roru-nav__pill--plain.roru-nav__accent-pill:hover *,
-div.roru-nav__pill--plain.roru-nav__accent-pill:hover * {
-  color: inherit;
-}
-
-.roru-nav__menu-wrap {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  gap: 9px;
-}
-
-.roru-nav__menu-items {
-  position: absolute;
-  top: 0;
-  right: calc(100% + var(--roru-nav-gap));
-  display: flex;
-  align-items: center;
-  gap: var(--roru-nav-gap);
-  opacity: 0;
-  transform: translateX(14px);
-  pointer-events: none;
-  transition:
-    opacity 0.24s ease,
-    transform 0.42s var(--roru-nav-ease);
-}
-
-/* Allow links to receive taps when the flyout uses pointer-events: none on the container (mobile). */
-.roru-nav__menu-items .roru-nav__pill {
-  pointer-events: auto;
-}
-
-.roru-nav__menu-wrap.is-open .roru-nav__menu-items {
-  opacity: 1;
-  transform: translateX(0);
-  pointer-events: auto;
-}
-
-/* Home / About must be reachable without opening the menu; also keeps links clickable under PageTransition. */
-@media (min-width: 768px) {
-  .roru-nav__menu-items {
-    position: static;
-    opacity: 1;
-    transform: none;
-    pointer-events: auto;
-    display: flex;
-    align-items: center;
-    gap: var(--roru-nav-gap);
-  }
-
-  .roru-nav__menu-button {
-    display: none;
-  }
-}
-
-.roru-nav__menu-button {
-  cursor: pointer;
-}
-
-@media (max-width: 767px) {
-  :root {
-    /* Match .roru-nav mobile: padding-top 3vh + pill/menu row 38px + gap under bar */
-    --roru-fixed-nav-clear-bottom: calc(env(safe-area-inset-top, 0px) + 3vh + 38px + 12px);
-  }
-
-  .roru-nav {
-    padding-top: 3vh;
-  }
-
-  .roru-nav__menu-button,
-  .roru-nav__pill {
-    height: 38px;
-    min-height: 38px;
-    font-size: 12px;
-    padding: 0 14px;
-  }
-
-  .roru-nav__accent-pill--stacked {
-    height: auto;
-    min-height: 38px;
-  }
-
-  .roru-nav__menu-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-  }
-
-  .roru-nav__menu-items {
-    top: calc(100% + 9px);
-    right: 0;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 9px;
-    transform: translateY(-10px);
-  }
-
-  .roru-nav__menu-wrap.is-open .roru-nav__menu-items {
-    transform: translateY(0);
-  }
-
-  .roru-nav__pill {
-    justify-content: center;
-  }
-
-  .roru-nav__pill--plain {
-    height: auto;
-    min-height: 0;
-    padding-inline: 0;
-  }
-}
-
-/* Fixed bottom dock: address (left) + brand (right); <md: hidden, reserve pill centered. Same scroll-hide as .roru-nav */
-.roru-nav-bottom {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 2.5%;
-  z-index: 998;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 0 2vw;
-  box-sizing: border-box;
-  pointer-events: none;
-  transform: translate3d(0, 0, 0);
-  transition: transform 0.5s var(--roru-nav-ease);
-  opacity: 0;
-}
-
-/* Full viewport push: `100%` of a flex bar was leaving pills peeking; footer detect uses #page-content rect */
-.roru-nav-bottom.is-hidden {
-  transform: translate3d(0, 100vh, 0) !important;
-  opacity: 0 !important;
-  visibility: hidden;
-  pointer-events: none;
   transition:
     transform 0.5s var(--roru-nav-ease),
-    opacity 0.4s var(--roru-nav-ease);
+    background-color 0.3s var(--roru-nav-ease),
+    opacity 0.45s ease;
+  opacity: 1;
 }
 
-.roru-nav-bottom a.roru-nav__accent-pill,
-.roru-nav-bottom .roru-nav__accent-pill,
-.roru-nav-bottom a.roru-nav__pill {
-  flex: 0 1 auto;
-  max-width: 48%;
-  min-width: 0;
+/* Footer panel active (home): fade the nav out. `!important` beats the inline
+   opacity:1 left by the GSAP entrance — `.roru-nav`'s opacity transition animates it. */
+html.roru-home-footer-active body:has(.roru-home-overlays) .roru-nav {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+html.roru-preload .roru-nav-item,
+html.roru-loading .roru-nav-item {
+  opacity: 0;
+}
+
+/* Scroll-hide (footer reveal, inner pages): fade out instead of sliding away.
+   `!important` beats the inline opacity:1 from the entrance; the opacity
+   transition on `.roru-nav` fades it out, and back in when `.is-hidden` is removed. */
+.roru-nav.is-hidden {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+/* Bar wrapper is click-through; the controls capture pointer events themselves.
+   (The flyout container drives its own state via Tailwind pointer-events utilities.) */
+.roru-nav a,
+.roru-nav button {
   pointer-events: auto;
 }
 
-/* Mobile: address + RORUBARU hidden; full-width reserve (inset 2vw via parent padding). */
-@media (max-width: 767px) {
-  .roru-nav-bottom {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: stretch;
-    align-items: center;
-    padding: 0 2vw max(0.5rem, env(safe-area-inset-bottom, 0px));
+.roru-nav-item,
+.roru-nav-item *,
+.roru-mobile-menu-item {
+  font-weight: 700 !important;
+}
+
+/* Mobile menu open: lock scroll, dim content behind the flyout. */
+@media (max-width: 1031px) {
+  html.roru-mobile-menu-open,
+  html.roru-mobile-menu-open body {
+    overflow: hidden !important;
+    overscroll-behavior: none;
   }
 
-  .roru-nav-bottom a.roru-nav__pill.roru-nav-bottom__reserve,
-  .roru-nav-bottom .roru-nav-bottom__reserve.roru-nav__pill {
-    width: 100%;
-    max-width: none;
-    flex: 1 1 100%;
-    min-width: 0;
+  html.roru-mobile-menu-open .roru-home-discover {
+    z-index: 30 !important;
+    pointer-events: none;
+  }
+
+  html.roru-mobile-menu-open .roru-footer {
+    filter: blur(8px);
+    opacity: 0.55;
+    pointer-events: none;
+    transition:
+      filter 300ms ease,
+      opacity 300ms ease;
   }
 }

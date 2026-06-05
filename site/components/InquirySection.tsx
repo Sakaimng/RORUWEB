@@ -2,10 +2,12 @@
 
 import { useId, useState } from "react";
 import { INQUIRY_PUBLIC_EMAIL } from "@/lib/content";
+import { useI18n } from "@/lib/i18n";
 
 type Status = "idle" | "sending" | "success" | "error";
 
 export function InquirySection() {
+  const { t } = useI18n();
   const formId = useId();
   const [status, setStatus] = useState<Status>("idle");
   const [errMsg, setErrMsg] = useState("");
@@ -37,11 +39,7 @@ export function InquirySection() {
 
       if (r.status === 503) {
         setStatus("error");
-        setErrMsg(
-          out.contact
-            ? `Inquiries are not available online just yet. Please write to ${out.contact}.`
-            : "Inquiries are not available online just yet. Please use the contact details in the footer."
-        );
+        setErrMsg(t.inquiry.errUnavailable);
         return;
       }
       if (!r.ok) {
@@ -49,7 +47,7 @@ export function InquirySection() {
         setErrMsg(
           out.error && typeof out.error === "string"
             ? out.error
-            : "Could not send. Please try again or email us directly."
+            : t.inquiry.errGeneric
         );
         return;
       }
@@ -58,43 +56,43 @@ export function InquirySection() {
       form.reset();
     } catch {
       setStatus("error");
-      setErrMsg("Something went wrong. Please try again or email us directly.");
+      setErrMsg(t.inquiry.errOffline);
     }
   }
 
   return (
     <section
-      className="roru-inquiry-section homepage-reveal section-surface border-t border-[color:rgba(245,69,0,0.2)]"
+      className="roru-inquiry-section section-surface"
       id="inquiry"
       aria-labelledby={`${formId}-heading`}
     >
-      <div className="roru-inquiry-grid grid min-h-0 grid-cols-6 gap-[9px] px-[2vw] py-[min(8vh,80px)] text-[var(--text)]">
-        <div className="col-span-6 max-w-3xl">
+      <div className="roru-inquiry-grid grid min-h-0 grid-cols-6 gap-[9px] text-[var(--text)]">
+        <div className="col-span-6 max-w-3xl" data-roru-reveal="up">
           <h2
             id={`${formId}-heading`}
             className="m-0 text-left text-[clamp(48px,7vw,132px)] font-thin uppercase leading-[0.82] tracking-[0.03em] indent-[-0.3%]"
           >
-            Inquire
+            {t.inquiry.title}
           </h2>
           <p className="mt-4 max-w-xl text-[clamp(15px,1.1vw,20px)] leading-relaxed text-[var(--text)] opacity-80">
-            Questions, private events, or feedback — send a note and we will get back to you.
+            {t.inquiry.desc}
           </p>
         </div>
 
         {status === "success" ? (
           <div className="col-span-6 max-w-3xl pt-6" role="status" aria-live="polite">
             <p className="m-0 text-[clamp(16px,1.2vw,22px)] leading-snug text-[var(--text)]">
-              Thank you. Your message has been sent; we will reply as soon as we can.
+              {t.inquiry.success}
             </p>
             <button
               type="button"
-              className="mt-8 cursor-pointer border-0 bg-transparent p-0 text-sm uppercase leading-none tracking-[0.08em] text-[var(--accent)] underline decoration-[color:var(--accent)] underline-offset-4"
+              className="mt-8 cursor-pointer border-0 bg-transparent p-0 text-sm uppercase leading-none tracking-[0.08em] text-[var(--text)] underline decoration-[color:var(--text)] underline-offset-4"
               onClick={() => {
                 setStatus("idle");
                 setErrMsg("");
               }}
             >
-              Send another
+              {t.inquiry.sendAnother}
             </button>
           </div>
         ) : (
@@ -102,13 +100,15 @@ export function InquirySection() {
             className="col-span-6 grid max-w-3xl grid-cols-1 gap-4 pt-8 min-[500px]:grid-cols-2"
             onSubmit={onSubmit}
             noValidate
+            data-roru-reveal="up"
+            data-roru-reveal-delay="0.05"
           >
             <p className="min-[500px]:col-span-2 m-0">
               <label
                 className="mb-2 block text-xs font-normal uppercase leading-none tracking-[0.08em] text-[var(--text)] opacity-80"
                 htmlFor={`${formId}-name`}
               >
-                Name
+                {t.inquiry.name}
               </label>
               <input
                 className="min-h-11 w-full border border-[color:var(--border)] bg-[var(--surface)] px-3 py-2.5 text-base text-[var(--text)]"
@@ -125,7 +125,7 @@ export function InquirySection() {
                 className="mb-2 block text-xs font-normal uppercase leading-none tracking-[0.08em] text-[var(--text)] opacity-80"
                 htmlFor={`${formId}-email`}
               >
-                Email
+                {t.inquiry.email}
               </label>
               <input
                 className="min-h-11 w-full border border-[color:var(--border)] bg-[var(--surface)] px-3 py-2.5 text-base text-[var(--text)]"
@@ -143,7 +143,8 @@ export function InquirySection() {
                 className="mb-2 block text-xs font-normal uppercase leading-none tracking-[0.08em] text-[var(--text)] opacity-80"
                 htmlFor={`${formId}-phone`}
               >
-                Phone <span className="normal-case opacity-60">(optional)</span>
+                {t.inquiry.phone}{" "}
+                <span className="normal-case opacity-60">{t.inquiry.optional}</span>
               </label>
               <input
                 className="min-h-11 w-full border border-[color:var(--border)] bg-[var(--surface)] px-3 py-2.5 text-base text-[var(--text)]"
@@ -160,7 +161,7 @@ export function InquirySection() {
                 className="mb-2 block text-xs font-normal uppercase leading-none tracking-[0.08em] text-[var(--text)] opacity-80"
                 htmlFor={`${formId}-message`}
               >
-                Message
+                {t.inquiry.message}
               </label>
               <textarea
                 className="min-h-40 w-full resize-y border border-[color:var(--border)] bg-[var(--surface)] px-3 py-2.5 text-base text-[var(--text)]"
@@ -190,7 +191,7 @@ export function InquirySection() {
               >
                 {errMsg}{" "}
                 <a
-                  className="text-[var(--accent)] underline"
+                  className="text-[var(--text)] underline"
                   href={`mailto:${INQUIRY_PUBLIC_EMAIL}`}
                 >
                   {INQUIRY_PUBLIC_EMAIL}
@@ -200,10 +201,10 @@ export function InquirySection() {
             <div className="min-[500px]:col-span-2">
               <button
                 type="submit"
-                className="mt-1 inline-flex min-w-[120px] cursor-pointer items-center justify-center border-0 bg-[var(--accent)] px-[18px] py-3.5 text-base uppercase leading-none text-black disabled:cursor-wait disabled:opacity-50"
+                className="mt-1 inline-flex min-w-[120px] cursor-pointer items-center justify-center border-0 bg-[var(--text)] px-[18px] py-3.5 text-base uppercase leading-none text-[var(--surface)] disabled:cursor-wait disabled:opacity-50"
                 disabled={status === "sending"}
               >
-                {status === "sending" ? "Sending…" : "Send"}
+                {status === "sending" ? t.inquiry.sending : t.inquiry.send}
               </button>
             </div>
           </form>

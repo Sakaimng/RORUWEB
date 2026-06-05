@@ -5,19 +5,12 @@ import { Navigation } from "@/components/Navigation";
 import { RoruLoader } from "@/components/roru/RoruLoader";
 import { PageTransition } from "@/components/roru/PageTransition";
 import { ScrollRestoration } from "@/components/ScrollRestoration";
-import { ThemeClassSync } from "@/components/ThemeAndClock";
-import { getHongKongHour } from "@/lib/content";
+import { LanguageProvider } from "@/lib/i18n";
 
-function initialHongKongThemeClass(): "theme-day" | "theme-night" {
-  const h = getHongKongHour();
-  return h >= 6 && h < 18 ? "theme-day" : "theme-night";
-}
-
-/* Only weights used in the UI (headings: thin–extralight; body/labels: normal–semibold). Dropping 700 cuts font bytes. */
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-geist",
-  weight: ["100", "200", "300", "400", "500", "600"],
+  weight: ["700"],
   display: "swap",
   adjustFontFallback: true,
 });
@@ -41,13 +34,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const themeClass = initialHongKongThemeClass();
   return (
-    <html
-      lang="en"
-      className={`${themeClass} roru-preload`}
-      suppressHydrationWarning
-    >
+    <html lang="en" className="theme-night roru-preload" suppressHydrationWarning>
       <head>
         <link
           rel="preconnect"
@@ -58,12 +46,13 @@ export default function RootLayout({
       <body
         className={`${geist.variable} min-h-screen overscroll-none bg-[var(--surface)] font-sans text-[var(--text)] antialiased`}
       >
-        <ThemeClassSync />
-        <ScrollRestoration />
-        <PageTransition />
-        <RoruLoader />
-        <Navigation />
-        {children}
+        <LanguageProvider>
+          <ScrollRestoration />
+          <PageTransition />
+          <RoruLoader />
+          <Navigation />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [{ source: "/gallery", destination: "/about", permanent: true }];
+  },
   images: {
     /** Long cache for stable public assets. */
     minimumCacheTTL: 60 * 60 * 24 * 30,

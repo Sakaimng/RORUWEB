@@ -1,19 +1,29 @@
-/** Gallery scroll — same order as the original site; files in `site/public/homePageImages`. */
-export const GALLERY_IMAGES = [
-  "/homePageImages/L1053430.jpg",
-  "/homePageImages/L1053433.jpg",
-  "/homePageImages/L1053405.jpg",
-  "/homePageImages/DSC07910.jpg",
-  "/homePageImages/L1053336.jpg",
-  "/homePageImages/L1052807.jpg",
-  "/homePageImages/L1052778.jpg",
-  "/homePageImages/L1053170.jpg",
-  "/homePageImages/DSC07924.jpg",
-  "/homePageImages/DSC07827.jpg",
-  "/homePageImages/DSC07643.jpg",
-  "/homePageImages/DSC07596.jpg",
-  "/homePageImages/DSC07800.jpg",
-] as const;
+/** Home overlay panel cover images — files in `site/public` (desktop + mobile pairs). */
+export const HOME_HERO_IMAGES = {
+  desktop: "/Desktop Home Hero BG.jpg",
+  mobile: "/Mobile Home Hero BG.jpg",
+} as const;
+
+/** Home overlay — About panel (after Reserve) links to `/about`. */
+export const HOME_ABOUT_COVER_IMAGES = {
+  desktop: "/About Desktop Home BG.jpg",
+  mobile: "/About Mobile Home BG.jpg",
+} as const;
+
+export const HOME_EVENTS_COVER_IMAGES = {
+  desktop: "/Event Home Desktop BG.jpg",
+  mobile: "/Event Home Mobile BG.jpg",
+} as const;
+
+export const HOME_RESERVE_COVER_IMAGES = {
+  desktop: "/Reserve Home Desktop.jpg",
+  mobile: "/Reserve Home Mobile.jpg",
+} as const;
+
+/** @deprecated Use HOME_EVENTS_COVER_IMAGES — kept for any external references. */
+export const EVENTS_COVER_IMAGE = HOME_EVENTS_COVER_IMAGES.desktop;
+/** @deprecated Use HOME_RESERVE_COVER_IMAGES — kept for any external references. */
+export const RESERVE_COVER_IMAGE = HOME_RESERVE_COVER_IMAGES.desktop;
 
 /** Served from `site/public/homePageImages`. */
 export const LOGO_URL =
@@ -30,13 +40,6 @@ export const SITE_MAP_URL =
 /** Single line for the fixed nav address strip. */
 export const SITE_ADDRESS_DOCK_LINE =
   "G/F, 100–102 Queen's Road East, Wan Chai, Hong Kong Island";
-
-export const BOOKING_NOTES: Record<"lunch" | "dinner", string> = {
-  lunch:
-    "Only electronic payments are accepted at the venue. Dining experience for Lunch is 60 minutes from reservation time. Table reservations will be held for a maximum of 10 minutes after the reservation time.",
-  dinner:
-    "Only electronic payments are accepted at the venue. Dining experience for Dinner is 75 minutes from reservation time. Table reservations will be held for a maximum of 10 minutes after the reservation time.",
-};
 
 export type SiteEvent = {
   title: string;
@@ -73,39 +76,39 @@ export const EVENTS: SiteEvent[] = [
 
 /** About page grid — files in `site/public/aboutPageImages` (alphabetical). */
 export const ABOUT_PAGE_IMAGES: { src: string; n: string }[] = [
-  { src: "/aboutPageImages/DSC07800.jpg", n: "01" },
-  { src: "/aboutPageImages/DSC07910.jpg", n: "02" },
-  { src: "/aboutPageImages/L1052879.jpg", n: "03" },
-  { src: "/aboutPageImages/L1052894.jpg", n: "04" },
-  { src: "/aboutPageImages/L1052984.jpg", n: "05" },
-  { src: "/aboutPageImages/L1053041.jpg", n: "06" },
-  { src: "/aboutPageImages/L1053100.jpg", n: "07" },
-  { src: "/aboutPageImages/L1053309.jpg", n: "08" },
-  { src: "/aboutPageImages/L1053310.jpg", n: "09" },
-  { src: "/aboutPageImages/L1053338.jpg", n: "10" },
-  { src: "/aboutPageImages/L1053412.jpg", n: "11" },
-  { src: "/aboutPageImages/L1053624.jpg", n: "12" },
+  { src: "/aboutPageImages/DSC07800.webp", n: "01" },
+  { src: "/aboutPageImages/DSC07910.webp", n: "02" },
+  { src: "/aboutPageImages/L1052879.webp", n: "03" },
+  { src: "/aboutPageImages/L1052894.webp", n: "04" },
+  { src: "/aboutPageImages/L1052984.webp", n: "05" },
+  { src: "/aboutPageImages/L1053041.webp", n: "06" },
+  { src: "/aboutPageImages/L1053100.webp", n: "07" },
+  { src: "/aboutPageImages/L1053309.webp", n: "08" },
+  { src: "/aboutPageImages/L1053310.webp", n: "09" },
+  { src: "/aboutPageImages/L1053338.webp", n: "10" },
+  { src: "/aboutPageImages/L1053412.webp", n: "11" },
+  { src: "/aboutPageImages/L1053624.webp", n: "12" },
 ];
 
 /** Hero marquee order (matches Squarespace about sequence). */
 export const ABOUT_SEQUENCE: { src: string; n: string; alt: string }[] = [
-  { src: "/aboutPageImages/L1053310.jpg", n: "01", alt: "About image 01" },
-  { src: "/aboutPageImages/L1053309.jpg", n: "02", alt: "About image 02" },
-  { src: "/aboutPageImages/L1053338.jpg", n: "03", alt: "About image 03" },
-  { src: "/aboutPageImages/L1053100.jpg", n: "04", alt: "About image 04" },
-  { src: "/aboutPageImages/L1052894.jpg", n: "05", alt: "About image 05" },
-  { src: "/aboutPageImages/L1053041.jpg", n: "06", alt: "About image 06" },
-  { src: "/aboutPageImages/L1052984.jpg", n: "07", alt: "About image 07" },
-  { src: "/aboutPageImages/L1052879.jpg", n: "08", alt: "About image 08" },
-  { src: "/aboutPageImages/L1053624.jpg", n: "09", alt: "About image 09" },
-  { src: "/aboutPageImages/DSC07800.jpg", n: "10", alt: "About image 10" },
+  { src: "/aboutPageImages/L1053310.webp", n: "01", alt: "About image 01" },
+  { src: "/aboutPageImages/L1053309.webp", n: "02", alt: "About image 02" },
+  { src: "/aboutPageImages/L1053338.webp", n: "03", alt: "About image 03" },
+  { src: "/aboutPageImages/L1053100.webp", n: "04", alt: "About image 04" },
+  { src: "/aboutPageImages/L1052894.webp", n: "05", alt: "About image 05" },
+  { src: "/aboutPageImages/L1053041.webp", n: "06", alt: "About image 06" },
+  { src: "/aboutPageImages/L1052984.webp", n: "07", alt: "About image 07" },
+  { src: "/aboutPageImages/L1052879.webp", n: "08", alt: "About image 08" },
+  { src: "/aboutPageImages/L1053624.webp", n: "09", alt: "About image 09" },
+  { src: "/aboutPageImages/DSC07800.webp", n: "10", alt: "About image 10" },
 ];
 
 /** Story masonry (section 3). */
 export const ABOUT_STORY_IMAGES = {
-  large: "/aboutPageImages/DSC07910.jpg",
-  top: "/aboutPageImages/L1053412.jpg",
-  bottom: "/aboutPageImages/L1053624.jpg",
+  large: "/aboutPageImages/DSC07910.webp",
+  top: "/aboutPageImages/L1053412.webp",
+  bottom: "/aboutPageImages/L1053624.webp",
 } as const;
 
 export function getHongKongHour(): number {
