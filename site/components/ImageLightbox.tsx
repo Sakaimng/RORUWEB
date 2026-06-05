@@ -67,8 +67,7 @@ export function ImageLightbox({ images, active, onClose, onChange }: Props) {
           <Image
             src={images[active]!}
             alt=""
-            width={1200}
-            height={1600}
+            fill
             className="roru-lightbox__image"
             priority
             sizes="100vw"
