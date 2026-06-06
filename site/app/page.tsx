@@ -42,7 +42,7 @@ export default function Home() {
             className="roru-home-overlay-panel homepage-reveal"
             data-home-cta
             data-home-cta-id="reserve"
-            data-home-cta-title="APPOINTMENT"
+            data-home-cta-title="reserve"
             data-home-cta-href="/reserve"
           >
             <HomeCoverPanel

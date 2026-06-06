@@ -45,6 +45,7 @@ export default function RootLayout({
       </head>
       <body
         className={`${geist.variable} min-h-screen overscroll-none bg-[var(--surface)] font-sans text-[var(--text)] antialiased`}
+        suppressHydrationWarning
       >
         <LanguageProvider>
           <ScrollRestoration />

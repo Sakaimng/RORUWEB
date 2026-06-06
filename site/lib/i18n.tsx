@@ -31,12 +31,17 @@ const HTML_LANG: Record<Lang, string> = {
 const STORAGE_KEY = "roru-lang";
 
 /**
- * Site copy by language. The Menu page title and the booking page heading ("APPOINTMENT")
- * stay in English. JP / Traditional-Chinese strings are first-pass translations and
- * are meant to be proofread.
+ * Site copy by language. The Menu page title stays in English.
+ * JP / Traditional-Chinese strings are first-pass translations and are meant to be proofread.
  */
 type Dict = {
-  nav: { home: string; about: string; events: string; menus: string };
+  nav: {
+    home: string;
+    about: string;
+    events: string;
+    menus: string;
+    appointment: string;
+  };
   menuToggle: { open: string; close: string };
   /** Hero tagline rendered as two lines. */
   heroTagline: [string, string];
@@ -85,7 +90,6 @@ type Dict = {
     intro: string[];
     story: string[];
   };
-  /** Reserve / appointment page — `pageTitle` is always English. */
   booking: {
     pageTitle: string;
     lunch: string;
@@ -103,7 +107,13 @@ type Dict = {
 };
 
 const en: Dict = {
-  nav: { home: "Home", about: "About", events: "Events", menus: "Menus" },
+  nav: {
+    home: "Home",
+    about: "About",
+    events: "Events",
+    menus: "Menus",
+    appointment: "Appointment",
+  },
   menuToggle: { open: "Menu", close: "Close" },
   heroTagline: ["Hong Kong's", "Original Hand Roll Bar"],
   cta: { discover: "Discover", events: "Events", inquire: "Inquire" },
@@ -180,7 +190,13 @@ const en: Dict = {
 };
 
 const jp: Dict = {
-  nav: { home: "ホーム", about: "私たちについて", events: "イベント", menus: "メニュー" },
+  nav: {
+    home: "ホーム",
+    about: "私たちについて",
+    events: "イベント",
+    menus: "メニュー",
+    appointment: "予約",
+  },
   menuToggle: { open: "メニュー", close: "閉じる" },
   heroTagline: ["香港発", "オリジナル手巻き寿司バー"],
   cta: { discover: "見る", events: "イベント", inquire: "お問い合わせ" },
@@ -239,7 +255,7 @@ const jp: Dict = {
     ],
   },
   booking: {
-    pageTitle: "APPOINTMENT",
+    pageTitle: "予約",
     lunch: "ランチ",
     dinner: "ディナー",
     chefsCounter: "シェフカウンター",
@@ -257,7 +273,13 @@ const jp: Dict = {
 };
 
 const cn: Dict = {
-  nav: { home: "首頁", about: "關於我們", events: "活動", menus: "菜單" },
+  nav: {
+    home: "首頁",
+    about: "關於我們",
+    events: "活動",
+    menus: "菜單",
+    appointment: "預約",
+  },
   menuToggle: { open: "選單", close: "關閉" },
   heroTagline: ["香港首創", "手卷壽司吧"],
   cta: { discover: "探索", events: "活動", inquire: "查詢" },
@@ -316,7 +338,7 @@ const cn: Dict = {
     ],
   },
   booking: {
-    pageTitle: "APPOINTMENT",
+    pageTitle: "預約",
     lunch: "午餐",
     dinner: "晚餐",
     chefsCounter: "主廚吧台",

@@ -60,7 +60,6 @@ export function HomeSectionCta() {
   const shown = item ?? lastItemRef.current;
   if (!shown) return null;
 
-  // Translate the panel title by id ("APPOINTMENT" stays English).
   const titleById: Record<string, string> = {
     about: t.nav.about,
     events: t.cta.events,

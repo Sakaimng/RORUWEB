@@ -108,22 +108,15 @@ export function Navigation() {
   const { t } = useI18n();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  /* Nav links — translated, except Appointment and Reserve Now (English). */
   const links = [
     { href: "/", label: t.nav.home },
     { href: "/about", label: t.nav.about },
     { href: "/events", label: t.nav.events },
     { href: "/menu", label: t.nav.menus },
-    { href: "/reserve", label: "Appointment" },
+    { href: "/reserve", label: t.nav.appointment },
   ];
 
-  const mobileLinks = [
-    { href: "/", label: t.nav.home },
-    { href: "/about", label: t.nav.about },
-    { href: "/events", label: t.nav.events },
-    { href: "/menu", label: t.nav.menus },
-    { href: "/reserve", label: "Appointment" },
-  ];
+  const mobileLinks = links;
   const menuRef = useRef<HTMLElement>(null);
   const previousPathnameRef = useRef(pathname);
   const hasAnimatedMenuRef = useRef(false);

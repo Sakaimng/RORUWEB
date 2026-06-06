@@ -10,6 +10,7 @@
     "lint": "next lint",
     "assets:home-covers": "node scripts/optimize-home-covers.mjs",
     "assets:event-galleries": "node scripts/build-event-galleries.mjs",
+    "assets:event-galleries:sync": "node scripts/sync-event-galleries-manifest.mjs",
     "assets:all": "npm run assets:home-covers && npm run assets:event-galleries"
   },
   "dependencies": {

@@ -131,9 +131,37 @@ html.roru-nav-tone-light .roru-home-discover__button {
   color: #f1f1f1 !important;
 }
 
-/* Active language pill: #121212 background, #D9D9D9 label */
-.roru-nav .roru-language-toggle button[aria-pressed="true"] {
-  background: #121212 !important;
+/* Language toggle — sliding thumb + label colors */
+.roru-language-toggle {
+  position: relative;
+  isolation: isolate;
+}
+
+.roru-language-toggle__thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 999px;
+  background: #121212;
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform, width, height;
+}
+
+.roru-language-toggle__btn {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
+  opacity: 0.6;
+  transition: color 0.3s var(--roru-nav-ease), opacity 0.3s var(--roru-nav-ease);
+}
+
+.roru-language-toggle__btn:hover {
+  opacity: 1;
+}
+
+.roru-language-toggle__btn.is-active,
+.roru-language-toggle__btn[aria-pressed="true"] {
   color: #d9d9d9 !important;
   opacity: 1 !important;
 }
@@ -165,9 +193,9 @@ html.roru-nav-tone-light .roru-home-discover__button {
     opacity: 0.6;
   }
 
-  html.roru-mobile-menu-open .roru-nav .roru-language-toggle button[aria-pressed="true"] {
+  html.roru-mobile-menu-open .roru-nav .roru-language-toggle__btn.is-active,
+  html.roru-mobile-menu-open .roru-nav .roru-language-toggle__btn[aria-pressed="true"] {
     color: #d9d9d9 !important;
-    background: #121212 !important;
   }
 
   html.roru-mobile-menu-open .roru-home-discover {
