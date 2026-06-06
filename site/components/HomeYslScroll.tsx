@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { clearNavTone, syncNavToneFromPanel } from "@/lib/nav-tone";
 import { SCROLL_TO_TOP_EVENT } from "@/lib/scroll-to-top";
 
 const LOCK_MS = 850;
@@ -71,6 +72,8 @@ function applyIndex(index: number) {
       detail: { item: itemForPanel(panels[clamped]) },
     })
   );
+
+  syncNavToneFromPanel(panels[clamped]);
 
   return clamped;
 }
@@ -175,6 +178,7 @@ export function HomeYslScroll() {
       window.clearTimeout(settleTimer);
       document.documentElement.classList.remove("roru-home-footer-active");
       document.documentElement.style.removeProperty("--roru-home-active-index");
+      clearNavTone();
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);

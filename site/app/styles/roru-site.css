@@ -5,7 +5,7 @@
 }
 
 html.theme-day body {
-  background: #f1f1f1;
+  background: #d9d9d9;
   color: #121212;
 }
 
@@ -20,13 +20,13 @@ html.theme-day body {
 }
 
 html.theme-day #page-content {
-  background: #f1f1f1;
+  background: #d9d9d9;
   color: #121212;
 }
 
 html.theme-night body {
-  background: #121212;
-  color: #f1f1f1;
+  background: #d9d9d9;
+  color: #121212;
 }
 
 /* Main surfaces */
@@ -43,7 +43,7 @@ html.theme-day .roru-about-intro,
 html.theme-day .roru-about-story,
 html.theme-day .about-opera-section,
 html.theme-day .roru-menu-page {
-  background: #f1f1f1 !important;
+  background: #d9d9d9 !important;
   color: #121212 !important;
 }
 
@@ -60,8 +60,8 @@ html.theme-night .roru-about-intro,
 html.theme-night .roru-about-story,
 html.theme-night .about-opera-section,
 html.theme-night .roru-menu-page {
-  background: #121212 !important;
-  color: #f1f1f1 !important;
+  background: #d9d9d9 !important;
+  color: #121212 !important;
 }
 
 /* Typography + buttons + UI */
@@ -105,7 +105,7 @@ html.theme-night .roru-event-card__desc,
 html.theme-night .roru-event-card__date,
 html.theme-night .roru-event-card__status,
 html.theme-night .roru-events-tab {
-  color: #f1f1f1 !important;
+  color: #121212 !important;
 }
 
 /* Borders */
@@ -128,8 +128,7 @@ html.theme-night .date-select {
 html.theme-day .slots-title,
 html.theme-day .party-label,
 html.theme-day .calendar-days button.is-selected,
-html.theme-day .slot-btn.is-selected,
-html.theme-day .roru-booking-cta {
+html.theme-day .slot-btn.is-selected {
   color: #121212 !important;
   stroke: #121212 !important;
   fill: #121212 !important;
@@ -140,7 +139,7 @@ html.theme-day .calendar-days button.is-selected,
 html.theme-day .slot-btn.is-selected,
 html.theme-day .roru-booking-cta {
   background: #121212 !important;
-  color: #f1f1f1 !important;
+  color: #ffffff !important;
 }
 
 html.theme-day img,
@@ -201,8 +200,8 @@ body {
   left: 0;
   width: 100%;
   z-index: 1;
-  background: #121212;
-  color: #f1f1f1;
+  background: #d9d9d9;
+  color: #121212;
 }
 
 .roru-footer__grid {
@@ -260,7 +259,7 @@ body {
   line-height: 1;
   font-weight: 600;
   letter-spacing: 0.04em;
-  color: #f1f1f1;
+  color: #121212;
 }
 
 .roru-footer__text,
@@ -270,7 +269,7 @@ body {
   font-size: clamp(16px, 1.2vw, 24px);
   line-height: 1.15;
   font-weight: 400;
-  color: #f1f1f1;
+  color: #121212;
   text-decoration: none;
 }
 
@@ -439,7 +438,7 @@ html.roru-preload .homepage-reveal {
 /* Hero section */
 
 :root {
-  --roru-bg: #121212;
+  --roru-bg: #d9d9d9;
   --roru-orange: var(--text);
   --roru-white: #f1f1f1;
   --roru-gap: 9px;
@@ -804,7 +803,7 @@ figure.roru-gallery-item {
   padding: 12px 16px;
   border: 0;
   background: var(--text);
-  color: #121212;
+  color: #ffffff;
   cursor: pointer;
   font-size: clamp(13px, 1.1vw, 16px);
   line-height: 1;
@@ -1635,8 +1634,17 @@ html.theme-night .roru-inquiry-section * {
 .roru-inquiry-section button[type="submit"] {
   background: var(--text) !important;
   border-color: var(--text) !important;
-  color: #121212 !important;
   border-radius: 999px;
+}
+
+.calendar-days button.is-selected,
+.slot-btn.is-selected {
+  color: #121212 !important;
+}
+
+.roru-booking-cta,
+.roru-inquiry-section button[type="submit"] {
+  color: #ffffff !important;
 }
 
 .roru-events-section {
@@ -2240,17 +2248,17 @@ html.theme-day .roru-gallery-section {
 }
 
 html.theme-day {
-  --roru-home-bg: #f1f1f1;
+  --roru-home-bg: #d9d9d9;
   --roru-home-fg: #121212;
   --roru-home-muted: rgba(18, 18, 18, 0.68);
   --roru-home-rule: rgba(18, 18, 18, 0.16);
 }
 
 html.theme-night {
-  --roru-home-bg: #121212;
-  --roru-home-fg: #f1f1f1;
-  --roru-home-muted: rgba(241, 241, 241, 0.68);
-  --roru-home-rule: rgba(241, 241, 241, 0.16);
+  --roru-home-bg: #d9d9d9;
+  --roru-home-fg: #121212;
+  --roru-home-muted: rgba(18, 18, 18, 0.68);
+  --roru-home-rule: rgba(18, 18, 18, 0.16);
 }
 
 body:has(#page-content),
@@ -2467,7 +2475,16 @@ body:has(#page-content) .roru-booking-cta,
 body:has(#page-content) .roru-inquiry-section button[type="submit"] {
   background: var(--text) !important;
   border-color: var(--text) !important;
+}
+
+body:has(#page-content) .calendar-days button.is-selected,
+body:has(#page-content) .slot-btn.is-selected {
   color: #121212 !important;
+}
+
+body:has(#page-content) .roru-booking-cta,
+body:has(#page-content) .roru-inquiry-section button[type="submit"] {
+  color: #ffffff !important;
 }
 
 body:has(#page-content) .roru-events-heading,
@@ -4326,7 +4343,7 @@ body:has(.roru-home-overlays) .roru-gallery-section--featured .roru-gallery-shel
   display: grid;
   justify-items: center;
   gap: 8px;
-  color: var(--text);
+  color: #121212;
   transform: translateX(-50%);
   pointer-events: none;
   opacity: 1;
@@ -4380,7 +4397,7 @@ body:has(.roru-home-overlays) .roru-home-overlay-panel--hero:not(.is-active) .ro
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: var(--text);
+  color: inherit;
   font: inherit;
   font-size: 12px !important;
   line-height: 1;
@@ -4392,7 +4409,8 @@ body:has(.roru-home-overlays) .roru-home-overlay-panel--hero:not(.is-active) .ro
   pointer-events: auto;
   transition:
     opacity 0.2s ease,
-    transform 0.2s ease;
+    transform 0.2s ease,
+    color 0.3s var(--roru-nav-ease);
 }
 
 .roru-home-discover__button:hover {

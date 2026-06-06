@@ -35,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="theme-night roru-preload" suppressHydrationWarning>
+    <html lang="en" className="theme-day roru-preload" suppressHydrationWarning>
       <head>
         <link
           rel="preconnect"

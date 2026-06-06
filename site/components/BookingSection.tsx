@@ -202,7 +202,7 @@ export function BookingSection() {
 
           <button
             type="button"
-            className="roru-booking-cta mt-6 inline-flex w-fit min-w-[120px] cursor-pointer items-center justify-center border-0 bg-[var(--text)] px-[18px] py-3.5 text-base uppercase leading-none text-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-40"
+            className="roru-booking-cta mt-6 inline-flex w-fit min-w-[120px] cursor-pointer items-center justify-center border-0 bg-[var(--text)] px-[18px] py-3.5 text-base uppercase leading-none text-white disabled:cursor-not-allowed disabled:opacity-40"
             disabled={!ctaReady}
             onClick={() => {
               if (!ctaReady || !slot) return;

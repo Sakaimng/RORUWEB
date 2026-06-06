@@ -36,7 +36,7 @@ html.roru-transition-pending .roru-page-transition {
   --roru-nav-radius: 999px;
   --roru-nav-bg: rgba(18, 18, 18, 0.9);
   --roru-nav-border: rgba(255, 255, 255, 0.14);
-  --roru-nav-fg: #f1f1f1;
+  --roru-nav-fg: #121212;
   --roru-nav-ease: cubic-bezier(0.76, 0, 0.24, 1);
   /* Space from top of viewport to first hero content (safe area + fixed .roru-nav). Desktop default; mobile overrides. */
   --roru-fixed-nav-clear-bottom: calc(
@@ -102,12 +102,72 @@ html.roru-loading .roru-nav-item {
   font-weight: 700 !important;
 }
 
+/* Default: dark nav on #D9D9D9 content sections */
+.roru-nav,
+.roru-nav .roru-nav-item,
+.roru-nav .roru-nav-item *,
+.roru-nav .roru-mobile-menu-item,
+.roru-nav a,
+.roru-nav button {
+  color: var(--roru-nav-fg);
+  transition: color 0.3s var(--roru-nav-ease);
+}
+
+/* Cover image panels: light nav */
+html.roru-nav-tone-light {
+  --roru-nav-fg: #f1f1f1;
+}
+
+html.roru-nav-tone-light .roru-nav .roru-language-toggle {
+  background: color-mix(in srgb, #121212 42%, transparent);
+}
+
+html.roru-nav-tone-light .roru-nav .roru-language-toggle button:not([aria-pressed="true"]) {
+  color: #f1f1f1;
+}
+
+html.roru-nav-tone-light .roru-home-discover,
+html.roru-nav-tone-light .roru-home-discover__button {
+  color: #f1f1f1 !important;
+}
+
+/* Active language pill: #121212 background, #D9D9D9 label */
+.roru-nav .roru-language-toggle button[aria-pressed="true"] {
+  background: #121212 !important;
+  color: #d9d9d9 !important;
+  opacity: 1 !important;
+}
+
 /* Mobile menu open: lock scroll, dim content behind the flyout. */
 @media (max-width: 1031px) {
   html.roru-mobile-menu-open,
   html.roru-mobile-menu-open body {
     overflow: hidden !important;
     overscroll-behavior: none;
+  }
+
+  /* Menu backdrop is light gray — always use dark nav over the flyout */
+  html.roru-mobile-menu-open {
+    --roru-nav-fg: #121212;
+  }
+
+  html.roru-mobile-menu-open .roru-nav,
+  html.roru-mobile-menu-open .roru-nav .roru-nav-item,
+  html.roru-mobile-menu-open .roru-nav .roru-nav-item *,
+  html.roru-mobile-menu-open .roru-nav .roru-mobile-menu-item,
+  html.roru-mobile-menu-open .roru-nav a,
+  html.roru-mobile-menu-open .roru-nav button {
+    color: #121212 !important;
+  }
+
+  html.roru-mobile-menu-open .roru-nav .roru-language-toggle button:not([aria-pressed="true"]) {
+    color: #121212 !important;
+    opacity: 0.6;
+  }
+
+  html.roru-mobile-menu-open .roru-nav .roru-language-toggle button[aria-pressed="true"] {
+    color: #d9d9d9 !important;
+    background: #121212 !important;
   }
 
   html.roru-mobile-menu-open .roru-home-discover {

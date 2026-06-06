@@ -10,8 +10,9 @@
 :root {
   --roru-light: #f1f1f1;
   --roru-dark: #121212;
-  --surface: var(--roru-dark);
-  --text: var(--roru-light);
+  --roru-surface: #d9d9d9;
+  --surface: var(--roru-surface);
+  --text: var(--roru-dark);
   --accent: var(--text);
   --accent-muted: var(--text);
   --border: color-mix(in srgb, var(--text) 16%, transparent);
@@ -20,7 +21,7 @@
   /** Horizontal inset for main sections (never exceed 2vw per side). */
   --roru-section-pad-x: 2vw;
 
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 * {

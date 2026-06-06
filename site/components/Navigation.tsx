@@ -207,7 +207,7 @@ export function Navigation() {
             <div className="flex min-w-0 items-center justify-start gap-3 min-[1032px]:flex-1 min-[1032px]:gap-4">
               <button
                 type="button"
-                className="roru-nav-item inline-flex shrink-0 items-center justify-center overflow-hidden px-0 py-2 text-xs font-bold uppercase text-[var(--text)] transition-opacity hover:opacity-70 min-[1032px]:hidden"
+                className="roru-nav-item inline-flex shrink-0 items-center justify-center overflow-hidden px-0 py-2 text-xs font-bold uppercase transition-opacity hover:opacity-70 min-[1032px]:hidden"
                 aria-controls="roru-mobile-menu"
                 aria-expanded={menuOpen}
                 aria-label={menuOpen ? "Close menu" : "Menu"}
@@ -227,7 +227,7 @@ export function Navigation() {
                     key={href}
                     href={href}
                     aria-current={isActiveRoute(pathname, href) ? "page" : undefined}
-                    className="roru-nav-item text-xs font-bold uppercase text-[var(--text)] transition-opacity hover:opacity-70"
+                    className="roru-nav-item text-xs font-bold uppercase transition-opacity hover:opacity-70"
                   >
                     {label}
                   </Link>
@@ -239,7 +239,7 @@ export function Navigation() {
             <div className={`justify-self-center ${brandPositionClassName}`}>
               <button
                 type="button"
-                className="roru-nav-item block leading-none text-[var(--text)]"
+                className="roru-nav-item block leading-none"
                 aria-label="Back to top"
                 onClick={() => {
                   setMenuOpen(false);
@@ -256,7 +256,7 @@ export function Navigation() {
                 href={TOCK_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="roru-nav-item shrink-0 px-0 py-2 text-xs font-bold uppercase text-[var(--text)] transition-opacity hover:opacity-70"
+                className="roru-nav-item shrink-0 px-0 py-2 text-xs font-bold uppercase transition-opacity hover:opacity-70"
               >
                 Reserve Now
               </a>
@@ -279,7 +279,7 @@ export function Navigation() {
                   key={href}
                   href={href}
                   aria-current={isActiveRoute(pathname, href) ? "page" : undefined}
-                  className="roru-mobile-menu-item block rounded-lg px-6 py-3 text-center text-base font-bold uppercase text-[var(--text)] transition-opacity hover:opacity-70"
+                  className="roru-mobile-menu-item block rounded-lg px-6 py-3 text-center text-base font-bold uppercase transition-opacity hover:opacity-70"
                 >
                   {label}
                 </Link>

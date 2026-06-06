@@ -10,7 +10,7 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
     <div
       role="group"
       aria-label="Language"
-      className={`roru-nav-item inline-flex shrink-0 items-center rounded-full bg-[color:color-mix(in_srgb,var(--surface)_68%,transparent)] p-1 backdrop-blur-md ${className}`}
+      className={`roru-nav-item roru-language-toggle inline-flex shrink-0 items-center rounded-full bg-[color:color-mix(in_srgb,var(--surface)_68%,transparent)] p-1 backdrop-blur-md ${className}`}
     >
       {LANGS.map((code) => {
         const active = lang === code;
@@ -22,9 +22,7 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
             aria-label={`Switch language to ${LANG_LABELS[code]}`}
             onClick={() => setLang(code)}
             className={`rounded-full px-2.5 py-1.5 text-xs font-bold uppercase leading-none transition-opacity sm:px-3 ${
-              active
-                ? "bg-[var(--text)] text-[var(--surface)]"
-                : "text-[var(--text)] opacity-60 hover:opacity-100"
+              active ? "opacity-100" : "opacity-60 hover:opacity-100"
             }`}
           >
             {LANG_LABELS[code]}
