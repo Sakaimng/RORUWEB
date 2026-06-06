@@ -93,7 +93,7 @@ export function ImageLightbox({ images, active, onClose, onChange }: Props) {
           <button
             type="button"
             ref={closeBtnRef}
-            className="roru-lightbox__close roru-nav-item shrink-0 px-0 py-2 text-xs font-bold uppercase leading-none text-[var(--text)] transition-opacity hover:opacity-70"
+            className="roru-lightbox__close roru-nav-item shrink-0 px-0 py-2 text-xs font-bold uppercase leading-none transition-opacity hover:opacity-70"
             onClick={(e) => {
               e.stopPropagation();
               onClose();

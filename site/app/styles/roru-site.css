@@ -3671,6 +3671,7 @@ body:has(#page-content) .roru-inquiry-section button[type="submit"]:not(:disable
   border-radius: 0;
   cursor: pointer;
   pointer-events: auto;
+  color: #d9d9d9 !important;
 }
 
 .roru-lightbox__nav {
