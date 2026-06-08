@@ -365,7 +365,7 @@ body.roru-loading {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface);
+  background: var(--text);
   overflow: hidden;
   will-change: transform;
 }
@@ -393,16 +393,17 @@ body.roru-loading {
 }
 
 .roru-loader-logo__stroke {
-  fill: none;
-  stroke: var(--text);
+  fill: transparent;
+  fill-opacity: 0;
+  stroke: var(--roru-light);
   stroke-width: 2.25px;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
 
-.roru-loader-logo__fill {
-  fill: var(--text);
+.roru-loader-logo__stroke.is-filled {
+  fill: var(--roru-light);
   stroke: none;
 }
 
@@ -3892,7 +3893,7 @@ body:has(#page-content) .roru-hero__visual-img {
 
 /* Preloader polish */
 #roru-loader {
-  background: var(--surface);
+  background: var(--text);
 }
 
 .roru-loader__inner {
@@ -3902,17 +3903,9 @@ body:has(#page-content) .roru-hero__visual-img {
   width: min(88vw, 1040px);
 }
 
-#roru-loader-logo {
-  filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.28));
-}
-
 .roru-loader-logo__stroke {
-  stroke: #f4f1eb;
+  stroke: var(--roru-light);
   stroke-width: 1.8px;
-}
-
-.roru-loader-logo__fill {
-  fill: var(--text);
 }
 
 @media (max-width: 767px) {

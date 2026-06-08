@@ -54,12 +54,6 @@ function LoaderLogoSvg() {
       role="img"
       aria-label="RORUBARU"
     >
-      <defs>
-        <clipPath id="roru-loader-rise-clip">
-          <rect id="roru-loader-rise-rect" x="0" y="136" width="267" height="0" />
-        </clipPath>
-      </defs>
-
       <g id="roru-loader-strokes">
         <g id="roru-loader-line-top">
           {PATH_LINE_TOP.map((d, i) => (
@@ -69,19 +63,6 @@ function LoaderLogoSvg() {
         <g id="roru-loader-line-bottom">
           {PATH_LINE_BOTTOM.map((d, i) => (
             <path key={`sb-${i}`} className="roru-loader-logo__stroke" d={d} />
-          ))}
-        </g>
-      </g>
-
-      <g clipPath="url(#roru-loader-rise-clip)" id="roru-loader-fills">
-        <g id="roru-loader-fill-top">
-          {PATH_LINE_TOP.map((d, i) => (
-            <path key={`ft-${i}`} className="roru-loader-logo__fill" d={d} />
-          ))}
-        </g>
-        <g id="roru-loader-fill-bottom">
-          {PATH_LINE_BOTTOM.map((d, i) => (
-            <path key={`fb-${i}`} className="roru-loader-logo__fill" d={d} />
           ))}
         </g>
       </g>
@@ -156,7 +137,6 @@ export function RoruLoader() {
       const wrap = innerRef.current;
       const loader = document.getElementById("roru-loader");
       const loaderSvg = document.getElementById("roru-loader-logo");
-      const riseRect = document.getElementById("roru-loader-rise-rect");
       if (!wrap) {
         revealWithoutLoader(shouldAnimateNav);
         ranRef.current = true;
@@ -173,11 +153,11 @@ export function RoruLoader() {
       );
       const nav = document.getElementById("roru-nav");
       const navBottom = document.getElementById("roru-nav-bottom");
+      const strokePaths = [...topStrokes, ...bottomStrokes];
 
       if (
         !loader ||
         !loaderSvg ||
-        !riseRect ||
         !strokeRoot ||
         !topStrokes.length ||
         !bottomStrokes.length
@@ -190,11 +170,13 @@ export function RoruLoader() {
       document.documentElement.classList.add("roru-loading");
       document.body.classList.add("roru-loading");
 
-      [...topStrokes, ...bottomStrokes].forEach((path) => {
+      strokePaths.forEach((path) => {
         const len = path.getTotalLength();
         gsap.set(path, {
           strokeDasharray: len,
           strokeDashoffset: len,
+          fillOpacity: 0,
+          strokeOpacity: 1,
         });
       });
       gsap.set(wrap, {
@@ -253,22 +235,17 @@ export function RoruLoader() {
             "<0.09"
           )
           .to(
-            strokeRoot,
+            strokePaths,
             {
-              opacity: 0,
-              duration: 0.12,
-              ease: "power2.in",
+              strokeOpacity: 0,
+              fillOpacity: 1,
+              duration: 0.42,
+              ease: "power2.inOut",
+              onStart: () => {
+                strokePaths.forEach((path) => path.classList.add("is-filled"));
+              },
             },
             ">-0.06"
-          )
-          .to(
-            riseRect,
-            {
-              attr: { y: 0, height: 136 },
-              duration: 0.65,
-              ease: "power3.out",
-            },
-            "<0.04"
           )
           .to(
             logoWrap,
@@ -277,7 +254,7 @@ export function RoruLoader() {
               duration: 0.58,
               ease: "expo.out",
             },
-            "<"
+            "<0.04"
           )
           .set(loaderEl, {
             clipPath: "inset(0% 0% 0% 0%)",

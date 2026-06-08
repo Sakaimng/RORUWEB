@@ -7,7 +7,7 @@ import { HOME_HERO_SLIDES } from "@/lib/content";
 import { PREOPTIMIZED_IMAGE } from "@/lib/image-display";
 import { useI18n } from "@/lib/i18n";
 
-const SLIDE_MS = 4000;
+const SLIDE_MS = 3000;
 const SLIDES = HOME_HERO_SLIDES;
 
 /** Renders the tagline as two lines, each line's words wrapped for the reveal animation. */
