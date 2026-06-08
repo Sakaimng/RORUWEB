@@ -4845,7 +4845,7 @@ body:has(#page-content) .roru-hero--ysl {
   position: relative;
   min-height: 100svh;
   overflow: hidden;
-  background: var(--surface) !important;
+  background: #000 !important;
 }
 
 body:has(#page-content) .roru-hero--ysl .roru-hero__reveal {
@@ -4864,6 +4864,7 @@ body:has(#page-content) .roru-hero--ysl .roru-hero__reveal {
   inset: 0;
   z-index: 0;
   overflow: hidden;
+  background: #000;
 }
 
 .roru-hero--ysl .roru-hero__slide {
