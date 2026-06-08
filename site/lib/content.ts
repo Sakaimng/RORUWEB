@@ -1,4 +1,9 @@
-/** Home overlay covers — WebP in `site/public/home-covers` (`npm run assets:home-covers`). */
+import heroSlidesManifest from "./home-hero-slides.manifest.json";
+
+/** Autoplay hero slideshow — WebP in `site/public/home-hero-slides`. */
+export const HOME_HERO_SLIDES = heroSlidesManifest.slides as readonly string[];
+
+/** @deprecated Hero uses HOME_HERO_SLIDES; kept for home-covers asset pipeline. */
 export const HOME_HERO_IMAGES = {
   desktop: "/home-covers/Desktop Home Hero BG.webp",
   mobile: "/home-covers/Mobile Home Hero BG.webp",

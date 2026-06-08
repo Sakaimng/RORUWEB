@@ -4863,25 +4863,32 @@ body:has(#page-content) .roru-hero--ysl .roru-hero__reveal {
   position: absolute;
   inset: 0;
   z-index: 0;
+  overflow: hidden;
+}
+
+.roru-hero--ysl .roru-hero__slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  z-index: 0;
+  transition: opacity 1.15s cubic-bezier(0.76, 0, 0.24, 1);
+  will-change: opacity;
+}
+
+.roru-hero--ysl .roru-hero__slide.is-active {
+  opacity: 1;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roru-hero--ysl .roru-hero__slide {
+    transition: none;
+  }
 }
 
 .roru-hero--ysl .roru-hero__media-img {
   object-fit: cover;
   object-position: 50% 50%;
-}
-
-.roru-hero--ysl .roru-hero__media-img--mobile {
-  display: none;
-}
-
-@media (max-width: 767px) {
-  .roru-hero--ysl .roru-hero__media-img--desktop {
-    display: none;
-  }
-
-  .roru-hero--ysl .roru-hero__media-img--mobile {
-    display: block;
-  }
 }
 
 body:has(#page-content) .roru-hero--ysl .roru-hero__center {

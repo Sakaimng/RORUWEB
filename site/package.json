@@ -11,7 +11,8 @@
     "assets:home-covers": "node scripts/optimize-home-covers.mjs",
     "assets:event-galleries": "node scripts/build-event-galleries.mjs",
     "assets:event-galleries:sync": "node scripts/sync-event-galleries-manifest.mjs",
-    "assets:all": "npm run assets:home-covers && npm run assets:event-galleries"
+    "assets:hero-slides": "node scripts/build-home-hero-slides.mjs",
+    "assets:all": "npm run assets:home-covers && npm run assets:hero-slides && npm run assets:event-galleries"
   },
   "dependencies": {
     "gsap": "^3.15.0",

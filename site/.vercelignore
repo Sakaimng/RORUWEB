@@ -23,5 +23,8 @@ public/Reserve Home Mobile.jpg
 public/Gallery Desktop Home BG.jpg
 public/Gallery Mobile Home BG.jpg
 
+# Full-res hero slideshow sources (deploy home-hero-slides/)
+public/HOME HERO SLIDES/**
+
 # Source menu SVGs (built copies in public/menus/)
 public/Menus SVG/**
