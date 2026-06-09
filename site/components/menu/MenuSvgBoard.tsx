@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import {
-  applyMenuSvgTheme,
   isMenuMobileLayout,
   MENU_MOBILE_MAX_WIDTH,
 } from "@/lib/menu-svg-process";
@@ -32,7 +31,6 @@ async function mountMenuSvg(
 
   svg.setAttribute("role", "img");
   svg.setAttribute("aria-label", ariaLabel);
-  applyMenuSvgTheme(svg);
   if (!isCurrent()) return;
   host.appendChild(svg);
 }
@@ -81,21 +79,10 @@ export function MenuSvgBoard({ src, mobileSrc, title, headingId }: Props) {
     void render(isMenuMobileLayout());
     layoutMq.addEventListener("change", onLayoutChange);
 
-    const themeObserver = new MutationObserver(() => {
-      hostEl.querySelectorAll("svg").forEach((node) => {
-        if (node instanceof SVGSVGElement) applyMenuSvgTheme(node);
-      });
-    });
-    themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
     return () => {
       cancelled = true;
       renderIdRef.current += 1;
       layoutMq.removeEventListener("change", onLayoutChange);
-      themeObserver.disconnect();
     };
   }, [src, mobileSrc, title]);
 

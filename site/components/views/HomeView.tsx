@@ -49,7 +49,7 @@ export function HomeView({ lang }: { lang: Lang }) {
             className="roru-home-overlay-panel homepage-reveal"
             data-home-cta
             data-home-cta-id="reserve"
-            data-home-cta-title="reserve"
+            data-home-cta-title="reservations"
             data-home-cta-href={reserveHref}
           >
             <HomeCoverPanel

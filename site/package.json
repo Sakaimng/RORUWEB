@@ -12,8 +12,9 @@
     "assets:event-galleries": "node scripts/build-event-galleries.mjs",
     "assets:event-galleries:sync": "node scripts/sync-event-galleries-manifest.mjs",
     "assets:hero-slides": "node scripts/build-home-hero-slides.mjs",
+    "assets:menus": "node scripts/build-menu-svgs.mjs",
     "assets:seo": "node scripts/seo-assets.mjs",
-    "assets:all": "npm run assets:home-covers && npm run assets:hero-slides && npm run assets:event-galleries && npm run assets:seo"
+    "assets:all": "npm run assets:home-covers && npm run assets:hero-slides && npm run assets:event-galleries && npm run assets:menus && npm run assets:seo"
   },
   "dependencies": {
     "gsap": "^3.15.0",

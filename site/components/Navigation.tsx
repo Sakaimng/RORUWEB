@@ -115,7 +115,7 @@ export function Navigation() {
     { href: "/about", label: t.nav.about },
     { href: "/events", label: t.nav.events },
     { href: "/menu", label: t.nav.menus },
-    { href: "/reserve", label: t.nav.appointment },
+    { href: "/reserve", label: t.nav.reserve },
   ];
 
   const mobileLinks = links;

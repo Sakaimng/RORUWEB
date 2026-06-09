@@ -45,7 +45,7 @@ type Dict = {
     about: string;
     events: string;
     menus: string;
-    appointment: string;
+    reserve: string;
   };
   menuToggle: { open: string; close: string };
   /** Hero tagline rendered as two lines. */
@@ -117,7 +117,7 @@ const en: Dict = {
     about: "About",
     events: "Events",
     menus: "Menus",
-    appointment: "Appointment",
+    reserve: "Reservations",
   },
   menuToggle: { open: "Menu", close: "Close" },
   heroTagline: ["Hong Kong's", "Original Hand Roll Bar"],
@@ -177,7 +177,7 @@ const en: Dict = {
     ],
   },
   booking: {
-    pageTitle: "APPOINTMENT",
+    pageTitle: "RESERVATIONS",
     lunch: "Lunch",
     dinner: "Dinner",
     chefsCounter: "Chef's Counter",
@@ -200,7 +200,7 @@ const jp: Dict = {
     about: "私たちについて",
     events: "イベント",
     menus: "メニュー",
-    appointment: "予約",
+    reserve: "予約",
   },
   menuToggle: { open: "メニュー", close: "閉じる" },
   heroTagline: ["香港発", "オリジナル手巻き寿司バー"],
@@ -283,7 +283,7 @@ const cn: Dict = {
     about: "關於我們",
     events: "活動",
     menus: "菜單",
-    appointment: "預約",
+    reserve: "預約",
   },
   menuToggle: { open: "選單", close: "關閉" },
   heroTagline: ["香港首創", "手卷壽司吧"],

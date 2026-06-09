@@ -129,17 +129,6 @@ export const OG_IMAGE = {
   alt: "RORUBARU — Hong Kong's original hand roll bar in Wan Chai",
 } as const;
 
-/**
- * UI languages and their BCP-47 codes for hreflang `alternates.languages`.
- * The site serves all languages from one URL via a client toggle, so every
- * locale points at the same canonical path (see buildLanguageAlternates).
- */
-export const LOCALES = {
-  en: "en-HK",
-  ja: "ja-JP",
-  "zh-Hant": "zh-Hant-HK",
-} as const;
-
 /** Absolute URL helper. Pass a path beginning with "/". */
 export function absoluteUrl(path = "/"): string {
   if (!path.startsWith("/")) path = `/${path}`;

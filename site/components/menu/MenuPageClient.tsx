@@ -4,7 +4,7 @@ import { MenuSvgBoard } from "@/components/menu/MenuSvgBoard";
 
 const ALA_CARTE_MOBILE = [
   "/menus/A la carte 1.svg",
-  "/menus/A la carte 2.svg",
+  "/menus/A la carte 3.svg",
 ] as const;
 
 const DRINKS_MOBILE = [
