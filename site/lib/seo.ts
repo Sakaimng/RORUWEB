@@ -86,18 +86,21 @@ export const SITE_MAP_URL =
 
 /**
  * Opening hours for `openingHoursSpecification`.
- * Sun–Thu 12:00–22:00 (last call 21:30); Fri–Sat 12:00–24:00 (last call 22:30).
+ * Open daily 12:00–22:00 (last call 21:30).
  */
 export const OPENING_HOURS = [
   {
-    days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"],
+    days: [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ],
     opens: "12:00",
     closes: "22:00",
-  },
-  {
-    days: ["Friday", "Saturday"],
-    opens: "12:00",
-    closes: "00:00",
   },
 ] as const;
 

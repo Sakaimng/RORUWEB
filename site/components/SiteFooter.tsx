@@ -65,11 +65,6 @@ export function SiteFooter() {
                 <br />
                 {t.footer.hoursWeekdayCall}
               </p>
-              <p className="roru-footer__text">
-                {t.footer.hoursWeekend}
-                <br />
-                {t.footer.hoursWeekendCall}
-              </p>
             </div>
           </div>
 
