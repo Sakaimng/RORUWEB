@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { EventsView } from "@/components/views/EventsView";
 import { buildPageMetadata } from "@/lib/page-seo";
 
-export const metadata: Metadata = buildPageMetadata("events", "en");
+export const metadata: Metadata = buildPageMetadata("events", "cn");
 
-export default function EventsPage() {
-  return <EventsView lang="en" />;
+export default function EventsZhHant() {
+  return <EventsView lang="cn" />;
 }

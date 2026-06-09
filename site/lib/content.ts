@@ -1,7 +1,5 @@
-import heroSlidesManifest from "./home-hero-slides.manifest.json";
-
-/** Autoplay hero slideshow — WebP in `site/public/home-hero-slides`. */
-export const HOME_HERO_SLIDES = heroSlidesManifest.slides as readonly string[];
+export type { HeroSlide } from "./home-hero-slides";
+export { HOME_HERO_SLIDES } from "./home-hero-slides";
 
 /** @deprecated Hero uses HOME_HERO_SLIDES; kept for home-covers asset pipeline. */
 export const HOME_HERO_IMAGES = {
@@ -97,16 +95,16 @@ export const ABOUT_PAGE_IMAGES: { src: string; n: string }[] = [
 
 /** Hero marquee order (matches Squarespace about sequence). */
 export const ABOUT_SEQUENCE: { src: string; n: string; alt: string }[] = [
-  { src: "/aboutPageImages/L1053310.webp", n: "01", alt: "About image 01" },
-  { src: "/aboutPageImages/L1053309.webp", n: "02", alt: "About image 02" },
-  { src: "/aboutPageImages/L1053338.webp", n: "03", alt: "About image 03" },
-  { src: "/aboutPageImages/L1053100.webp", n: "04", alt: "About image 04" },
-  { src: "/aboutPageImages/L1052894.webp", n: "05", alt: "About image 05" },
-  { src: "/aboutPageImages/L1053041.webp", n: "06", alt: "About image 06" },
-  { src: "/aboutPageImages/L1052984.webp", n: "07", alt: "About image 07" },
-  { src: "/aboutPageImages/L1052879.webp", n: "08", alt: "About image 08" },
-  { src: "/aboutPageImages/L1053624.webp", n: "09", alt: "About image 09" },
-  { src: "/aboutPageImages/DSC07800.webp", n: "10", alt: "About image 10" },
+  { src: "/aboutPageImages/L1053310.webp", n: "01", alt: "A RORUBARU team member in a Roru Baru tee at the hand roll counter in Wan Chai, Hong Kong" },
+  { src: "/aboutPageImages/L1053309.webp", n: "02", alt: "Portrait of a RORUBARU team member" },
+  { src: "/aboutPageImages/L1053338.webp", n: "03", alt: "A RORUBARU team member celebrating the opening of the Wan Chai hand roll bar" },
+  { src: "/aboutPageImages/L1053100.webp", n: "04", alt: "RORUBARU staff preparing hand rolls at the counter — shirt reads 'rolled to order, served at its freshest'" },
+  { src: "/aboutPageImages/L1052894.webp", n: "05", alt: "Lion dance heads at the RORUBARU opening celebration in Wan Chai, Hong Kong" },
+  { src: "/aboutPageImages/L1053041.webp", n: "06", alt: "The RORUBARU team with lion dancers at the hand roll bar's grand opening in Wan Chai" },
+  { src: "/aboutPageImages/L1052984.webp", n: "07", alt: "Guests at the opening night of RORUBARU, Hong Kong's original hand roll bar" },
+  { src: "/aboutPageImages/L1052879.webp", n: "08", alt: "RORUBARU (Roru Baru) signage at the Wan Chai hand roll bar entrance" },
+  { src: "/aboutPageImages/L1053624.webp", n: "09", alt: "A RORUBARU chef hand-rolling temaki with rice and Japanese nori at the counter" },
+  { src: "/aboutPageImages/DSC07800.webp", n: "10", alt: "Close-up of a temaki hand roll being made with rice and crisp Japanese nori at RORUBARU" },
 ];
 
 /** Story masonry (section 3). */

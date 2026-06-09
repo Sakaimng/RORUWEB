@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { ReserveView } from "@/components/views/ReserveView";
 import { buildPageMetadata } from "@/lib/page-seo";
 
-export const metadata: Metadata = buildPageMetadata("reserve", "en");
+export const metadata: Metadata = buildPageMetadata("reserve", "jp");
 
-export default function ReservePage() {
-  return <ReserveView lang="en" />;
+export default function ReserveJa() {
+  return <ReserveView lang="jp" />;
 }

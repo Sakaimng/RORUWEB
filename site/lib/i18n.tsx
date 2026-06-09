@@ -6,8 +6,13 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useState,
 } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  langFromPathname,
+  stripLocale,
+  withLocale,
+} from "@/lib/locale-routing";
 
 /** Supported UI languages. CN = Traditional Chinese. */
 export type Lang = "en" | "jp" | "cn";
@@ -28,7 +33,7 @@ const HTML_LANG: Record<Lang, string> = {
   cn: "zh-Hant",
 };
 
-const STORAGE_KEY = "roru-lang";
+// Language is derived from the URL locale prefix (see lib/locale-routing).
 
 /**
  * Site copy by language. The Menu page title stays in English.
@@ -159,7 +164,7 @@ const en: Dict = {
   about: {
     heroTitle: "WHO WE ARE",
     intro: [
-      "Roru Baru was born out of a love for hand rolls and the craft behind them. As Hong Kong's original hand roll bar we wanted to bring a new energy to the city,",
+      "Roru Baru was born out of a love for hand rolls — temaki — and the craft behind them. As Hong Kong's original hand roll bar we wanted to bring a new energy to the city,",
       "inspired by the pace and spirit of Tokyo's dining culture. Our rolls are made to order and served fresh off the bar, always ready to be enjoyed at their best.",
       "The details are at the heart of what we do. Warm rice, crisp nori flown in from Japan and seafood dressed with care.",
       "The menu is focused, but we like to play with flavours inspired by local dishes and our travels abroad.",
@@ -367,37 +372,25 @@ type I18nValue = { lang: Lang; setLang: (lang: Lang) => void; t: Dict };
 
 const I18nContext = createContext<I18nValue | null>(null);
 
-function isLang(value: unknown): value is Lang {
-  return value === "en" || value === "jp" || value === "cn";
-}
-
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  // SSR + first client render use "en" to keep hydration stable; the stored choice is
-  // applied right after mount.
-  const [lang, setLangState] = useState<Lang>("en");
-
-  useEffect(() => {
-    let stored: string | null = null;
-    try {
-      stored = localStorage.getItem(STORAGE_KEY);
-    } catch {
-      /* ignore */
-    }
-    if (isLang(stored)) setLangState(stored);
-  }, []);
+  // The URL is the single source of truth for language: "/" = English,
+  // "/ja/*" = Japanese, "/zh-Hant/*" = Traditional Chinese. Deriving from the
+  // pathname keeps server render, hydration and crawled content in sync.
+  const pathname = usePathname();
+  const router = useRouter();
+  const lang = langFromPathname(pathname);
 
   useEffect(() => {
     document.documentElement.lang = HTML_LANG[lang];
   }, [lang]);
 
-  const setLang = useCallback((next: Lang) => {
-    setLangState(next);
-    try {
-      localStorage.setItem(STORAGE_KEY, next);
-    } catch {
-      /* ignore */
-    }
-  }, []);
+  // Switching language navigates to the same page in the chosen locale.
+  const setLang = useCallback(
+    (next: Lang) => {
+      router.push(withLocale(stripLocale(pathname ?? "/"), next));
+    },
+    [pathname, router]
+  );
 
   const value = useMemo<I18nValue>(
     () => ({ lang, setLang, t: DICTS[lang] }),

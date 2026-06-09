@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { runPostLoaderSequence } from "@/lib/home-entrance";
+import { isHomePathname } from "@/lib/roru-path";
 import {
   INTERNAL_NAV_KEY,
   PAGE_TRANSITION_START_EVENT,
@@ -167,7 +168,7 @@ export function PageTransition() {
       delay: 0.04,
       onStart: () => {
         revealPageContent();
-        runPostLoaderSequence(false, pathname === "/");
+        runPostLoaderSequence(false, isHomePathname(pathname));
       },
       onComplete: () => {
         overlay.classList.remove("is-active");

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { AboutView } from "@/components/views/AboutView";
 import { buildPageMetadata } from "@/lib/page-seo";
 
-export const metadata: Metadata = buildPageMetadata("about", "en");
+export const metadata: Metadata = buildPageMetadata("about", "jp");
 
-export default function AboutPage() {
-  return <AboutView lang="en" />;
+export default function AboutJa() {
+  return <AboutView lang="jp" />;
 }

@@ -8,12 +8,14 @@ import { NavLogo } from "./NavLogo";
 import { LanguageToggle } from "./LanguageToggle";
 import { TOCK_URL } from "@/lib/content";
 import { useI18n } from "@/lib/i18n";
+import { withLocale, stripLocale } from "@/lib/locale-routing";
 import { PAGE_TRANSITION_START_EVENT } from "@/lib/roru-session";
 import { scrollPageToTop } from "@/lib/scroll-to-top";
 
 function isActiveRoute(pathname: string, href: string) {
-  if (href === "/") return pathname === "/";
-  return pathname === href || pathname.startsWith(`${href}/`);
+  const path = stripLocale(pathname);
+  if (href === "/") return path === "/";
+  return path === href || path.startsWith(`${href}/`);
 }
 
 /** Crossfading MENU / CLOSE label for the mobile toggle (matches WSSC's swap animation). */
@@ -105,7 +107,7 @@ function MenuToggleLabel({ open }: { open: boolean }) {
 
 export function Navigation() {
   const pathname = usePathname();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const links = [
@@ -218,7 +220,7 @@ export function Navigation() {
                 {links.map(({ href, label }) => (
                   <Link
                     key={href}
-                    href={href}
+                    href={withLocale(href, lang)}
                     aria-current={isActiveRoute(pathname, href) ? "page" : undefined}
                     className="roru-nav-item text-xs font-bold uppercase transition-opacity hover:opacity-70"
                   >
@@ -270,7 +272,7 @@ export function Navigation() {
               {mobileLinks.map(({ href, label }) => (
                 <Link
                   key={href}
-                  href={href}
+                  href={withLocale(href, lang)}
                   aria-current={isActiveRoute(pathname, href) ? "page" : undefined}
                   className="roru-mobile-menu-item block rounded-lg px-6 py-3 text-center text-base font-bold uppercase transition-opacity hover:opacity-70"
                 >

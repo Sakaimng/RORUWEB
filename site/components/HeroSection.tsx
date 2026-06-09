@@ -3,7 +3,7 @@
 import gsap from "gsap";
 import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { HOME_HERO_SLIDES } from "@/lib/content";
+import { HOME_HERO_SLIDES } from "@/lib/home-hero-slides";
 import { PREOPTIMIZED_IMAGE } from "@/lib/image-display";
 import { useI18n } from "@/lib/i18n";
 
@@ -62,7 +62,7 @@ export function HeroSection() {
     if (SLIDES.length <= 1) return;
     const next = (activeSlide + 1) % SLIDES.length;
     const img = new window.Image();
-    img.src = SLIDES[next]!;
+    img.src = SLIDES[next]!.src;
   }, [activeSlide]);
 
   useLayoutEffect(() => {
@@ -164,18 +164,19 @@ export function HeroSection() {
     <section className="roru-hero roru-hero--ysl section-surface" ref={rootRef}>
       <div className="homepage-reveal roru-hero__reveal">
         <div className="roru-hero__media" aria-hidden>
-          {SLIDES.map((src, index) => (
+          {SLIDES.map((slide, index) => (
             <div
-              key={src}
+              key={slide.src}
               className={`roru-hero__slide${index === activeSlide ? " is-active" : ""}`}
             >
               <Image
-                src={src}
+                src={slide.src}
                 alt=""
                 fill
                 priority={index === 0}
                 sizes="100vw"
                 className="roru-hero__media-img"
+                style={{ objectPosition: slide.focus }}
                 fetchPriority={index === 0 ? "high" : undefined}
                 {...PREOPTIMIZED_IMAGE}
               />

@@ -2,13 +2,20 @@
 
 import Link from "next/link";
 import { PATH_LINE_BOTTOM, PATH_LINE_TOP } from "@/lib/footer-logo-paths";
+import { useI18n } from "@/lib/i18n";
+import { withLocale } from "@/lib/locale-routing";
 
 export function FooterLogo() {
+  const { lang } = useI18n();
   return (
     <div
       className="roru-footer-logo flex min-h-0 w-full min-w-0 flex-col items-stretch max-md:h-full md:h-auto md:items-start"
     >
-      <Link href="/" className="roru-footer__logo-link" aria-label="RORUBARU home">
+      <Link
+        href={withLocale("/", lang)}
+        className="roru-footer__logo-link"
+        aria-label="RORUBARU home"
+      >
         <div className="roru-footer-logo__svg-wrap flex h-full min-h-0 w-full max-w-full shrink-0 items-stretch max-md:h-full md:h-auto">
           <svg
             className="roru-footer__logo-svg h-full max-h-full w-full max-w-full shrink-0 max-md:h-full md:h-auto md:max-h-[min(88vh,820px)]"

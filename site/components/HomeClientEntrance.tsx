@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { runPostLoaderSequence } from "@/lib/home-entrance";
+import { isHomePathname } from "@/lib/roru-path";
 import { SITE_ENTERED_KEY, TRANSITION_PENDING_KEY } from "@/lib/roru-session";
 
 /**
@@ -14,7 +15,7 @@ export function HomeClientEntrance() {
   const pathname = usePathname() ?? "";
 
   useEffect(() => {
-    if (pathname !== "/") return;
+    if (!isHomePathname(pathname)) return;
 
     let cancelled = false;
 

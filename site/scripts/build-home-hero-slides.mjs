@@ -8,6 +8,12 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const publicDir = path.join(root, "public");
 const srcDir = path.join(publicDir, "HOME HERO SLIDES");
 const outDir = path.join(publicDir, "home-hero-slides");
+const focusPath = path.join(root, "lib", "home-hero-slides.focus.json");
+const defaultFocus = "50% 42%";
+
+const focusMap = fs.existsSync(focusPath)
+  ? JSON.parse(fs.readFileSync(focusPath, "utf8"))
+  : {};
 
 if (!fs.existsSync(srcDir)) {
   console.error(`missing source folder: ${srcDir}`);
@@ -31,9 +37,13 @@ for (const file of jpgs) {
   console.log(`wrote ${base} (${kb} KB)`);
 }
 
-const slides = jpgs.map(
-  (f) => `/home-hero-slides/${f.replace(/\.jpg$/i, ".webp")}`
-);
+const slides = jpgs.map((f) => {
+  const base = f.replace(/\.jpg$/i, ".webp");
+  return {
+    src: `/home-hero-slides/${base}`,
+    focus: focusMap[base] ?? defaultFocus,
+  };
+});
 
 const manifestPath = path.join(root, "lib", "home-hero-slides.manifest.json");
 fs.writeFileSync(manifestPath, `${JSON.stringify({ slides }, null, 2)}\n`);
