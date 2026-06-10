@@ -1,4 +1,3 @@
-import { HomeClientEntrance } from "@/components/HomeClientEntrance";
 import { HomeCoverPanel } from "@/components/HomeCoverPanel";
 import { HomeSectionCta } from "@/components/HomeSectionCta";
 import { HomeYslScroll } from "@/components/HomeYslScroll";
@@ -21,7 +20,6 @@ export function HomeView({ lang }: { lang: Lang }) {
 
   return (
     <>
-      <HomeClientEntrance />
       <HomeYslScroll />
       <HomeSectionCta />
       <main

@@ -4,6 +4,10 @@ import gsap from "gsap";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { runPostLoaderSequence } from "@/lib/home-entrance";
+import {
+  NAVIGATE_WITH_TRANSITION_EVENT,
+  revealPageContent,
+} from "@/lib/navigate-with-transition";
 import { isHomePathname } from "@/lib/roru-path";
 import {
   INTERNAL_NAV_KEY,
@@ -29,12 +33,6 @@ function isSameAppPath(
   const next = normalizePathname(targetUrl.pathname);
   const cur = normalizePathname(currentPathnameFromRouter || loc.pathname);
   return next === cur;
-}
-
-function revealPageContent() {
-  document.querySelectorAll("body > *:not(#roru-page-transition)").forEach((el) => {
-    (el as HTMLElement).style.removeProperty("visibility");
-  });
 }
 
 export function PageTransition() {
@@ -139,10 +137,18 @@ export function PageTransition() {
       transitionIn(nextLoc);
     }
 
+    function onNavigateWithTransition(e: Event) {
+      const href = (e as CustomEvent<{ href: string }>).detail?.href;
+      if (!href) return;
+      transitionIn(href);
+    }
+
     document.addEventListener("click", onClick, true);
+    window.addEventListener(NAVIGATE_WITH_TRANSITION_EVENT, onNavigateWithTransition);
 
     return () => {
       document.removeEventListener("click", onClick, true);
+      window.removeEventListener(NAVIGATE_WITH_TRANSITION_EVENT, onNavigateWithTransition);
     };
   }, [router]);
 

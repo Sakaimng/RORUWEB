@@ -7,12 +7,13 @@ import {
   useEffect,
   useMemo,
 } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   langFromPathname,
   stripLocale,
   withLocale,
 } from "@/lib/locale-routing";
+import { navigateWithTransition } from "@/lib/navigate-with-transition";
 
 /** Supported UI languages. CN = Traditional Chinese. */
 export type Lang = "en" | "jp" | "cn";
@@ -377,19 +378,20 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   // "/ja/*" = Japanese, "/zh-Hant/*" = Traditional Chinese. Deriving from the
   // pathname keeps server render, hydration and crawled content in sync.
   const pathname = usePathname();
-  const router = useRouter();
   const lang = langFromPathname(pathname);
 
   useEffect(() => {
     document.documentElement.lang = HTML_LANG[lang];
   }, [lang]);
 
-  // Switching language navigates to the same page in the chosen locale.
+  // Switching language navigates to the same page in the chosen locale with a fade transition.
   const setLang = useCallback(
     (next: Lang) => {
-      router.push(withLocale(stripLocale(pathname ?? "/"), next));
+      if (next === lang) return;
+      const href = withLocale(stripLocale(pathname ?? "/"), next);
+      navigateWithTransition(href);
     },
-    [pathname, router]
+    [lang, pathname]
   );
 
   const value = useMemo<I18nValue>(
