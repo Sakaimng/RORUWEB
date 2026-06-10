@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 import { ClientPageEntrance } from "@/components/ClientPageEntrance";
 import { Navigation } from "@/components/Navigation";
 import { RoruLoader } from "@/components/roru/RoruLoader";
@@ -113,6 +114,7 @@ export default function RootLayout({
           <Navigation />
           {children}
         </LanguageProvider>
+        <Analytics />
       </body>
     </html>
   );
