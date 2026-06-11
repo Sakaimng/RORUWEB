@@ -243,6 +243,17 @@ body {
   text-decoration: none;
 }
 
+button.roru-footer__logo-link {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: inherit;
+}
+
 .roru-footer__logo-svg {
   display: block;
 }

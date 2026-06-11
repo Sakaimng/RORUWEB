@@ -179,6 +179,7 @@ export function AboutScrollScenes({ sequence, storyImages }: AboutScrollScenesPr
     sectionRef.current = s;
     setActiveSection(s);
     syncNavToneForAboutSection(s);
+    document.documentElement.dataset.aboutSection = String(s);
     window.dispatchEvent(
       new CustomEvent("roru:about-section-change", { detail: { section: s } })
     );

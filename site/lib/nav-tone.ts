@@ -22,4 +22,5 @@ export function syncNavToneForAboutSection(_section: 0 | 1 | 2) {
 export function clearNavTone() {
   if (typeof document === "undefined") return;
   document.documentElement.classList.remove(NAV_TONE_LIGHT_CLASS);
+  delete document.documentElement.dataset.aboutSection;
 }
