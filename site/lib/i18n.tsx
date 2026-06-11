@@ -111,6 +111,17 @@ type Dict = {
     noteLunch: string;
     noteDinner: string;
   };
+  install: {
+    title: string;
+    lead: string;
+    inAppLead: string;
+    stepShare: string;
+    stepAdd: string;
+    stepConfirm: string;
+    safariNote: string;
+    dismiss: string;
+    menuLink: string;
+  };
 };
 
 const en: Dict = {
@@ -194,6 +205,18 @@ const en: Dict = {
       "Only electronic payments are accepted at the venue. Dining experience for Lunch is 60 minutes from reservation time. Table reservations will be held for a maximum of 10 minutes after the reservation time.",
     noteDinner:
       "Only electronic payments are accepted at the venue. Dining experience for Dinner is 75 minutes from reservation time. Table reservations will be held for a maximum of 10 minutes after the reservation time.",
+  },
+  install: {
+    title: "Add RORUBARU to your home screen",
+    lead: "Install the site as an app for quick access from your home screen.",
+    inAppLead:
+      "Open this page in Safari, then use Share → Add to Home Screen to install the app.",
+    stepShare: "Tap Share in the Safari toolbar",
+    stepAdd: 'Choose "Add to Home Screen"',
+    stepConfirm: 'Tap "Add"',
+    safariNote: "Add to Home Screen works best in Safari.",
+    dismiss: "Not now",
+    menuLink: "Install App",
   },
 };
 
@@ -279,6 +302,18 @@ const jp: Dict = {
     noteDinner:
       "店内では電子決済のみとなります。ディナーのお食事時間は予約時間から75分です。予約時間から最大10分までお待ちいたします。",
   },
+  install: {
+    title: "RORUBARUをホーム画面に追加",
+    lead: "ホーム画面に追加すると、アプリのようにすぐにアクセスできます。",
+    inAppLead:
+      "Safariでこのページを開き、共有 → ホーム画面に追加 からインストールしてください。",
+    stepShare: "Safariのツールバーで「共有」をタップ",
+    stepAdd: "「ホーム画面に追加」を選択",
+    stepConfirm: "「追加」をタップ",
+    safariNote: "ホーム画面への追加はSafariが最も確実です。",
+    dismiss: "後で",
+    menuLink: "アプリをインストール",
+  },
 };
 
 const cn: Dict = {
@@ -362,6 +397,17 @@ const cn: Dict = {
       "本店只接受電子付款。午餐用餐時間為預約時間起計60分鐘。預約時間後最多保留10分鐘。",
     noteDinner:
       "本店只接受電子付款。晚餐用餐時間為預約時間起計75分鐘。預約時間後最多保留10分鐘。",
+  },
+  install: {
+    title: "將 RORUBARU 加入主畫面",
+    lead: "加入主畫面後，可像 App 一樣快速開啟網站。",
+    inAppLead: "請在 Safari 中開啟此頁，然後使用「分享」→「加入主畫面」來安裝。",
+    stepShare: "點按 Safari 工具列的「分享」",
+    stepAdd: "選擇「加入主畫面」",
+    stepConfirm: "點按「加入」",
+    safariNote: "在 Safari 中加入主畫面最為可靠。",
+    dismiss: "稍後",
+    menuLink: "安裝 App",
   },
 };
 

@@ -5,6 +5,16 @@ html:not(.roru-loading):not(.roru-preload) body.roru-about-page .roru-nav {
   opacity: 1 !important;
 }
 
+/* Scroll cue: invert against gallery + surface so it stays readable in every scene. */
+body.roru-about-page .roru-hero-scroll-cue {
+  color: #fff;
+  mix-blend-mode: difference;
+}
+
+body.roru-about-page .roru-hero-scroll-cue__dot {
+  box-shadow: none;
+}
+
 :root {
   --roru-gap: 9px;
   --roru-pad-x: var(--roru-section-pad-x);

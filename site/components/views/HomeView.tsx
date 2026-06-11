@@ -1,6 +1,5 @@
 import { HomeCoverPanel } from "@/components/HomeCoverPanel";
 import { HomeSectionCta } from "@/components/HomeSectionCta";
-import { HeroScrollCue } from "@/components/HeroScrollCue";
 import { HomeYslScroll } from "@/components/HomeYslScroll";
 import { HeroSection } from "@/components/HeroSection";
 import { InquirySection } from "@/components/InquirySection";
@@ -23,7 +22,6 @@ export function HomeView({ lang }: { lang: Lang }) {
     <>
       <HomeYslScroll />
       <HomeSectionCta />
-      <HeroScrollCue />
       <main
         id="page-content"
         className="page-content roru-home-overlays relative z-[9] mb-[100vh]"

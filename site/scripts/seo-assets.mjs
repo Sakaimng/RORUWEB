@@ -51,6 +51,8 @@ async function makeIcon(size, markRatio, out) {
 
 await makeIcon(512, 0.62, join(PUB, "icons", "icon-512.png"));
 await makeIcon(192, 0.62, join(PUB, "icons", "icon-192.png"));
+await makeIcon(180, 0.62, join(PUB, "icons", "icon-180.png"));
+await makeIcon(180, 0.62, join(ROOT, "app", "apple-icon.png"));
 // Maskable: keep mark within the ~80% safe zone.
 await makeIcon(512, 0.5, join(PUB, "icons", "icon-maskable-512.png"));
 

@@ -7,6 +7,7 @@ import { AboutHeroTitle } from "./AboutHeroTitle";
 import { AboutSequenceMarquee } from "./AboutSequenceMarquee";
 import { useI18n } from "@/lib/i18n";
 import { SCROLL_TO_TOP_EVENT } from "@/lib/scroll-to-top";
+import { syncNavToneForAboutSection } from "@/lib/nav-tone";
 
 /** Viewport width at which opera uses top horizontal gallery + bottom centered text stack */
 const OPERA_MOBILE_MAX_PX = 1031;
@@ -177,6 +178,10 @@ export function AboutScrollScenes({ sequence, storyImages }: AboutScrollScenesPr
   const syncRefsToSection = useCallback((s: 0 | 1 | 2) => {
     sectionRef.current = s;
     setActiveSection(s);
+    syncNavToneForAboutSection(s);
+    window.dispatchEvent(
+      new CustomEvent("roru:about-section-change", { detail: { section: s } })
+    );
   }, []);
 
   useLayoutEffect(() => {

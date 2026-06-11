@@ -12,6 +12,10 @@ import { useI18n } from "@/lib/i18n";
 import { withLocale, stripLocale } from "@/lib/locale-routing";
 import { PAGE_TRANSITION_START_EVENT } from "@/lib/roru-session";
 import { scrollPageToTop } from "@/lib/scroll-to-top";
+import {
+  canShowInstallMenuLink,
+  openInstallPrompt,
+} from "@/lib/pwa-install";
 
 function isActiveRoute(pathname: string, href: string) {
   const path = stripLocale(pathname);
@@ -23,6 +27,7 @@ export function Navigation() {
   const pathname = usePathname();
   const { t, lang } = useI18n();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showInstallLink, setShowInstallLink] = useState(false);
 
   const links = [
     { href: "/", label: t.nav.home },
@@ -38,6 +43,10 @@ export function Navigation() {
   const hasAnimatedMenuRef = useRef(false);
 
   /* Close the flyout on real client navigations. */
+  useEffect(() => {
+    setShowInstallLink(canShowInstallMenuLink());
+  }, []);
+
   useEffect(() => {
     if (previousPathnameRef.current === pathname) return;
     previousPathnameRef.current = pathname;
@@ -167,7 +176,7 @@ export function Navigation() {
       <nav
         ref={menuRef}
         id="roru-mobile-menu"
-        className={`fixed right-0 left-0 top-16 z-[999] h-[calc(100dvh-4rem-var(--roru-bottom-dock-clear))] overflow-hidden bg-transparent px-[var(--roru-section-pad-x)] sm:top-20 sm:h-[calc(100dvh-5rem-var(--roru-bottom-dock-clear))] min-[1032px]:hidden ${
+        className={`fixed right-0 left-0 top-16 z-[1000] h-[calc(100dvh-4rem-var(--roru-bottom-dock-clear))] overflow-hidden bg-transparent px-[var(--roru-section-pad-x)] sm:top-20 sm:h-[calc(100dvh-5rem-var(--roru-bottom-dock-clear))] min-[1032px]:hidden ${
           menuOpen ? "pointer-events-auto" : "pointer-events-none"
         }`}
         aria-label="Mobile"
@@ -185,6 +194,18 @@ export function Navigation() {
               {label}
             </Link>
           ))}
+          {showInstallLink ? (
+            <button
+              type="button"
+              className="roru-mobile-menu-item block rounded-lg px-6 py-3 text-center text-base font-bold uppercase transition-opacity hover:opacity-70"
+              onClick={() => {
+                setMenuOpen(false);
+                openInstallPrompt();
+              }}
+            >
+              {t.install.menuLink}
+            </button>
+          ) : null}
           <div className="roru-mobile-menu-item absolute right-0 bottom-[9vh] left-0 flex justify-center">
             <LanguageToggle />
           </div>

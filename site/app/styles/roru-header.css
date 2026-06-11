@@ -234,6 +234,12 @@ html.roru-nav-tone-light .roru-home-discover__button {
     pointer-events: none;
   }
 
+  html.roru-mobile-menu-open .roru-hero-scroll-cue {
+    z-index: 30 !important;
+    opacity: 0 !important;
+    pointer-events: none;
+  }
+
   html.roru-mobile-menu-open .roru-footer {
     filter: blur(8px);
     opacity: 0.55;

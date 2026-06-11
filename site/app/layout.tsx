@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { ClientPageEntrance } from "@/components/ClientPageEntrance";
+import { HeroScrollCue } from "@/components/HeroScrollCue";
 import { Navigation } from "@/components/Navigation";
 import { RoruLoader } from "@/components/roru/RoruLoader";
 import { PageTransition } from "@/components/roru/PageTransition";
+import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 import { ScrollRestoration } from "@/components/ScrollRestoration";
 import { JsonLd } from "@/components/JsonLd";
 import { LanguageProvider } from "@/lib/i18n";
@@ -84,6 +86,24 @@ export const metadata: Metadata = {
   verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
     ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
     : undefined,
+  appleWebApp: {
+    capable: true,
+    title: SITE_NAME,
+    statusBarStyle: "black-translucent",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f54500" },
+    { media: "(prefers-color-scheme: dark)", color: "#f54500" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -111,6 +131,8 @@ export default function RootLayout({
           <ClientPageEntrance />
           <RoruLoader />
           <Navigation />
+          <HeroScrollCue />
+          <PwaInstallPrompt />
           {children}
         </LanguageProvider>
       </body>

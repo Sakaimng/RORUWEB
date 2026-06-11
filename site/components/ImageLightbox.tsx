@@ -20,7 +20,10 @@ type Props = {
 export function ImageLightbox({ images, active, onClose, onChange }: Props) {
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const prevOverflowRef = useRef<string | null>(null);
+  const touchStartXRef = useRef<number | null>(null);
   const [lightboxRoot, setLightboxRoot] = useState<HTMLElement | null>(null);
+
+  const TOUCH_SWIPE_THRESHOLD_PX = 44;
 
   useLayoutEffect(() => {
     setLightboxRoot(document.body);
@@ -69,12 +72,33 @@ export function ImageLightbox({ images, active, onClose, onChange }: Props) {
     }
   }, [active, images]);
 
+  function onTouchStart(event: React.TouchEvent) {
+    touchStartXRef.current = event.touches[0]?.clientX ?? null;
+  }
+
+  function onTouchEnd(event: React.TouchEvent) {
+    const startX = touchStartXRef.current;
+    const endX = event.changedTouches[0]?.clientX ?? null;
+    touchStartXRef.current = null;
+    if (startX == null || endX == null) return;
+
+    const delta = startX - endX;
+    if (Math.abs(delta) < TOUCH_SWIPE_THRESHOLD_PX) return;
+    if (delta > 0) next();
+    else prev();
+  }
+
   const root = lightboxRoot;
   if (!root || !images.length) return null;
 
   return createPortal(
     <div className="roru-lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
-      <div className="roru-lightbox__viewport" onClick={onClose}>
+      <div
+        className="roru-lightbox__viewport"
+        onClick={onClose}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
         <div className="roru-lightbox__stage" onClick={(e) => e.stopPropagation()}>
           <Image
             src={images[active]!}
