@@ -51,6 +51,7 @@ type Dict = {
   menuToggle: { open: string; close: string };
   /** Hero tagline rendered as two lines. */
   heroTagline: [string, string];
+  scrollCue: string;
   cta: { discover: string; events: string; inquire: string };
   inquiry: {
     title: string;
@@ -122,6 +123,7 @@ const en: Dict = {
   },
   menuToggle: { open: "Menu", close: "Close" },
   heroTagline: ["Hong Kong's", "Original Hand Roll Bar"],
+  scrollCue: "Scroll",
   cta: { discover: "Discover", events: "Events", inquire: "Inquire" },
   inquiry: {
     title: "Inquire",
@@ -205,6 +207,7 @@ const jp: Dict = {
   },
   menuToggle: { open: "メニュー", close: "閉じる" },
   heroTagline: ["香港発", "オリジナル手巻き寿司バー"],
+  scrollCue: "スクロール",
   cta: { discover: "見る", events: "イベント", inquire: "お問い合わせ" },
   inquiry: {
     title: "お問い合わせ",
@@ -288,6 +291,7 @@ const cn: Dict = {
   },
   menuToggle: { open: "選單", close: "關閉" },
   heroTagline: ["香港首創", "手卷壽司吧"],
+  scrollCue: "捲動",
   cta: { discover: "探索", events: "活動", inquire: "查詢" },
   inquiry: {
     title: "查詢",
