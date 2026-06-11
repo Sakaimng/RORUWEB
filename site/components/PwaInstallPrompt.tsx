@@ -3,11 +3,18 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import {
+  canTriggerNativeInstall,
   dismissInstallPrompt,
+  initDeferredInstallPrompt,
+  isAndroidMobile,
   isIosInAppBrowser,
+  isIosDevice,
   isIosSafari,
+  openInstallPrompt,
   PWA_INSTALL_OPEN_EVENT,
+  PWA_INSTALL_READY_EVENT,
   shouldOfferIosInstall,
+  triggerNativeInstall,
 } from "@/lib/pwa-install";
 
 function ShareIcon() {
@@ -24,16 +31,32 @@ function ShareIcon() {
   );
 }
 
-/** Guides iOS users through Add to Home Screen — Apple has no install API. */
+/** Guides mobile users through installing the PWA (iOS manual steps or Android prompt). */
 export function PwaInstallPrompt() {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
+  const [nativeInstallReady, setNativeInstallReady] = useState(false);
+  const android = isAndroidMobile();
+  const ios = isIosDevice();
   const inApp = isIosInAppBrowser();
   const safari = isIosSafari();
+
+  useEffect(() => initDeferredInstallPrompt(), []);
+
+  useEffect(() => {
+    function syncNativeReady() {
+      setNativeInstallReady(canTriggerNativeInstall());
+    }
+
+    syncNativeReady();
+    window.addEventListener(PWA_INSTALL_READY_EVENT, syncNativeReady);
+    return () => window.removeEventListener(PWA_INSTALL_READY_EVENT, syncNativeReady);
+  }, []);
 
   useEffect(() => {
     function onOpen() {
       setOpen(true);
+      setNativeInstallReady(canTriggerNativeInstall());
     }
     window.addEventListener(PWA_INSTALL_OPEN_EVENT, onOpen);
     return () => window.removeEventListener(PWA_INSTALL_OPEN_EVENT, onOpen);
@@ -49,7 +72,7 @@ export function PwaInstallPrompt() {
       ) {
         return;
       }
-      setOpen(true);
+      openInstallPrompt();
     }
 
     const timer = window.setTimeout(tryOpen, 2800);
@@ -64,6 +87,12 @@ export function PwaInstallPrompt() {
       observer.disconnect();
     };
   }, []);
+
+  async function onNativeInstall() {
+    const accepted = await triggerNativeInstall();
+    if (accepted) setOpen(false);
+    setNativeInstallReady(canTriggerNativeInstall());
+  }
 
   function close() {
     dismissInstallPrompt();
@@ -84,9 +113,29 @@ export function PwaInstallPrompt() {
           {t.install.title}
         </p>
 
-        {inApp ? (
+        {android ? (
+          <>
+            <p className="roru-pwa-install__lead">{t.install.androidLead}</p>
+            {nativeInstallReady ? (
+              <div className="roru-pwa-install__actions roru-pwa-install__actions--primary">
+                <button
+                  type="button"
+                  className="roru-pwa-install__install"
+                  onClick={onNativeInstall}
+                >
+                  {t.install.installButton}
+                </button>
+              </div>
+            ) : (
+              <ol className="roru-pwa-install__steps">
+                <li>{t.install.androidStepMenu}</li>
+                <li>{t.install.androidStepInstall}</li>
+              </ol>
+            )}
+          </>
+        ) : ios && inApp ? (
           <p className="roru-pwa-install__lead">{t.install.inAppLead}</p>
-        ) : (
+        ) : ios ? (
           <>
             <p className="roru-pwa-install__lead">{t.install.lead}</p>
             <ol className="roru-pwa-install__steps">
@@ -103,7 +152,7 @@ export function PwaInstallPrompt() {
               <p className="roru-pwa-install__note">{t.install.safariNote}</p>
             ) : null}
           </>
-        )}
+        ) : null}
 
         <div className="roru-pwa-install__actions">
           <button type="button" className="roru-pwa-install__dismiss" onClick={close}>

@@ -5149,6 +5149,26 @@ body:has(#page-content) .roru-hero--ysl .roru-hero__title {
   justify-content: flex-end;
 }
 
+.roru-pwa-install__actions--primary {
+  justify-content: stretch;
+  margin-bottom: 12px;
+}
+
+.roru-pwa-install__install {
+  width: 100%;
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 18px;
+  background: var(--text);
+  color: var(--surface);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
 .roru-pwa-install__dismiss {
   border: 0;
   background: transparent;

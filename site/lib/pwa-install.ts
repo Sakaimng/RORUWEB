@@ -1,6 +1,45 @@
 const DISMISS_KEY = "roru-pwa-install-dismissed";
 
 export const PWA_INSTALL_OPEN_EVENT = "roru:pwa-install-open";
+export const PWA_INSTALL_READY_EVENT = "roru:pwa-install-ready";
+
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+};
+
+let deferredInstallPrompt: BeforeInstallPromptEvent | null = null;
+
+/** Capture Chrome / Android install prompt when the browser offers it. */
+export function initDeferredInstallPrompt(): () => void {
+  if (typeof window === "undefined") return () => {};
+
+  function onBeforeInstallPrompt(event: Event) {
+    event.preventDefault();
+    deferredInstallPrompt = event as BeforeInstallPromptEvent;
+    window.dispatchEvent(new CustomEvent(PWA_INSTALL_READY_EVENT));
+  }
+
+  window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
+  return () => {
+    window.removeEventListener("beforeinstallprompt", onBeforeInstallPrompt);
+    deferredInstallPrompt = null;
+  };
+}
+
+export function canTriggerNativeInstall(): boolean {
+  return deferredInstallPrompt != null;
+}
+
+export async function triggerNativeInstall(): Promise<boolean> {
+  const prompt = deferredInstallPrompt;
+  if (!prompt) return false;
+
+  await prompt.prompt();
+  const { outcome } = await prompt.userChoice;
+  deferredInstallPrompt = null;
+  return outcome === "accepted";
+}
 
 /** True when the site is already running as an installed home-screen app. */
 export function isStandalonePwa(): boolean {
@@ -19,6 +58,13 @@ export function isIosDevice(): boolean {
   return navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
 }
 
+/** Android phones (excludes most tablets without Mobile in UA). */
+export function isAndroidMobile(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent;
+  return /Android/i.test(ua) && /Mobile/i.test(ua);
+}
+
 /** Social / in-app browsers on iOS that block Add to Home Screen. */
 export function isIosInAppBrowser(): boolean {
   if (typeof navigator === "undefined") return false;
@@ -31,6 +77,10 @@ export function isIosSafari(): boolean {
   if (!isIosDevice() || isIosInAppBrowser()) return false;
   const ua = navigator.userAgent;
   return /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+}
+
+export function canOfferMobileInstall(): boolean {
+  return !isStandalonePwa() && (isIosDevice() || isAndroidMobile());
 }
 
 export function shouldOfferIosInstall(): boolean {
@@ -54,9 +104,9 @@ export function dismissInstallPrompt(): void {
   }
 }
 
-/** Permanent menu entry — shown whenever iOS install is still available. */
+/** Permanent menu entry — shown whenever mobile install is still available. */
 export function canShowInstallMenuLink(): boolean {
-  return isIosDevice() && !isStandalonePwa();
+  return canOfferMobileInstall();
 }
 
 export function openInstallPrompt(): void {

@@ -121,6 +121,10 @@ type Dict = {
     safariNote: string;
     dismiss: string;
     menuLink: string;
+    androidLead: string;
+    androidStepMenu: string;
+    androidStepInstall: string;
+    installButton: string;
   };
 };
 
@@ -217,6 +221,10 @@ const en: Dict = {
     safariNote: "Add to Home Screen works best in Safari.",
     dismiss: "Not now",
     menuLink: "Install App",
+    androidLead: "Install the site as an app for quick access from your home screen.",
+    androidStepMenu: "Tap the menu (⋮) in Chrome",
+    androidStepInstall: 'Choose "Install app" or "Add to Home screen"',
+    installButton: "Install",
   },
 };
 
@@ -313,6 +321,10 @@ const jp: Dict = {
     safariNote: "ホーム画面への追加はSafariが最も確実です。",
     dismiss: "後で",
     menuLink: "アプリをインストール",
+    androidLead: "ホーム画面に追加すると、アプリのようにすぐにアクセスできます。",
+    androidStepMenu: "Chromeのメニュー（⋮）をタップ",
+    androidStepInstall: "「アプリをインストール」または「ホーム画面に追加」を選択",
+    installButton: "インストール",
   },
 };
 
@@ -408,6 +420,10 @@ const cn: Dict = {
     safariNote: "在 Safari 中加入主畫面最為可靠。",
     dismiss: "稍後",
     menuLink: "安裝 App",
+    androidLead: "加入主畫面後，可像 App 一樣快速開啟網站。",
+    androidStepMenu: "點按 Chrome 選單（⋮）",
+    androidStepInstall: "選擇「安裝應用程式」或「加入主畫面」",
+    installButton: "安裝",
   },
 };
 
