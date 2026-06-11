@@ -17,13 +17,37 @@ type Props = {
   onChange: (index: number) => void;
 };
 
+const CLOSE_ANIM_MS = 820;
+const CLOSE_LABEL = "Close";
+
 export function ImageLightbox({ images, active, onClose, onChange }: Props) {
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const closingRef = useRef(false);
   const prevOverflowRef = useRef<string | null>(null);
   const touchStartXRef = useRef<number | null>(null);
   const [lightboxRoot, setLightboxRoot] = useState<HTMLElement | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
 
   const TOUCH_SWIPE_THRESHOLD_PX = 44;
+
+  const requestClose = useCallback(() => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      onClose();
+      return;
+    }
+    setIsClosing(true);
+  }, [onClose]);
+
+  useEffect(() => {
+    if (!isClosing) return;
+    const timer = window.setTimeout(onClose, CLOSE_ANIM_MS);
+    return () => window.clearTimeout(timer);
+  }, [isClosing, onClose]);
 
   useLayoutEffect(() => {
     setLightboxRoot(document.body);
@@ -53,13 +77,13 @@ export function ImageLightbox({ images, active, onClose, onChange }: Props) {
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") requestClose();
       else if (e.key === "ArrowRight") next();
       else if (e.key === "ArrowLeft") prev();
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [next, onClose, prev]);
+  }, [next, requestClose, prev]);
 
   useEffect(() => {
     if (!images.length) return;
@@ -93,10 +117,15 @@ export function ImageLightbox({ images, active, onClose, onChange }: Props) {
   if (!root || !images.length) return null;
 
   return createPortal(
-    <div className="roru-lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+    <div
+      className={`roru-lightbox${isClosing ? " roru-lightbox--closing" : ""}`}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image viewer"
+    >
       <div
         className="roru-lightbox__viewport"
-        onClick={onClose}
+        onClick={requestClose}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
@@ -119,14 +148,23 @@ export function ImageLightbox({ images, active, onClose, onChange }: Props) {
           <button
             type="button"
             ref={closeBtnRef}
-            className="roru-lightbox__close roru-nav-item shrink-0 px-0 py-2 text-xs font-bold uppercase leading-none transition-opacity hover:opacity-70"
+            className="roru-lightbox__close roru-nav-item shrink-0 px-0 py-2 text-xs font-bold uppercase leading-none"
             onClick={(e) => {
               e.stopPropagation();
-              onClose();
+              requestClose();
             }}
             aria-label="Close gallery viewer"
           >
-            Close
+            <span className="roru-lightbox__close-label" aria-hidden="true">
+              {CLOSE_LABEL.split("").map((char, index) => (
+                <span
+                  key={`${char}-${index}`}
+                  className="roru-lightbox__close-char-wrap"
+                >
+                  <span className="roru-lightbox__close-char">{char}</span>
+                </span>
+              ))}
+            </span>
           </button>
         </div>
       </div>

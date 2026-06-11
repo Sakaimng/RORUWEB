@@ -3575,6 +3575,26 @@ body:has(#page-content) .roru-inquiry-section button[type="submit"]:not(:disable
   }
 }
 
+@keyframes roruLightboxOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes roruLightboxStageOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
 .roru-lightbox__viewport {
   flex: 1 1 0;
   min-height: 0;
@@ -3668,14 +3688,92 @@ body:has(#page-content) .roru-inquiry-section button[type="submit"]:not(:disable
   }
 }
 
+.roru-lightbox--closing {
+  pointer-events: none;
+  animation: roruLightboxOut 0.72s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+}
+
+.roru-lightbox--closing .roru-lightbox__stage {
+  animation: roruLightboxStageOut 0.58s cubic-bezier(0.22, 1, 0.36, 1) 0.14s forwards;
+}
+
+.roru-lightbox--closing .roru-lightbox__nav {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
 .roru-lightbox__close {
   position: static;
+  display: inline-flex;
+  align-items: center;
   border: 0;
   background: transparent;
   border-radius: 0;
   cursor: pointer;
   pointer-events: auto;
   color: #d9d9d9 !important;
+}
+
+.roru-lightbox__close-label {
+  display: inline-flex;
+  overflow: hidden;
+  letter-spacing: 0.12em;
+  transition: letter-spacing 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.roru-lightbox__close-char-wrap {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.roru-lightbox__close-char {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .roru-lightbox__close:hover .roru-lightbox__close-label {
+    letter-spacing: 0.2em;
+  }
+}
+
+.roru-lightbox--closing .roru-lightbox__close-char {
+  animation: roruLightboxCloseChar 0.52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.roru-lightbox--closing .roru-lightbox__close-char-wrap:nth-child(1) .roru-lightbox__close-char {
+  animation-delay: 0ms;
+}
+
+.roru-lightbox--closing .roru-lightbox__close-char-wrap:nth-child(2) .roru-lightbox__close-char {
+  animation-delay: 55ms;
+}
+
+.roru-lightbox--closing .roru-lightbox__close-char-wrap:nth-child(3) .roru-lightbox__close-char {
+  animation-delay: 110ms;
+}
+
+.roru-lightbox--closing .roru-lightbox__close-char-wrap:nth-child(4) .roru-lightbox__close-char {
+  animation-delay: 165ms;
+}
+
+.roru-lightbox--closing .roru-lightbox__close-char-wrap:nth-child(5) .roru-lightbox__close-char {
+  animation-delay: 220ms;
+}
+
+@keyframes roruLightboxCloseChar {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-115%);
+    opacity: 0;
+  }
 }
 
 .roru-lightbox__nav {
@@ -3795,6 +3893,21 @@ body:has(#page-content) .roru-inquiry-section button[type="submit"]:not(:disable
     height: 44px;
   }
 
+  .roru-lightbox__header-slot {
+    top: auto;
+    bottom: 0;
+    height: auto;
+    min-height: 4rem;
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
+    grid-template-columns: 1fr;
+  }
+
+  .roru-lightbox__header-slot-inner {
+    grid-column: 1 / -1;
+    justify-content: center;
+    width: 100%;
+  }
+
   /* Disable scroll snap on touch — interferes with native momentum scroll. */
   body:has(#page-content) #page-content {
     scroll-snap-type: none;
@@ -3813,7 +3926,8 @@ body:has(#page-content) .roru-inquiry-section button[type="submit"]:not(:disable
   .roru-gallery-page__image,
   .roru-lightbox,
   .roru-lightbox__viewport,
-  .roru-lightbox__stage {
+  .roru-lightbox__stage,
+  .roru-lightbox__close-char {
     transition: none !important;
     animation: none !important;
     transform: none !important;
