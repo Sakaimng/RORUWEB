@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { NavLogo } from "./NavLogo";
 import { LanguageToggle } from "./LanguageToggle";
+import { MobileNavDock } from "./MobileNavDock";
 import { TOCK_URL } from "@/lib/content";
 import { useI18n } from "@/lib/i18n";
 import { withLocale, stripLocale } from "@/lib/locale-routing";
@@ -16,93 +17,6 @@ function isActiveRoute(pathname: string, href: string) {
   const path = stripLocale(pathname);
   if (href === "/") return path === "/";
   return path === href || path.startsWith(`${href}/`);
-}
-
-/** Crossfading MENU / CLOSE label for the mobile toggle (matches WSSC's swap animation). */
-function MenuToggleLabel({ open }: { open: boolean }) {
-  const menuRef = useRef<HTMLSpanElement>(null);
-  const closeRef = useRef<HTMLSpanElement>(null);
-  const openRef = useRef(open);
-  const hasMountedRef = useRef(false);
-
-  useLayoutEffect(() => {
-    const menu = menuRef.current;
-    const close = closeRef.current;
-    if (!menu || !close) return;
-
-    const showMenu = !open;
-
-    if (!hasMountedRef.current) {
-      hasMountedRef.current = true;
-      openRef.current = open;
-      gsap.set(menu, {
-        autoAlpha: showMenu ? 1 : 0,
-        y: 0,
-        pointerEvents: showMenu ? "auto" : "none",
-      });
-      gsap.set(close, {
-        autoAlpha: showMenu ? 0 : 1,
-        y: 0,
-        pointerEvents: showMenu ? "none" : "auto",
-      });
-      return;
-    }
-
-    if (openRef.current === open) return;
-    openRef.current = open;
-
-    const entering = showMenu ? menu : close;
-    const exiting = showMenu ? close : menu;
-
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) {
-      gsap.set(menu, {
-        autoAlpha: showMenu ? 1 : 0,
-        y: 0,
-        pointerEvents: showMenu ? "auto" : "none",
-      });
-      gsap.set(close, {
-        autoAlpha: showMenu ? 0 : 1,
-        y: 0,
-        pointerEvents: showMenu ? "none" : "auto",
-      });
-      return;
-    }
-
-    gsap.killTweensOf([menu, close]);
-
-    gsap
-      .timeline({ defaults: { ease: "power2.inOut" } })
-      .to(exiting, { autoAlpha: 0, y: -7, duration: 0.14, ease: "power2.in" }, 0)
-      .fromTo(
-        entering,
-        { autoAlpha: 0, y: 7 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.22,
-          ease: "power3.out",
-          pointerEvents: "auto",
-        },
-        0.06
-      )
-      .set(exiting, { pointerEvents: "none" }, 0);
-  }, [open]);
-
-  return (
-    <span
-      className="relative inline-block min-w-[2.85rem] overflow-hidden text-center leading-none"
-      aria-hidden
-    >
-      <span ref={menuRef} className="absolute inset-0 flex items-center justify-center">
-        Menu
-      </span>
-      <span ref={closeRef} className="absolute inset-0 flex items-center justify-center">
-        Close
-      </span>
-      <span className="invisible">Close</span>
-    </span>
-  );
 }
 
 export function Navigation() {
@@ -198,19 +112,8 @@ export function Navigation() {
       >
         <div className="relative h-full w-full">
           <div className="relative grid h-full w-full grid-cols-[1fr_auto_1fr] items-center px-[var(--roru-section-pad-x)] min-[1032px]:flex min-[1032px]:justify-normal">
-            {/* Left: mobile menu toggle / desktop language + nav links */}
+            {/* Left: desktop language + nav links */}
             <div className="flex min-w-0 items-center justify-start gap-3 min-[1032px]:flex-1 min-[1032px]:gap-4">
-              <button
-                type="button"
-                className="roru-nav-item inline-flex shrink-0 items-center justify-center overflow-hidden px-0 py-2 text-xs font-bold uppercase transition-opacity hover:opacity-70 min-[1032px]:hidden"
-                aria-controls="roru-mobile-menu"
-                aria-expanded={menuOpen}
-                aria-label={menuOpen ? "Close menu" : "Menu"}
-                onClick={() => setMenuOpen((open) => !open)}
-              >
-                <MenuToggleLabel open={menuOpen} />
-              </button>
-
               <LanguageToggle className="hidden min-[1032px]:inline-flex" />
 
               <nav
@@ -245,8 +148,8 @@ export function Navigation() {
               </button>
             </div>
 
-            {/* Right: reserve */}
-            <div className="flex items-center justify-end gap-2 min-[1032px]:flex-1 sm:gap-3">
+            {/* Right: reserve (desktop only) */}
+            <div className="hidden items-center justify-end gap-2 min-[1032px]:flex min-[1032px]:flex-1 sm:gap-3">
               <a
                 href={TOCK_URL}
                 target="_blank"
@@ -257,35 +160,41 @@ export function Navigation() {
               </a>
             </div>
           </div>
-
-          {/* Mobile flyout — full-height panel: links centred, language toggle pinned bottom */}
-          <nav
-            ref={menuRef}
-            id="roru-mobile-menu"
-            className={`absolute top-full right-0 left-0 z-[45] h-[calc(100dvh-4rem)] overflow-hidden bg-transparent px-[var(--roru-section-pad-x)] sm:h-[calc(100dvh-5rem)] min-[1032px]:hidden ${
-              menuOpen ? "pointer-events-auto" : "pointer-events-none"
-            }`}
-            aria-label="Mobile"
-            aria-hidden={!menuOpen}
-          >
-            <div className="relative flex h-full flex-col items-center justify-center gap-2">
-              {mobileLinks.map(({ href, label }) => (
-                <Link
-                  key={href}
-                  href={withLocale(href, lang)}
-                  aria-current={isActiveRoute(pathname, href) ? "page" : undefined}
-                  className="roru-mobile-menu-item block rounded-lg px-6 py-3 text-center text-base font-bold uppercase transition-opacity hover:opacity-70"
-                >
-                  {label}
-                </Link>
-              ))}
-              <div className="roru-mobile-menu-item absolute right-0 bottom-[9vh] left-0 flex justify-center">
-                <LanguageToggle />
-              </div>
-            </div>
-          </nav>
         </div>
       </header>
+
+      {/* Outside header so fixed positioning is not trapped by .roru-nav transform */}
+      <nav
+        ref={menuRef}
+        id="roru-mobile-menu"
+        className={`fixed right-0 left-0 top-16 z-[999] h-[calc(100dvh-4rem-var(--roru-bottom-dock-clear))] overflow-hidden bg-transparent px-[var(--roru-section-pad-x)] sm:top-20 sm:h-[calc(100dvh-5rem-var(--roru-bottom-dock-clear))] min-[1032px]:hidden ${
+          menuOpen ? "pointer-events-auto" : "pointer-events-none"
+        }`}
+        aria-label="Mobile"
+        aria-hidden={!menuOpen}
+      >
+        <div className="relative flex h-full flex-col items-center justify-center gap-2">
+          {mobileLinks.map(({ href, label }) => (
+            <Link
+              key={href}
+              href={withLocale(href, lang)}
+              aria-current={isActiveRoute(pathname, href) ? "page" : undefined}
+              className="roru-mobile-menu-item block rounded-lg px-6 py-3 text-center text-base font-bold uppercase transition-opacity hover:opacity-70"
+              onClick={() => setMenuOpen(false)}
+            >
+              {label}
+            </Link>
+          ))}
+          <div className="roru-mobile-menu-item absolute right-0 bottom-[9vh] left-0 flex justify-center">
+            <LanguageToggle />
+          </div>
+        </div>
+      </nav>
+
+      <MobileNavDock
+        menuOpen={menuOpen}
+        onMenuToggle={() => setMenuOpen((open) => !open)}
+      />
 
       <button
         type="button"

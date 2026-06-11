@@ -126,9 +126,7 @@ html.theme-night .date-select {
 }
 
 html.theme-day .slots-title,
-html.theme-day .party-label,
-html.theme-day .calendar-days button.is-selected,
-html.theme-day .slot-btn.is-selected {
+html.theme-day .party-label {
   color: #121212 !important;
   stroke: #121212 !important;
   fill: #121212 !important;
@@ -759,7 +757,7 @@ figure.roru-gallery-item {
 .slot-btn.is-selected {
   background: var(--text);
   border-color: var(--text);
-  color: #121212;
+  color: #ffffff;
 }
 
 .roru-booking-slots {
@@ -1639,10 +1637,7 @@ html.theme-night .roru-inquiry-section * {
 }
 
 .calendar-days button.is-selected,
-.slot-btn.is-selected {
-  color: #121212 !important;
-}
-
+.slot-btn.is-selected,
 .roru-booking-cta,
 .roru-inquiry-section button[type="submit"] {
   color: #ffffff !important;
@@ -2479,10 +2474,7 @@ body:has(#page-content) .roru-inquiry-section button[type="submit"] {
 }
 
 body:has(#page-content) .calendar-days button.is-selected,
-body:has(#page-content) .slot-btn.is-selected {
-  color: #121212 !important;
-}
-
+body:has(#page-content) .slot-btn.is-selected,
 body:has(#page-content) .roru-booking-cta,
 body:has(#page-content) .roru-inquiry-section button[type="submit"] {
   color: #ffffff !important;
@@ -4433,9 +4425,22 @@ body:has(.roru-home-overlays) .roru-inquiry-grid {
     width: 100%;
     height: 100svh;
   }
+}
 
-  .roru-home-discover {
-    bottom: max(14px, env(safe-area-inset-bottom, 0px));
+/* Mobile home: center section titles/CTAs in each full-viewport panel */
+@media (max-width: 1031px) {
+  body:has(.roru-home-overlays) .roru-home-discover {
+    top: 50%;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+  }
+
+  body:has(.roru-home-overlays) .roru-inquiry-section h2,
+  body:has(.roru-home-overlays) .roru-inquiry-section .roru-inquiry-grid > div:first-child,
+  body:has(.roru-home-overlays) .roru-inquiry-section .roru-inquiry-grid > div:first-child p,
+  body:has(.roru-home-overlays) .roru-inquiry-section form,
+  body:has(.roru-home-overlays) .roru-inquiry-section label {
+    text-align: left !important;
   }
 }
 
@@ -4890,8 +4895,8 @@ body:has(#page-content) .roru-hero--ysl .roru-hero__center {
   inset: 0;
   z-index: 1;
   display: grid;
-  place-items: end center;
-  padding: 0 var(--roru-section-pad-x) 6vh;
+  place-items: center center;
+  padding: 0 var(--roru-section-pad-x);
   width: 100%;
   height: 100%;
   box-sizing: border-box;
@@ -4910,10 +4915,21 @@ body:has(#page-content) .roru-hero--ysl .roru-hero__title {
   text-shadow: 0 2px 40px rgba(0, 0, 0, 0.45) !important;
   text-wrap: balance;
   display: block !important;
-  align-self: end !important;
+  align-self: center !important;
   justify-self: center !important;
   visibility: visible !important;
   transition: opacity 0.45s ease;
+}
+
+@media (min-width: 1032px) {
+  body:has(#page-content) .roru-hero--ysl .roru-hero__center {
+    place-items: end center;
+    padding-bottom: 6vh;
+  }
+
+  body:has(#page-content) .roru-hero--ysl .roru-hero__title {
+    align-self: end !important;
+  }
 }
 
 .roru-hero--ysl .roru-hero__title .word-wrap {

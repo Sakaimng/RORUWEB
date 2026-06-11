@@ -42,8 +42,8 @@ html.roru-transition-pending .roru-page-transition {
   --roru-fixed-nav-clear-bottom: calc(
     env(safe-area-inset-top, 0px) + var(--roru-nav-pad-top) + var(--roru-nav-height) + 12px
   );
-  /* Fixed .roru-nav-bottom (offset + pill row + safe area) — used by booking + hero spacing */
-  --roru-bottom-dock-clear: calc(env(safe-area-inset-bottom, 0px) + 2.5vh + 52px);
+  /* Fixed bottom mobile dock (offset + pill row + safe area) */
+  --roru-bottom-dock-clear: calc(env(safe-area-inset-bottom, 0px) + 88px);
 }
 
 /* ===========================================================================
@@ -58,7 +58,7 @@ html.roru-transition-pending .roru-page-transition {
   left: 0;
   right: 0;
   width: 100%;
-  z-index: 999;
+  z-index: 100000;
   box-sizing: border-box;
   pointer-events: none;
   transform: translateY(0);
@@ -98,7 +98,9 @@ html.roru-loading .roru-nav-item {
 
 .roru-nav-item,
 .roru-nav-item *,
-.roru-mobile-menu-item {
+.roru-mobile-menu-item,
+#roru-mobile-menu,
+#roru-mobile-menu .roru-mobile-menu-item {
   font-weight: 700 !important;
 }
 
@@ -108,7 +110,11 @@ html.roru-loading .roru-nav-item {
 .roru-nav .roru-nav-item *,
 .roru-nav .roru-mobile-menu-item,
 .roru-nav a,
-.roru-nav button {
+.roru-nav button,
+#roru-mobile-menu,
+#roru-mobile-menu .roru-mobile-menu-item,
+#roru-mobile-menu a,
+#roru-mobile-menu button {
   color: var(--roru-nav-fg);
   transition: color 0.3s var(--roru-nav-ease);
 }
@@ -129,6 +135,25 @@ html.roru-nav-tone-light .roru-nav .roru-language-toggle button:not([aria-presse
 html.roru-nav-tone-light .roru-home-discover,
 html.roru-nav-tone-light .roru-home-discover__button {
   color: #f1f1f1 !important;
+}
+
+/* Bottom dock icons follow the same tone as the top nav (dark on surface, light on covers). */
+@media (max-width: 1031px) {
+  html.roru-nav-tone-light .roru-nav-bottom__btn:not(.roru-nav-bottom__btn--reserve) {
+    color: var(--roru-nav-fg);
+  }
+
+  html.roru-nav-tone-light .roru-nav-bottom__btn:not(.roru-nav-bottom__btn--reserve) svg {
+    filter: drop-shadow(0 1px 3px rgba(18, 18, 18, 0.45));
+  }
+
+  html.roru-nav-tone-light
+    .roru-nav-bottom__btn.is-active:not(.roru-nav-bottom__btn--reserve):not(
+      .roru-nav-bottom__btn--menu
+    ) {
+    background: color-mix(in srgb, #ffffff 22%, transparent);
+    color: #ffffff;
+  }
 }
 
 /* Language toggle — sliding thumb + label colors */
@@ -182,19 +207,25 @@ html.roru-nav-tone-light .roru-home-discover__button {
   html.roru-mobile-menu-open .roru-nav,
   html.roru-mobile-menu-open .roru-nav .roru-nav-item,
   html.roru-mobile-menu-open .roru-nav .roru-nav-item *,
-  html.roru-mobile-menu-open .roru-nav .roru-mobile-menu-item,
   html.roru-mobile-menu-open .roru-nav a,
-  html.roru-mobile-menu-open .roru-nav button {
+  html.roru-mobile-menu-open .roru-nav button,
+  html.roru-mobile-menu-open #roru-mobile-menu,
+  html.roru-mobile-menu-open #roru-mobile-menu .roru-mobile-menu-item,
+  html.roru-mobile-menu-open #roru-mobile-menu a,
+  html.roru-mobile-menu-open #roru-mobile-menu button {
     color: #121212 !important;
   }
 
-  html.roru-mobile-menu-open .roru-nav .roru-language-toggle button:not([aria-pressed="true"]) {
+  html.roru-mobile-menu-open .roru-nav .roru-language-toggle button:not([aria-pressed="true"]),
+  html.roru-mobile-menu-open #roru-mobile-menu .roru-language-toggle button:not([aria-pressed="true"]) {
     color: #121212 !important;
     opacity: 0.6;
   }
 
   html.roru-mobile-menu-open .roru-nav .roru-language-toggle__btn.is-active,
-  html.roru-mobile-menu-open .roru-nav .roru-language-toggle__btn[aria-pressed="true"] {
+  html.roru-mobile-menu-open .roru-nav .roru-language-toggle__btn[aria-pressed="true"],
+  html.roru-mobile-menu-open #roru-mobile-menu .roru-language-toggle__btn.is-active,
+  html.roru-mobile-menu-open #roru-mobile-menu .roru-language-toggle__btn[aria-pressed="true"] {
     color: #d9d9d9 !important;
   }
 
@@ -210,5 +241,186 @@ html.roru-nav-tone-light .roru-home-discover__button {
     transition:
       filter 300ms ease,
       opacity 300ms ease;
+  }
+}
+
+/* ===========================================================================
+   Mobile bottom dock — liquid-glass pill (home / menu / reserve). Desktop hidden.
+   =========================================================================== */
+.roru-nav-bottom {
+  display: none;
+}
+
+@media (max-width: 1031px) {
+  .roru-nav-bottom {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100001;
+    display: block;
+    pointer-events: none;
+    transform: translateY(0);
+    opacity: 1;
+    transition:
+      transform 0.5s var(--roru-nav-ease),
+      opacity 0.45s ease;
+  }
+
+  .roru-nav-bottom.is-hidden {
+    opacity: 0 !important;
+    pointer-events: none;
+  }
+
+  html.roru-home-footer-active body:has(.roru-home-overlays) .roru-nav-bottom {
+    opacity: 0 !important;
+    pointer-events: none;
+  }
+
+  html.roru-preload .roru-nav-bottom,
+  html.roru-loading .roru-nav-bottom {
+    opacity: 0;
+  }
+
+  .roru-nav-bottom__shell {
+    display: flex;
+    justify-content: center;
+    padding:
+      0 max(16px, var(--roru-section-pad-x))
+      max(12px, env(safe-area-inset-bottom, 0px));
+  }
+
+  .roru-nav-bottom__pill {
+    pointer-events: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    gap: 4px;
+    width: min(100%, 320px);
+    padding: 6px;
+    border-radius: 999px;
+    background: color-mix(in srgb, rgba(255, 255, 255, 0.55) 72%, transparent);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid color-mix(in srgb, rgba(255, 255, 255, 0.62) 70%, transparent);
+    box-shadow:
+      0 10px 40px rgba(18, 18, 18, 0.1),
+      0 2px 8px rgba(18, 18, 18, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5),
+      inset 0 -1px 0 rgba(18, 18, 18, 0.03);
+  }
+
+  .roru-nav-bottom__btn:not(.roru-nav-bottom__btn--reserve) {
+    color: var(--roru-nav-fg);
+  }
+
+  .roru-nav-bottom__btn:not(.roru-nav-bottom__btn--reserve) svg {
+    filter: none;
+  }
+
+  .roru-nav-bottom__btn:active {
+    transform: scale(0.94);
+  }
+
+  .roru-nav-bottom__btn.is-active:not(.roru-nav-bottom__btn--reserve):not(
+      .roru-nav-bottom__btn--menu
+    ) {
+    background: color-mix(in srgb, var(--roru-nav-fg) 12%, transparent);
+    color: var(--roru-nav-fg);
+  }
+
+  .roru-nav-bottom__btn {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-width: 48px;
+    height: 48px;
+    border-radius: 999px;
+    transition:
+      background-color 0.24s var(--roru-nav-ease),
+      color 0.24s var(--roru-nav-ease),
+      transform 0.24s var(--roru-nav-ease);
+  }
+
+  .roru-nav-bottom__btn--reserve {
+    background: #121212;
+    color: #ffffff;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 4px 14px rgba(18, 18, 18, 0.22);
+  }
+
+  .roru-nav-bottom__btn--reserve:active {
+    background: color-mix(in srgb, #121212 92%, #ffffff);
+  }
+
+  html.roru-mobile-menu-open .roru-nav-bottom__btn:not(.roru-nav-bottom__btn--reserve) {
+    color: #121212;
+  }
+
+  html.roru-mobile-menu-open .roru-nav-bottom__btn:not(.roru-nav-bottom__btn--reserve) svg {
+    filter: none;
+  }
+
+  .roru-nav-bottom__btn--menu,
+  html.roru-mobile-menu-open .roru-nav-bottom__btn--menu {
+    background: transparent;
+  }
+
+  html.roru-mobile-menu-open
+    .roru-nav-bottom__btn.is-active:not(.roru-nav-bottom__btn--reserve):not(
+      .roru-nav-bottom__btn--menu
+    ) {
+    background: color-mix(in srgb, #121212 10%, transparent);
+    color: #121212;
+  }
+
+  html.roru-mobile-menu-open .roru-nav-bottom__btn--reserve {
+    background: #121212;
+    color: #ffffff !important;
+  }
+
+  .roru-nav-bottom__menu-icon {
+    position: relative;
+    display: block;
+    width: 22px;
+    height: 22px;
+  }
+
+  .roru-nav-bottom__menu-bars,
+  .roru-nav-bottom__menu-close {
+    position: absolute;
+    inset: 0;
+    transition:
+      opacity 0.22s var(--roru-nav-ease),
+      transform 0.32s var(--roru-nav-ease);
+  }
+
+  .roru-nav-bottom__menu-bars {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+
+  .roru-nav-bottom__menu-bars.is-hidden {
+    opacity: 0;
+    transform: scale(0.82) rotate(90deg);
+  }
+
+  .roru-nav-bottom__menu-close {
+    opacity: 0;
+    transform: scale(0.82) rotate(-90deg);
+  }
+
+  .roru-nav-bottom__menu-close.is-visible {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .roru-nav-bottom__menu-bars,
+    .roru-nav-bottom__menu-close {
+      transition: opacity 0.12s ease;
+      transform: none;
+    }
   }
 }

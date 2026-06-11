@@ -714,3 +714,127 @@ html:not(.roru-loading):not(.roru-preload) body.roru-about-page .roru-nav {
     text-align: center;
   }
 }
+
+/* Tablet / mobile nav breakpoint — center about text in each scene */
+@media (max-width: 1031px) {
+  .about-opera-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 8px;
+    padding: max(3.25rem, 2.5vh) var(--roru-pad-x) max(3.5rem, 10vh);
+    align-items: stretch;
+    align-content: stretch;
+    min-height: 0;
+  }
+
+  .about-opera-gallery-col {
+    grid-row: 1;
+    grid-column: 1;
+    width: 100%;
+    height: auto;
+    min-height: clamp(88px, 20vh, 180px);
+    max-height: min(200px, 30vh);
+    min-width: 0;
+  }
+
+  .about-opera-gallery-col .roru-about-sequence {
+    height: 100%;
+    min-height: 88px;
+  }
+
+  .about-opera-gallery-col
+    .roru-about-sequence:not(.roru-about-sequence--vertical)
+    .roru-about-sequence__viewport {
+    height: 100%;
+    min-height: 80px;
+    touch-action: pan-x pan-y;
+  }
+
+  .about-opera-gallery-col
+    .roru-about-sequence:not(.roru-about-sequence--vertical)
+    .roru-about-sequence__item {
+    width: min(42vw, 200px);
+  }
+
+  .about-opera-text-col {
+    grid-row: 2;
+    grid-column: 1;
+    width: 100%;
+    min-height: 0;
+    height: 100%;
+    align-self: stretch;
+    text-align: center !important;
+  }
+
+  .about-opera-text-pane {
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .about-opera-text-pane--intro,
+  .about-opera-text-pane--story {
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    overflow-y: visible;
+    overscroll-behavior-y: auto;
+  }
+
+  .roru-about-hero__title-wrap,
+  .roru-about-hero__title,
+  .about-opera-text-pane--hero,
+  .about-opera-text-pane--hero .roru-about-hero__title-wrap,
+  .about-opera-text-pane--hero .roru-about-hero__title {
+    text-align: center !important;
+  }
+
+  .about-opera-stage--unified > .about-opera-text-pane--hero,
+  .about-opera-text-pane--hero {
+    inset: 0;
+    top: max(4rem, 3vh);
+    bottom: max(3rem, 8vh);
+    left: 0;
+    right: 0;
+    width: auto;
+    padding: 0 var(--roru-pad-x);
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .about-opera-stage--unified > .about-opera-text-pane--hero .roru-about-hero__title-wrap,
+  .about-opera-stage--unified > .about-opera-text-pane--hero .roru-about-hero__title,
+  .about-opera-intro__line-inner,
+  .about-opera-story__title,
+  .about-opera-story__text,
+  .about-opera-story__line-inner,
+  .about-opera-text-pane--story .roru-about-story__title,
+  .about-opera-story-text-only,
+  .roru-about-intro__text,
+  .roru-about-story__content,
+  .roru-about-story__eyebrow,
+  .roru-about-story__title,
+  .roru-about-story__text p {
+    text-align: center !important;
+  }
+
+  .about-opera-intro--inline {
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .about-opera-story-text-only {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .about-opera-story__title {
+    width: 100%;
+    max-width: 100%;
+  }
+}

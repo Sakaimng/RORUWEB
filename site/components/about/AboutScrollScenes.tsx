@@ -8,8 +8,8 @@ import { AboutSequenceMarquee } from "./AboutSequenceMarquee";
 import { useI18n } from "@/lib/i18n";
 import { SCROLL_TO_TOP_EVENT } from "@/lib/scroll-to-top";
 
-/** Viewport width at which opera uses top horizontal gallery + bottom text stack */
-const OPERA_MOBILE_MAX_PX = 767;
+/** Viewport width at which opera uses top horizontal gallery + bottom centered text stack */
+const OPERA_MOBILE_MAX_PX = 1031;
 
 /* Discrete stepper feel — mirrors the home/events panel scroller (HomeYslScroll):
    one gesture = one scene change, then a lock until it settles. */
