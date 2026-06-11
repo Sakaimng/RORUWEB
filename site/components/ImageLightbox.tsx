@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { PREOPTIMIZED_IMAGE } from "@/lib/image-display";
+import { PREOPTIMIZED_IMAGE, LIGHTBOX_IMAGE_SIZES } from "@/lib/image-display";
 
 function clampIndex(i: number, len: number): number {
   if (len <= 0) return 0;
@@ -68,6 +68,7 @@ export function ImageLightbox({ images, active, onClose, onChange }: Props) {
       .filter((i) => i !== active);
     for (const i of preload) {
       const img = new window.Image();
+      img.decoding = "async";
       img.src = images[i]!;
     }
   }, [active, images]);
@@ -106,7 +107,8 @@ export function ImageLightbox({ images, active, onClose, onChange }: Props) {
             fill
             className="roru-lightbox__image"
             priority
-            sizes="(max-width: 1180px) 96vw, 1180px"
+            decoding="async"
+            sizes={LIGHTBOX_IMAGE_SIZES}
             {...PREOPTIMIZED_IMAGE}
           />
         </div>

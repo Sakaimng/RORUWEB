@@ -4326,20 +4326,6 @@ body:has(.roru-home-overlays) .roru-gallery-section--featured .roru-gallery-shel
   filter: saturate(0.92) contrast(1.02);
 }
 
-.roru-gallery-feature__image--mobile {
-  display: none;
-}
-
-@media (max-width: 767px) {
-  .roru-gallery-feature__image--desktop {
-    display: none;
-  }
-
-  .roru-gallery-feature__image--mobile {
-    display: block;
-  }
-}
-
 .roru-home-discover {
   position: fixed;
   left: 50%;

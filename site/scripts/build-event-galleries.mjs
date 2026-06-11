@@ -2,7 +2,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { MAX_EDGE, toWebp } from "./lib/sharp-assets.mjs";
+import { MAX_EDGE, WEBP_QUALITY, toWebp } from "./lib/sharp-assets.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const publicDir = path.join(root, "public");
@@ -47,11 +47,11 @@ async function buildEvent({ slug, srcDir, coverDesktop, coverMobile }) {
 
   await toWebp(path.join(src, coverDesktop), path.join(dest, "cover-desktop.webp"), {
     maxEdge: MAX_EDGE.coverDesktop,
-    quality: 90,
+    quality: WEBP_QUALITY.coverDesktop,
   });
   await toWebp(path.join(src, coverMobile), path.join(dest, "cover-mobile.webp"), {
     maxEdge: MAX_EDGE.coverMobile,
-    quality: 88,
+    quality: WEBP_QUALITY.coverMobile,
   });
 
   const files = fs
@@ -63,7 +63,7 @@ async function buildEvent({ slug, srcDir, coverDesktop, coverMobile }) {
     const base = file.replace(/\.jpg$/i, ".webp");
     await toWebp(path.join(src, file), path.join(dest, base), {
       maxEdge: MAX_EDGE.gallery,
-      quality: 88,
+      quality: WEBP_QUALITY.gallery,
     });
   }
 

@@ -3,6 +3,7 @@
 import gsap from "gsap";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
+import { ABOUT_MARQUEE_SIZES, PREOPTIMIZED_IMAGE } from "@/lib/image-display";
 
 type Item = { src: string; n: string; alt: string };
 
@@ -165,8 +166,9 @@ export function AboutSequenceMarquee({
     }
 
     function waitForImages(imgs: HTMLImageElement[]) {
+      const firstBatch = imgs.slice(0, Math.min(4, imgs.length));
       return Promise.all(
-        imgs.map((img) => {
+        firstBatch.map((img) => {
           if (img.complete) return Promise.resolve();
           return new Promise<void>((resolve) => {
             img.addEventListener("load", () => resolve(), { once: true });
@@ -257,7 +259,10 @@ export function AboutSequenceMarquee({
                     width={300}
                     height={300}
                     className="roru-about-sequence__image h-full w-full object-cover"
-                    sizes="(max-width: 767px) 68vw, (max-width: 991px) 36vw, 22vw"
+                    sizes={ABOUT_MARQUEE_SIZES}
+                    loading="lazy"
+                    decoding="async"
+                    {...PREOPTIMIZED_IMAGE}
                   />
                 </div>
                 {item.n ? (
