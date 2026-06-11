@@ -4,7 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { TOCK_URL } from "@/lib/content";
 import { useI18n } from "@/lib/i18n";
-import { withLocale, stripLocale } from "@/lib/locale-routing";
+import { withLocale } from "@/lib/locale-routing";
+import { isHomePathname } from "@/lib/roru-path";
+import { scrollPageToTop } from "@/lib/scroll-to-top";
 
 function HomeIcon() {
   return (
@@ -70,20 +72,31 @@ export function MobileNavDock({ menuOpen, onMenuToggle }: Props) {
   const pathname = usePathname() ?? "/";
   const { lang } = useI18n();
   const homeHref = withLocale("/", lang);
-  const isHome = stripLocale(pathname) === "/";
+  const isHome = isHomePathname(pathname);
 
   return (
     <div className="roru-nav-bottom" id="roru-nav-bottom" aria-label="Mobile navigation">
       <div className="roru-nav-bottom__shell">
         <div className="roru-nav-bottom__pill">
-          <Link
-            href={homeHref}
-            aria-current={isHome ? "page" : undefined}
-            aria-label="Home"
-            className={`roru-nav-bottom__btn roru-nav-item${isHome ? " is-active" : ""}`}
-          >
-            <HomeIcon />
-          </Link>
+          {isHome ? (
+            <button
+              type="button"
+              aria-current="page"
+              aria-label="Back to top"
+              className="roru-nav-bottom__btn roru-nav-item is-active"
+              onClick={() => scrollPageToTop()}
+            >
+              <HomeIcon />
+            </button>
+          ) : (
+            <Link
+              href={homeHref}
+              aria-label="Home"
+              className="roru-nav-bottom__btn roru-nav-item"
+            >
+              <HomeIcon />
+            </Link>
+          )}
 
           <button
             type="button"
