@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 import { ClientPageEntrance } from "@/components/ClientPageEntrance";
 import { HeroScrollCue } from "@/components/HeroScrollCue";
 import { Navigation } from "@/components/Navigation";
@@ -135,6 +136,7 @@ export default function RootLayout({
           <PwaInstallPrompt />
           {children}
         </LanguageProvider>
+        <Analytics />
       </body>
     </html>
   );
