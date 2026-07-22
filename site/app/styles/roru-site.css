@@ -4494,6 +4494,11 @@ body:has(.roru-home-overlays) .roru-home-overlay-panel--hero:not(.is-active) .ro
   .roru-hero-scroll-cue {
     bottom: calc(var(--roru-bottom-dock-clear) + 10px);
   }
+
+  /* Sit above the ongoing-order pill when it stacks on the nav dock. */
+  body:has(.roru-nav-bottom__order-status) .roru-hero-scroll-cue {
+    bottom: calc(var(--roru-bottom-dock-clear) + 58px);
+  }
 }
 
 @media (min-width: 1032px) {

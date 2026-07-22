@@ -11,13 +11,14 @@ import { pageMetadata } from "@/lib/seo";
  * native speaker. Edit here to update both the <title>/<meta> and social tags.
  */
 
-export type PageKey = "home" | "about" | "events" | "menu" | "reserve";
+export type PageKey = "home" | "about" | "events" | "menu" | "order" | "reserve";
 
 export const PAGE_PATHS: Record<PageKey, string> = {
   home: "/",
   about: "/about",
   events: "/events",
   menu: "/menu",
+  order: "/order",
   reserve: "/reserve",
 };
 
@@ -44,6 +45,11 @@ export const PAGE_SEO: Record<Lang, Record<PageKey, Copy>> = {
       title: "Menu — Hand Rolls (Temaki), Drinks & Sake",
       description:
         "RORUBARU's à la carte hand roll (temaki) menu and drinks list — signature hand rolls, sake and cocktails at Hong Kong's original hand roll bar in Wan Chai.",
+    },
+    order: {
+      title: "Order — Takeout & Delivery",
+      description:
+        "Order hand rolls, drinks and sake from RORUBARU for pickup or delivery in Wan Chai. Browse the full menu, build your cart and checkout online.",
     },
     reserve: {
       title: "Reservations — Book a Table",
@@ -72,6 +78,11 @@ export const PAGE_SEO: Record<Lang, Record<PageKey, Copy>> = {
       description:
         "RORUBARU のアラカルト手巻き（テマキ）メニューとドリンクリスト。香港・湾仔の手巻き寿司バーで、シグネチャー手巻きや日本酒をどうぞ。",
     },
+    order: {
+      title: "注文 — テイクアウト・デリバリー",
+      description:
+        "RORUBARU の手巻き・ドリンク・日本酒を湾仔からテイクアウトまたはデリバリー。フルメニューからカートに追加してオンライン注文。",
+    },
     reserve: {
       title: "ご予約 — テーブルを予約する",
       description:
@@ -98,6 +109,11 @@ export const PAGE_SEO: Record<Lang, Record<PageKey, Copy>> = {
       title: "餐牌 — 手卷、飲品與清酒",
       description:
         "RORUBARU 的單點手卷（手巻き）餐牌與飲品單。香港灣仔手卷吧，供應招牌手卷、清酒與特調。",
+    },
+    order: {
+      title: "外賣 — 自取及送餐",
+      description:
+        "向灣仔 RORUBARU 訂購手卷、飲品及清酒，支持自取或送餐。瀏覽全餐牌、加入購物車並線上結帳。",
     },
     reserve: {
       title: "預約 — 預訂座位",

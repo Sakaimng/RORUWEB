@@ -12,6 +12,7 @@ import { useI18n } from "@/lib/i18n";
 import { withLocale, stripLocale } from "@/lib/locale-routing";
 import { PAGE_TRANSITION_START_EVENT } from "@/lib/roru-session";
 import { scrollPageToTop } from "@/lib/scroll-to-top";
+import { ORDER_ONLINE_ENABLED } from "@/lib/site-flags";
 import {
   canShowInstallMenuLink,
   openInstallPrompt,
@@ -29,6 +30,7 @@ export function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showInstallLink, setShowInstallLink] = useState(false);
 
+  /* Ordering is mobile-only when live — see ORDER_ONLINE_ENABLED in lib/site-flags.ts */
   const links = [
     { href: "/", label: t.nav.home },
     { href: "/about", label: t.nav.about },
@@ -37,7 +39,9 @@ export function Navigation() {
     { href: "/reserve", label: t.nav.reserve },
   ];
 
-  const mobileLinks = links;
+  const mobileLinks = ORDER_ONLINE_ENABLED
+    ? [...links.slice(0, 4), { href: "/order", label: t.nav.order }, ...links.slice(4)]
+    : links;
   const menuRef = useRef<HTMLElement>(null);
   const previousPathnameRef = useRef(pathname);
   const hasAnimatedMenuRef = useRef(false);

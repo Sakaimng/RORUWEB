@@ -1,11 +1,14 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useOrderCart } from "@/components/order/OrderCartProvider";
 import { TOCK_URL } from "@/lib/content";
 import { useI18n } from "@/lib/i18n";
-import { withLocale } from "@/lib/locale-routing";
+import { stripLocale, withLocale } from "@/lib/locale-routing";
 import { isHomePathname } from "@/lib/roru-path";
+import { ORDER_ONLINE_ENABLED } from "@/lib/site-flags";
 import { scrollPageToTop } from "@/lib/scroll-to-top";
 
 function HomeIcon() {
@@ -13,6 +16,25 @@ function HomeIcon() {
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
       <path
         d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-8.5Z"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function OrderIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M7 9V7a5 5 0 0 1 10 0v2"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+      />
+      <path
+        d="M5 9h14l-1.2 10.5a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 9Z"
         stroke="currentColor"
         strokeWidth="1.75"
         strokeLinejoin="round"
@@ -68,36 +90,23 @@ type Props = {
   onMenuToggle: () => void;
 };
 
-export function MobileNavDock({ menuOpen, onMenuToggle }: Props) {
-  const pathname = usePathname() ?? "/";
-  const { lang } = useI18n();
-  const homeHref = withLocale("/", lang);
-  const isHome = isHomePathname(pathname);
+type DockShellProps = Props & {
+  orderStatus?: ReactNode;
+  secondSlot?: ReactNode;
+};
 
+function MobileNavDockShell({ menuOpen, onMenuToggle, orderStatus, secondSlot }: DockShellProps) {
   return (
     <div className="roru-nav-bottom" id="roru-nav-bottom" aria-label="Mobile navigation">
       <div className="roru-nav-bottom__shell">
-        <div className="roru-nav-bottom__pill">
-          {isHome ? (
-            <button
-              type="button"
-              aria-current="page"
-              aria-label="Back to top"
-              className="roru-nav-bottom__btn roru-nav-item is-active"
-              onClick={() => scrollPageToTop()}
-            >
-              <HomeIcon />
-            </button>
-          ) : (
-            <Link
-              href={homeHref}
-              aria-label="Home"
-              className="roru-nav-bottom__btn roru-nav-item"
-            >
-              <HomeIcon />
-            </Link>
-          )}
-
+        {orderStatus}
+        <div
+          className={`roru-nav-bottom__pill${
+            secondSlot ? " roru-nav-bottom__pill--4" : ""
+          }`}
+        >
+          <HomeSlot />
+          {secondSlot}
           <button
             type="button"
             aria-controls="roru-mobile-menu"
@@ -108,7 +117,6 @@ export function MobileNavDock({ menuOpen, onMenuToggle }: Props) {
           >
             <MenuIcon open={menuOpen} />
           </button>
-
           <a
             href={TOCK_URL}
             target="_blank"
@@ -122,4 +130,93 @@ export function MobileNavDock({ menuOpen, onMenuToggle }: Props) {
       </div>
     </div>
   );
+}
+
+function HomeSlot() {
+  const pathname = usePathname() ?? "/";
+  const { lang } = useI18n();
+  const homeHref = withLocale("/", lang);
+  const isHome = isHomePathname(pathname);
+
+  if (isHome) {
+    return (
+      <button
+        type="button"
+        aria-current="page"
+        aria-label="Back to top"
+        className="roru-nav-bottom__btn roru-nav-item is-active"
+        onClick={() => scrollPageToTop()}
+      >
+        <HomeIcon />
+      </button>
+    );
+  }
+
+  return (
+    <Link href={homeHref} aria-label="Home" className="roru-nav-bottom__btn roru-nav-item">
+      <HomeIcon />
+    </Link>
+  );
+}
+
+function MobileNavDockWithOrder(props: Props) {
+  const pathname = usePathname() ?? "/";
+  const { lang, t } = useI18n();
+  const { itemCount, activeOrderTracking, trackingSheetOpen, openOrderTracking } =
+    useOrderCart();
+  const orderHref = withLocale("/order", lang);
+  const isOrder = stripLocale(pathname) === "/order";
+  const showCartBadge = !isOrder && itemCount > 0;
+  const showOrderStatus = activeOrderTracking != null && !trackingSheetOpen;
+  const orderStatusLabel =
+    activeOrderTracking?.fulfillment === "pickup"
+      ? "Pickup order in progress"
+      : "Delivery order in progress";
+
+  return (
+    <MobileNavDockShell
+      {...props}
+      orderStatus={
+        showOrderStatus ? (
+          <button
+            type="button"
+            className="roru-nav-bottom__order-status"
+            onClick={openOrderTracking}
+            aria-label={`${orderStatusLabel}. Tap to view order tracking.`}
+          >
+            <span className="roru-nav-bottom__order-status-dot" aria-hidden />
+            <span className="roru-nav-bottom__order-status-text">{orderStatusLabel}</span>
+          </button>
+        ) : null
+      }
+      secondSlot={
+        <Link
+          href={orderHref}
+          aria-current={isOrder ? "page" : undefined}
+          aria-label={
+            showCartBadge
+              ? `${t.nav.order}, ${itemCount} items in cart`
+              : t.nav.order
+          }
+          className={`roru-nav-bottom__btn roru-nav-item${isOrder ? " is-active" : ""}`}
+        >
+          <span className="roru-nav-bottom__icon-wrap">
+            <OrderIcon />
+            {showCartBadge ? (
+              <span className="roru-nav-bottom__badge" aria-hidden>
+                {itemCount}
+              </span>
+            ) : null}
+          </span>
+        </Link>
+      }
+    />
+  );
+}
+
+export function MobileNavDock(props: Props) {
+  if (ORDER_ONLINE_ENABLED) {
+    return <MobileNavDockWithOrder {...props} />;
+  }
+  return <MobileNavDockShell {...props} />;
 }

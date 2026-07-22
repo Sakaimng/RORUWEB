@@ -4,12 +4,14 @@ import "./globals.css";
 import { ClientPageEntrance } from "@/components/ClientPageEntrance";
 import { HeroScrollCue } from "@/components/HeroScrollCue";
 import { Navigation } from "@/components/Navigation";
+import { OrderCartRoot } from "@/components/order/OrderCartRoot";
 import { RoruLoader } from "@/components/roru/RoruLoader";
 import { PageTransition } from "@/components/roru/PageTransition";
 import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 import { ScrollRestoration } from "@/components/ScrollRestoration";
 import { JsonLd } from "@/components/JsonLd";
 import { LanguageProvider } from "@/lib/i18n";
+import { ORDER_ONLINE_ENABLED } from "@/lib/site-flags";
 import {
   SITE_URL,
   SITE_NAME,
@@ -126,14 +128,29 @@ export default function RootLayout({
       >
         <JsonLd data={siteGraph()} />
         <LanguageProvider>
-          <ScrollRestoration />
-          <PageTransition />
-          <ClientPageEntrance />
-          <RoruLoader />
-          <Navigation />
-          <HeroScrollCue />
-          <PwaInstallPrompt />
-          {children}
+          {ORDER_ONLINE_ENABLED ? (
+            <OrderCartRoot>
+              <ScrollRestoration />
+              <PageTransition />
+              <ClientPageEntrance />
+              <RoruLoader />
+              <Navigation />
+              <HeroScrollCue />
+              <PwaInstallPrompt />
+              {children}
+            </OrderCartRoot>
+          ) : (
+            <>
+              <ScrollRestoration />
+              <PageTransition />
+              <ClientPageEntrance />
+              <RoruLoader />
+              <Navigation />
+              <HeroScrollCue />
+              <PwaInstallPrompt />
+              {children}
+            </>
+          )}
         </LanguageProvider>
       </body>
     </html>

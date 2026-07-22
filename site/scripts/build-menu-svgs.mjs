@@ -40,7 +40,7 @@ ${right}
 }
 
 const alaLeft = path.join(menusDir, "A la carte 1.svg");
-const alaRight = path.join(menusDir, "A la carte 3.svg");
+const alaRight = path.join(menusDir, "A la carte 2.svg");
 const drinksLeft = path.join(menusDir, "DRINKS MENU 1.svg");
 const drinksRight = path.join(menusDir, "DRINKS MENU 2.svg");
 

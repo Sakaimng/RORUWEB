@@ -290,10 +290,58 @@ html.roru-nav-tone-light .roru-home-discover__button {
 
   .roru-nav-bottom__shell {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
     padding:
       0 max(16px, var(--roru-section-pad-x))
       max(12px, env(safe-area-inset-bottom, 0px));
+  }
+
+  .roru-nav-bottom__order-status {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: min(100%, 360px);
+    padding: 9px 14px;
+    border: 0;
+    border-radius: 999px;
+    background: #121212;
+    color: #ffffff;
+    box-shadow: 0 8px 24px rgba(18, 18, 18, 0.22);
+    cursor: pointer;
+    text-transform: none !important;
+  }
+
+  .roru-nav-bottom__order-status-dot {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--order-brand, #f54500);
+    animation: roruOrderStatusPulse 1.4s ease-in-out infinite;
+  }
+
+  .roru-nav-bottom__order-status-text {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @keyframes roruOrderStatusPulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.55;
+      transform: scale(0.88);
+    }
   }
 
   .roru-nav-bottom__pill {
@@ -314,6 +362,11 @@ html.roru-nav-tone-light .roru-home-discover__button {
       0 2px 8px rgba(18, 18, 18, 0.04),
       inset 0 1px 0 rgba(255, 255, 255, 0.5),
       inset 0 -1px 0 rgba(18, 18, 18, 0.03);
+  }
+
+  .roru-nav-bottom__pill--4 {
+    grid-template-columns: repeat(4, 1fr);
+    width: min(100%, 360px);
   }
 
   .roru-nav-bottom__btn:not(.roru-nav-bottom__btn--reserve) {
@@ -348,6 +401,29 @@ html.roru-nav-tone-light .roru-home-discover__button {
       transform 0.24s var(--roru-nav-ease);
   }
 
+  .roru-nav-bottom__icon-wrap {
+    position: relative;
+    display: grid;
+    place-items: center;
+  }
+
+  .roru-nav-bottom__badge {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: #121212;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    pointer-events: none;
+  }
+
   .roru-nav-bottom__btn--reserve {
     background: #121212;
     color: #ffffff;
@@ -379,6 +455,11 @@ html.roru-nav-tone-light .roru-home-discover__button {
     ) {
     background: color-mix(in srgb, #121212 10%, transparent);
     color: #121212;
+  }
+
+  html.roru-mobile-menu-open .roru-nav-bottom__order-status {
+    visibility: hidden;
+    pointer-events: none;
   }
 
   html.roru-mobile-menu-open .roru-nav-bottom__btn--reserve {

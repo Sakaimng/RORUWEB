@@ -2,9 +2,12 @@
 
 import { MenuSvgBoard } from "@/components/menu/MenuSvgBoard";
 
+const ALA_CARTE_DESKTOP = "/menus/A La Carte menu Group.svg";
+const DRINKS_DESKTOP = "/menus/Drinks Menu Group.svg";
+
 const ALA_CARTE_MOBILE = [
   "/menus/A la carte 1.svg",
-  "/menus/A la carte 3.svg",
+  "/menus/A la carte 2.svg",
 ] as const;
 
 const DRINKS_MOBILE = [
@@ -21,13 +24,13 @@ export function MenuPageClient() {
 
       <div className="roru-menu-page__boards">
         <MenuSvgBoard
-          src="/menus/a-la-carte.svg"
+          src={ALA_CARTE_DESKTOP}
           mobileSrc={ALA_CARTE_MOBILE}
           title="À la carte"
           headingId="roru-menu-ala-carte"
         />
         <MenuSvgBoard
-          src="/menus/drinks.svg"
+          src={DRINKS_DESKTOP}
           mobileSrc={DRINKS_MOBILE}
           title="Drinks"
           headingId="roru-menu-drinks"

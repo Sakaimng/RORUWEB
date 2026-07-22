@@ -46,6 +46,7 @@ type Dict = {
     about: string;
     events: string;
     menus: string;
+    order: string;
     reserve: string;
   };
   menuToggle: { open: string; close: string };
@@ -134,6 +135,7 @@ const en: Dict = {
     about: "About",
     events: "Events",
     menus: "Menus",
+    order: "Order",
     reserve: "Reservations",
   },
   menuToggle: { open: "Menu", close: "Close" },
@@ -234,6 +236,7 @@ const jp: Dict = {
     about: "私たちについて",
     events: "イベント",
     menus: "メニュー",
+    order: "注文",
     reserve: "予約",
   },
   menuToggle: { open: "メニュー", close: "閉じる" },
@@ -334,6 +337,7 @@ const cn: Dict = {
     about: "關於我們",
     events: "活動",
     menus: "菜單",
+    order: "外賣",
     reserve: "預約",
   },
   menuToggle: { open: "選單", close: "關閉" },

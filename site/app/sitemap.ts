@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { absoluteUrl, buildLanguageAlternates } from "@/lib/seo";
 import { withLocale } from "@/lib/locale-routing";
+import { ORDER_ONLINE_ENABLED } from "@/lib/site-flags";
 import type { Lang } from "@/lib/i18n";
 
 /**
@@ -17,6 +18,9 @@ const ROUTES: {
 }[] = [
   { path: "/", priority: 1.0, changeFrequency: "weekly" },
   { path: "/menu", priority: 0.9, changeFrequency: "monthly" },
+  ...(ORDER_ONLINE_ENABLED
+    ? [{ path: "/order", priority: 0.9, changeFrequency: "monthly" as const }]
+    : []),
   { path: "/reserve", priority: 0.9, changeFrequency: "monthly" },
   { path: "/events", priority: 0.8, changeFrequency: "weekly" },
   { path: "/about", priority: 0.7, changeFrequency: "monthly" },

@@ -2,6 +2,7 @@
 @import "./styles/roru-site.css";
 @import "./styles/about-page.css";
 @import "./styles/menu-page.css";
+@import "./styles/order-page.css";
 
 @tailwind base;
 @tailwind components;
