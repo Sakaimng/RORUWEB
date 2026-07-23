@@ -24,6 +24,87 @@ function isActiveRoute(pathname: string, href: string) {
   return path === href || path.startsWith(`${href}/`);
 }
 
+function MobileMenuLinkIcon({ href }: { href: string }) {
+  const props = {
+    className: "roru-mobile-menu-item__icon",
+    width: 24,
+    height: 24,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    "aria-hidden": true,
+  };
+
+  switch (href) {
+    case "/":
+      return (
+        <svg {...props}>
+          <path
+            d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-8.5Z"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+    case "/about":
+      return (
+        <svg {...props}>
+          <circle cx="12" cy="8" r="3.25" stroke="currentColor" strokeWidth="1.6" />
+          <path
+            d="M5.5 20c.9-3.6 3.1-5.4 6.5-5.4s5.6 1.8 6.5 5.4"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          />
+        </svg>
+      );
+    case "/events":
+      return (
+        <svg {...props}>
+          <rect x="4" y="5.5" width="16" height="14" rx="1.5" stroke="currentColor" strokeWidth="1.6" />
+          <path d="M4 10h16M8 3.5v4M16 3.5v4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          <path d="M8 14h3M13 14h3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        </svg>
+      );
+    case "/menu":
+      return (
+        <svg {...props}>
+          <path d="M6.5 4v7M4.5 4v4a2 2 0 0 0 4 0V4M6.5 11v9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          <path d="M15.5 4v16M15.5 4c2.3 1.2 3.5 3.2 3.5 6h-3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
+    case "/delivery":
+      return (
+        <svg {...props}>
+          <path d="M3.5 7.5h11v9h-11zM14.5 10.5h3l2 3v3h-5z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+          <circle cx="7" cy="18" r="1.5" stroke="currentColor" strokeWidth="1.6" />
+          <circle cx="17.5" cy="18" r="1.5" stroke="currentColor" strokeWidth="1.6" />
+          <path d="M6.5 10.5h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        </svg>
+      );
+    case "/order":
+      return (
+        <svg {...props}>
+          <path d="M8 9V7a4 4 0 0 1 8 0v2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          <path d="M5.5 9h13l-1 10H6.5l-1-10Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+        </svg>
+      );
+    case "/install":
+      return (
+        <svg {...props}>
+          <path d="M12 4v10M8.5 10.5 12 14l3.5-3.5M5 19h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
+    default:
+      return (
+        <svg {...props}>
+          <rect x="4" y="5.5" width="16" height="14" rx="1.5" stroke="currentColor" strokeWidth="1.6" />
+          <path d="M4 10h16M8 3.5v4M16 3.5v4M8.5 15l2.1 2.1L16 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
+  }
+}
+
 export function Navigation() {
   const pathname = usePathname();
   const { t, lang } = useI18n();
@@ -36,6 +117,7 @@ export function Navigation() {
     { href: "/about", label: t.nav.about },
     { href: "/events", label: t.nav.events },
     { href: "/menu", label: t.nav.menus },
+    { href: "/delivery", label: t.nav.delivery },
     { href: "/reserve", label: t.nav.reserve },
   ];
 
@@ -186,31 +268,35 @@ export function Navigation() {
         aria-label="Mobile"
         aria-hidden={!menuOpen}
       >
-        <div className="relative flex h-full flex-col items-center justify-center gap-2">
-          {mobileLinks.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={withLocale(href, lang)}
-              aria-current={isActiveRoute(pathname, href) ? "page" : undefined}
-              className="roru-mobile-menu-item block rounded-lg px-6 py-3 text-center text-base font-bold uppercase transition-opacity hover:opacity-70"
-              onClick={() => setMenuOpen(false)}
-            >
-              {label}
-            </Link>
-          ))}
-          {showInstallLink ? (
-            <button
-              type="button"
-              className="roru-mobile-menu-item block rounded-lg px-6 py-3 text-center text-base font-bold uppercase transition-opacity hover:opacity-70"
-              onClick={() => {
-                setMenuOpen(false);
-                openInstallPrompt();
-              }}
-            >
-              {t.install.menuLink}
-            </button>
-          ) : null}
-          <div className="roru-mobile-menu-item absolute right-0 bottom-[9vh] left-0 flex justify-center">
+        <div className="roru-mobile-menu__content relative flex h-full flex-col items-center justify-center">
+          <div className="roru-mobile-menu__grid">
+            {mobileLinks.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={withLocale(href, lang)}
+                aria-current={isActiveRoute(pathname, href) ? "page" : undefined}
+                className="roru-mobile-menu-item roru-mobile-menu-item--block"
+                onClick={() => setMenuOpen(false)}
+              >
+                <MobileMenuLinkIcon href={href} />
+                <span>{label}</span>
+              </Link>
+            ))}
+            {showInstallLink ? (
+              <button
+                type="button"
+                className="roru-mobile-menu-item roru-mobile-menu-item--block roru-mobile-menu-item--wide"
+                onClick={() => {
+                  setMenuOpen(false);
+                  openInstallPrompt();
+                }}
+              >
+                <MobileMenuLinkIcon href="/install" />
+                <span>{t.install.menuLink}</span>
+              </button>
+            ) : null}
+          </div>
+          <div className="roru-mobile-menu__language absolute right-0 bottom-[9vh] left-0 flex justify-center">
             <LanguageToggle />
           </div>
         </div>

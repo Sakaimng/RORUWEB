@@ -11,7 +11,14 @@ import { pageMetadata } from "@/lib/seo";
  * native speaker. Edit here to update both the <title>/<meta> and social tags.
  */
 
-export type PageKey = "home" | "about" | "events" | "menu" | "order" | "reserve";
+export type PageKey =
+  | "home"
+  | "about"
+  | "events"
+  | "menu"
+  | "order"
+  | "delivery"
+  | "reserve";
 
 export const PAGE_PATHS: Record<PageKey, string> = {
   home: "/",
@@ -19,6 +26,7 @@ export const PAGE_PATHS: Record<PageKey, string> = {
   events: "/events",
   menu: "/menu",
   order: "/order",
+  delivery: "/delivery",
   reserve: "/reserve",
 };
 
@@ -50,6 +58,11 @@ export const PAGE_SEO: Record<Lang, Record<PageKey, Copy>> = {
       title: "Order — Takeout & Delivery",
       description:
         "Order hand rolls, drinks and sake from RORUBARU for pickup or delivery in Wan Chai. Browse the full menu, build your cart and checkout online.",
+    },
+    delivery: {
+      title: "Delivery — Coming Soon",
+      description:
+        "RORUBARU delivery is coming soon. Join the waitlist to be first to know when fresh hand rolls can be delivered to your door in Hong Kong.",
     },
     reserve: {
       title: "Reservations — Book a Table",
@@ -83,6 +96,11 @@ export const PAGE_SEO: Record<Lang, Record<PageKey, Copy>> = {
       description:
         "RORUBARU の手巻き・ドリンク・日本酒を湾仔からテイクアウトまたはデリバリー。フルメニューからカートに追加してオンライン注文。",
     },
+    delivery: {
+      title: "デリバリー — 近日開始",
+      description:
+        "RORUBARU のデリバリーサービスは近日開始予定です。香港で新鮮な手巻きをお届けできるようになったら、ウェイトリストへいち早くお知らせします。",
+    },
     reserve: {
       title: "ご予約 — テーブルを予約する",
       description:
@@ -114,6 +132,11 @@ export const PAGE_SEO: Record<Lang, Record<PageKey, Copy>> = {
       title: "外賣 — 自取及送餐",
       description:
         "向灣仔 RORUBARU 訂購手卷、飲品及清酒，支持自取或送餐。瀏覽全餐牌、加入購物車並線上結帳。",
+    },
+    delivery: {
+      title: "送餐服務 — 即將推出",
+      description:
+        "RORUBARU 送餐服務即將推出。加入等候名單，在香港可以享用新鮮手卷送餐服務時率先收到通知。",
     },
     reserve: {
       title: "預約 — 預訂座位",

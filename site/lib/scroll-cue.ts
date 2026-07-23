@@ -26,6 +26,9 @@ export function shouldShowScrollCue(): boolean {
   if (html.classList.contains("roru-order-page") || document.querySelector(".order-page-shell")) {
     return false;
   }
+  if (document.querySelector(".roru-delivery-page")) {
+    return false;
+  }
 
   const homeOverlays = document.querySelector(".roru-home-overlays");
   if (homeOverlays) {

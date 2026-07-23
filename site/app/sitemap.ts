@@ -21,6 +21,7 @@ const ROUTES: {
   ...(ORDER_ONLINE_ENABLED
     ? [{ path: "/order", priority: 0.9, changeFrequency: "monthly" as const }]
     : []),
+  { path: "/delivery", priority: 0.8, changeFrequency: "monthly" },
   { path: "/reserve", priority: 0.9, changeFrequency: "monthly" },
   { path: "/events", priority: 0.8, changeFrequency: "weekly" },
   { path: "/about", priority: 0.7, changeFrequency: "monthly" },

@@ -248,6 +248,65 @@ html.roru-nav-tone-light .roru-home-discover__button {
       filter 300ms ease,
       opacity 300ms ease;
   }
+
+  #roru-mobile-menu .roru-mobile-menu__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: clamp(72px, 19vw, 92px);
+    gap: clamp(8px, 2.5vw, 14px);
+    width: min(100%, 400px);
+  }
+
+  #roru-mobile-menu .roru-mobile-menu-item--block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid color-mix(in srgb, #121212 14%, transparent);
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--surface) 82%, #ffffff);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.52),
+      0 8px 20px rgba(18, 18, 18, 0.05);
+    color: #121212;
+    font-size: clamp(11px, 3vw, 13px);
+    line-height: 1;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  #roru-mobile-menu .roru-mobile-menu-item--block:active {
+    transform: scale(0.97);
+  }
+
+  #roru-mobile-menu .roru-mobile-menu-item--wide {
+    grid-column: 1 / -1;
+    flex-direction: row;
+  }
+
+  #roru-mobile-menu .roru-mobile-menu-item__icon {
+    flex: 0 0 auto;
+  }
+
+  html.roru-mobile-menu-open
+    #roru-mobile-menu
+    .roru-mobile-menu-item--block[aria-current="page"] {
+    border-color: #121212;
+    background: #121212;
+    color: #f1f1f1 !important;
+  }
+
+  #roru-mobile-menu .roru-mobile-menu__language {
+    pointer-events: auto;
+  }
 }
 
 /* ===========================================================================
