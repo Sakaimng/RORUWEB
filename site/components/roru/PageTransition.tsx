@@ -2,7 +2,7 @@
 
 import gsap from "gsap";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { runPostLoaderSequence } from "@/lib/home-entrance";
 import {
   NAVIGATE_WITH_TRANSITION_EVENT,
@@ -17,6 +17,13 @@ import {
 
 const FADE_OUT_DURATION = 0.32;
 const FADE_IN_DURATION = 0.38;
+
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
 
 function normalizePathname(pathname: string): string {
   if (!pathname || pathname === "/") return "/";
@@ -43,6 +50,25 @@ export function PageTransition() {
   const pathnameRef = useRef(pathname);
   pathnameRef.current = pathname;
 
+  const releaseTransitionLock = useCallback(
+    (overlay = overlayRef.current) => {
+      overlay?.classList.remove("is-active");
+      if (overlay) {
+        gsap.set(overlay, { opacity: 0 });
+      }
+
+      document.documentElement.classList.remove("roru-transition-pending");
+      isTransitioning.current = false;
+
+      try {
+        sessionStorage.removeItem(TRANSITION_PENDING_KEY);
+      } catch {
+        /* ignore */
+      }
+    },
+    [],
+  );
+
   useEffect(() => {
     isTransitioning.current = false;
   }, [pathname]);
@@ -55,11 +81,7 @@ export function PageTransition() {
     }
 
     function hideOverlay() {
-      const el = overlayRef.current;
-      if (!el) return;
-      el.classList.remove("is-active");
-      document.documentElement.classList.remove("roru-transition-pending");
-      gsap.set(el, { opacity: 0 });
+      releaseTransitionLock();
     }
 
     function transitionIn(href: string) {
@@ -75,26 +97,31 @@ export function PageTransition() {
       }
       if (isTransitioning.current) return;
       isTransitioning.current = true;
-      window.dispatchEvent(new CustomEvent(PAGE_TRANSITION_START_EVENT));
       showOverlay();
-      gsap.fromTo(
-        el,
-        { opacity: 0 },
-        {
-          opacity: 1,
-          duration: FADE_OUT_DURATION,
-          ease: "power2.inOut",
-          onComplete: () => {
-            try {
-              sessionStorage.setItem(TRANSITION_PENDING_KEY, "1");
-              sessionStorage.setItem(INTERNAL_NAV_KEY, "1");
-            } catch {
-              /* ignore */
-            }
-            router.push(href);
-          },
-        },
-      );
+
+      const completeOutgoingTransition = () => {
+        window.dispatchEvent(new CustomEvent(PAGE_TRANSITION_START_EVENT));
+        try {
+          sessionStorage.setItem(TRANSITION_PENDING_KEY, "1");
+          sessionStorage.setItem(INTERNAL_NAV_KEY, "1");
+        } catch {
+          /* ignore */
+        }
+        router.push(href);
+      };
+
+      if (prefersReducedMotion()) {
+        gsap.set(el, { opacity: 1 });
+        completeOutgoingTransition();
+        return;
+      }
+
+      gsap.fromTo(el, { opacity: 0 }, {
+        opacity: 1,
+        duration: FADE_OUT_DURATION,
+        ease: "power2.inOut",
+        onComplete: completeOutgoingTransition,
+      });
     }
 
     try {
@@ -150,22 +177,33 @@ export function PageTransition() {
       document.removeEventListener("click", onClick, true);
       window.removeEventListener(NAVIGATE_WITH_TRANSITION_EVENT, onNavigateWithTransition);
     };
-  }, [router]);
+  }, [releaseTransitionLock, router]);
 
   useEffect(() => {
     let pending = false;
     try {
       pending = sessionStorage.getItem(TRANSITION_PENDING_KEY) === "1";
     } catch {
+      releaseTransitionLock();
       return;
     }
-    if (!pending) return;
+    if (!pending) {
+      releaseTransitionLock();
+      return;
+    }
 
     const overlay = overlayRef.current;
     if (!overlay) return;
 
     gsap.set(overlay, { opacity: 1 });
     overlay.classList.add("is-active");
+
+    if (prefersReducedMotion()) {
+      revealPageContent();
+      runPostLoaderSequence(false, isHomePathname(pathname));
+      releaseTransitionLock(overlay);
+      return;
+    }
 
     const tween = gsap.to(overlay, {
       opacity: 0,
@@ -177,21 +215,22 @@ export function PageTransition() {
         runPostLoaderSequence(false, isHomePathname(pathname));
       },
       onComplete: () => {
-        overlay.classList.remove("is-active");
-        document.documentElement.classList.remove("roru-transition-pending");
-        isTransitioning.current = false;
-        try {
-          sessionStorage.removeItem(TRANSITION_PENDING_KEY);
-        } catch {
-          /* ignore */
-        }
+        releaseTransitionLock(overlay);
       },
     });
 
     return () => {
       tween.kill();
+      /*
+       * React replays effects in development, so only release when a real
+       * pathname change interrupted this fade. Otherwise the replay would
+       * cancel a valid incoming transition before it becomes visible.
+       */
+      if (pathnameRef.current !== pathname) {
+        releaseTransitionLock(overlay);
+      }
     };
-  }, [pathname]);
+  }, [pathname, releaseTransitionLock]);
 
   return (
     <div

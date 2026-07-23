@@ -12,5 +12,9 @@ export const PREOPTIMIZED_IMAGE = { unoptimized: true as const };
 /** Lightbox stage is capped at 1180px wide in CSS. */
 export const LIGHTBOX_IMAGE_SIZES = "(max-width: 1180px) 96vw, 1180px";
 
+/** Grid-view lightbox tiles show several pre-optimized gallery images at once. */
+export const LIGHTBOX_GRID_IMAGE_SIZES =
+  "(max-width: 767px) 31vw, (max-width: 1180px) 20vw, 180px";
+
 /** About marquee tile display (matches AboutSequenceMarquee sizes). */
 export const ABOUT_MARQUEE_SIZES = "(max-width: 767px) 68vw, (max-width: 991px) 36vw, 22vw";

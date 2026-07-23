@@ -29,7 +29,7 @@ export function PageOverlayShell({
         <div className="roru-home-overlay-stack">
           <div
             className={[
-              "roru-home-overlay-panel homepage-reveal",
+              "roru-home-overlay-panel homepage-reveal is-active",
               scrollable ? "roru-home-overlay-panel--scrollable" : "",
               contentClassName,
             ]
@@ -38,7 +38,7 @@ export function PageOverlayShell({
           >
             {children}
           </div>
-          <div className="roru-home-overlay-panel roru-home-overlay-panel--footer">
+          <div className="roru-home-overlay-panel roru-home-overlay-panel--footer is-after">
             <SiteFooter />
           </div>
         </div>

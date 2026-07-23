@@ -3,7 +3,13 @@
 import gsap from "gsap";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { NavLogo } from "./NavLogo";
 import { LanguageToggle } from "./LanguageToggle";
 import { MobileNavDock } from "./MobileNavDock";
@@ -125,8 +131,26 @@ export function Navigation() {
     ? [...links.slice(0, 4), { href: "/order", label: t.nav.order }, ...links.slice(4)]
     : links;
   const menuRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const previousPathnameRef = useRef(pathname);
   const hasAnimatedMenuRef = useRef(false);
+  const shouldRestoreMenuButtonFocusRef = useRef(false);
+
+  const closeMenu = useCallback((restoreMenuButtonFocus = false) => {
+    if (restoreMenuButtonFocus) {
+      shouldRestoreMenuButtonFocusRef.current = true;
+    }
+    setMenuOpen(false);
+  }, []);
+
+  const toggleMenu = useCallback(() => {
+    setMenuOpen((open) => {
+      if (open) {
+        shouldRestoreMenuButtonFocusRef.current = true;
+      }
+      return !open;
+    });
+  }, []);
 
   /* Close the flyout on real client navigations. */
   useEffect(() => {
@@ -136,19 +160,19 @@ export function Navigation() {
   useEffect(() => {
     if (previousPathnameRef.current === pathname) return;
     previousPathnameRef.current = pathname;
-    const timeout = window.setTimeout(() => setMenuOpen(false), 0);
+    const timeout = window.setTimeout(() => closeMenu(), 0);
     return () => window.clearTimeout(timeout);
-  }, [pathname]);
+  }, [closeMenu, pathname]);
 
   /* RORU page transitions also dismiss the flyout. */
   useEffect(() => {
     function onTransitionStart() {
-      setMenuOpen(false);
+      closeMenu();
     }
     window.addEventListener(PAGE_TRANSITION_START_EVENT, onTransitionStart);
     return () =>
       window.removeEventListener(PAGE_TRANSITION_START_EVENT, onTransitionStart);
-  }, []);
+  }, [closeMenu]);
 
   /* Flag the open state on <html> (lets the footer blur behind the menu). */
   useEffect(() => {
@@ -156,6 +180,38 @@ export function Navigation() {
     return () =>
       document.documentElement.classList.remove("roru-mobile-menu-open");
   }, [menuOpen]);
+
+  useEffect(() => {
+    const menu = menuRef.current;
+    if (menuOpen) {
+      const frame = window.requestAnimationFrame(() => {
+        menu
+          ?.querySelector<HTMLElement>(".roru-mobile-menu-item")
+          ?.focus({ preventScroll: true });
+      });
+      return () => window.cancelAnimationFrame(frame);
+    }
+
+    if (!shouldRestoreMenuButtonFocusRef.current) return;
+    shouldRestoreMenuButtonFocusRef.current = false;
+    const frame = window.requestAnimationFrame(() => {
+      menuButtonRef.current?.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      closeMenu(true);
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [closeMenu, menuOpen]);
 
   /* Mobile flyout open/close: full-height panel fades in with staggered items. */
   useLayoutEffect(() => {
@@ -165,15 +221,24 @@ export function Navigation() {
     const items = Array.from(
       menu.querySelectorAll<HTMLElement>(".roru-mobile-menu-item")
     );
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
     if (!hasAnimatedMenuRef.current) {
       hasAnimatedMenuRef.current = true;
       gsap.set(menu, { autoAlpha: 0 });
-      gsap.set(items, { autoAlpha: 0, y: 10 });
+      gsap.set(items, { autoAlpha: 0, y: reducedMotion ? 0 : 10 });
       return;
     }
 
     gsap.killTweensOf([menu, ...items]);
+
+    if (reducedMotion) {
+      gsap.set(menu, { autoAlpha: menuOpen ? 1 : 0 });
+      gsap.set(items, { autoAlpha: menuOpen ? 1 : 0, y: 0 });
+      return;
+    }
 
     if (menuOpen) {
       gsap
@@ -220,7 +285,7 @@ export function Navigation() {
                     key={href}
                     href={withLocale(href, lang)}
                     aria-current={isActiveRoute(pathname, href) ? "page" : undefined}
-                    className="roru-nav-item text-xs font-bold uppercase transition-opacity hover:opacity-70"
+                    className="roru-nav-item text-xs font-bold uppercase transition-opacity"
                   >
                     {label}
                   </Link>
@@ -235,7 +300,7 @@ export function Navigation() {
                 className="roru-nav-item block leading-none"
                 aria-label="Back to top"
                 onClick={() => {
-                  setMenuOpen(false);
+                  closeMenu();
                   scrollPageToTop();
                 }}
               >
@@ -249,7 +314,7 @@ export function Navigation() {
                 href={TOCK_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="roru-nav-item shrink-0 px-0 py-2 text-xs font-bold uppercase transition-opacity hover:opacity-70"
+                className="roru-nav-item shrink-0 px-0 py-2 text-xs font-bold uppercase transition-opacity"
               >
                 Reserve Now
               </a>
@@ -262,9 +327,7 @@ export function Navigation() {
       <nav
         ref={menuRef}
         id="roru-mobile-menu"
-        className={`fixed right-0 left-0 top-16 z-[1000] h-[calc(100dvh-4rem-var(--roru-bottom-dock-clear))] overflow-hidden bg-transparent px-[var(--roru-section-pad-x)] sm:top-20 sm:h-[calc(100dvh-5rem-var(--roru-bottom-dock-clear))] min-[1032px]:hidden ${
-          menuOpen ? "pointer-events-auto" : "pointer-events-none"
-        }`}
+        className="roru-mobile-menu"
         aria-label="Mobile"
         aria-hidden={!menuOpen}
       >
@@ -276,7 +339,7 @@ export function Navigation() {
                 href={withLocale(href, lang)}
                 aria-current={isActiveRoute(pathname, href) ? "page" : undefined}
                 className="roru-mobile-menu-item roru-mobile-menu-item--block"
-                onClick={() => setMenuOpen(false)}
+                onClick={() => closeMenu()}
               >
                 <MobileMenuLinkIcon href={href} />
                 <span>{label}</span>
@@ -287,7 +350,7 @@ export function Navigation() {
                 type="button"
                 className="roru-mobile-menu-item roru-mobile-menu-item--block roru-mobile-menu-item--wide"
                 onClick={() => {
-                  setMenuOpen(false);
+                  closeMenu();
                   openInstallPrompt();
                 }}
               >
@@ -304,16 +367,17 @@ export function Navigation() {
 
       <MobileNavDock
         menuOpen={menuOpen}
-        onMenuToggle={() => setMenuOpen((open) => !open)}
+        onMenuToggle={toggleMenu}
+        menuButtonRef={menuButtonRef}
       />
 
       <button
         type="button"
         aria-label="Close menu"
-        onClick={() => setMenuOpen(false)}
-        className={`fixed inset-0 z-[998] bg-[color:color-mix(in_srgb,var(--surface)_82%,transparent)] backdrop-blur-3xl transition duration-300 min-[1032px]:hidden ${
-          menuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
-        }`}
+        aria-hidden={!menuOpen}
+        tabIndex={menuOpen ? 0 : -1}
+        onClick={() => closeMenu(true)}
+        className={`roru-mobile-menu-scrim${menuOpen ? " is-open" : ""}`}
       />
     </>
   );

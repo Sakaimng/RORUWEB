@@ -1,4 +1,4 @@
-/** Dispatched when PageTransition starts (before fade-out + router.push). */
+/** Dispatched once the outgoing page is covered, immediately before router.push. */
 export const PAGE_TRANSITION_START_EVENT = "roru:page-transition-start";
 
 export const TRANSITION_PENDING_KEY = "roruTransitionPending";

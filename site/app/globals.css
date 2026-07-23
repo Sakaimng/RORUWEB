@@ -168,3 +168,110 @@ video {
     color: var(--text);
   }
 }
+
+/*
+ * Mobile app shell tokens. These leave the editorial desktop system intact,
+ * while giving touch-first surfaces one consistent spacing, elevation, and
+ * control language.
+ */
+@media (max-width: 1031px) {
+  :root {
+    --roru-section-pad-x: max(
+      16px,
+      env(safe-area-inset-left, 0px),
+      env(safe-area-inset-right, 0px)
+    );
+    --roru-mobile-pad-x: var(--roru-section-pad-x);
+    --roru-mobile-radius-sm: 12px;
+    --roru-mobile-radius-lg: 20px;
+    --roru-mobile-radius-pill: 999px;
+    --roru-mobile-surface-elevated: color-mix(
+      in srgb,
+      var(--surface) 88%,
+      #ffffff
+    );
+    --roru-mobile-surface-muted: color-mix(in srgb, var(--surface) 78%, #ffffff);
+    --roru-mobile-border: color-mix(in srgb, var(--text) 10%, transparent);
+    --roru-mobile-shadow: 0 10px 30px rgba(18, 18, 18, 0.1);
+    --roru-mobile-touch: 48px;
+    /*
+     * Mobile Liquid Glass materials. Glass is reserved for functional chrome
+     * (navigation, controls, and sheets); content remains standard material
+     * for legibility and visual hierarchy.
+     */
+    --roru-glass-blur-chrome: 20px;
+    --roru-glass-blur-heavy: 28px;
+    --roru-glass-saturate: 165%;
+    --roru-glass-fill-dark: rgba(18, 18, 18, 0.76);
+    --roru-glass-fill-dark-strong: rgba(18, 18, 18, 0.9);
+    --roru-glass-fill-light: color-mix(in srgb, var(--surface) 74%, transparent);
+    --roru-glass-fill-light-strong: color-mix(in srgb, var(--surface) 88%, transparent);
+    --roru-glass-border-light: color-mix(in srgb, #ffffff 18%, transparent);
+    --roru-glass-border-dark: color-mix(in srgb, var(--text) 14%, transparent);
+    --roru-glass-highlight-dark: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    --roru-glass-highlight-light: inset 0 1px 0 rgba(255, 255, 255, 0.56);
+    --roru-glass-shadow: 0 12px 32px rgba(18, 18, 18, 0.18);
+    --roru-focus-ring: 0 0 0 3px color-mix(in srgb, #f54500 28%, transparent);
+    --roru-press-scale: 0.97;
+    /*
+     * Overlay stack: content < actions < scrim < sheets < navigation < modal.
+     * Existing values remain explicit where cross-page layering requires them.
+     */
+    --roru-z-floating-action: 997;
+    --roru-z-scrim: 998;
+    --roru-z-sheet: 1000;
+    --roru-z-chrome: 100001;
+    --roru-z-modal: 100100;
+    --roru-nav-height: 4rem;
+    --roru-fixed-nav-clear-bottom: calc(
+      env(safe-area-inset-top, 0px) + var(--roru-nav-height) + 12px
+    );
+    --roru-bottom-chrome-clear: var(--roru-bottom-dock-clear);
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    touch-action: manipulation;
+  }
+}
+
+/*
+ * Users who reduce transparency, and browsers without backdrop filtering,
+ * get opaque materials with the same contrast and shape.
+ */
+@media (max-width: 1031px) and (prefers-reduced-transparency: reduce) {
+  :root {
+    --roru-glass-fill-dark: #121212;
+    --roru-glass-fill-dark-strong: #121212;
+    --roru-glass-fill-light: var(--roru-mobile-surface-elevated);
+    --roru-glass-fill-light-strong: var(--roru-mobile-surface-elevated);
+    --roru-glass-blur-chrome: 0px;
+    --roru-glass-blur-heavy: 0px;
+  }
+}
+
+@media (max-width: 1031px) {
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    :root {
+      --roru-glass-fill-dark: #121212;
+      --roru-glass-fill-dark-strong: #121212;
+      --roru-glass-fill-light: var(--roru-mobile-surface-elevated);
+      --roru-glass-fill-light-strong: var(--roru-mobile-surface-elevated);
+      --roru-glass-blur-chrome: 0px;
+      --roru-glass-blur-heavy: 0px;
+    }
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1031px) {
+  :root {
+    --roru-nav-height: 5rem;
+  }
+}

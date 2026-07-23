@@ -3,7 +3,11 @@
 import Image from "next/image";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { PREOPTIMIZED_IMAGE, LIGHTBOX_IMAGE_SIZES } from "@/lib/image-display";
+import {
+  PREOPTIMIZED_IMAGE,
+  LIGHTBOX_GRID_IMAGE_SIZES,
+  LIGHTBOX_IMAGE_SIZES,
+} from "@/lib/image-display";
 
 function clampIndex(i: number, len: number): number {
   if (len <= 0) return 0;
@@ -22,11 +26,13 @@ const CLOSE_LABEL = "Close";
 
 export function ImageLightbox({ images, active, onClose, onChange }: Props) {
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const activeGridTileRef = useRef<HTMLButtonElement>(null);
   const closingRef = useRef(false);
   const prevOverflowRef = useRef<string | null>(null);
   const touchStartXRef = useRef<number | null>(null);
   const [lightboxRoot, setLightboxRoot] = useState<HTMLElement | null>(null);
   const [isClosing, setIsClosing] = useState(false);
+  const [view, setView] = useState<"single" | "grid">("single");
 
   const TOUCH_SWIPE_THRESHOLD_PX = 44;
 
@@ -53,6 +59,10 @@ export function ImageLightbox({ images, active, onClose, onChange }: Props) {
     setLightboxRoot(document.body);
   }, []);
 
+  useEffect(() => {
+    setView("single");
+  }, [images]);
+
   const next = useCallback(
     () => onChange(clampIndex(active + 1, images.length)),
     [active, images.length, onChange]
@@ -78,15 +88,15 @@ export function ImageLightbox({ images, active, onClose, onChange }: Props) {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") requestClose();
-      else if (e.key === "ArrowRight") next();
-      else if (e.key === "ArrowLeft") prev();
+      else if (view === "single" && e.key === "ArrowRight") next();
+      else if (view === "single" && e.key === "ArrowLeft") prev();
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [next, requestClose, prev]);
+  }, [next, requestClose, prev, view]);
 
   useEffect(() => {
-    if (!images.length) return;
+    if (view === "grid" || !images.length) return;
     const preload = [active + 1, active - 1]
       .map((i) => clampIndex(i, images.length))
       .filter((i) => i !== active);
@@ -95,7 +105,17 @@ export function ImageLightbox({ images, active, onClose, onChange }: Props) {
       img.decoding = "async";
       img.src = images[i]!;
     }
-  }, [active, images]);
+  }, [active, images, view]);
+
+  useEffect(() => {
+    if (view !== "grid") return;
+    const frame = window.requestAnimationFrame(() => {
+      const tile = activeGridTileRef.current;
+      tile?.scrollIntoView({ block: "center", inline: "center" });
+      tile?.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [active, view]);
 
   function onTouchStart(event: React.TouchEvent) {
     touchStartXRef.current = event.touches[0]?.clientX ?? null;
@@ -118,37 +138,89 @@ export function ImageLightbox({ images, active, onClose, onChange }: Props) {
 
   return createPortal(
     <div
-      className={`roru-lightbox${isClosing ? " roru-lightbox--closing" : ""}`}
+      className={`roru-lightbox${view === "grid" ? " roru-lightbox--grid" : ""}${
+        isClosing ? " roru-lightbox--closing" : ""
+      }`}
       role="dialog"
       aria-modal="true"
-      aria-label="Image viewer"
+      aria-label={view === "grid" ? `Gallery grid, ${images.length} images` : "Image viewer"}
     >
       <div
+        id="roru-lightbox-viewport"
         className="roru-lightbox__viewport"
         onClick={requestClose}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
+        onTouchStart={view === "single" ? onTouchStart : undefined}
+        onTouchEnd={view === "single" ? onTouchEnd : undefined}
       >
-        <div className="roru-lightbox__stage" onClick={(e) => e.stopPropagation()}>
-          <Image
-            src={images[active]!}
-            alt=""
-            fill
-            className="roru-lightbox__image"
-            priority
-            decoding="async"
-            sizes={LIGHTBOX_IMAGE_SIZES}
-            {...PREOPTIMIZED_IMAGE}
-          />
-        </div>
+        {view === "single" ? (
+          <div className="roru-lightbox__stage" onClick={(e) => e.stopPropagation()}>
+            <Image
+              src={images[active]!}
+              alt=""
+              fill
+              className="roru-lightbox__image"
+              priority
+              decoding="async"
+              sizes={LIGHTBOX_IMAGE_SIZES}
+              {...PREOPTIMIZED_IMAGE}
+            />
+          </div>
+        ) : (
+          <div
+            className="roru-lightbox__grid-scroll"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <ul className="roru-lightbox__grid">
+              {images.map((src, index) => (
+                <li key={`${src}-${index}`} className="roru-lightbox__grid-cell">
+                  <button
+                    ref={index === active ? activeGridTileRef : null}
+                    type="button"
+                    className="roru-lightbox__grid-tile"
+                    aria-current={index === active ? "true" : undefined}
+                    aria-label={`View image ${index + 1} of ${images.length}`}
+                    onClick={() => {
+                      onChange(index);
+                      setView("single");
+                      window.requestAnimationFrame(() => closeBtnRef.current?.focus());
+                    }}
+                  >
+                    <Image
+                      src={src}
+                      alt=""
+                      fill
+                      className="roru-lightbox__grid-image"
+                      loading="lazy"
+                      decoding="async"
+                      sizes={LIGHTBOX_GRID_IMAGE_SIZES}
+                      {...PREOPTIMIZED_IMAGE}
+                    />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
-      <div className="roru-lightbox__header-slot" aria-hidden>
+      <div className="roru-lightbox__header-slot">
         <div className="roru-lightbox__header-slot-inner">
           <button
             type="button"
+            className="roru-lightbox__grid-toggle"
+            aria-label={view === "grid" ? "Return to image viewer" : "Show gallery grid"}
+            aria-controls="roru-lightbox-viewport"
+            aria-pressed={view === "grid"}
+            onClick={() => setView((current) => (current === "grid" ? "single" : "grid"))}
+          >
+            <span key={view} className="roru-lightbox__grid-toggle-label">
+              {view === "grid" ? "Switch to image view" : "Switch to grid view"}
+            </span>
+          </button>
+          <button
+            type="button"
             ref={closeBtnRef}
-            className="roru-lightbox__close roru-nav-item shrink-0 px-0 py-2 text-xs font-bold uppercase leading-none"
+            className="roru-lightbox__close"
             onClick={(e) => {
               e.stopPropagation();
               requestClose();
@@ -169,29 +241,33 @@ export function ImageLightbox({ images, active, onClose, onChange }: Props) {
         </div>
       </div>
 
-      <button
-        type="button"
-        className="roru-lightbox__nav roru-lightbox__nav--prev"
-        onClick={(e) => {
-          e.stopPropagation();
-          prev();
-        }}
-        aria-label="Previous image"
-      >
-        <span aria-hidden="true">←</span>
-      </button>
+      {view === "single" ? (
+        <>
+          <button
+            type="button"
+            className="roru-lightbox__nav roru-lightbox__nav--prev"
+            onClick={(e) => {
+              e.stopPropagation();
+              prev();
+            }}
+            aria-label="Previous image"
+          >
+            <span aria-hidden="true">←</span>
+          </button>
 
-      <button
-        type="button"
-        className="roru-lightbox__nav roru-lightbox__nav--next"
-        onClick={(e) => {
-          e.stopPropagation();
-          next();
-        }}
-        aria-label="Next image"
-      >
-        <span aria-hidden="true">→</span>
-      </button>
+          <button
+            type="button"
+            className="roru-lightbox__nav roru-lightbox__nav--next"
+            onClick={(e) => {
+              e.stopPropagation();
+              next();
+            }}
+            aria-label="Next image"
+          >
+            <span aria-hidden="true">→</span>
+          </button>
+        </>
+      ) : null}
     </div>,
     root
   );

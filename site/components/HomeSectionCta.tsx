@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePillWidthTransition } from "./usePillWidthTransition";
 import { useI18n } from "@/lib/i18n";
 
 type SectionCta = {
@@ -17,6 +18,17 @@ export function HomeSectionCta() {
   const lastItemRef = useRef<SectionCta | null>(null);
   const currentIdRef = useRef<string | null>(null);
   const switchTimerRef = useRef<number | null>(null);
+  const shown = item ?? lastItemRef.current;
+  const titleById: Record<string, string> = {
+    about: t.nav.about,
+    events: t.cta.events,
+    inquire: t.cta.inquire,
+    reserve: t.booking.pageTitle,
+  };
+  const title = shown ? (titleById[shown.id] ?? shown.title) : "";
+  const { pillRef, capturePillWidth } = usePillWidthTransition(
+    shown ? `${shown.id}:${title}` : "",
+  );
 
   useEffect(() => {
     function onPanelChange(event: Event) {
@@ -34,6 +46,7 @@ export function HomeSectionCta() {
       setHidden(false);
 
       if (lastItemRef.current && lastItemRef.current.id !== next.id) {
+        capturePillWidth();
         setIsSwitching(true);
         if (switchTimerRef.current != null) {
           window.clearTimeout(switchTimerRef.current);
@@ -55,18 +68,9 @@ export function HomeSectionCta() {
       if (switchTimerRef.current != null) window.clearTimeout(switchTimerRef.current);
       window.removeEventListener("roru:home-panel-change", onPanelChange as EventListener);
     };
-  }, []);
+  }, [capturePillWidth]);
 
-  const shown = item ?? lastItemRef.current;
   if (!shown) return null;
-
-  const titleById: Record<string, string> = {
-    about: t.nav.about,
-    events: t.cta.events,
-    inquire: t.cta.inquire,
-    reserve: t.booking.pageTitle,
-  };
-  const title = titleById[shown.id] ?? shown.title;
 
   const isExternal = /^https?:\/\//.test(shown.href);
   const classes = [
@@ -78,7 +82,7 @@ export function HomeSectionCta() {
     .join(" ");
 
   return (
-    <div className={classes} aria-live="polite" aria-hidden={hidden}>
+    <div ref={pillRef} className={classes} aria-live="polite" aria-hidden={hidden}>
       <div className="roru-home-discover__title">{title}</div>
       <a
         className="roru-home-discover__button"

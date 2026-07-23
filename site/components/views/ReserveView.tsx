@@ -6,7 +6,10 @@ import { breadcrumbList } from "@/lib/structured-data";
 
 export function ReserveView({ lang }: { lang: Lang }) {
   return (
-    <PageOverlayShell contentClassName="roru-home-overlay-panel--fill">
+    <PageOverlayShell
+      scrollable
+      contentClassName="roru-home-overlay-panel--fill"
+    >
       <JsonLd
         data={breadcrumbList(
           [

@@ -5,6 +5,13 @@ import { INTERNAL_NAV_KEY, SITE_ENTERED_KEY } from "@/lib/roru-session";
 
 const navScrollAttached = new WeakSet<HTMLElement>();
 
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
 function queryNavEntranceItems(nav: HTMLElement | null): HTMLElement[] {
   if (!nav) return [];
   return Array.from(nav.querySelectorAll<HTMLElement>(".roru-nav-item")).filter(
@@ -173,10 +180,44 @@ export function runPostLoaderSequence(shouldAnimateNav: boolean, instantHeroStar
 }
 
 function runPostLoaderSequenceImpl(shouldAnimateNav: boolean, instantHeroStart: boolean) {
-  /* Nav is not included: it has its own entrance in `shouldAnimateNav`; excluding avoids replay on client navigations. */
-  const revealItems = document.querySelectorAll(".homepage-reveal:not(#roru-nav)");
+  /*
+   * Overlay panels own their transform through HomeYslScroll. Never include
+   * them in this GSAP entrance tween: `y: 0` would overwrite their stacked
+   * translateY state and briefly expose every panel.
+   */
+  const revealItems = document.querySelectorAll(
+    ".homepage-reveal:not(#roru-nav):not(.roru-home-overlay-panel)",
+  );
   const nav = document.getElementById("roru-nav");
   const navBottom = document.getElementById("roru-nav-bottom");
+  const reducedMotion = prefersReducedMotion();
+
+  if (reducedMotion) {
+    window.dispatchEvent(
+      new CustomEvent("roru:hero-animate", {
+        detail: { instant: true },
+      })
+    );
+    revealItems.forEach((el) => {
+      el.classList.add("homepage-reveal--settled");
+    });
+    applyNavEntranceInitial(nav, false);
+    if (navBottom) {
+      gsap.set(navBottom, {
+        autoAlpha: 1,
+        y: 0,
+        clearProps: "transform",
+      });
+    }
+    if (nav) setupNavScrollLogic(nav);
+    try {
+      sessionStorage.setItem(SITE_ENTERED_KEY, "1");
+      sessionStorage.removeItem(INTERNAL_NAV_KEY);
+    } catch {
+      /* ignore */
+    }
+    return;
+  }
 
   revealItems.forEach((el) => {
     el.classList.remove("homepage-reveal--settled");

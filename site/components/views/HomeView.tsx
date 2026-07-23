@@ -27,11 +27,11 @@ export function HomeView({ lang }: { lang: Lang }) {
         className="page-content roru-home-overlays relative z-[9] mb-[100vh]"
       >
         <div className="roru-home-overlay-stack">
-          <div className="roru-home-overlay-panel roru-home-overlay-panel--hero">
+          <div className="roru-home-overlay-panel roru-home-overlay-panel--hero is-active">
             <HeroSection />
           </div>
           <div
-            className="roru-home-overlay-panel homepage-reveal"
+            className="roru-home-overlay-panel homepage-reveal is-after"
             data-home-cta
             data-home-cta-id="events"
             data-home-cta-title="Events"
@@ -44,7 +44,7 @@ export function HomeView({ lang }: { lang: Lang }) {
             />
           </div>
           <div
-            className="roru-home-overlay-panel homepage-reveal"
+            className="roru-home-overlay-panel homepage-reveal is-after"
             data-home-cta
             data-home-cta-id="reserve"
             data-home-cta-title="reservations"
@@ -57,7 +57,7 @@ export function HomeView({ lang }: { lang: Lang }) {
             />
           </div>
           <div
-            className="roru-home-overlay-panel homepage-reveal"
+            className="roru-home-overlay-panel homepage-reveal is-after"
             data-home-cta
             data-home-cta-id="about"
             data-home-cta-title="About"
@@ -70,10 +70,10 @@ export function HomeView({ lang }: { lang: Lang }) {
             />
           </div>
           {/* No Discover CTA/title on inquiry — the CTA fades out when this panel is active. */}
-          <div className="roru-home-overlay-panel homepage-reveal">
+          <div className="roru-home-overlay-panel roru-home-overlay-panel--scrollable homepage-reveal is-after">
             <InquirySection />
           </div>
-          <div className="roru-home-overlay-panel roru-home-overlay-panel--footer">
+          <div className="roru-home-overlay-panel roru-home-overlay-panel--footer is-after">
             <SiteFooter />
           </div>
         </div>

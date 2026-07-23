@@ -67,6 +67,14 @@ export function BookingSection() {
   });
 
   const ctaReady = Boolean(resolvedDayKey && slot);
+  const mobileBookingSummary = slot
+    ? `${party} · ${formatDateLabel(resolvedDayKey, dateLocale)} · ${slot}`
+    : b.availableTimeSlots;
+
+  function continueToTock() {
+    if (!ctaReady || !slot) return;
+    window.location.href = buildTockUrl(booking, resolvedDayKey, party, slot);
+  }
 
   return (
     <section
@@ -85,7 +93,7 @@ export function BookingSection() {
             type="button"
             className={`roru-booking-option grid cursor-pointer grid-cols-[minmax(72px,0.85fr)_minmax(0,1.5fr)] gap-[clamp(10px,1.5vw,18px)] border-0 bg-transparent p-0 text-left uppercase text-[var(--text)] transition-opacity ${
               booking === "lunch" ? "is-active opacity-100" : "opacity-[0.28]"
-            } hover:opacity-100`}
+            }`}
             data-booking="lunch"
             onClick={() => {
               setBooking("lunch");
@@ -103,7 +111,7 @@ export function BookingSection() {
             type="button"
             className={`roru-booking-option grid cursor-pointer grid-cols-[minmax(72px,0.85fr)_minmax(0,1.5fr)] gap-[clamp(10px,1.5vw,18px)] border-0 bg-transparent p-0 text-left uppercase text-[var(--text)] transition-opacity ${
               booking === "dinner" ? "is-active opacity-100" : "opacity-[0.28]"
-            } hover:opacity-100`}
+            }`}
             data-booking="dinner"
             onClick={() => {
               setBooking("dinner");
@@ -204,10 +212,7 @@ export function BookingSection() {
             type="button"
             className="roru-booking-cta mt-6 inline-flex w-fit min-w-[120px] cursor-pointer items-center justify-center border-0 bg-[var(--text)] px-[18px] py-3.5 text-base uppercase leading-none text-white disabled:cursor-not-allowed disabled:opacity-40"
             disabled={!ctaReady}
-            onClick={() => {
-              if (!ctaReady || !slot) return;
-              window.location.href = buildTockUrl(booking, resolvedDayKey, party, slot);
-            }}
+            onClick={continueToTock}
           >
             {b.continue}
           </button>
@@ -221,6 +226,20 @@ export function BookingSection() {
             {booking === "lunch" ? b.noteLunch : b.noteDinner}
           </h3>
         </div>
+      </div>
+
+      <div className="roru-booking-mobile-action">
+        <p aria-live="polite" aria-atomic="true" title={mobileBookingSummary}>
+          {mobileBookingSummary}
+        </p>
+        <button
+          type="button"
+          className="roru-booking-mobile-action__cta"
+          disabled={!ctaReady}
+          onClick={continueToTock}
+        >
+          {b.continue}
+        </button>
       </div>
     </section>
   );

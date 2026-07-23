@@ -270,6 +270,10 @@ export function AboutScrollScenes({ sequence, storyImages }: AboutScrollScenesPr
     let locked = false;
     let lockTimer: number | null = null;
     let touchStartY: number | null = null;
+    let footerWasActive = document.documentElement.classList.contains(
+      "roru-home-footer-active",
+    );
+    let ignoreUpwardInputUntil = 0;
 
     const lock = () => {
       locked = true;
@@ -292,10 +296,30 @@ export function AboutScrollScenes({ sequence, storyImages }: AboutScrollScenesPr
           lock();
         }
       } else if (s > 0) {
+        if (s === 2 && performance.now() < ignoreUpwardInputUntil) {
+          return;
+        }
         goToSection((s - 1) as 0 | 1 | 2);
         lock();
       }
       // dir === -1 at hero (s === 0): nothing above the first panel.
+    };
+
+    const onHomePanelChange = () => {
+      const footerActive = document.documentElement.classList.contains(
+        "roru-home-footer-active",
+      );
+
+      if (footerWasActive && !footerActive && aboutActive()) {
+        // A trackpad's inertial upward events can continue after the footer
+        // restores About. Keep the final story scene visible until that burst
+        // settles instead of immediately stepping back to the intro.
+        syncRefsToSection(2);
+        applyTextOpacitiesForSection(2, true);
+        ignoreUpwardInputUntil = performance.now() + ABOUT_STEP_LOCK_MS;
+      }
+
+      footerWasActive = footerActive;
     };
 
     const onWheel = (e: WheelEvent) => {
@@ -347,6 +371,7 @@ export function AboutScrollScenes({ sequence, storyImages }: AboutScrollScenesPr
     window.addEventListener("touchmove", onTouchMove, { passive: false, capture: true });
     window.addEventListener("touchend", onTouchEnd, { passive: true, capture: true });
     window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("roru:home-panel-change", onHomePanelChange);
 
     return () => {
       if (lockTimer) clearTimeout(lockTimer);
@@ -355,6 +380,7 @@ export function AboutScrollScenes({ sequence, storyImages }: AboutScrollScenesPr
       window.removeEventListener("touchmove", onTouchMove, capture);
       window.removeEventListener("touchend", onTouchEnd, capture);
       window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("roru:home-panel-change", onHomePanelChange);
     };
   }, [reduced, refreshDomRefs, goToSection, applyTextOpacitiesForSection, syncRefsToSection]);
 

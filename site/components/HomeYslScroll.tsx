@@ -5,9 +5,17 @@ import { clearNavTone, syncNavToneFromPanel } from "@/lib/nav-tone";
 import { SCROLL_TO_TOP_EVENT } from "@/lib/scroll-to-top";
 
 const LOCK_MS = 850;
+const REDUCED_MOTION_LOCK_MS = 120;
 const WHEEL_THRESHOLD = 18;
 const TOUCH_THRESHOLD = 44;
 const SCROLL_EDGE_PX = 2;
+
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
 
 function getPanels(): HTMLElement[] {
   return Array.from(document.querySelectorAll<HTMLElement>(".roru-home-overlay-panel"));
@@ -96,7 +104,7 @@ export function HomeYslScroll() {
       indexRef.current = applyIndex(next);
       window.setTimeout(() => {
         lockedRef.current = false;
-      }, LOCK_MS);
+      }, prefersReducedMotion() ? REDUCED_MOTION_LOCK_MS : LOCK_MS);
     }
 
     function onWheel(event: WheelEvent) {
@@ -153,7 +161,7 @@ export function HomeYslScroll() {
     indexRef.current = applyIndex(0);
     const settleTimer = window.setTimeout(() => {
       indexRef.current = applyIndex(indexRef.current);
-    }, 350);
+    }, prefersReducedMotion() ? 0 : 350);
 
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("touchstart", onTouchStart, { passive: true });

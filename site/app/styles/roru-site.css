@@ -297,10 +297,6 @@ button.roru-footer__logo-link {
   transition: opacity 0.25s ease;
 }
 
-.roru-footer__link:hover {
-  opacity: 0.7;
-}
-
 @media (min-width: 768px) {
   .roru-footer__layout {
     grid-template-columns: minmax(0, 1fr) minmax(14rem, 22rem);
@@ -420,19 +416,19 @@ html.roru-preload #roru-loader {
   opacity: 1;
 }
 
-html.roru-preload .homepage-reveal {
+html.roru-preload .homepage-reveal:not(.roru-home-overlay-panel) {
   opacity: 0 !important;
   transform: translateY(24px) !important;
 }
 
-.homepage-reveal {
+.homepage-reveal:not(.roru-home-overlay-panel) {
   opacity: 0;
   transform: translateY(24px);
   will-change: transform, opacity;
 }
 
 /* After entrance: avoid layout jump when GSAP clears inline styles (base .homepage-reveal would otherwise reapply). */
-.homepage-reveal.homepage-reveal--settled {
+.homepage-reveal.homepage-reveal--settled:not(.roru-home-overlay-panel) {
   opacity: 1;
   transform: none;
   will-change: auto;
@@ -634,8 +630,7 @@ figure.roru-gallery-item {
   transition: opacity 0.25s ease;
 }
 
-.roru-booking-option.is-active,
-.roru-booking-option:hover {
+.roru-booking-option.is-active {
   opacity: 1;
 }
 
@@ -1410,15 +1405,10 @@ html.theme-night .roru-inquiry-section * {
     transform 0.32s var(--roru-nav-ease);
 }
 
-.roru-hero__cta:hover,
 .roru-hero__cta--primary {
   background: var(--text);
   border-color: var(--text);
   color: #121212 !important;
-}
-
-.roru-hero__cta:hover {
-  transform: translateY(-2px);
 }
 
 .roru-hero__visual {
@@ -1720,15 +1710,6 @@ html.theme-night .roru-inquiry-section * {
     transform 0.35s var(--roru-nav-ease);
 }
 
-.roru-events-list:hover .roru-event-card {
-  opacity: 0.42;
-}
-
-.roru-events-list .roru-event-card:hover {
-  opacity: 1;
-  transform: translateX(8px);
-}
-
 .roru-event-card__meta {
   grid-column: 1 / 3;
   color: rgba(18, 18, 18, 0.58) !important;
@@ -1773,10 +1754,6 @@ html.theme-night .roru-inquiry-section * {
 .roru-event-card__image {
   aspect-ratio: 4 / 3;
   transition: transform 0.65s var(--roru-nav-ease);
-}
-
-.roru-event-card:hover .roru-event-card__image {
-  transform: scale(1.06);
 }
 
 .roru-inquiry-section {
@@ -1983,10 +1960,6 @@ html.theme-night .roru-inquiry-section * {
   .roru-event-card {
     min-height: 0;
     transform: none !important;
-  }
-
-  .roru-events-list:hover .roru-event-card {
-    opacity: 1;
   }
 
   .roru-event-card__body {
@@ -3036,7 +3009,7 @@ html.theme-night body:has(#page-content) .roru-footer__label {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .homepage-reveal {
+  .homepage-reveal:not(.roru-home-overlay-panel) {
     opacity: 1 !important;
     transform: none !important;
   }
@@ -3286,11 +3259,6 @@ body:has(#page-content) .roru-gallery-cta {
   transition: transform 0.4s var(--roru-nav-ease), color 0.3s var(--roru-nav-ease);
 }
 
-body:has(#page-content) .roru-gallery-cta:hover {
-  color: var(--text) !important;
-  transform: translateX(6px);
-}
-
 body:has(#page-content) .roru-gallery-track {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -3333,11 +3301,6 @@ body:has(#page-content) .roru-gallery-image {
   filter: saturate(0.95);
 }
 
-body:has(#page-content) .roru-gallery-item:hover .roru-gallery-image {
-  transform: scale(1.05);
-  filter: saturate(1.05);
-}
-
 body:has(#page-content) .roru-gallery-frame::after {
   content: "View";
   position: absolute;
@@ -3354,11 +3317,6 @@ body:has(#page-content) .roru-gallery-frame::after {
   pointer-events: none;
 }
 
-body:has(#page-content) .roru-gallery-item:hover .roru-gallery-frame::after {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 body:has(#page-content) .roru-gallery-caption {
   display: flex;
   justify-content: space-between;
@@ -3369,10 +3327,6 @@ body:has(#page-content) .roru-gallery-caption {
   color: var(--roru-home-fg);
 }
 
-body:has(#page-content) .roru-gallery-item:hover .roru-gallery-caption {
-  color: var(--text);
-}
-
 /* --- HOVER: events + booking pills --------------------------------------- */
 body:has(#page-content) .roru-event-card {
   position: relative;
@@ -3381,24 +3335,12 @@ body:has(#page-content) .roru-event-card {
     transform 0.45s var(--roru-nav-ease);
 }
 
-body:has(#page-content) .roru-event-card:hover {
-  transform: translateX(6px);
-}
-
 body:has(#page-content) .roru-event-card__title {
   transition: color 0.4s var(--roru-nav-ease);
 }
 
-body:has(#page-content) .roru-event-card:hover .roru-event-card__title {
-  color: var(--text) !important;
-}
-
 body:has(#page-content) .roru-event-card__image {
   transition: transform 0.7s var(--roru-nav-ease);
-}
-
-body:has(#page-content) .roru-event-card:hover .roru-event-card__image {
-  transform: scale(1.05);
 }
 
 body:has(#page-content) .roru-events-tab {
@@ -3419,17 +3361,12 @@ body:has(#page-content) .roru-events-tab::after {
   transition: transform 0.36s var(--roru-nav-ease);
 }
 
-body:has(#page-content) .roru-events-tab.is-active::after,
-body:has(#page-content) .roru-events-tab:hover::after {
+body:has(#page-content) .roru-events-tab.is-active::after {
   transform: scaleX(1);
 }
 
 body:has(#page-content) .roru-booking-option {
   transition: opacity 0.3s var(--roru-nav-ease), transform 0.45s var(--roru-nav-ease);
-}
-
-body:has(#page-content) .roru-booking-option:hover {
-  transform: translateX(4px);
 }
 
 body:has(#page-content) .roru-booking-cta,
@@ -3438,12 +3375,6 @@ body:has(#page-content) .roru-inquiry-section button[type="submit"] {
     transform 0.4s var(--roru-nav-ease),
     background-color 0.3s var(--roru-nav-ease),
     color 0.3s var(--roru-nav-ease);
-}
-
-body:has(#page-content) .roru-booking-cta:not(:disabled):hover,
-body:has(#page-content) .roru-inquiry-section button[type="submit"]:not(:disabled):hover {
-  transform: translateY(-2px);
-  filter: brightness(1.05);
 }
 
 /* --- GALLERY PAGE -------------------------------------------------------- */
@@ -3530,11 +3461,6 @@ body:has(#page-content) .roru-inquiry-section button[type="submit"]:not(:disable
   object-fit: cover !important;
   transition: transform 0.65s var(--roru-nav-ease), filter 0.65s var(--roru-nav-ease);
   filter: saturate(0.95);
-}
-
-.roru-gallery-page__tile:hover .roru-gallery-page__image {
-  transform: scale(1.04);
-  filter: saturate(1.06);
 }
 
 .roru-gallery-page__index {
@@ -3641,6 +3567,81 @@ body:has(#page-content) .roru-inquiry-section button[type="submit"]:not(:disable
   box-shadow: 0 32px 96px rgba(0, 0, 0, 0.55);
 }
 
+.roru-lightbox--grid .roru-lightbox__viewport {
+  align-items: stretch;
+  justify-content: center;
+  padding: 0 var(--roru-section-pad-x);
+}
+
+.roru-lightbox__grid-scroll {
+  width: min(100%, 1180px);
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding:
+    max(6rem, calc(env(safe-area-inset-top, 0px) + 4rem))
+    0
+    clamp(2rem, 5vw, 4rem);
+  animation: roruLightboxGridIn 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes roruLightboxGridIn {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.roru-lightbox__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: clamp(8px, 1vw, 14px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.roru-lightbox__grid-cell {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.roru-lightbox__grid-tile {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 1px solid transparent;
+  background: #121212;
+  color: #f4f1eb;
+}
+
+.roru-lightbox__grid-tile[aria-current="true"] {
+  border-color: #f4f1eb;
+  box-shadow: inset 0 0 0 1px rgba(244, 241, 235, 0.8);
+}
+
+.roru-lightbox__grid-tile:focus-visible {
+  z-index: 1;
+  outline: 2px solid #f54500;
+  outline-offset: 2px;
+}
+
+.roru-lightbox__grid-image {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
 .roru-lightbox__nav {
   position: fixed;
   z-index: 10003;
@@ -3714,6 +3715,37 @@ body:has(#page-content) .roru-inquiry-section button[type="submit"]:not(:disable
   color: #d9d9d9 !important;
 }
 
+.roru-lightbox__grid-toggle {
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #d9d9d9 !important;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.roru-lightbox__grid-toggle[aria-pressed="true"] {
+  color: #ffffff !important;
+}
+
+.roru-lightbox__grid-toggle-label {
+  display: inline-block;
+  animation: roruLightboxGridToggleLabelIn 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes roruLightboxGridToggleLabelIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .roru-lightbox__close-label {
   display: inline-flex;
   overflow: hidden;
@@ -3732,7 +3764,7 @@ body:has(#page-content) .roru-inquiry-section button[type="submit"]:not(:disable
   will-change: transform, opacity;
 }
 
-@media (hover: hover) and (pointer: fine) {
+@media (min-width: 1032px) and (hover: hover) and (pointer: fine) {
   .roru-lightbox__close:hover .roru-lightbox__close-label {
     letter-spacing: 0.2em;
   }
@@ -3801,7 +3833,7 @@ body:has(#page-content) .roru-inquiry-section button[type="submit"]:not(:disable
   right: clamp(14px, 2vw, 32px);
 }
 
-@media (hover: hover) and (pointer: fine) {
+@media (min-width: 1032px) and (hover: hover) and (pointer: fine) {
   .roru-lightbox__nav:hover {
     background: var(--text);
     border-color: var(--text);
@@ -3812,6 +3844,108 @@ body:has(#page-content) .roru-inquiry-section button[type="submit"]:not(:disable
 @media (max-width: 1031px) {
   .roru-lightbox__nav {
     transition: none;
+  }
+}
+
+/*
+ * Hover affordances are desktop-only. Touch devices can retain a hovered state
+ * after a tap, so mobile relies on explicit :active feedback instead.
+ */
+@media (min-width: 1032px) and (hover: hover) and (pointer: fine) {
+  .roru-footer__link:hover {
+    opacity: 0.7;
+  }
+
+  .roru-booking-option:hover {
+    opacity: 1;
+  }
+
+  .roru-hero__cta:hover {
+    border-color: var(--text);
+    background: var(--text);
+    color: #121212 !important;
+    transform: translateY(-2px);
+  }
+
+  .roru-events-list:hover .roru-event-card {
+    opacity: 0.42;
+  }
+
+  .roru-events-list .roru-event-card:hover {
+    opacity: 1;
+    transform: translateX(8px);
+  }
+
+  .roru-event-card:hover .roru-event-card__image {
+    transform: scale(1.06);
+  }
+
+  body:has(#page-content) .roru-gallery-cta:hover {
+    color: var(--text) !important;
+    transform: translateX(6px);
+  }
+
+  body:has(#page-content) .roru-gallery-item:hover .roru-gallery-image {
+    filter: saturate(1.05);
+    transform: scale(1.05);
+  }
+
+  body:has(#page-content) .roru-gallery-item:hover .roru-gallery-frame::after {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  body:has(#page-content) .roru-gallery-item:hover .roru-gallery-caption {
+    color: var(--text);
+  }
+
+  body:has(#page-content) .roru-event-card:hover {
+    transform: translateX(6px);
+  }
+
+  body:has(#page-content) .roru-event-card:hover .roru-event-card__title {
+    color: var(--text) !important;
+  }
+
+  body:has(#page-content) .roru-event-card:hover .roru-event-card__image {
+    transform: scale(1.05);
+  }
+
+  body:has(#page-content) .roru-events-tab:hover::after {
+    transform: scaleX(1);
+  }
+
+  body:has(#page-content) .roru-booking-option:hover {
+    transform: translateX(4px);
+  }
+
+  body:has(#page-content) .roru-booking-cta:not(:disabled):hover,
+  body:has(#page-content)
+    .roru-inquiry-section
+    button[type="submit"]:not(:disabled):hover {
+    filter: brightness(1.05);
+    transform: translateY(-2px);
+  }
+
+  .roru-gallery-page__tile:hover .roru-gallery-page__image {
+    filter: saturate(1.06);
+    transform: scale(1.04);
+  }
+
+  .roru-home-discover__button:hover {
+    opacity: 0.72;
+  }
+
+  body:has(#page-content) .roru-booking-option:not(.is-active):hover {
+    opacity: 0.62 !important;
+  }
+
+  body:has(#page-content) .roru-gallery-item:hover .roru-gallery-caption {
+    color: var(--text);
+  }
+
+  .roru-pwa-install__dismiss:hover {
+    opacity: 1;
   }
 }
 
@@ -3908,6 +4042,37 @@ body:has(#page-content) .roru-inquiry-section button[type="submit"]:not(:disable
     width: 100%;
   }
 
+  .roru-lightbox__viewport {
+    padding-top: max(5.25rem, calc(env(safe-area-inset-top, 0px) + 4.25rem));
+  }
+
+  .roru-lightbox__grid-toggle {
+    position: fixed;
+    top: max(1rem, env(safe-area-inset-top, 0px));
+    left: 50%;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #f4f1eb !important;
+    transform: translateX(-50%);
+  }
+
+  .roru-lightbox--grid .roru-lightbox__grid-scroll {
+    padding-top: max(5.25rem, calc(env(safe-area-inset-top, 0px) + 4.25rem));
+  }
+
+  .roru-lightbox__grid-scroll {
+    padding-top: 1rem;
+    padding-bottom: max(5.75rem, calc(env(safe-area-inset-bottom, 0px) + 4.5rem));
+  }
+
+  .roru-lightbox__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
   /* Disable scroll snap on touch — interferes with native momentum scroll. */
   body:has(#page-content) #page-content {
     scroll-snap-type: none;
@@ -3927,6 +4092,8 @@ body:has(#page-content) .roru-inquiry-section button[type="submit"]:not(:disable
   .roru-lightbox,
   .roru-lightbox__viewport,
   .roru-lightbox__stage,
+  .roru-lightbox__grid-scroll,
+  .roru-lightbox__grid-toggle-label,
   .roru-lightbox__close-char {
     transition: none !important;
     animation: none !important;
@@ -4279,11 +4446,16 @@ body:has(.roru-home-overlays)::after {
 body:has(.roru-home-overlays) .roru-home-overlay-panel--scrollable > .roru-booking-section,
 body:has(.roru-home-overlays) .roru-home-overlay-panel--scrollable > .roru-reserve-page,
 body:has(.roru-home-overlays) .roru-home-overlay-panel--scrollable > .roru-gallery-page,
-body:has(.roru-home-overlays) .roru-home-overlay-panel--scrollable > .roru-menu-page {
+body:has(.roru-home-overlays) .roru-home-overlay-panel--scrollable > .roru-menu-page,
+body:has(.roru-home-overlays) .roru-home-overlay-panel--scrollable > .roru-inquiry-section {
   min-height: 100svh !important;
   height: auto !important;
   /* Restore the top padding the panel's `> *` reset removes, so content clears the fixed nav. */
   padding-top: max(7rem, var(--roru-fixed-nav-clear-bottom)) !important;
+}
+
+body:has(.roru-home-overlays) .roru-home-overlay-panel--scrollable > .roru-inquiry-section {
+  padding-bottom: max(7rem, calc(var(--roru-bottom-dock-clear) + 1.5rem)) !important;
 }
 
 body:has(.roru-home-overlays) .roru-home-overlay-panel--fill > .roru-reserve-page,
@@ -4295,7 +4467,7 @@ body:has(.roru-home-overlays) .roru-home-overlay-panel--fill .roru-booking-secti
 
 body:has(.roru-home-overlays) .roru-home-overlay-panel--fill > .roru-reserve-page {
   padding-top: max(7rem, var(--roru-fixed-nav-clear-bottom)) !important;
-  padding-bottom: max(2.5rem, var(--roru-bottom-dock-clear)) !important;
+  padding-bottom: 0 !important;
   padding-inline: 2vw !important;
 }
 
@@ -4308,11 +4480,9 @@ body:has(.roru-home-overlays) .roru-home-overlay-panel--fill > .roru-reserve-pag
   body:has(.roru-home-overlays) .roru-home-overlay-panel--fill > .roru-reserve-page {
     display: flex;
     flex-direction: column;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    overflow: visible;
     padding-top: max(5.25rem, var(--roru-fixed-nav-clear-bottom)) !important;
-    padding-bottom: clamp(1.25rem, 3vh, 2.5rem) !important;
+    padding-bottom: 0 !important;
   }
 
   body:has(.roru-home-overlays) .roru-home-overlay-panel--fill .roru-booking-section {
@@ -4362,6 +4532,33 @@ body:has(.roru-home-overlays) .roru-home-overlay-panel--fill > .roru-reserve-pag
   body:has(#page-content) .roru-reserve-page .roru-booking-note {
     grid-column: 1 / -1 !important;
     grid-row: 4 !important;
+  }
+}
+
+@media (max-width: 767px) {
+  /*
+   * The reservation panel keeps the desktop fill layout above this breakpoint.
+   * On phones, the form alone establishes the scroll height. Nested viewport
+   * minimums create an empty scroll region after the booking content.
+   */
+  body:has(.roru-home-overlays)
+    .roru-home-overlay-panel--fill.roru-home-overlay-panel--scrollable
+    > .roru-reserve-page,
+  body:has(.roru-home-overlays)
+    .roru-home-overlay-panel--fill.roru-home-overlay-panel--scrollable
+    .roru-booking-section {
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  body:has(.roru-home-overlays)
+    .roru-home-overlay-panel--fill.roru-home-overlay-panel--scrollable
+    > .roru-reserve-page {
+    /*
+     * Keep the panel itself free of trailing space so HomeYslScroll can
+     * advance to the footer as soon as the booking content ends.
+     */
+    padding-bottom: 0 !important;
   }
 }
 
@@ -4448,11 +4645,16 @@ body:has(.roru-home-overlays) .roru-gallery-section--featured .roru-gallery-shel
   display: grid;
   justify-items: center;
   gap: 8px;
+  width: max-content;
+  overflow: hidden;
   color: #121212;
   transform: translateX(-50%);
   pointer-events: none;
   opacity: 1;
-  transition: opacity 0.45s ease;
+  white-space: nowrap;
+  transition:
+    width 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.45s ease;
 }
 
 html.roru-home-footer-active body:has(.roru-home-overlays) .roru-home-discover,
@@ -4634,10 +4836,6 @@ body:has(.roru-home-overlay-panel--fill.is-active) .roru-hero-scroll-cue {
     color 0.3s var(--roru-nav-ease);
 }
 
-.roru-home-discover__button:hover {
-  opacity: 0.72;
-}
-
 .roru-home-discover.is-switching .roru-home-discover__title {
   opacity: 0;
   transform: translateY(4px);
@@ -4702,10 +4900,6 @@ body:has(#page-content) .roru-booking-option {
 
 body:has(#page-content) .roru-booking-option.is-active {
   opacity: 1 !important;
-}
-
-body:has(#page-content) .roru-booking-option:not(.is-active):hover {
-  opacity: 0.62 !important;
 }
 
 body:has(#page-content) .roru-booking-option .label,
@@ -4855,10 +5049,6 @@ body:has(#page-content) .roru-gallery-caption {
 body:has(#page-content) .roru-gallery-item figcaption,
 body:has(#page-content) .roru-gallery-caption {
   background: transparent !important;
-}
-
-body:has(#page-content) .roru-gallery-item:hover .roru-gallery-caption {
-  color: var(--text);
 }
 
 /* Reserve, Events, and Inquire share a left-aligned editorial heading system. */
@@ -5298,7 +5488,610 @@ body:has(#page-content) .roru-hero--ysl .roru-hero__title {
   opacity: 0.72;
 }
 
-.roru-pwa-install__dismiss:hover {
-  opacity: 1;
+/* Mobile reservation completion bar — persistent above the fixed dock. */
+.roru-booking-mobile-action {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  body:has(#page-content)
+    .roru-reserve-page
+    .roru-booking-slots
+    .roru-booking-cta {
+    display: none;
+  }
+
+  body:has(#page-content) .roru-reserve-page .roru-booking-section {
+    /*
+     * The completion control is fixed above the dock. Do not reserve a trailing
+     * spacer for it here, otherwise users must scroll through blank content
+     * before the overlay can advance to the footer.
+     */
+    padding-bottom: 0 !important;
+  }
+
+  body:has(#page-content) .roru-reserve-page .roru-booking-mobile-action {
+    position: fixed;
+    right: var(--roru-section-pad-x);
+    bottom: calc(var(--roru-bottom-dock-clear) + 10px);
+    left: var(--roru-section-pad-x);
+    z-index: 997;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    min-height: 58px;
+    box-sizing: border-box;
+    border: 1px solid color-mix(in srgb, var(--text) 16%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+    padding: 8px;
+    color: var(--text);
+  }
+
+  body:has(#page-content) .roru-reserve-page .roru-booking-mobile-action p {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  body:has(#page-content) .roru-reserve-page .roru-booking-mobile-action__cta {
+    min-height: 42px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--text);
+    color: var(--surface);
+    padding: 0 16px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  body:has(#page-content)
+    .roru-reserve-page
+    .roru-booking-mobile-action__cta:disabled {
+    opacity: 0.42;
+  }
+}
+
+/*
+ * Mobile application treatment. The editorial cover panels remain cinematic,
+ * while interactive surfaces use a calmer, touch-first visual language.
+ */
+@media (max-width: 1031px) {
+  .roru-home-overlay-panel {
+    transition-duration: 0.58s;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .roru-home-overlay-panel--scrollable {
+    scroll-padding-top: var(--roru-fixed-nav-clear-bottom);
+    scroll-padding-bottom: var(--roru-bottom-chrome-clear);
+  }
+
+  body:has(.roru-home-overlays) .roru-home-discover {
+    top: auto;
+    bottom: calc(var(--roru-bottom-dock-clear) + 12px);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid color-mix(in srgb, #ffffff 30%, transparent);
+    border-radius: var(--roru-mobile-radius-pill);
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
+    box-shadow: var(--roru-mobile-shadow);
+    padding: 6px;
+    color: var(--text);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+    backdrop-filter: blur(18px) saturate(145%);
+    transform: translateX(-50%);
+  }
+
+  .roru-home-discover__title {
+    padding-left: 8px;
+    font-size: 11px !important;
+    letter-spacing: 0.04em !important;
+  }
+
+  .roru-home-discover__button {
+    min-width: 108px;
+    min-height: 42px;
+    background: var(--text);
+    color: var(--surface) !important;
+    padding: 0 16px;
+    font-size: 12px !important;
+    letter-spacing: 0.04em !important;
+  }
+
+  body:has(.roru-home-discover:not(.is-hidden)) .roru-hero-scroll-cue {
+    opacity: 0 !important;
+  }
+
+  body:has(#page-content) .roru-inquiry-section .roru-inquiry-grid,
+  body:has(#page-content) .roru-booking-section .roru-booking-grid {
+    padding-inline: var(--roru-mobile-pad-x);
+  }
+
+  body:has(#page-content) .roru-inquiry-section h2,
+  body:has(#page-content) .roru-booking-title h2,
+  body:has(#page-content) .roru-events-heading h2 {
+    font-size: clamp(32px, 9vw, 44px) !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.04em !important;
+    line-height: 0.96;
+  }
+
+  .roru-inquiry-section .roru-inquiry-grid > div:first-child p,
+  .roru-inquiry-section [role="status"] p,
+  .roru-booking-note h3 {
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0 !important;
+    line-height: 1.45;
+    text-transform: none !important;
+  }
+
+  .roru-inquiry-section form {
+    gap: 14px;
+    border: 1px solid var(--roru-mobile-border);
+    border-radius: var(--roru-mobile-radius-lg);
+    background: var(--roru-mobile-surface-elevated);
+    box-shadow: var(--roru-mobile-shadow);
+    padding: 16px;
+  }
+
+  .roru-inquiry-section label,
+  .roru-booking-section .party-label,
+  .roru-booking-section .date-label {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em !important;
+    text-transform: none !important;
+  }
+
+  .roru-inquiry-section input,
+  .roru-inquiry-section textarea,
+  body:has(#page-content) .roru-reserve-page .party-select,
+  body:has(#page-content) .roru-reserve-page .date-select {
+    min-height: var(--roru-mobile-touch) !important;
+    border: 1px solid var(--roru-mobile-border) !important;
+    border-radius: var(--roru-mobile-radius-sm) !important;
+    background: color-mix(in srgb, var(--surface) 70%, #ffffff) !important;
+    color: var(--text) !important;
+    padding: 0 14px !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+  }
+
+  .roru-inquiry-section textarea {
+    min-height: 9rem !important;
+    padding-block: 14px !important;
+    border-radius: var(--roru-mobile-radius-lg) !important;
+  }
+
+  .roru-inquiry-section input:focus-visible,
+  .roru-inquiry-section textarea:focus-visible,
+  body:has(#page-content) .roru-reserve-page .party-select:focus-visible,
+  body:has(#page-content) .roru-reserve-page .date-select:focus-visible {
+    outline: 0;
+    border-color: #f54500 !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, #f54500 20%, transparent);
+  }
+
+  .roru-inquiry-section button[type="submit"] {
+    width: 100%;
+    min-height: var(--roru-mobile-touch);
+    border-radius: var(--roru-mobile-radius-pill) !important;
+    font-size: 14px !important;
+    letter-spacing: 0.04em !important;
+  }
+
+  body:has(#page-content) .roru-reserve-page .roru-booking-fields {
+    gap: 12px;
+  }
+
+  body:has(#page-content) .roru-reserve-page .slot-btn {
+    min-height: 44px !important;
+    border: 1px solid var(--roru-mobile-border) !important;
+    border-radius: var(--roru-mobile-radius-sm) !important;
+    background: color-mix(in srgb, var(--surface) 70%, #ffffff) !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+  }
+
+  body:has(#page-content) .roru-reserve-page .slot-btn.is-selected {
+    background: var(--text) !important;
+    border-color: var(--text) !important;
+    color: var(--surface) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  body:has(#page-content) .roru-reserve-page .roru-booking-option {
+    min-height: 0;
+    padding: 14px 0 !important;
+  }
+
+  body:has(#page-content) .roru-reserve-page .roru-booking-option .label,
+  body:has(#page-content) .roru-reserve-page .roru-booking-option .value {
+    font-size: clamp(18px, 5.2vw, 22px) !important;
+    line-height: 1;
+  }
+
+  body:has(#page-content) .roru-reserve-page .roru-booking-mobile-action {
+    border-color: var(--roru-mobile-border);
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    box-shadow: var(--roru-mobile-shadow);
+  }
+
+  body:has(#page-content) .roru-reserve-page .roru-booking-mobile-action p {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+  }
+
+  body:has(#page-content) .roru-reserve-page .roru-booking-mobile-action__cta {
+    min-height: 44px;
+    font-size: 13px !important;
+  }
+}
+
+@media (max-width: 1031px) {
+  .roru-inquiry-section input,
+  .roru-inquiry-section textarea,
+  body:has(#page-content) .roru-reserve-page .party-select,
+  body:has(#page-content) .roru-reserve-page .date-select,
+  body:has(#page-content) .roru-reserve-page .slot-btn {
+    transition:
+      border-color 0.18s ease,
+      background-color 0.18s ease,
+      box-shadow 0.18s ease,
+      transform 0.18s ease;
+  }
+
+  .roru-inquiry-section button[type="submit"]:active,
+  body:has(#page-content) .roru-reserve-page .slot-btn:active,
+  body:has(#page-content) .roru-reserve-page .roru-booking-mobile-action__cta:active {
+    transform: scale(0.98);
+  }
+}
+
+/*
+ * Mobile Liquid Glass controls. These floating elements intentionally use
+ * glass while the editorial panels beneath them remain opaque and unblurred.
+ */
+@media (max-width: 1031px) {
+  body:has(.roru-home-overlays) .roru-home-discover {
+    border-color: var(--roru-glass-border-light);
+    background: var(--roru-glass-fill-light);
+    box-shadow:
+      var(--roru-glass-highlight-light),
+      var(--roru-glass-shadow);
+    -webkit-backdrop-filter: blur(var(--roru-glass-blur-chrome))
+      saturate(var(--roru-glass-saturate));
+    backdrop-filter: blur(var(--roru-glass-blur-chrome))
+      saturate(var(--roru-glass-saturate));
+  }
+
+  .roru-home-discover__button {
+    border-radius: var(--roru-mobile-radius-pill);
+    transition:
+      transform 0.18s ease,
+      background-color 0.18s ease,
+      color 0.18s ease;
+  }
+
+  .roru-home-discover__button:active {
+    transform: scale(var(--roru-press-scale));
+  }
+
+  .roru-home-discover__button:focus-visible,
+  body:has(#page-content) .roru-reserve-page .roru-booking-mobile-action__cta:focus-visible {
+    outline: 2px solid #f54500;
+    outline-offset: 3px;
+  }
+
+  body:has(#page-content) .roru-reserve-page .roru-booking-mobile-action {
+    z-index: var(--roru-z-floating-action);
+    border-color: var(--roru-glass-border-dark);
+    background: var(--roru-glass-fill-light-strong);
+    box-shadow:
+      var(--roru-glass-highlight-light),
+      var(--roru-glass-shadow);
+    -webkit-backdrop-filter: blur(var(--roru-glass-blur-chrome))
+      saturate(var(--roru-glass-saturate));
+    backdrop-filter: blur(var(--roru-glass-blur-chrome))
+      saturate(var(--roru-glass-saturate));
+  }
+
+  body:has(#page-content) .roru-reserve-page .roru-booking-mobile-action__cta {
+    transition:
+      transform 0.18s ease,
+      background-color 0.18s ease,
+      opacity 0.18s ease;
+  }
+
+  .roru-pwa-install {
+    z-index: var(--roru-z-modal);
+  }
+
+  .roru-pwa-install__panel {
+    border-color: var(--roru-glass-border-dark);
+    background: var(--roru-glass-fill-light-strong);
+    box-shadow:
+      var(--roru-glass-highlight-light),
+      0 18px 48px rgba(18, 18, 18, 0.18);
+    -webkit-backdrop-filter: blur(var(--roru-glass-blur-heavy))
+      saturate(var(--roru-glass-saturate));
+    backdrop-filter: blur(var(--roru-glass-blur-heavy))
+      saturate(var(--roru-glass-saturate));
+  }
+
+  .roru-pwa-install__install,
+  .roru-pwa-install__dismiss {
+    min-height: 44px;
+    transition:
+      transform 0.18s ease,
+      background-color 0.18s ease,
+      opacity 0.18s ease;
+  }
+
+  .roru-pwa-install__dismiss {
+    padding: 0 12px;
+    border-radius: var(--roru-mobile-radius-pill);
+  }
+
+  .roru-pwa-install__install:active,
+  .roru-pwa-install__dismiss:active {
+    transform: scale(var(--roru-press-scale));
+  }
+
+  .roru-pwa-install__install:focus-visible,
+  .roru-pwa-install__dismiss:focus-visible {
+    outline: 2px solid #f54500;
+    outline-offset: 3px;
+  }
+
+  .roru-lightbox {
+    z-index: var(--roru-z-modal);
+  }
+
+  .roru-lightbox__nav,
+  .roru-lightbox__close,
+  .roru-lightbox__grid-toggle {
+    border: 1px solid var(--roru-glass-border-light);
+    background: var(--roru-glass-fill-dark);
+    box-shadow:
+      var(--roru-glass-highlight-dark),
+      0 8px 24px rgba(0, 0, 0, 0.26);
+    color: #f4f1eb !important;
+    -webkit-backdrop-filter: blur(var(--roru-glass-blur-chrome))
+      saturate(var(--roru-glass-saturate));
+    backdrop-filter: blur(var(--roru-glass-blur-chrome))
+      saturate(var(--roru-glass-saturate));
+  }
+
+  .roru-lightbox__nav {
+    transition:
+      background-color 0.18s ease,
+      border-color 0.18s ease,
+      transform 0.18s ease;
+  }
+
+  .roru-lightbox__close,
+  .roru-lightbox__grid-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em !important;
+    line-height: 1;
+    text-transform: uppercase;
+    transition:
+      background-color 0.18s ease,
+      border-color 0.18s ease,
+      transform 0.18s ease;
+  }
+
+  .roru-lightbox__close {
+    min-width: 44px;
+    padding: 0 13px;
+    border-radius: var(--roru-mobile-radius-pill);
+  }
+
+  .roru-lightbox__grid-toggle {
+    padding: 0 14px;
+    border-radius: var(--roru-mobile-radius-sm);
+  }
+
+  .roru-lightbox__nav:active {
+    transform: translateY(-50%) scale(var(--roru-press-scale));
+  }
+
+  .roru-lightbox__close:active,
+  .roru-lightbox__grid-toggle:active,
+  .roru-lightbox__grid-tile:active {
+    transform: scale(var(--roru-press-scale));
+  }
+
+  .roru-lightbox__nav:focus-visible,
+  .roru-lightbox__close:focus-visible,
+  .roru-lightbox__grid-toggle:focus-visible,
+  .roru-lightbox__grid-tile:focus-visible {
+    outline: 2px solid #f54500;
+    outline-offset: 3px;
+  }
+
+  .roru-lightbox__grid-tile {
+    transition:
+      transform 0.18s ease,
+      border-color 0.18s ease;
+  }
+}
+
+@media (max-width: 767px) {
+  .roru-lightbox__grid-toggle {
+    top: max(0.75rem, env(safe-area-inset-top, 0px));
+    min-height: 42px;
+  }
+
+  .roru-lightbox__close {
+    min-height: 42px;
+    min-width: 42px;
+  }
+}
+
+@media (max-width: 1031px) and (prefers-reduced-motion: reduce) {
+  .roru-home-discover__button,
+  body:has(#page-content) .roru-reserve-page .roru-booking-mobile-action__cta,
+  .roru-pwa-install__install,
+  .roru-pwa-install__dismiss,
+  .roru-lightbox__nav,
+  .roru-lightbox__close,
+  .roru-lightbox__grid-toggle,
+  .roru-lightbox__grid-tile {
+    transition: none !important;
+  }
+}
+
+@media (max-width: 1031px) and (prefers-reduced-transparency: reduce) {
+  body:has(.roru-home-overlays) .roru-home-discover,
+  body:has(#page-content) .roru-reserve-page .roru-booking-mobile-action,
+  .roru-pwa-install__panel,
+  .roru-lightbox__nav,
+  .roru-lightbox__close,
+  .roru-lightbox__grid-toggle {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/*
+ * Mobile page controls use opaque standard-material surfaces. This keeps the
+ * glass system reserved for chrome while forms remain stable and easy to read.
+ */
+@media (max-width: 1031px) {
+  body:has(#page-content) .roru-inquiry-section form {
+    border-color: var(--roru-mobile-border);
+    background: var(--roru-mobile-surface-elevated);
+    box-shadow: 0 8px 22px rgba(18, 18, 18, 0.07);
+  }
+
+  .roru-inquiry-section input,
+  .roru-inquiry-section textarea,
+  body:has(#page-content) .roru-reserve-page .party-select,
+  body:has(#page-content) .roru-reserve-page .date-select,
+  body:has(#page-content) .roru-reserve-page .slot-btn,
+  .calendar-days button {
+    border-color: var(--roru-mobile-border) !important;
+    background: var(--roru-mobile-surface-muted) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
+  }
+
+  .roru-inquiry-section input:focus-visible,
+  .roru-inquiry-section textarea:focus-visible,
+  body:has(#page-content) .roru-reserve-page .party-select:focus-visible,
+  body:has(#page-content) .roru-reserve-page .date-select:focus-visible,
+  body:has(#page-content) .roru-reserve-page .slot-btn:focus-visible,
+  .calendar-days button:focus-visible,
+  .roru-booking-option:focus-visible,
+  .roru-inquiry-section button[type="submit"]:focus-visible {
+    outline: 2px solid #f54500;
+    outline-offset: 3px;
+    box-shadow: var(--roru-focus-ring);
+  }
+
+  body:has(#page-content) .roru-reserve-page .slot-btn:active,
+  .calendar-days button:active,
+  .roru-booking-option:active,
+  .roru-inquiry-section button[type="submit"]:active {
+    transform: scale(var(--roru-press-scale));
+  }
+
+  body:has(#page-content) .roru-reserve-page .slot-btn.is-selected,
+  .calendar-days button.is-selected {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 5px 12px rgba(18, 18, 18, 0.16);
+  }
+
+  .roru-events-tabs {
+    gap: 3px !important;
+    padding: 3px !important;
+    border: 1px solid var(--roru-mobile-border);
+    border-radius: var(--roru-mobile-radius-pill);
+    background: var(--roru-mobile-surface-muted);
+  }
+
+  .roru-events-tab {
+    min-height: 42px;
+    padding: 0 14px !important;
+    border-radius: var(--roru-mobile-radius-pill);
+    color: color-mix(in srgb, var(--text) 62%, transparent) !important;
+    transition:
+      transform 0.18s ease,
+      background-color 0.18s ease,
+      color 0.18s ease,
+      opacity 0.18s ease;
+  }
+
+  .roru-events-tab.is-active {
+    background: var(--text);
+    color: var(--surface) !important;
+    opacity: 1 !important;
+  }
+
+  .roru-events-tab:active,
+  .roru-event-card__link:active {
+    transform: scale(var(--roru-press-scale));
+  }
+
+  .roru-events-tab:focus-visible,
+  .roru-event-card__link:focus-visible,
+  .roru-event-card__image-link:focus-visible {
+    outline: 2px solid #f54500;
+    outline-offset: 4px;
+  }
+
+  .roru-event-card__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    transition: transform 0.18s ease, opacity 0.18s ease;
+  }
+}
+
+@media (max-width: 1031px) and (prefers-reduced-motion: reduce) {
+  .roru-events-tab,
+  .roru-event-card__link {
+    transition: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roru-home-overlay-panel,
+  .roru-home-discover,
+  body:has(#page-content) .roru-hero--ysl .roru-hero__title,
+  .roru-hero--ysl .roru-hero__slide {
+    transition: none !important;
+  }
 }
 

@@ -1,7 +1,9 @@
 /* About page — aligned with Squarespace structure */
 
-/* Keep nav visible on About after load; do not override loader/preload hiding. */
-html:not(.roru-loading):not(.roru-preload) body.roru-about-page .roru-nav {
+/* Keep nav visible on About after load, except while the footer overlay is active. */
+html:not(.roru-loading):not(.roru-preload):not(.roru-home-footer-active)
+  body.roru-about-page
+  .roru-nav {
   opacity: 1 !important;
 }
 
@@ -92,8 +94,10 @@ body.roru-about-page .roru-hero-scroll-cue__dot {
   transition: transform 0.45s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
-.roru-about-sequence__link:hover .roru-about-sequence__image {
-  transform: scale(1.04);
+@media (min-width: 1032px) and (hover: hover) and (pointer: fine) {
+  .roru-about-sequence__link:hover .roru-about-sequence__image {
+    transform: scale(1.04);
+  }
 }
 
 .roru-about-sequence__index {
@@ -846,5 +850,38 @@ body.roru-about-page .roru-hero-scroll-cue__dot {
   .about-opera-story__title {
     width: 100%;
     max-width: 100%;
+  }
+}
+
+@media (max-width: 1031px) {
+  .about-opera-stage--unified > .about-opera-text-pane--hero,
+  .about-opera-text-pane--hero {
+    bottom: max(
+      4.5rem,
+      calc(var(--roru-bottom-dock-clear) + 1rem)
+    ) !important;
+    padding-inline: var(--roru-mobile-pad-x) !important;
+  }
+}
+
+/* Preserve the editorial photography while giving mobile links usable feedback. */
+@media (max-width: 1031px) {
+  .roru-about-sequence__link:focus-visible,
+  .about-opera-text-pane a:focus-visible,
+  .about-opera-text-pane button:focus-visible {
+    position: relative;
+    z-index: 2;
+    outline: 2px solid #f54500;
+    outline-offset: 3px;
+  }
+
+  .roru-about-sequence__link:active .roru-about-sequence__image {
+    transform: scale(var(--roru-press-scale));
+  }
+}
+
+@media (max-width: 1031px) and (prefers-reduced-motion: reduce) {
+  .roru-about-sequence__image {
+    transition: none;
   }
 }

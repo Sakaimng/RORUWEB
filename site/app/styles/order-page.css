@@ -1074,3 +1074,187 @@ html.roru-mobile-menu-open body:has(.order-page-shell) .order-portals .order-car
     animation: none;
   }
 }
+
+/*
+ * Mobile ordering keeps a stronger contrast baseline than the editorial site,
+ * while sharing the same glass hierarchy for transient controls and sheets.
+ */
+@media (max-width: 1031px) {
+  body:has(.order-page-shell) .roru-nav {
+    background: var(--roru-glass-fill-light-strong);
+    border-bottom-color: var(--roru-glass-border-dark);
+    box-shadow: var(--roru-glass-highlight-light);
+    -webkit-backdrop-filter: blur(var(--roru-glass-blur-chrome))
+      saturate(var(--roru-glass-saturate));
+    backdrop-filter: blur(var(--roru-glass-blur-chrome))
+      saturate(var(--roru-glass-saturate));
+  }
+
+  .order-portals .order-cart-bar,
+  .order-cart-bar {
+    z-index: var(--roru-z-floating-action);
+    border: 1px solid var(--roru-glass-border-light);
+    background: var(--roru-glass-fill-dark) !important;
+    box-shadow:
+      var(--roru-glass-highlight-dark),
+      var(--roru-glass-shadow);
+    -webkit-backdrop-filter: blur(var(--roru-glass-blur-chrome))
+      saturate(var(--roru-glass-saturate));
+    backdrop-filter: blur(var(--roru-glass-blur-chrome))
+      saturate(var(--roru-glass-saturate));
+    transition:
+      transform 0.18s ease,
+      background-color 0.18s ease;
+  }
+
+  .order-cart-bar:active {
+    transform: translateX(-50%) scale(var(--roru-press-scale));
+  }
+
+  .order-cart-bar:focus-visible,
+  .order-sheet button:focus-visible,
+  .order-sheet input:focus-visible,
+  .order-sheet textarea:focus-visible,
+  .order-sheet select:focus-visible,
+  .order-top__mode:focus-visible,
+  .order-categories__chip:focus-visible,
+  .order-item__add:focus-visible {
+    outline: 2px solid #f54500;
+    outline-offset: 3px;
+  }
+
+  .order-sheet {
+    z-index: var(--roru-z-modal);
+  }
+
+  .order-sheet__backdrop {
+    background: rgba(18, 18, 18, 0.46);
+  }
+
+  /*
+   * This panel enters with a translate animation, so it uses a nearly opaque
+   * elevated material rather than an expensive backdrop blur while moving.
+   */
+  .order-sheet__panel {
+    border: 1px solid var(--roru-glass-border-dark);
+    border-bottom: 0;
+    border-radius: 24px 24px 0 0;
+    background: var(--roru-glass-fill-light-strong);
+    box-shadow:
+      var(--roru-glass-highlight-light),
+      0 -16px 44px rgba(18, 18, 18, 0.2);
+  }
+
+  .order-sheet__header,
+  .order-sheet__footer {
+    background: color-mix(in srgb, var(--surface) 94%, #ffffff);
+    border-color: var(--roru-mobile-border);
+  }
+
+  .order-icon-btn {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--roru-mobile-border);
+    border-radius: var(--roru-mobile-radius-pill);
+    background: color-mix(in srgb, var(--surface) 72%, #ffffff);
+    font-size: 32px;
+    line-height: 1;
+    transition:
+      transform 0.18s ease,
+      background-color 0.18s ease;
+  }
+
+  .order-icon-btn:active,
+  .order-top__mode:active,
+  .order-categories__chip:active,
+  .order-item__add:active,
+  .order-qty__btn:active,
+  .order-segment__btn:active,
+  .order-option-chip:active,
+  .order-btn:active {
+    transform: scale(var(--roru-press-scale));
+  }
+
+  .order-top__fulfillment,
+  .order-segment {
+    border: 1px solid var(--roru-mobile-border);
+    background: color-mix(in srgb, var(--surface) 76%, #ffffff);
+  }
+
+  .order-top__mode,
+  .order-segment__btn {
+    transition:
+      transform 0.18s ease,
+      background-color 0.18s ease,
+      color 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+
+  .order-top__mode.is-active,
+  .order-segment__btn.is-active {
+    box-shadow:
+      var(--roru-glass-highlight-light),
+      0 4px 12px rgba(18, 18, 18, 0.08);
+  }
+
+  .order-categories__chip,
+  .order-item__add,
+  .order-qty__btn,
+  .order-option-chip,
+  .order-field {
+    border-color: var(--roru-mobile-border);
+    background: color-mix(in srgb, var(--surface) 78%, #ffffff);
+    box-shadow: var(--roru-glass-highlight-light);
+  }
+
+  .order-categories__chip,
+  .order-option-chip,
+  .order-btn,
+  .order-field {
+    transition:
+      transform 0.18s ease,
+      border-color 0.18s ease,
+      background-color 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+
+  .order-field:focus-visible {
+    border-color: #f54500;
+    box-shadow: var(--roru-focus-ring);
+  }
+
+  .order-btn {
+    min-height: var(--roru-mobile-touch);
+  }
+
+  .pac-container {
+    z-index: 100110 !important;
+    border-color: var(--roru-glass-border-dark);
+    box-shadow: var(--roru-glass-shadow);
+  }
+}
+
+@media (max-width: 1031px) and (prefers-reduced-motion: reduce) {
+  .order-cart-bar,
+  .order-icon-btn,
+  .order-top__mode,
+  .order-segment__btn,
+  .order-categories__chip,
+  .order-item__add,
+  .order-qty__btn,
+  .order-option-chip,
+  .order-btn,
+  .order-field {
+    transition: none !important;
+  }
+}
+
+@media (max-width: 1031px) and (prefers-reduced-transparency: reduce) {
+  body:has(.order-page-shell) .roru-nav,
+  .order-cart-bar {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}

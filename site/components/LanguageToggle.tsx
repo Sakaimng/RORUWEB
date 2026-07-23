@@ -20,13 +20,16 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
     const activeBtn = buttonRefs.current[lang];
     if (!root || !activeBtn) return;
 
-    const rootBox = root.getBoundingClientRect();
-    const btnBox = activeBtn.getBoundingClientRect();
     setThumb({
-      x: btnBox.left - rootBox.left,
-      y: btnBox.top - rootBox.top,
-      width: btnBox.width,
-      height: btnBox.height,
+      /*
+       * `offset*` uses the positioned toggle as its coordinate system, exactly
+       * matching the absolute thumb. Viewport rectangles drift when the menu
+       * sheet or nav is transformed during its open animation.
+       */
+      x: activeBtn.offsetLeft,
+      y: activeBtn.offsetTop,
+      width: activeBtn.offsetWidth,
+      height: activeBtn.offsetHeight,
     });
   }, [lang]);
 
@@ -59,7 +62,7 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
       ref={rootRef}
       role="group"
       aria-label="Language"
-      className={`roru-nav-item roru-language-toggle inline-flex shrink-0 items-center rounded-full bg-[color:color-mix(in_srgb,var(--surface)_68%,transparent)] p-1 backdrop-blur-md ${className}`.trim()}
+      className={`roru-nav-item roru-language-toggle inline-flex shrink-0 items-center ${className}`.trim()}
     >
       <span
         className="roru-language-toggle__thumb"

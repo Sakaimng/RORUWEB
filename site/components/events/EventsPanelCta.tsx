@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePillWidthTransition } from "@/components/usePillWidthTransition";
 
 type PanelCta =
   | {
@@ -26,6 +27,10 @@ export function EventsPanelCta({ onOpenGallery }: Props) {
   const lastItemRef = useRef<PanelCta | null>(null);
   const currentIdRef = useRef<string | null>(null);
   const switchTimerRef = useRef<number | null>(null);
+  const shown = item ?? lastItemRef.current;
+  const { pillRef, capturePillWidth } = usePillWidthTransition(
+    shown ? `${shown.id}:${shown.title}` : "",
+  );
 
   useEffect(() => {
     function onPanelChange(event: Event) {
@@ -43,6 +48,7 @@ export function EventsPanelCta({ onOpenGallery }: Props) {
       setHidden(false);
 
       if (lastItemRef.current && lastItemRef.current.id !== next.id) {
+        capturePillWidth();
         setIsSwitching(true);
         if (switchTimerRef.current != null) {
           window.clearTimeout(switchTimerRef.current);
@@ -64,9 +70,8 @@ export function EventsPanelCta({ onOpenGallery }: Props) {
       if (switchTimerRef.current != null) window.clearTimeout(switchTimerRef.current);
       window.removeEventListener("roru:home-panel-change", onPanelChange as EventListener);
     };
-  }, []);
+  }, [capturePillWidth]);
 
-  const shown = item ?? lastItemRef.current;
   if (!shown) return null;
 
   const classes = [
@@ -78,7 +83,7 @@ export function EventsPanelCta({ onOpenGallery }: Props) {
     .join(" ");
 
   return (
-    <div className={classes} aria-live="polite" aria-hidden={hidden}>
+    <div ref={pillRef} className={classes} aria-live="polite" aria-hidden={hidden}>
       <div className="roru-home-discover__title">{shown.title}</div>
       {shown.action === "gallery" ? (
         <button

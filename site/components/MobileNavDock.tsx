@@ -1,10 +1,9 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useOrderCart } from "@/components/order/OrderCartProvider";
-import { TOCK_URL } from "@/lib/content";
 import { useI18n } from "@/lib/i18n";
 import { stripLocale, withLocale } from "@/lib/locale-routing";
 import { isHomePathname } from "@/lib/roru-path";
@@ -88,6 +87,7 @@ function ReserveIcon() {
 type Props = {
   menuOpen: boolean;
   onMenuToggle: () => void;
+  menuButtonRef?: RefObject<HTMLButtonElement | null>;
 };
 
 type DockShellProps = Props & {
@@ -95,7 +95,13 @@ type DockShellProps = Props & {
   secondSlot?: ReactNode;
 };
 
-function MobileNavDockShell({ menuOpen, onMenuToggle, orderStatus, secondSlot }: DockShellProps) {
+function MobileNavDockShell({
+  menuOpen,
+  onMenuToggle,
+  menuButtonRef,
+  orderStatus,
+  secondSlot,
+}: DockShellProps) {
   return (
     <div className="roru-nav-bottom" id="roru-nav-bottom" aria-label="Mobile navigation">
       <div className="roru-nav-bottom__shell">
@@ -108,6 +114,7 @@ function MobileNavDockShell({ menuOpen, onMenuToggle, orderStatus, secondSlot }:
           <HomeSlot />
           {secondSlot}
           <button
+            ref={menuButtonRef}
             type="button"
             aria-controls="roru-mobile-menu"
             aria-expanded={menuOpen}
@@ -117,15 +124,7 @@ function MobileNavDockShell({ menuOpen, onMenuToggle, orderStatus, secondSlot }:
           >
             <MenuIcon open={menuOpen} />
           </button>
-          <a
-            href={TOCK_URL}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Reserve now"
-            className="roru-nav-bottom__btn roru-nav-bottom__btn--reserve roru-nav-item"
-          >
-            <ReserveIcon />
-          </a>
+          <ReserveSlot />
         </div>
       </div>
     </div>
@@ -155,6 +154,25 @@ function HomeSlot() {
   return (
     <Link href={homeHref} aria-label="Home" className="roru-nav-bottom__btn roru-nav-item">
       <HomeIcon />
+    </Link>
+  );
+}
+
+function ReserveSlot() {
+  const { lang, t } = useI18n();
+  const pathname = usePathname() ?? "/";
+  const isReserve = stripLocale(pathname) === "/reserve";
+
+  return (
+    <Link
+      href={withLocale("/reserve", lang)}
+      aria-current={isReserve ? "page" : undefined}
+      aria-label={t.nav.reserve}
+      className={`roru-nav-bottom__btn roru-nav-bottom__btn--reserve roru-nav-item${
+        isReserve ? " is-active" : ""
+      }`}
+    >
+      <ReserveIcon />
     </Link>
   );
 }

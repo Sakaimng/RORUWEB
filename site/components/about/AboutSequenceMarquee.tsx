@@ -40,6 +40,9 @@ export function AboutSequenceMarquee({
     const reduced =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const supportsFineHover = window.matchMedia(
+      "(min-width: 1032px) and (hover: hover) and (pointer: fine)",
+    ).matches;
 
     if (reduced) {
       gsap.set(articleEls, { opacity: 1, y: 0, x: 0 });
@@ -189,10 +192,12 @@ export function AboutSequenceMarquee({
       targetSpeed = baseSpeed;
     };
 
-    linkEls.forEach((link) => {
-      link.addEventListener("mouseenter", onEnter);
-      link.addEventListener("mouseleave", onLeave);
-    });
+    if (supportsFineHover) {
+      linkEls.forEach((link) => {
+        link.addEventListener("mouseenter", onEnter);
+        link.addEventListener("mouseleave", onLeave);
+      });
+    }
 
     waitForImages(imgEls).then(() => {
       requestAnimationFrame(() => {
@@ -222,10 +227,12 @@ export function AboutSequenceMarquee({
       gsap.set(articleEls, { opacity: 1 });
       window.removeEventListener("resize", onResize);
       if (rafId) cancelAnimationFrame(rafId);
-      linkEls.forEach((link) => {
-        link.removeEventListener("mouseenter", onEnter);
-        link.removeEventListener("mouseleave", onLeave);
-      });
+      if (supportsFineHover) {
+        linkEls.forEach((link) => {
+          link.removeEventListener("mouseenter", onEnter);
+          link.removeEventListener("mouseleave", onLeave);
+        });
+      }
     };
   }, [items.length, axis]);
 

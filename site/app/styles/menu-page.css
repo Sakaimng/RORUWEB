@@ -93,3 +93,73 @@
 .roru-menu-board__host--stack svg {
   flex: 0 0 auto;
 }
+
+@media (max-width: 1031px) {
+  .roru-menu-page {
+    --roru-menu-pad-x: var(--roru-mobile-pad-x);
+    padding-bottom: max(
+      7rem,
+      calc(var(--roru-bottom-dock-clear) + 1.5rem)
+    );
+  }
+}
+
+@media (max-width: 767px) {
+  .roru-menu-page {
+    padding-top: max(5.5rem, var(--roru-fixed-nav-clear-bottom));
+  }
+
+  .roru-menu-page__header {
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .roru-menu-page__title {
+    font-size: clamp(36px, 10vw, 52px) !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.04em !important;
+    line-height: 0.94;
+  }
+
+  .roru-menu-page__boards {
+    gap: 40px;
+  }
+
+  .roru-menu-board__title {
+    margin-bottom: 14px;
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  .roru-menu-board__host--stack {
+    gap: 18px;
+  }
+}
+
+/* Mobile menu documents get a quiet standard-material edge, not glass. */
+@media (max-width: 1031px) {
+  .roru-menu-board__host {
+    overflow: hidden;
+    border: 1px solid var(--roru-mobile-border);
+    border-radius: var(--roru-mobile-radius-lg);
+    background: var(--roru-mobile-surface-elevated);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.46),
+      0 8px 22px rgba(18, 18, 18, 0.06);
+  }
+
+  .roru-menu-board__host--stack {
+    gap: 8px;
+    padding: 6px;
+    background: var(--roru-mobile-border);
+  }
+
+  .roru-menu-board__host svg {
+    background: var(--roru-mobile-surface-elevated);
+  }
+
+  .roru-menu-board__host--stack svg {
+    border-radius: calc(var(--roru-mobile-radius-sm) - 2px);
+  }
+}
