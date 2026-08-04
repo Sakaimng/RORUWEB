@@ -10,6 +10,7 @@ import {
   isIosInAppBrowser,
   isIosDevice,
   isIosSafari,
+  markInstallPromptShownThisSession,
   openInstallPrompt,
   PWA_INSTALL_OPEN_EVENT,
   PWA_INSTALL_READY_EVENT,
@@ -66,12 +67,14 @@ export function PwaInstallPrompt() {
     if (!shouldOfferIosInstall()) return;
 
     function tryOpen() {
+      if (!shouldOfferIosInstall()) return;
       if (
         document.documentElement.classList.contains("roru-preload") ||
         document.documentElement.classList.contains("roru-loading")
       ) {
         return;
       }
+      markInstallPromptShownThisSession();
       openInstallPrompt();
     }
 

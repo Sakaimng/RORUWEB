@@ -1,4 +1,5 @@
 const DISMISS_KEY = "roru-pwa-install-dismissed";
+const AUTO_PROMPT_SESSION_KEY = "roru-pwa-install-auto-shown";
 
 export const PWA_INSTALL_OPEN_EVENT = "roru:pwa-install-open";
 export const PWA_INSTALL_READY_EVENT = "roru:pwa-install-ready";
@@ -84,7 +85,12 @@ export function canOfferMobileInstall(): boolean {
 }
 
 export function shouldOfferIosInstall(): boolean {
-  return isIosDevice() && !isStandalonePwa() && !isInstallPromptDismissed();
+  return (
+    isIosDevice() &&
+    !isStandalonePwa() &&
+    !isInstallPromptDismissed() &&
+    !hasShownInstallPromptThisSession()
+  );
 }
 
 export function isInstallPromptDismissed(): boolean {
@@ -93,6 +99,24 @@ export function isInstallPromptDismissed(): boolean {
     return window.localStorage.getItem(DISMISS_KEY) === "1";
   } catch {
     return false;
+  }
+}
+
+export function hasShownInstallPromptThisSession(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.sessionStorage.getItem(AUTO_PROMPT_SESSION_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+/** Records only the automatic landing reminder; manual menu opens stay available. */
+export function markInstallPromptShownThisSession(): void {
+  try {
+    window.sessionStorage.setItem(AUTO_PROMPT_SESSION_KEY, "1");
+  } catch {
+    /* private browsing */
   }
 }
 
