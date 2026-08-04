@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { trackLeadCapture } from "@/lib/analytics";
 import { INQUIRY_PUBLIC_EMAIL } from "@/lib/content";
 import { useI18n } from "@/lib/i18n";
 
@@ -54,6 +55,7 @@ export function InquirySection() {
 
       setStatus("success");
       form.reset();
+      trackLeadCapture("inquiry");
     } catch {
       setStatus("error");
       setErrMsg(t.inquiry.errOffline);

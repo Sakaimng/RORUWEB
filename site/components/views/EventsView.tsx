@@ -1,5 +1,6 @@
 import { EventsPageClient } from "@/components/events/EventsPageClient";
 import { JsonLd } from "@/components/JsonLd";
+import { TockLink } from "@/components/TockLink";
 import { EVENTS } from "@/lib/content";
 import type { Lang } from "@/lib/i18n";
 import { breadcrumbList, eventsGraph } from "@/lib/structured-data";
@@ -34,7 +35,13 @@ export function EventsView({ lang }: { lang: Lang }) {
                 {event.title} — {event.date} ({event.status})
               </h2>
               <p>{event.description}</p>
-              <a href={event.link}>Book {event.title} on Tock</a>
+              <TockLink
+                href={event.link}
+                campaign="events"
+                content={event.title}
+              >
+                Book {event.title} on Tock
+              </TockLink>
             </li>
           ))}
         </ul>

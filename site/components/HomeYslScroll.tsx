@@ -43,6 +43,12 @@ function shouldScrollPanel(panel: HTMLElement, deltaY: number): boolean {
   return false;
 }
 
+function isLightboxInteraction(event?: Event): boolean {
+  if (document.querySelector(".roru-lightbox")) return true;
+  const target = event?.target;
+  return target instanceof Element && target.closest(".roru-lightbox") !== null;
+}
+
 function itemForPanel(panel: HTMLElement | undefined) {
   if (!panel) return null;
   const id = panel.dataset.homeCtaId;
@@ -108,6 +114,7 @@ export function HomeYslScroll() {
     }
 
     function onWheel(event: WheelEvent) {
+      if (isLightboxInteraction(event)) return;
       if (Math.abs(event.deltaY) < WHEEL_THRESHOLD) return;
 
       const panels = getPanels();
@@ -119,10 +126,15 @@ export function HomeYslScroll() {
     }
 
     function onTouchStart(event: TouchEvent) {
+      if (isLightboxInteraction(event)) {
+        touchStartYRef.current = null;
+        return;
+      }
       touchStartYRef.current = event.touches[0]?.clientY ?? null;
     }
 
     function onTouchMove(event: TouchEvent) {
+      if (isLightboxInteraction(event)) return;
       const panels = getPanels();
       const activePanel = panels[indexRef.current];
       if (isScrollablePanel(activePanel) && activePanel.classList.contains("is-active")) {
@@ -132,6 +144,10 @@ export function HomeYslScroll() {
     }
 
     function onTouchEnd(event: TouchEvent) {
+      if (isLightboxInteraction(event)) {
+        touchStartYRef.current = null;
+        return;
+      }
       const startY = touchStartYRef.current;
       const endY = event.changedTouches[0]?.clientY ?? null;
       touchStartYRef.current = null;
@@ -148,6 +164,7 @@ export function HomeYslScroll() {
     }
 
     function onKeyDown(event: KeyboardEvent) {
+      if (isLightboxInteraction()) return;
       if (event.defaultPrevented) return;
       if (event.key === "ArrowDown" || event.key === "PageDown" || event.key === " ") {
         event.preventDefault();

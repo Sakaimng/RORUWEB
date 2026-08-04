@@ -13,7 +13,9 @@ import {
 import { NavLogo } from "./NavLogo";
 import { LanguageToggle } from "./LanguageToggle";
 import { MobileNavDock } from "./MobileNavDock";
+import { TockLink } from "./TockLink";
 import { TOCK_URL } from "@/lib/content";
+import { trackTockReservationCheckout } from "@/lib/analytics";
 import { useI18n } from "@/lib/i18n";
 import { withLocale, stripLocale } from "@/lib/locale-routing";
 import { PAGE_TRANSITION_START_EVENT } from "@/lib/roru-session";
@@ -310,14 +312,21 @@ export function Navigation() {
 
             {/* Right: reserve (desktop only) */}
             <div className="hidden items-center justify-end gap-2 min-[1032px]:flex min-[1032px]:flex-1 sm:gap-3">
-              <a
+              <TockLink
                 href={TOCK_URL}
+                campaign="desktop_navigation"
+                content="reserve_now"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener"
                 className="roru-nav-item shrink-0 px-0 py-2 text-xs font-bold uppercase transition-opacity"
+                onClick={() =>
+                  trackTockReservationCheckout({
+                    source: "desktop_navigation",
+                  })
+                }
               >
                 Reserve Now
-              </a>
+              </TockLink>
             </div>
           </div>
         </div>

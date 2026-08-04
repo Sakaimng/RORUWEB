@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
+import { TockLink } from "@/components/TockLink";
+import { trackTockReservationCheckout } from "@/lib/analytics";
 import { EVENTS, type SiteEvent } from "@/lib/content";
 import { hkDateKey } from "@/lib/hk-date";
 import { useI18n } from "@/lib/i18n";
@@ -122,21 +124,37 @@ function EventCard({ event }: { event: SiteEvent }) {
             {event.description}
           </p>
           {event.link !== "#" && (
-            <a
+            <TockLink
               href={event.link}
+              campaign="events"
+              content={event.title}
               className="roru-event-card__link mt-8 inline-block text-sm uppercase leading-none tracking-[0.06em] text-[var(--text)]"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener"
+              onClick={() =>
+                trackTockReservationCheckout({
+                  source: "event_card",
+                  eventName: event.title,
+                })
+              }
             >
               {t.events.details}
-            </a>
+            </TockLink>
           )}
         </div>
-        <a
+        <TockLink
           href={event.link}
+          campaign="events"
+          content={event.title}
           className="roru-event-card__image-link col-span-6 block md:col-span-1"
           target="_blank"
-          rel="noreferrer"
+          rel="noopener"
+          onClick={() =>
+            trackTockReservationCheckout({
+              source: "event_card",
+              eventName: event.title,
+            })
+          }
         >
           <div className="roru-event-card__image-wrap mt-[18px] w-full md:w-1/2">
             <Image
@@ -148,7 +166,7 @@ function EventCard({ event }: { event: SiteEvent }) {
               sizes="(max-width: 767px) 100vw, 40vw"
             />
           </div>
-        </a>
+        </TockLink>
       </div>
     </article>
   );

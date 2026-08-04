@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
+import { trackLeadCapture } from "@/lib/analytics";
 import type { DeliveryWaitlistCopy } from "@/lib/delivery-copy";
 
 type Status = "idle" | "sending" | "success" | "error";
@@ -49,6 +50,7 @@ export function DeliveryWaitlistForm({
 
       form.reset();
       setStatus("success");
+      trackLeadCapture("delivery_waitlist");
     } catch {
       setStatus("error");
       setError(copy.error);

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { ClientPageEntrance } from "@/components/ClientPageEntrance";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { HeroScrollCue } from "@/components/HeroScrollCue";
 import { Navigation } from "@/components/Navigation";
 import { OrderCartRoot } from "@/components/order/OrderCartRoot";
@@ -127,6 +128,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <JsonLd data={siteGraph()} />
+        <GoogleAnalytics />
         <LanguageProvider>
           {ORDER_ONLINE_ENABLED ? (
             <OrderCartRoot>

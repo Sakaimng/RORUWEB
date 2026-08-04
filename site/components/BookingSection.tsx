@@ -7,6 +7,11 @@ import {
   computeTimeSlots,
   type BookingType,
 } from "@/lib/booking";
+import {
+  buildTockTrackingUrl,
+  trackReservationExperienceSelection,
+  trackTockReservationCheckout,
+} from "@/lib/analytics";
 import { BOOKING_DATE_LOCALE, useI18n } from "@/lib/i18n";
 import { hkDateKey, hkMinutesSinceMidnight } from "@/lib/hk-date";
 
@@ -70,10 +75,23 @@ export function BookingSection() {
   const mobileBookingSummary = slot
     ? `${party} · ${formatDateLabel(resolvedDayKey, dateLocale)} · ${slot}`
     : b.availableTimeSlots;
+  const tockUrl =
+    ctaReady && slot
+      ? buildTockTrackingUrl(
+          buildTockUrl(booking, resolvedDayKey, party, slot),
+          {
+            campaign: "booking_widget",
+            content: booking,
+          },
+        )
+      : null;
 
-  function continueToTock() {
-    if (!ctaReady || !slot) return;
-    window.location.href = buildTockUrl(booking, resolvedDayKey, party, slot);
+  function trackCheckoutStart() {
+    trackTockReservationCheckout({
+      source: "reservation_widget",
+      experience: booking,
+      partySize: party,
+    });
   }
 
   return (
@@ -96,6 +114,9 @@ export function BookingSection() {
             }`}
             data-booking="lunch"
             onClick={() => {
+              if (booking !== "lunch") {
+                trackReservationExperienceSelection("lunch");
+              }
               setBooking("lunch");
               setSlot(null);
             }}
@@ -114,6 +135,9 @@ export function BookingSection() {
             }`}
             data-booking="dinner"
             onClick={() => {
+              if (booking !== "dinner") {
+                trackReservationExperienceSelection("dinner");
+              }
               setBooking("dinner");
               setSlot(null);
             }}
@@ -208,14 +232,23 @@ export function BookingSection() {
             )}
           </div>
 
-          <button
-            type="button"
-            className="roru-booking-cta mt-6 inline-flex w-fit min-w-[120px] cursor-pointer items-center justify-center border-0 bg-[var(--text)] px-[18px] py-3.5 text-base uppercase leading-none text-white disabled:cursor-not-allowed disabled:opacity-40"
-            disabled={!ctaReady}
-            onClick={continueToTock}
-          >
-            {b.continue}
-          </button>
+          {tockUrl ? (
+            <a
+              href={tockUrl}
+              className="roru-booking-cta mt-6 inline-flex w-fit min-w-[120px] cursor-pointer items-center justify-center border-0 bg-[var(--text)] px-[18px] py-3.5 text-base uppercase leading-none text-white no-underline"
+              onClick={trackCheckoutStart}
+            >
+              {b.continue}
+            </a>
+          ) : (
+            <button
+              type="button"
+              className="roru-booking-cta mt-6 inline-flex w-fit min-w-[120px] cursor-pointer items-center justify-center border-0 bg-[var(--text)] px-[18px] py-3.5 text-base uppercase leading-none text-white disabled:cursor-not-allowed disabled:opacity-40"
+              disabled
+            >
+              {b.continue}
+            </button>
+          )}
         </div>
 
         <div className="roru-booking-note col-span-6 mt-5 self-end">
@@ -232,14 +265,23 @@ export function BookingSection() {
         <p aria-live="polite" aria-atomic="true" title={mobileBookingSummary}>
           {mobileBookingSummary}
         </p>
-        <button
-          type="button"
-          className="roru-booking-mobile-action__cta"
-          disabled={!ctaReady}
-          onClick={continueToTock}
-        >
-          {b.continue}
-        </button>
+        {tockUrl ? (
+          <a
+            href={tockUrl}
+            className="roru-booking-mobile-action__cta inline-flex items-center justify-center no-underline"
+            onClick={trackCheckoutStart}
+          >
+            {b.continue}
+          </a>
+        ) : (
+          <button
+            type="button"
+            className="roru-booking-mobile-action__cta"
+            disabled
+          >
+            {b.continue}
+          </button>
+        )}
       </div>
     </section>
   );

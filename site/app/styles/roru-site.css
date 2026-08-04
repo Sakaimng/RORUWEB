@@ -3574,11 +3574,14 @@ body:has(#page-content) .roru-inquiry-section button[type="submit"] {
 }
 
 .roru-lightbox__grid-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
   width: min(100%, 1180px);
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
+  touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
   padding:
     max(6rem, calc(env(safe-area-inset-top, 0px) + 4rem))
