@@ -17,6 +17,22 @@ export const EVENT_GALLERIES = manifest.galleries as Record<
   EventGalleryManifest
 >;
 
+export const RORU_AFTER_DARK_EVENT = {
+  id: "roru-after-dark",
+  title: "RORU AFTER DARK",
+  desktopThumbnail: "/event-galleries/delia-x-rorubaru/L1060247.webp",
+  mobileThumbnail: "/event-galleries/delia-x-rorubaru/L1060246.webp",
+  poster: "/RORU after dark Feed.jpg",
+  centerLabel: "COMING SOON",
+  schedule: "Every Friday from 8PM - Late",
+  caption: [
+    "The last hand roll is never the end of the night at Roru.",
+    "Join us every Friday as the lights dim, the music turns up and the counter comes alive. Expect cocktails, sake and a soundtrack curated by DJ Mike Wolf of Sol Passion Music.",
+    "Come for dinner. Stay for another round. Kanpai!",
+    "Launching 21 August.",
+  ],
+} as const;
+
 export const PAST_EVENT_PANELS = [
   {
     id: "invite-only-opening",

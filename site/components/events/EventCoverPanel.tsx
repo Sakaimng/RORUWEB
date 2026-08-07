@@ -10,10 +10,11 @@ type CoverImages = {
 type Props = {
   images: CoverImages;
   label: string;
+  centerLabel?: string;
 };
 
 /** Full-viewport event cover (no link) for the events overlay stack. */
-export function EventCoverPanel({ images, label }: Props) {
+export function EventCoverPanel({ images, label, centerLabel }: Props) {
   return (
     <section
       className="roru-gallery-section roru-gallery-section--featured section-surface"
@@ -25,6 +26,9 @@ export function EventCoverPanel({ images, label }: Props) {
             desktop={images.desktop}
             mobile={images.mobile}
           />
+          {centerLabel ? (
+            <span className="roru-event-cover__center-label">{centerLabel}</span>
+          ) : null}
         </div>
       </div>
     </section>

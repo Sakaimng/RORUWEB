@@ -14,13 +14,19 @@ type PanelCta =
       id: string;
       title: string;
       action: "gallery";
+    }
+  | {
+      id: string;
+      title: string;
+      action: "detail";
     };
 
 type Props = {
   onOpenGallery: (eventId: string) => void;
+  onOpenDetail: (eventId: string) => void;
 };
 
-export function EventsPanelCta({ onOpenGallery }: Props) {
+export function EventsPanelCta({ onOpenGallery, onOpenDetail }: Props) {
   const [item, setItem] = useState<PanelCta | null>(null);
   const [hidden, setHidden] = useState(true);
   const [isSwitching, setIsSwitching] = useState(false);
@@ -85,13 +91,17 @@ export function EventsPanelCta({ onOpenGallery }: Props) {
   return (
     <div ref={pillRef} className={classes} aria-live="polite" aria-hidden={hidden}>
       <div className="roru-home-discover__title">{shown.title}</div>
-      {shown.action === "gallery" ? (
+      {shown.action === "gallery" || shown.action === "detail" ? (
         <button
           type="button"
           className="roru-home-discover__button"
-          onClick={() => onOpenGallery(shown.id)}
+          onClick={() =>
+            shown.action === "gallery"
+              ? onOpenGallery(shown.id)
+              : onOpenDetail(shown.id)
+          }
         >
-          Gallery
+          {shown.action === "gallery" ? "Gallery" : "DETAIL"}
         </button>
       ) : (
         <a className="roru-home-discover__button" href={shown.href}>

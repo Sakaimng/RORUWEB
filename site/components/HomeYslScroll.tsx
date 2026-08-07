@@ -44,9 +44,12 @@ function shouldScrollPanel(panel: HTMLElement, deltaY: number): boolean {
 }
 
 function isLightboxInteraction(event?: Event): boolean {
-  if (document.querySelector(".roru-lightbox")) return true;
+  if (document.querySelector(".roru-lightbox, .roru-event-detail")) return true;
   const target = event?.target;
-  return target instanceof Element && target.closest(".roru-lightbox") !== null;
+  return (
+    target instanceof Element &&
+    target.closest(".roru-lightbox, .roru-event-detail") !== null
+  );
 }
 
 function itemForPanel(panel: HTMLElement | undefined) {
@@ -59,6 +62,9 @@ function itemForPanel(panel: HTMLElement | undefined) {
 
   if (action === "gallery") {
     return { id, title, action: "gallery" as const };
+  }
+  if (action === "detail") {
+    return { id, title, action: "detail" as const };
   }
 
   if (!href) return null;

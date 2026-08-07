@@ -3476,6 +3476,224 @@ body:has(#page-content) .roru-inquiry-section button[type="submit"] {
   backdrop-filter: blur(6px);
 }
 
+/* --- EVENT DETAIL OVERLAY ------------------------------------------------ */
+.roru-event-detail {
+  position: fixed;
+  inset: 0;
+  z-index: var(--roru-z-modal, 100100);
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+  animation: roruEventDetailIn 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.roru-event-detail__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(8, 8, 8, 0.82);
+  cursor: pointer;
+}
+
+.roru-event-detail__dialog {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.8fr);
+  width: 100%;
+  height: 100dvh;
+  max-height: none;
+  overflow: hidden;
+  border: 0;
+  background: #121212;
+  color: #f4f1eb;
+  animation: roruEventDetailDialogIn 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.roru-event-detail__poster {
+  --roru-event-detail-close-clear: max(
+    68px,
+    calc(env(safe-area-inset-top, 0px) + 56px)
+  );
+  position: relative;
+  min-height: 0;
+  height: calc(100% - var(--roru-event-detail-close-clear));
+  margin-top: var(--roru-event-detail-close-clear);
+  aspect-ratio: auto;
+  background: #121212;
+}
+
+.roru-event-detail__poster-image {
+  object-fit: contain;
+}
+
+@media (min-width: 768px) {
+  .roru-event-detail__poster {
+    --roru-event-detail-poster-bottom-clear: clamp(24px, 4vh, 56px);
+    height: calc(
+      100% - var(--roru-event-detail-close-clear) -
+        var(--roru-event-detail-poster-bottom-clear)
+    );
+    margin-bottom: var(--roru-event-detail-poster-bottom-clear);
+  }
+}
+
+.roru-event-detail__copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: clamp(2rem, 5vw, 4.5rem);
+}
+
+.roru-event-detail__schedule,
+.roru-event-detail__caption p {
+  margin: 0;
+}
+
+.roru-event-detail__copy h2 {
+  margin: 0;
+  color: #f4f1eb !important;
+  font-size: clamp(34px, 4.8vw, 64px);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+html.theme-day .roru-event-detail__schedule,
+html.theme-night .roru-event-detail__schedule {
+  margin-top: 1rem;
+  color: rgba(244, 241, 235, 0.72) !important;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.roru-event-detail__caption {
+  display: grid;
+  gap: 1rem;
+  margin-top: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+html.theme-day .roru-event-detail__caption p,
+html.theme-night .roru-event-detail__caption p {
+  color: rgba(244, 241, 235, 0.88) !important;
+  font-size: clamp(14px, 1.35vw, 17px);
+  line-height: 1.5;
+}
+
+html.theme-day .roru-event-detail__caption p:last-child,
+html.theme-night .roru-event-detail__caption p:last-child {
+  color: #f54500 !important;
+  font-weight: 700;
+}
+
+.roru-event-detail__close {
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  right: 12px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(18, 18, 18, 0.72);
+  color: #f4f1eb;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.roru-event-detail__close:focus-visible {
+  outline: 2px solid #f54500;
+  outline-offset: 3px;
+}
+
+.roru-event-detail--closing {
+  pointer-events: none;
+  animation: roruEventDetailOut 0.28s ease forwards;
+}
+
+.roru-event-detail--closing .roru-event-detail__dialog {
+  animation: roruEventDetailDialogOut 0.24s ease forwards;
+}
+
+@keyframes roruEventDetailIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes roruEventDetailDialogIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes roruEventDetailOut {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes roruEventDetailDialogOut {
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+}
+
+@media (max-width: 767px) {
+  .roru-event-detail {
+    align-items: stretch;
+  }
+
+  .roru-event-detail__dialog {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(18rem, 48dvh) minmax(0, 1fr);
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+  }
+
+  .roru-event-detail__poster {
+    min-height: 0;
+    max-height: none;
+  }
+
+  .roru-event-detail__copy {
+    padding: 2rem var(--roru-mobile-pad-x)
+      max(2.5rem, env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roru-event-detail,
+  .roru-event-detail__dialog,
+  .roru-event-detail--closing,
+  .roru-event-detail--closing .roru-event-detail__dialog {
+    animation: none !important;
+  }
+}
+
 /* --- LIGHTBOX ------------------------------------------------------------ */
 .roru-lightbox {
   position: fixed;
@@ -4638,6 +4856,30 @@ body:has(.roru-home-overlays) .roru-gallery-section--featured .roru-gallery-shel
   object-fit: cover;
   object-position: 50% 50%;
   filter: saturate(0.92) contrast(1.02);
+}
+
+.roru-event-cover__center-label {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  color: #ffffff;
+  font-size: clamp(16px, 2vw, 30px);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  pointer-events: none;
+  text-align: center;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.72);
+}
+
+@media (min-width: 768px) {
+  .roru-home-overlay-panel[data-home-cta-id="roru-after-dark"]
+    .roru-gallery-feature__image {
+    object-position: 50% 0%;
+  }
 }
 
 .roru-home-discover {
