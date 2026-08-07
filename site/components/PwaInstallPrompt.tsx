@@ -18,6 +18,16 @@ import {
   triggerNativeInstall,
 } from "@/lib/pwa-install";
 
+const EVENT_ANNOUNCEMENT_SESSION_KEY = "roru-event-announcement-seen";
+
+function hasSeenEventAnnouncement(): boolean {
+  try {
+    return window.sessionStorage.getItem(EVENT_ANNOUNCEMENT_SESSION_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
 function ShareIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -69,8 +79,10 @@ export function PwaInstallPrompt() {
     function tryOpen() {
       if (!shouldOfferIosInstall()) return;
       if (
+        hasSeenEventAnnouncement() ||
         document.documentElement.classList.contains("roru-preload") ||
-        document.documentElement.classList.contains("roru-loading")
+        document.documentElement.classList.contains("roru-loading") ||
+        document.body.classList.contains("roru-event-announcement-open")
       ) {
         return;
       }

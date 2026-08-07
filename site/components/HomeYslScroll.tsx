@@ -44,11 +44,13 @@ function shouldScrollPanel(panel: HTMLElement, deltaY: number): boolean {
 }
 
 function isLightboxInteraction(event?: Event): boolean {
-  if (document.querySelector(".roru-lightbox, .roru-event-detail")) return true;
+  const modalSelector =
+    ".roru-lightbox, .roru-event-detail, .roru-event-announcement";
+  if (document.querySelector(modalSelector)) return true;
   const target = event?.target;
   return (
     target instanceof Element &&
-    target.closest(".roru-lightbox, .roru-event-detail") !== null
+    target.closest(modalSelector) !== null
   );
 }
 

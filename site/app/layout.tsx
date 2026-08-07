@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { ClientPageEntrance } from "@/components/ClientPageEntrance";
+import { EventAnnouncementPopup } from "@/components/EventAnnouncementPopup";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { HeroScrollCue } from "@/components/HeroScrollCue";
 import { Navigation } from "@/components/Navigation";
@@ -130,6 +131,7 @@ export default function RootLayout({
         <JsonLd data={siteGraph()} />
         <GoogleAnalytics />
         <LanguageProvider>
+          <EventAnnouncementPopup />
           {ORDER_ONLINE_ENABLED ? (
             <OrderCartRoot>
               <ScrollRestoration />
