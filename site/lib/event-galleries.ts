@@ -25,7 +25,7 @@ export const RORU_AFTER_DARK_EVENT = {
   title: "RORU AFTER DARK",
   desktopThumbnail: "/event-galleries/delia-x-rorubaru/L1060247.webp",
   mobileThumbnail: "/event-galleries/delia-x-rorubaru/L1060246.webp",
-  poster: "/RORU after dark Feed.jpg",
+  poster: "/RORU after dark Feed.jpg?v=20260812",
   centerLabel: "COMING SOON",
   schedule: "Every Friday from 8PM - Late",
   bookingUrl: FEATURED_EVENT_TOCK_URL,
