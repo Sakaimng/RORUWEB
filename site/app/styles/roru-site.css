@@ -3597,7 +3597,7 @@ html.theme-night .roru-event-detail__caption p:last-child {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  align-self: flex-start;
+  align-self: center;
   min-height: 46px;
   margin-top: clamp(1.75rem, 4vw, 2.5rem);
   border-radius: 999px;
@@ -3830,10 +3830,13 @@ html.theme-night .roru-event-announcement__launch {
   justify-content: center;
   min-height: 46px;
   margin-top: clamp(1.75rem, 4vw, 2.5rem);
+  border: 0;
   border-radius: 999px;
   background: #f4f1eb;
   color: #121212 !important;
   padding: 0 20px;
+  cursor: pointer;
+  font: inherit;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.09em;
@@ -3876,6 +3879,15 @@ html.theme-night .roru-event-announcement__launch {
   outline-offset: 3px;
 }
 
+.roru-event-announcement--closing {
+  pointer-events: none;
+  animation: roruEventAnnouncementOut 0.28s ease forwards;
+}
+
+.roru-event-announcement--closing .roru-event-announcement__panel {
+  animation: roruEventAnnouncementPanelOut 0.24s ease forwards;
+}
+
 @keyframes roruEventAnnouncementIn {
   from {
     opacity: 0;
@@ -3893,6 +3905,19 @@ html.theme-night .roru-event-announcement__launch {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes roruEventAnnouncementOut {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes roruEventAnnouncementPanelOut {
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
   }
 }
 
@@ -5298,6 +5323,12 @@ body:has(.roru-home-overlay-panel--fill.is-active) .roru-hero-scroll-cue {
     transform 0.16s ease;
 }
 
+@media (min-width: 1032px) {
+  .roru-home-discover__title {
+    color: #f1f1f1 !important;
+  }
+}
+
 .roru-home-discover__button {
   display: inline-flex;
   align-items: center;
@@ -6010,7 +6041,7 @@ body:has(#page-content) .roru-hero--ysl .roru-hero__title {
     min-height: 58px;
     box-sizing: border-box;
     border: 1px solid color-mix(in srgb, var(--text) 16%, transparent);
-    border-radius: 999px;
+    border-radius: var(--roru-mobile-radius-sm);
     background: color-mix(in srgb, var(--surface) 92%, transparent);
     -webkit-backdrop-filter: blur(18px) saturate(150%);
     backdrop-filter: blur(18px) saturate(150%);

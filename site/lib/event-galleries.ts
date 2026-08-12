@@ -52,8 +52,8 @@ export const SUZUSHII_NIGHTS_EVENT = {
 } as const;
 
 export const FEATURED_EVENT_PANELS = [
-  SUZUSHII_NIGHTS_EVENT,
   RORU_AFTER_DARK_EVENT,
+  SUZUSHII_NIGHTS_EVENT,
 ] as const;
 
 export const PAST_EVENT_PANELS = [

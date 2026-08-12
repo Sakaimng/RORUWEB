@@ -1,15 +1,23 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { RORU_AFTER_DARK_EVENT } from "@/lib/event-galleries";
 import { useI18n } from "@/lib/i18n";
 import { stripLocale, withLocale } from "@/lib/locale-routing";
+import { navigateWithTransition } from "@/lib/navigate-with-transition";
 
 const SESSION_KEY = "roru-event-announcement-seen";
 const OPEN_DELAY_MS = 400;
+const CLOSE_ANIMATION_MS = 280;
+
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
 
 function hasSeenAnnouncement(): boolean {
   try {
@@ -32,7 +40,10 @@ export function EventAnnouncementPopup() {
   const pathname = usePathname();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousOverflowRef = useRef<string | null>(null);
+  const closingRef = useRef(false);
+  const pendingNavigationRef = useRef<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
     if (stripLocale(pathname) === "/events" || hasSeenAnnouncement()) return;
@@ -63,6 +74,33 @@ export function EventAnnouncementPopup() {
     };
   }, [pathname]);
 
+  const requestClose = useCallback((href?: string) => {
+    if (closingRef.current) return;
+
+    closingRef.current = true;
+    pendingNavigationRef.current = href ?? null;
+
+    if (prefersReducedMotion()) {
+      setOpen(false);
+      if (href) navigateWithTransition(href);
+      return;
+    }
+
+    setIsClosing(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClosing) return;
+
+    const timer = window.setTimeout(() => {
+      const href = pendingNavigationRef.current;
+      setOpen(false);
+      if (href) navigateWithTransition(href);
+    }, CLOSE_ANIMATION_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [isClosing]);
+
   useEffect(() => {
     if (!open) return;
 
@@ -84,18 +122,20 @@ export function EventAnnouncementPopup() {
     function onKeyDown(event: KeyboardEvent) {
       if (event.key !== "Escape") return;
       event.preventDefault();
-      setOpen(false);
+      requestClose();
     }
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open]);
+  }, [open, requestClose]);
 
   if (!open) return null;
 
   return (
     <div
-      className="roru-event-announcement"
+      className={`roru-event-announcement${
+        isClosing ? " roru-event-announcement--closing" : ""
+      }`}
       role="dialog"
       aria-modal="true"
       aria-labelledby="roru-event-announcement-title"
@@ -104,7 +144,7 @@ export function EventAnnouncementPopup() {
         type="button"
         className="roru-event-announcement__backdrop"
         aria-label="Dismiss event announcement"
-        onClick={() => setOpen(false)}
+        onClick={() => requestClose()}
       />
       <section className="roru-event-announcement__panel">
         <button
@@ -112,7 +152,7 @@ export function EventAnnouncementPopup() {
           type="button"
           className="roru-event-announcement__close"
           aria-label="Dismiss event announcement"
-          onClick={() => setOpen(false)}
+          onClick={() => requestClose()}
         >
           Close
         </button>
@@ -135,13 +175,13 @@ export function EventAnnouncementPopup() {
             {RORU_AFTER_DARK_EVENT.schedule}
           </p>
           <p className="roru-event-announcement__launch">Launching 21 August.</p>
-          <Link
-            href={withLocale("/events", lang)}
+          <button
+            type="button"
             className="roru-event-announcement__cta"
-            onClick={() => setOpen(false)}
+            onClick={() => requestClose(withLocale("/events", lang))}
           >
             View event
-          </Link>
+          </button>
         </div>
       </section>
     </div>
