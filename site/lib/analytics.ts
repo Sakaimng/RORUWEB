@@ -34,7 +34,8 @@ export type ReservationExperience = "lunch" | "dinner";
 export type ReservationCheckoutSource =
   | "reservation_widget"
   | "desktop_navigation"
-  | "event_card";
+  | "event_card"
+  | "event_detail";
 
 export type TockAttribution = {
   campaign: string;

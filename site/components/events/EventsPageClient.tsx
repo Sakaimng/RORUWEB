@@ -9,14 +9,14 @@ import { ImageLightbox } from "@/components/ImageLightbox";
 import { SiteFooter } from "@/components/SiteFooter";
 import {
   EVENT_GALLERIES,
+  FEATURED_EVENT_PANELS,
   PAST_EVENT_PANELS,
-  RORU_AFTER_DARK_EVENT,
 } from "@/lib/event-galleries";
 
 export function EventsPageClient() {
   const [galleryEventId, setGalleryEventId] = useState<string | null>(null);
   const [galleryIndex, setGalleryIndex] = useState(0);
-  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailEventId, setDetailEventId] = useState<string | null>(null);
 
   const galleryImages = useMemo(() => {
     if (!galleryEventId) return [];
@@ -34,10 +34,14 @@ export function EventsPageClient() {
   }
 
   function openEventDetail(eventId: string) {
-    if (eventId === RORU_AFTER_DARK_EVENT.id) {
-      setDetailOpen(true);
+    if (FEATURED_EVENT_PANELS.some((event) => event.id === eventId)) {
+      setDetailEventId(eventId);
     }
   }
+
+  const detailEvent = FEATURED_EVENT_PANELS.find(
+    (event) => event.id === detailEventId,
+  );
 
   return (
     <>
@@ -54,10 +58,10 @@ export function EventsPageClient() {
           onChange={setGalleryIndex}
         />
       ) : null}
-      {detailOpen ? (
+      {detailEvent ? (
         <EventDetailOverlay
-          event={RORU_AFTER_DARK_EVENT}
-          onClose={() => setDetailOpen(false)}
+          event={detailEvent}
+          onClose={() => setDetailEventId(null)}
         />
       ) : null}
       <main
@@ -65,25 +69,28 @@ export function EventsPageClient() {
         className="page-content roru-home-overlays relative z-[9] mb-[100vh]"
       >
         <div className="roru-home-overlay-stack">
-          <button
-            type="button"
-            className="roru-home-overlay-panel roru-event-panel-open homepage-reveal"
-            data-home-cta
-            data-home-cta-id={RORU_AFTER_DARK_EVENT.id}
-            data-home-cta-title={RORU_AFTER_DARK_EVENT.title}
-            data-home-cta-action="detail"
-            onClick={() => openEventDetail(RORU_AFTER_DARK_EVENT.id)}
-            aria-label={`Open details for ${RORU_AFTER_DARK_EVENT.title}`}
-          >
-            <EventCoverPanel
-              images={{
-                desktop: RORU_AFTER_DARK_EVENT.desktopThumbnail,
-                mobile: RORU_AFTER_DARK_EVENT.mobileThumbnail,
-              }}
-              label={RORU_AFTER_DARK_EVENT.title}
-              centerLabel={RORU_AFTER_DARK_EVENT.centerLabel}
-            />
-          </button>
+          {FEATURED_EVENT_PANELS.map((event) => (
+            <button
+              key={event.id}
+              type="button"
+              className="roru-home-overlay-panel roru-event-panel-open homepage-reveal"
+              data-home-cta
+              data-home-cta-id={event.id}
+              data-home-cta-title={event.title}
+              data-home-cta-action="detail"
+              onClick={() => openEventDetail(event.id)}
+              aria-label={`Open details for ${event.title}`}
+            >
+              <EventCoverPanel
+                images={{
+                  desktop: event.desktopThumbnail,
+                  mobile: event.mobileThumbnail,
+                }}
+                label={event.title}
+                centerLabel={event.centerLabel}
+              />
+            </button>
+          ))}
           {PAST_EVENT_PANELS.map((event) => {
             const gallery = EVENT_GALLERIES[event.id as keyof typeof EVENT_GALLERIES];
             if (!gallery) return null;

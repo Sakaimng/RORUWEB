@@ -3593,6 +3593,34 @@ html.theme-night .roru-event-detail__caption p:last-child {
   font-weight: 700;
 }
 
+.roru-event-detail__booking {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  min-height: 46px;
+  margin-top: clamp(1.75rem, 4vw, 2.5rem);
+  border-radius: 999px;
+  background: #f54500;
+  color: #121212 !important;
+  padding: 0 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.roru-event-detail__booking:active {
+  transform: scale(0.97);
+}
+
+.roru-event-detail__booking:focus-visible {
+  outline: 2px solid #f54500;
+  outline-offset: 3px;
+}
+
 .roru-event-detail__close {
   position: absolute;
   z-index: 2;
@@ -5086,6 +5114,15 @@ body:has(.roru-home-overlays) .roru-gallery-section--featured .roru-gallery-shel
   }
 }
 
+.roru-home-overlay-panel[data-home-cta-id="suzushii-nights"] .roru-gallery-feature {
+  background: #f2f1ef;
+}
+
+.roru-home-overlay-panel[data-home-cta-id="suzushii-nights"]
+  .roru-gallery-feature__image {
+  object-fit: contain;
+}
+
 .roru-home-discover {
   position: fixed;
   left: 50%;
@@ -5249,6 +5286,7 @@ body:has(.roru-home-overlay-panel--fill.is-active) .roru-hero-scroll-cue {
 }
 
 .roru-home-discover__title {
+  color: #121212 !important;
   font-size: 12px !important;
   line-height: 1;
   font-weight: 700 !important;

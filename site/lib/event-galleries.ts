@@ -17,6 +17,9 @@ export const EVENT_GALLERIES = manifest.galleries as Record<
   EventGalleryManifest
 >;
 
+const FEATURED_EVENT_TOCK_URL =
+  "https://www.exploretock.com/roru-baru?tock_source=tock&tock_medium=search_nav";
+
 export const RORU_AFTER_DARK_EVENT = {
   id: "roru-after-dark",
   title: "RORU AFTER DARK",
@@ -25,6 +28,7 @@ export const RORU_AFTER_DARK_EVENT = {
   poster: "/RORU after dark Feed.jpg",
   centerLabel: "COMING SOON",
   schedule: "Every Friday from 8PM - Late",
+  bookingUrl: FEATURED_EVENT_TOCK_URL,
   caption: [
     "The last hand roll is never the end of the night at Roru.",
     "Join us every Friday as the lights dim, the music turns up and the counter comes alive. Expect cocktails, sake and a soundtrack curated by DJ Mike Wolf of Sol Passion Music.",
@@ -32,6 +36,25 @@ export const RORU_AFTER_DARK_EVENT = {
     "Launching 21 August.",
   ],
 } as const;
+
+export const SUZUSHII_NIGHTS_EVENT = {
+  id: "suzushii-nights",
+  title: "SUZUSHII NIGHTS",
+  desktopThumbnail: "/Suzushii Nights Feed.jpg",
+  mobileThumbnail: "/Suzushii Nights Feed.jpg",
+  poster: "/Suzushii Nights Feed.jpg",
+  centerLabel: "COMING SOON",
+  bookingUrl: FEATURED_EVENT_TOCK_URL,
+  caption: [
+    "As the season winds down, RORUBARU and Kowloon Spirits come together for Suzushii Nights, a celebration of craft, flavour and long evenings at the counter.",
+    "Inspired by the Japanese word suzushii, meaning cool and refreshing, we’ve created an exclusive Melon Yuzu Slushie featuring a custom spirit blend by Kowloon Spirits, available only at RoruBaru.",
+  ],
+} as const;
+
+export const FEATURED_EVENT_PANELS = [
+  SUZUSHII_NIGHTS_EVENT,
+  RORU_AFTER_DARK_EVENT,
+] as const;
 
 export const PAST_EVENT_PANELS = [
   {

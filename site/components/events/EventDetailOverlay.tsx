@@ -9,11 +9,14 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { TockLink } from "@/components/TockLink";
+import { trackTockReservationCheckout } from "@/lib/analytics";
 
 type EventDetail = {
   title: string;
-  schedule: string;
+  schedule?: string;
   poster: string;
+  bookingUrl?: string;
   caption: readonly string[];
 };
 
@@ -122,12 +125,32 @@ export function EventDetailOverlay({ event, onClose }: Props) {
 
         <div className="roru-event-detail__copy">
           <h2 id="roru-event-detail-title">{event.title}</h2>
-          <p className="roru-event-detail__schedule">{event.schedule}</p>
+          {event.schedule ? (
+            <p className="roru-event-detail__schedule">{event.schedule}</p>
+          ) : null}
           <div className="roru-event-detail__caption">
             {event.caption.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
             ))}
           </div>
+          {event.bookingUrl ? (
+            <TockLink
+              href={event.bookingUrl}
+              campaign="event_detail"
+              content={event.title}
+              target="_blank"
+              rel="noopener"
+              className="roru-event-detail__booking"
+              onClick={() =>
+                trackTockReservationCheckout({
+                  source: "event_detail",
+                  eventName: event.title,
+                })
+              }
+            >
+              Book on Tock
+            </TockLink>
+          ) : null}
         </div>
       </section>
     </div>,
