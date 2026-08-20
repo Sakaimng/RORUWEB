@@ -19,6 +19,7 @@ export const EVENT_GALLERIES = manifest.galleries as Record<
 
 const FEATURED_EVENT_TOCK_URL =
   "https://www.exploretock.com/roru-baru?tock_source=tock&tock_medium=search_nav";
+const SUZUSHII_NIGHTS_POSTER = "/Suzushii Nights Feed.jpg?v=20260820";
 
 export const RORU_AFTER_DARK_EVENT = {
   id: "roru-after-dark",
@@ -40,14 +41,15 @@ export const RORU_AFTER_DARK_EVENT = {
 export const SUZUSHII_NIGHTS_EVENT = {
   id: "suzushii-nights",
   title: "SUZUSHII NIGHTS",
-  desktopThumbnail: "/Suzushii Nights Feed.jpg",
-  mobileThumbnail: "/Suzushii Nights Feed.jpg",
-  poster: "/Suzushii Nights Feed.jpg",
+  desktopThumbnail: SUZUSHII_NIGHTS_POSTER,
+  mobileThumbnail: SUZUSHII_NIGHTS_POSTER,
+  poster: SUZUSHII_NIGHTS_POSTER,
   centerLabel: "COMING SOON",
   bookingUrl: FEATURED_EVENT_TOCK_URL,
   caption: [
     "As the season winds down, RORUBARU and Kowloon Spirits come together for Suzushii Nights, a celebration of craft, flavour and long evenings at the counter.",
     "Inspired by the Japanese word suzushii, meaning cool and refreshing, we’ve created an exclusive Melon Yuzu Slushie featuring a custom spirit blend by Kowloon Spirits, available only at RoruBaru.",
+    "Launching 2 September.",
   ],
 } as const;
 
