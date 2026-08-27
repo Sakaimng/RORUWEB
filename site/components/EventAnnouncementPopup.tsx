@@ -167,14 +167,15 @@ export function EventAnnouncementPopup() {
           />
         </div>
         <div className="roru-event-announcement__copy">
-          <p className="roru-event-announcement__eyebrow">Coming soon</p>
+          <p className="roru-event-announcement__eyebrow">
+            {RORU_AFTER_DARK_EVENT.centerLabel}
+          </p>
           <h2 id="roru-event-announcement-title">
             {RORU_AFTER_DARK_EVENT.title}
           </h2>
           <p className="roru-event-announcement__schedule">
             {RORU_AFTER_DARK_EVENT.schedule}
           </p>
-          <p className="roru-event-announcement__launch">Launching 21 August.</p>
           <button
             type="button"
             className="roru-event-announcement__cta"

@@ -27,14 +27,14 @@ export const RORU_AFTER_DARK_EVENT = {
   desktopThumbnail: "/event-galleries/delia-x-rorubaru/L1060247.webp",
   mobileThumbnail: "/event-galleries/delia-x-rorubaru/L1060246.webp",
   poster: "/RORU after dark Feed.jpg?v=20260812",
-  centerLabel: "COMING SOON",
+  centerLabel: "ONGOING",
   schedule: "Every Friday from 8PM - Late",
   bookingUrl: FEATURED_EVENT_TOCK_URL,
   caption: [
     "The last hand roll is never the end of the night at Roru.",
     "Join us every Friday as the lights dim, the music turns up and the counter comes alive. Expect cocktails, sake and a soundtrack curated by DJ Mike Wolf of Sol Passion Music.",
     "Come for dinner. Stay for another round. Kanpai!",
-    "Launching 21 August.",
+    "Ongoing every Friday.",
   ],
 } as const;
 
