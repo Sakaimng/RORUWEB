@@ -274,10 +274,8 @@ export function Navigation() {
       >
         <div className="relative h-full w-full">
           <div className="relative grid h-full w-full grid-cols-[1fr_auto_1fr] items-center px-[var(--roru-section-pad-x)] min-[1032px]:flex min-[1032px]:justify-normal">
-            {/* Left: desktop language + nav links */}
+            {/* Left: desktop navigation links */}
             <div className="flex min-w-0 items-center justify-start gap-3 min-[1032px]:flex-1 min-[1032px]:gap-4">
-              <LanguageToggle className="hidden min-[1032px]:inline-flex" />
-
               <nav
                 className="hidden flex-wrap items-center justify-start gap-x-3 gap-y-1 min-[1032px]:flex min-[1032px]:gap-x-4"
                 aria-label="Primary"
@@ -310,7 +308,7 @@ export function Navigation() {
               </button>
             </div>
 
-            {/* Right: reserve (desktop only) */}
+            {/* Right: reserve + language (desktop only) */}
             <div className="hidden items-center justify-end gap-2 min-[1032px]:flex min-[1032px]:flex-1 sm:gap-3">
               <TockLink
                 href={TOCK_URL}
@@ -327,6 +325,7 @@ export function Navigation() {
               >
                 Reserve Now
               </TockLink>
+              <LanguageToggle className="hidden min-[1032px]:inline-flex" />
             </div>
           </div>
         </div>
