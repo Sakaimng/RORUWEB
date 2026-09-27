@@ -44,12 +44,11 @@ export const SUZUSHII_NIGHTS_EVENT = {
   desktopThumbnail: SUZUSHII_NIGHTS_POSTER,
   mobileThumbnail: SUZUSHII_NIGHTS_POSTER,
   poster: SUZUSHII_NIGHTS_POSTER,
-  centerLabel: "COMING SOON",
+  centerLabel: "ONGOING",
   bookingUrl: FEATURED_EVENT_TOCK_URL,
   caption: [
     "As the season winds down, RORUBARU and Kowloon Spirits come together for Suzushii Nights, a celebration of craft, flavour and long evenings at the counter.",
     "Inspired by the Japanese word suzushii, meaning cool and refreshing, we’ve created an exclusive Melon Yuzu Slushie featuring a custom spirit blend by Kowloon Spirits, available only at RoruBaru.",
-    "Launching 2 September.",
   ],
 } as const;
 
