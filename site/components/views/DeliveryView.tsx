@@ -1,9 +1,8 @@
-import { DeliveryWaitlistForm } from "@/components/delivery/DeliveryWaitlistForm";
 import { JsonLd } from "@/components/JsonLd";
 import { PageOverlayShell } from "@/components/PageOverlayShell";
 import {
   DELIVERY_PLATFORMS,
-  DELIVERY_WAITLIST_COPY,
+  DELIVERY_COPY,
   type DeliveryPlatformKey,
 } from "@/lib/delivery-copy";
 import type { Lang } from "@/lib/i18n";
@@ -30,7 +29,7 @@ function withPlatformLinks(text: string) {
 }
 
 export function DeliveryView({ lang }: { lang: Lang }) {
-  const copy = DELIVERY_WAITLIST_COPY[lang];
+  const copy = DELIVERY_COPY[lang];
 
   return (
     <PageOverlayShell scrollable>
@@ -54,10 +53,6 @@ export function DeliveryView({ lang }: { lang: Lang }) {
           <p className="roru-delivery-page__description">
             {withPlatformLinks(copy.description)}
           </p>
-
-          <div className="roru-delivery-page__form">
-            <DeliveryWaitlistForm copy={copy} />
-          </div>
         </div>
       </section>
     </PageOverlayShell>
