@@ -45,15 +45,15 @@ export const DELIVERY_PLATFORM_ORDER: DeliveryPlatformKey[] = ["foodpanda", "kee
 
 export const DELIVERY_COPY: Record<Lang, DeliveryCopy> = {
   en: {
-    eyebrow: "Delivery / foodpanda & Keeta",
+    eyebrow: "Delivery",
     description: "Order delivery on",
   },
   jp: {
-    eyebrow: "デリバリー / foodpanda・Keeta",
+    eyebrow: "デリバリー",
     description: "デリバリーはこちらから",
   },
   cn: {
-    eyebrow: "外賣 / foodpanda 及 Keeta",
+    eyebrow: "外賣",
     description: "外賣可以喺以下平台訂購",
   },
 };
