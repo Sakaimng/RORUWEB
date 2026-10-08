@@ -1,4 +1,4 @@
-/* Delivery waitlist landing page */
+/* Delivery landing page */
 
 body:has(.roru-delivery-page) .roru-hero-scroll-cue {
   display: none !important;
@@ -290,5 +290,113 @@ body:has(.roru-delivery-page) .roru-hero-scroll-cue {
 @media (max-width: 1031px) and (prefers-reduced-motion: reduce) {
   .roru-delivery-waitlist__submit {
     transition: none !important;
+  }
+}
+
+/* Delivery platform logo buttons (foodpanda / Keeta) */
+
+.roru-delivery-platforms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: clamp(16px, 1.6vw, 22px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.roru-delivery-platforms__item {
+  flex: 0 1 220px;
+  min-width: 0;
+}
+
+.roru-delivery-platforms__link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 76px;
+  border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 0 24px;
+  box-shadow: 0 1px 2px rgba(18, 18, 18, 0.05);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.roru-delivery-platforms__logo {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: 30px;
+  object-fit: contain;
+}
+
+/* Keeta's mark is a stacked wordmark; give it more height so both read at the same visual weight. */
+.roru-delivery-platforms__link--keeta .roru-delivery-platforms__logo {
+  height: 46px;
+}
+
+.roru-delivery-platforms__link:focus-visible {
+  outline: 2px solid #f54500;
+  outline-offset: 3px;
+}
+
+@media (min-width: 1032px) and (hover: hover) and (pointer: fine) {
+  .roru-delivery-platforms__link:hover {
+    border-color: #f54500;
+    box-shadow: 0 8px 22px rgba(18, 18, 18, 0.1);
+    transform: translateY(-2px);
+  }
+}
+
+@media (max-width: 1031px) {
+  .roru-delivery-platforms {
+    justify-content: center;
+    margin-top: 18px;
+  }
+
+  .roru-delivery-platforms__item {
+    flex: 1 1 0;
+    max-width: 240px;
+  }
+
+  .roru-delivery-platforms__link {
+    border-color: var(--roru-mobile-border);
+    border-radius: var(--roru-mobile-radius-lg);
+    box-shadow: 0 8px 22px rgba(18, 18, 18, 0.07);
+  }
+
+  .roru-delivery-platforms__link:active {
+    transform: scale(var(--roru-press-scale));
+  }
+}
+
+@media (max-width: 479px) {
+  .roru-delivery-platforms {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .roru-delivery-platforms__item {
+    flex: none;
+    max-width: none;
+  }
+
+  .roru-delivery-platforms__link {
+    height: 72px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roru-delivery-platforms__link {
+    transition: none;
+  }
+
+  .roru-delivery-platforms__link:hover,
+  .roru-delivery-platforms__link:active {
+    transform: none;
   }
 }
