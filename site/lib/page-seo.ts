@@ -60,9 +60,9 @@ export const PAGE_SEO: Record<Lang, Record<PageKey, Copy>> = {
         "Order hand rolls, drinks and sake from RORUBARU for pickup or delivery in Wan Chai. Browse the full menu, build your cart and checkout online.",
     },
     delivery: {
-      title: "Delivery — Coming Soon",
+      title: "Delivery — Order on foodpanda & Keeta",
       description:
-        "RORUBARU delivery is coming soon. Join the waitlist to be first to know when fresh hand rolls can be delivered to your door in Hong Kong.",
+        "Order RORUBARU hand rolls for delivery in Hong Kong on foodpanda and Keeta — search RORUBARU in either app. Fresh temaki from our Wan Chai hand roll bar.",
     },
     reserve: {
       title: "Reservations — Book a Table",
@@ -97,9 +97,9 @@ export const PAGE_SEO: Record<Lang, Record<PageKey, Copy>> = {
         "RORUBARU の手巻き・ドリンク・日本酒を湾仔からテイクアウトまたはデリバリー。フルメニューからカートに追加してオンライン注文。",
     },
     delivery: {
-      title: "デリバリー — 近日開始",
+      title: "デリバリー — foodpanda・Keeta",
       description:
-        "RORUBARU のデリバリーサービスは近日開始予定です。香港で新鮮な手巻きをお届けできるようになったら、ウェイトリストへいち早くお知らせします。",
+        "RORUBARU の手巻きは foodpanda と Keeta でデリバリー注文いただけます。アプリで「RORUBARU」と検索してください。",
     },
     reserve: {
       title: "ご予約 — テーブルを予約する",
@@ -134,9 +134,9 @@ export const PAGE_SEO: Record<Lang, Record<PageKey, Copy>> = {
         "向灣仔 RORUBARU 訂購手卷、飲品及清酒，支持自取或送餐。瀏覽全餐牌、加入購物車並線上結帳。",
     },
     delivery: {
-      title: "送餐服務 — 即將推出",
+      title: "外賣送餐 — foodpanda 及 Keeta",
       description:
-        "RORUBARU 送餐服務即將推出。加入等候名單，在香港可以享用新鮮手卷送餐服務時率先收到通知。",
+        "喺 foodpanda 或 Keeta 搜尋 RORUBARU，即可叫灣仔手卷吧嘅手卷外賣送到府上。",
     },
     reserve: {
       title: "預約 — 預訂座位",

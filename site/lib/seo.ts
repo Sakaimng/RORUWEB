@@ -22,7 +22,12 @@ export const SITE_NAME = "RORUBARU";
  * editorial coverage (Time Out, OpenRice, Esquire HK, Japanese press) writes
  * the brand as two words "Roru Baru", so we claim both forms in metadata + schema.
  */
-export const BRAND_ALT_NAMES = ["Roru Baru", "Roru Baru Hong Kong"] as const;
+export const BRAND_ALT_NAMES = [
+  "Roru Baru",
+  "Roru Baru Hong Kong",
+  "RORUBARU – The Handroll Bar",
+  "RORUBARU 手卷吧",
+] as const;
 
 /** One-line positioning statement reused across metadata + schema. */
 export const SITE_TAGLINE = "Hong Kong's Original Hand Roll Bar";
@@ -72,12 +77,12 @@ export const SITE_ADDRESS = {
 } as const;
 
 /**
- * Approximate venue coordinates for 100–102 Queen's Road East, Wan Chai.
- * NOTE: confirm against the Google Business Profile map pin for best accuracy.
+ * Venue coordinates for G/F, 100–102 Queen's Road East (Queen's 100), Wan Chai,
+ * from the Hong Kong government address lookup (als.gov.hk).
  */
 export const SITE_GEO = {
-  latitude: 22.27538,
-  longitude: 114.17216,
+  latitude: 22.27632,
+  longitude: 114.17006,
 } as const;
 
 /** Google Maps link (matches lib/content.ts SITE_MAP_URL). */
@@ -122,6 +127,9 @@ export const SOCIAL_PROFILES = [
   "https://www.instagram.com/rorubaru/",
   "https://www.facebook.com/profile.php?id=61587043343492",
   "https://www.exploretock.com/roru-baru",
+  "https://www.tripadvisor.com/Restaurant_Review-g294217-d34135021-Reviews-Roru_Baru-Hong_Kong.html",
+  "https://www.openrice.com/en/hongkong/r-roru-baru-wan-chai-japanese-sushi-sashimi-r1123011",
+  "https://www.xiaohongshu.com/user/profile/65e060a1000000000500f54e",
 ] as const;
 
 /** Default Open Graph share image (served from /public). */

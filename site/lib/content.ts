@@ -69,7 +69,7 @@ export const EVENTS: SiteEvent[] = [
     title: "Delia x Rorubaru",
     date: "April 2026",
     eventDate: "2026-04-24, 2026-04-25",
-    status: "Upcoming",
+    status: "Past",
     description:
       "Roru Baru presents a special collaboration between Chef Joey Chan and Chef Diego Zarco of Delia Bangkok, founded by Gabriela Espinosa.",
     image: "/event-poster/delia-roru-sqspace.webp",

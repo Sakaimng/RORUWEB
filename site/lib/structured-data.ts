@@ -198,11 +198,21 @@ export function eventNode(event: SiteEvent): JsonLdNode {
   return node;
 }
 
-/** Wraps one or more Event nodes in a @graph for the events page. */
+/**
+ * Wraps one or more Event nodes in a @graph for the events page. Only events
+ * that have not ended (as of build time) are emitted, so past events never
+ * reach Google as "scheduled" with tickets in stock.
+ */
 export function eventsGraph(events: SiteEvent[]): JsonLdNode {
+  const today = new Date().toISOString().slice(0, 10);
+  const live = events.filter((event) => {
+    if (event.status === "Past") return false;
+    const { start, end } = parseEventDates(event.eventDate);
+    return (end ?? start) >= today;
+  });
   return {
     "@context": "https://schema.org",
-    "@graph": events.map(eventNode),
+    "@graph": live.map(eventNode),
   };
 }
 
