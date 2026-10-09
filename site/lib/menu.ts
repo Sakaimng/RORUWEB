@@ -102,7 +102,7 @@ export const A_LA_CARTE: MenuBoard = {
     },
     {
       name: "Daily Bara Chirashi",
-      note: "From 12–2:30. Quality cuts changed daily. Premium add-ons optional.",
+      note: "Weekday lunch menu, 12–2:30. Quality cuts changed daily. Premium add-ons optional.",
       items: [
         { name: "Daily Bara Chirashi", price: 178 },
         { name: "Add Uni", nameZh: "海膽", price: 88 },

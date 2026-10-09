@@ -106,7 +106,7 @@ export function MenuPageClient() {
               that day.
             </p>
             <p className="roru-menu-story__detail">
-              Daily Bara Chirashi Lunch Set, weekdays from 12–2:30pm.
+              Daily Bara Chirashi on the Weekday Lunch Menu, 12–2:30pm.
             </p>
           </div>
         </div>
