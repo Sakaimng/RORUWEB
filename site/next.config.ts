@@ -25,6 +25,8 @@ const nextConfig: NextConfig = {
   experimental: {
     /** Smaller client bundles for packages that re-export many modules. */
     optimizePackageImports: ["gsap"],
+    /** Global 404 with its own <html>; needed because each locale has its own root layout. */
+    globalNotFound: true,
   },
 };
 

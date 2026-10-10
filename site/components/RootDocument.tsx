@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import Script from "next/script";
-import "./globals.css";
+import "@/app/globals.css";
 import { ClientPageEntrance } from "@/components/ClientPageEntrance";
 import { EventAnnouncementPopup } from "@/components/EventAnnouncementPopup";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
@@ -37,7 +37,8 @@ const geist = Geist({
 const HOME_TITLE = "RORUBARU — Hand Roll & Temaki Bar in Wan Chai, Hong Kong";
 const GOOGLE_TAG_MANAGER_ID = "GTM-MD77MS5K";
 
-export const metadata: Metadata = {
+/** Shared metadata for every locale root layout (en, ja, zh-Hant). */
+export const rootMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: HOME_TITLE,
@@ -102,7 +103,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = {
+export const rootViewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#f54500" },
     { media: "(prefers-color-scheme: dark)", color: "#f54500" },
@@ -112,13 +113,20 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+/**
+ * The shared <html> document for every locale. Each locale has its own root
+ * layout (app/(en)/layout.tsx, app/ja/layout.tsx, app/zh-Hant/layout.tsx) so the
+ * server-rendered <html lang> matches the page language.
+ */
+export function RootDocument({
+  lang,
   children,
 }: Readonly<{
+  lang: "en" | "ja" | "zh-Hant";
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="theme-day roru-preload" suppressHydrationWarning>
+    <html lang={lang} className="theme-day roru-preload" suppressHydrationWarning>
       <head>
         <link
           rel="preconnect"
