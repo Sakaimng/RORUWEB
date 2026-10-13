@@ -1,6 +1,19 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return {
+      beforeFiles: [
+        /** The 3D RORUBARU room (static, in public/) is the homepage. Language and inner pages stay Next.js routes. */
+        { source: "/", destination: "/rorubaru-3d.html" },
+        /** The two largest story videos are served from the site's mirror (too big for the repo upload path). */
+        { source: "/story/story_v3_16x9.mp4", destination: "https://rorubaru-live-counter.sites.tab.bot/story/story_v3_16x9.mp4" },
+        { source: "/story/story_v3_9x16.mp4", destination: "https://rorubaru-live-counter.sites.tab.bot/story/story_v3_9x16.mp4" },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
+  },
   async redirects() {
     return [
       { source: "/gallery", destination: "/about", permanent: true },
