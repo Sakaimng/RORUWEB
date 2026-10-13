@@ -813,7 +813,7 @@ const HOT = {
   visit:   { label: 'Visit',           anchor: new THREE.Vector3(L.glassX - 0.3, 2.6, L.doorZ - 1.35), view: { t: [-7.6, 1.2, -2.9], az: -1.2, pol: 1.05, d: 9.5 } },
   central: { label: 'Central · coming soon', anchor: new THREE.Vector3(CENTRAL.x, 6.7, CENTRAL.z), view: { t: [CENTRAL.x, 2.0, CENTRAL.z + 4], az: -0.75, pol: 0.86, d: 30 } },
   events:  { label: 'Events',     anchor: new THREE.Vector3(EVW.x + 1.5, EVW.y + EVW.h / 2 + 1.75, EVW.z + 0.2), view: { t: [EVW.x + 0.3, 1.95, EVW.z + 0.4], az: -0.22, pol: 1.36, d: 4.4 } },
-  delivery: { label: 'Delivery', anchor: new THREE.Vector3(L.glassX - 0.3, 1.6, L.doorZ - 1.35), view: { t: [-7.6, 1.2, -2.9], az: -1.2, pol: 1.05, d: 9.5 } },
+  delivery: { label: 'Delivery', anchor: new THREE.Vector3(L.glassX, 0.3, 2.5), view: { t: [-7.6, 1.2, -2.9], az: -1.2, pol: 1.05, d: 9.5 } },
   lunch:   { view: { t: [2.6, 0.9, 2.0], az: 0.12, pol: 0.92, d: 10.5 } },
   social:  { label: 'IG · FB',         anchor: new THREE.Vector3(3.35, 1.55, L.F + 0.13), view: { t: [3.2, 1.0, 2.2], az: 0.3, pol: 0.82, d: 5.2 } },
 };
@@ -904,9 +904,10 @@ ring(EVW.x, 0.03, EVW.z + 0.75, 1.0);
 
 const hotLayer = document.getElementById('hotspots');
 const hotEls = [];
-// pins over the room: only what the bottom bar doesn't already carry (v20 declutter). Menu, drinks, delivery,
+// pins over the room: only what the bottom bar doesn't already carry (v20 declutter), plus Delivery
+// (Dominic, Oct 13 2026: wants it clickable in the room too). Menu, drinks,
 // walk-ins and Central still open from a tap on the room itself, the bottom bar or More.
-const NO_PIN = new Set(['menu', 'drinks', 'delivery', 'walkin', 'central']);
+const NO_PIN = new Set(['menu', 'drinks', 'walkin', 'central']);
 for (const [key, h] of Object.entries(HOT)) {
   if (!h.label || NO_PIN.has(key)) continue;
   // a pin with an href is a plain link (Instagram): a real <a>, so it opens in a new tab everywhere
