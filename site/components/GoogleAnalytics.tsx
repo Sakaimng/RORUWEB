@@ -35,6 +35,8 @@ export function GoogleAnalytics() {
         `}
       </Script>
       <AnalyticsPageView />
+      {/* Outbound click events (book_click, delivery_click, instagram_click, ...). Same file as the 3D homepage. */}
+      <Script src="/roru-track.js?v=ga1" strategy="lazyOnload" />
     </>
   );
 }
