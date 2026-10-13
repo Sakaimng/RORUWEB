@@ -25,7 +25,7 @@ export const DELIVERY_PLATFORMS = {
       jp: "foodpanda で注文する",
       cn: "喺 foodpanda 訂購",
     },
-    url: "https://www.foodpanda.hk/restaurant/otpm/rorubaru-otpm",
+    url: "https://www.foodpanda.hk/restaurant/fbv3/rorubaru-extended-delivery-fbv3",
     logo: { src: "/delivery/foodpanda.svg", width: 328, height: 64 },
   },
   keeta: {
