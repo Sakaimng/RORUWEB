@@ -100,6 +100,8 @@ export const rootMetadata: Metadata = {
   },
   other: {
     "mobile-web-app-capable": "yes",
+    copyright: "© 2026 We Rolling Limited. All rights reserved.",
+    robots: "noai, noimageai",
   },
 };
 
@@ -158,6 +160,8 @@ export function RootDocument({
         </noscript>
         <JsonLd data={siteGraph()} />
         <GoogleAnalytics />
+        {/* Copy deterrents (no right-click/long-press save, no text copy, no video download). Same file as the 3D homepage. */}
+        <Script src="/roru-guard.js?v=g1" strategy="afterInteractive" />
         <LanguageProvider>
           <EventAnnouncementPopup />
           {ORDER_ONLINE_ENABLED ? (

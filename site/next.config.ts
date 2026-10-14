@@ -14,6 +14,18 @@ const nextConfig: NextConfig = {
       fallback: [],
     };
   },
+  /** Anti-framing: other sites can't show rorubaru.com inside their own page (iframe). Tock/delivery links open in new tabs, so they're unaffected. */
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [
       { source: "/gallery", destination: "/about", permanent: true },

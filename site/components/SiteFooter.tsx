@@ -65,6 +65,12 @@ export function SiteFooter() {
                 <br />
                 {t.footer.hoursWeekdayCall}
               </p>
+              <p
+                className="roru-footer__legal"
+                style={{ marginTop: "1.25rem", fontSize: "10px", lineHeight: 1.4, opacity: 0.55 }}
+              >
+                © 2026 We Rolling Limited. All rights reserved.
+              </p>
             </div>
           </div>
 
