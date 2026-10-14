@@ -11,6 +11,8 @@
   const ensurePdf = () => libs || (libs = load("/loyalty/vendor/jspdf.umd.min.js").then(() => load("/loyalty/vendor/jspdf.plugin.autotable.min.js")));
   const save = (blob, name) => { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000); };
   const COLS = [["at", "Date/time (HK)"], ["type", "Type"], ["item", "Item"], ["pos_item", "Ring on POS"], ["code", "Code"], ["guest", "Guest"], ["shop", "Shop"], ["redeemed_by", "Handed over by"], ["logged", "Logged on POS"], ["logged_by", "Logged by"], ["logged_at", "Logged at"], ["reversed", "Reversed (not counted)"], ["reversed_by", "Reversed by"], ["reversed_at", "Reversed at"], ["reverse_reason", "Reason"], ["pos_action", "POS action"]];
+  // v42: long staff bill codes (STAFF-1-20261014062858663) break at the hyphens and after the date, never mid-chunk
+  const pc = (c) => { c = c == null ? "" : String(c); if (c.length <= 12 || /\s/.test(c)) return c; const m = /^([A-Z]+-\d+)-(\d{8})(\d+)$/.exec(c); return m ? m[1] + "-\n" + m[2] + "\n" + m[3] : c.replace(/-/g, "-\n"); };
   const live = (rows) => rows.filter(r => !r.reversed), rev = (rows) => rows.filter(r => r.reversed);
   const cell = (r, k) => k === "reversed" ? (r.reversed ? "REVERSED" : "") : k === "at" || k === "logged_at" || k === "reversed_at" ? hk(r[k]) : k === "logged" ? (r.logged === true ? "Yes" : r.logged === false ? "NO" : "n/a") : (r[k] == null ? "" : String(r[k]));
   function totals(rows) { const t = {}; live(rows).forEach(r => { const k = r.type + " | " + r.item; t[k] = (t[k] || 0) + 1; }); return Object.entries(t).sort((a, b) => b[1] - a[1]); }
@@ -24,17 +26,18 @@
     doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.text("RORUBARU · " + R.prog("en"), 14, 16);
     doc.setFontSize(12); doc.text("Month-end loyalty events for POS matching: " + monthName(d.month), 14, 23);
     doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(90);
-    doc.text("Generated " + hk(d.generated_at) + " (HK) by " + d.by + " (" + d.role + ").  " + live(d.rows).length + " events" + (rev(d.rows).length ? " + " + rev(d.rows).length + " reversed (not counted)" : "") + ".  PREVIEW data: rows marked (test) are test members.", 14, 28.5);
+    const sub = doc.splitTextToSize("Generated " + hk(d.generated_at) + " (HK) by " + d.by + " (" + d.role + ").  " + live(d.rows).length + " events" + (rev(d.rows).length ? " + " + rev(d.rows).length + " reversed (not counted)" : "") + ".  PREVIEW data: rows marked (test) are test members.", W - 28);
+    doc.text(sub, 14, 28.5); const hdrY = 28.5 + (sub.length - 1) * 3.6;
     doc.setTextColor(0);
     const not = live(d.rows).filter(r => r.logged === false);
-    let y = 35; doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(not.length ? 190 : 30, not.length ? 40 : 120, 40);
+    let y = hdrY + 6.5; doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(not.length ? 190 : 30, not.length ? 40 : 120, 40);
     doc.text(not.length ? "Not logged on POS yet: " + not.length : "Everything handed over was logged on POS", 14, y); doc.setTextColor(0);
-    if (not.length) doc.autoTable({ startY: y + 2, head: [["Date/time", "Item", "Code", "Guest", "Handed over by"]], body: not.map(r => [hk(r.at), r.item, r.code, r.guest + (r.is_test ? " (test)" : ""), r.redeemed_by || ""]),
+    if (not.length) doc.autoTable({ startY: y + 2, head: [["Date/time", "Item", "Code", "Guest", "Handed over by"]], body: not.map(r => [hk(r.at), r.item, pc(r.code), r.guest + (r.is_test ? " (test)" : ""), r.redeemed_by || ""]),
       styles: { fontSize: 8, cellPadding: 1.5 }, headStyles: { fillColor: [190, 40, 40] }, margin: { left: 14, right: 14 } });
     y = (doc.lastAutoTable && not.length ? doc.lastAutoTable.finalY : y) + 8;
     const rv = rev(d.rows);
     if (rv.length) { doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(120, 60, 160); doc.text("Reversed (not counted): " + rv.length, 14, y); doc.setTextColor(0);
-      doc.autoTable({ startY: y + 2, head: [["Handed over", "Item", "Code", "Guest", "Reversed by / at", "Reason", "POS"]], body: rv.map(r => [hk(r.at), r.item, r.code, r.guest + (r.is_test ? " (test)" : ""), (r.reversed_by || "") + "\n" + hk(r.reversed_at), r.reverse_reason || "", r.pos_action || ""]),
+      doc.autoTable({ startY: y + 2, head: [["Handed over", "Item", "Code", "Guest", "Reversed by / at", "Reason", "POS"]], body: rv.map(r => [hk(r.at), r.item, pc(r.code), r.guest + (r.is_test ? " (test)" : ""), (r.reversed_by || "") + "\n" + hk(r.reversed_at), r.reverse_reason || "", r.pos_action || ""]),
         styles: { fontSize: 8, cellPadding: 1.5 }, headStyles: { fillColor: [120, 60, 160] }, margin: { left: 14, right: 14 } });
       y = doc.lastAutoTable.finalY + 8; }
     doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.text("Totals by item", 14, y);
@@ -42,7 +45,7 @@
     y = doc.lastAutoTable.finalY + 8; if (y > 260) { doc.addPage(); y = 16; }
     doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.text("All events", 14, y);
     doc.autoTable({ startY: y + 2, head: [["Date/time", "Type", "Item", "Code", "Guest", "Handed over by", "Logged", "Logged by"]],
-      body: d.rows.map(r => [hk(r.at), r.type + (r.reversed ? "\nREVERSED" : ""), r.item + (r.pos_item && r.pos_item !== r.item ? "\nPOS: " + r.pos_item : ""), r.code, r.guest + (r.is_test ? " (test)" : ""), r.redeemed_by || "", (r.reversed ? (r.logged ? "Void on POS" : "n/a") : cell(r, "logged") + (r.logged_at ? "\n" + hk(r.logged_at) : "")), r.logged_by || ""]),
+      body: d.rows.map(r => [hk(r.at), r.type + (r.reversed ? "\nREVERSED" : ""), r.item + (r.pos_item && r.pos_item !== r.item ? "\nPOS: " + r.pos_item : ""), pc(r.code), r.guest + (r.is_test ? " (test)" : ""), r.redeemed_by || "", (r.reversed ? (r.logged ? "Void on POS" : "n/a") : cell(r, "logged") + (r.logged_at ? "\n" + hk(r.logged_at) : "")), r.logged_by || ""]),
       styles: { fontSize: 7.5, cellPadding: 1.4, valign: "top" }, headStyles: { fillColor: [246, 69, 1] }, margin: { left: 10, right: 10 }, columnStyles: { 0: { cellWidth: 20 }, 1: { cellWidth: 21 }, 3: { cellWidth: 19 }, 4: { cellWidth: 17 }, 5: { cellWidth: 22 }, 6: { cellWidth: 19 }, 7: { cellWidth: 20 } },
       didParseCell: (h) => { if (h.section === "body" && h.column.index === 6 && /^NO/.test(h.cell.raw)) { h.cell.styles.textColor = [190, 40, 40]; h.cell.styles.fontStyle = "bold"; } } });
     const n = doc.getNumberOfPages(); for (let i = 1; i <= n; i++) { doc.setPage(i); doc.setFontSize(7.5); doc.setTextColor(120); doc.text("Page " + i + " of " + n + "  ·  " + R.prog("en") + " month-end  ·  " + monthName(d.month), W / 2, 290, { align: "center" }); }

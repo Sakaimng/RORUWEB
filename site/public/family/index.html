@@ -8,9 +8,9 @@
 <title data-tt="{prog} — RORUBARU">High Rollers — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f19">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f21">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f19"></script>
+<script src="/loyalty/loyalty.js?v=f21"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -433,7 +433,7 @@
         d.innerHTML = '<b>' + (rw.kind === "plate" ? t("earned") : t("claimed")) + '</b><div class="scratch"><div class="under"><b>' + name + (rw.upgraded ? " ⬆️" : "") + '</b><span class="small muted">' + (rw.upgraded ? t("upgrade") : (detail || "")) + '</span></div><canvas></canvas><div class="hint">' + t("scratch_hint") + "</div></div>";
         box.appendChild(d); setupScratch(d.querySelector(".scratch"), rw.id); addUndo(d, rw);
       } else if (rw.status === "revealed") {
-        d.innerHTML = '<div class="row"><div class="grow"><b style="font-size:18px">' + name + (rw.upgraded ? " ⬆️" : "") + '</b><p class="small muted" style="margin:4px 0">' + (detail || "") + '</p><p class="small">' + t("reveal_done") + '</p><p class="code">' + rw.code + '</p></div><div class="qr">' + R.qrSvg("RR:" + rw.code, 120) + "</div></div>";
+        d.innerHTML = '<div class="row"><div class="grow"><b style="font-size:18px">' + name + (rw.upgraded ? " ⬆️" : "") + '</b><p class="small muted" style="margin:4px 0">' + (detail || "") + '</p><p class="small">' + t("reveal_done") + '</p><p class="code">' + rw.code + '</p></div><div class="qr qr-rw">' + R.qrSvg("RR:" + rw.code, 120) + "</div></div>";
         box.appendChild(d); addUndo(d, rw);
       } else {
         d.innerHTML = '<div class="row"><span class="grow muted">' + name + "</span><span class='pill'>" + t("redeemed") + " · " + R.fmtDay(rw.redeemed_at) + "</span></div>";

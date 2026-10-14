@@ -254,3 +254,11 @@ td input,td select{font-size:16px}
 
 /* v41: longer programme name in the staff header — let the header wrap on phones instead of overflowing */
 @media (max-width:520px){.staff .top{flex-wrap:wrap;row-gap:8px}.staff .top .row{margin-left:auto}}
+
+/* v42: reward QR fits inside the card on narrow phones */
+.reward .row .grow{min-width:0}.reward .code{overflow-wrap:anywhere}
+.qr.qr-rw{flex:none;padding:10px}.qr.qr-rw svg{width:120px;height:120px}
+@media (max-width:400px){.qr.qr-rw svg{width:104px;height:104px}}
+/* v42: a POS row already logged stays dimmed, but the manager's reverse form stays fully readable */
+.positem.done{opacity:1}.positem.done .pi-main>:not(.rev-box),.positem.done .pi-done{opacity:.6}
+.rev-box .rev-reason{color:#111;background:#fff;opacity:1;-webkit-text-fill-color:#111}.rev-box .rev-reason::placeholder{color:#6b6b6b;-webkit-text-fill-color:#6b6b6b}
