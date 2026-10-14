@@ -8,9 +8,9 @@
 <title>Roru Family — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f11">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f12">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f11"></script>
+<script src="/loyalty/loyalty.js?v=f12"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -362,7 +362,7 @@
     let k, h, sub = "", btn = null, btn2 = null;
     if (fav && favR) {
       if (favR.points_cost <= bal) { k = L.tonight; h = F(L.love, { f: favName }) + " 🍣"; sub = F(L.hasReady, { r: nm(favR, 1) }); btn = favR; }
-      else { k = L.save; h = F(L.love, { f: favName }) + " 🍣"; sub = F(L.has, { r: nm(favR, 1) }) + ", " + F(L.about, { v: visits(favR.points_cost - bal) }); if (best) { sub += " · " + F(L.useNow, { r: nm(best, 1) }); btn2 = best; } }
+      else { k = L.save; h = F(L.love, { f: favName }) + " 🍣"; sub = F(L.has, { r: nm(favR, 1) }) + (zh ? "，" : ", ") + F(L.about, { v: visits(favR.points_cost - bal) }); if (best) { sub += " · " + F(L.useNow, { r: nm(best, 1) }); btn2 = best; } }
     } else if (best) {
       if (next && next.points_cost - bal <= perVisit) { k = L.save; h = F(L.toNext, { v: L.v1, r: nm(next, 1) }); sub = F(L.useNow, { r: nm(best, 1) }); btn2 = best; }
       else { k = L.tonight; h = F(L.ready, { r: nm(best) }); btn = best; }
@@ -474,6 +474,8 @@
   $("#photo").addEventListener("change", async () => {
     const f = $("#photo").files[0]; if (!f) return;
     showScan("scanBusy"); $("#ocrBar").style.width = "5%";
+    // one-way fingerprint of the photo (the photo itself never leaves the phone): catches the same photo sent twice
+    state.imgHash = null; try { const hb = await crypto.subtle.digest("SHA-256", await f.arrayBuffer()); state.imgHash = [...new Uint8Array(hb)].map(b => b.toString(16).padStart(2, "0")).join(""); } catch (e) {}
     try {
       const cv = await downscale(f, 1600); $("#thumb").src = cv.toDataURL("image/jpeg", 0.6); $("#thumb").style.display = "block";
       if (!window.Tesseract) await new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
@@ -497,7 +499,7 @@
     const total = parseFloat(String($("#rTotal").value).replace(/[^0-9.]/g, "")); const at = $("#rAt").value ? new Date($("#rAt").value + ":00+08:00").toISOString() : null;
     const edited = !ocr.fromOcr || (ocr._no !== undefined && ($("#rNo").value !== ocr._no || $("#rTotal").value !== ocr._total));
     try {
-      const r = await R.rpc("family_submit_receipt", { p_token: state.token, p_receipt_no: $("#rNo").value.trim(), p_total_hkd: total, p_receipt_at: at, p_shop: ocr.shop, p_source: ocr.fromOcr && !edited ? "ocr" : "manual", p_ocr_confidence: ocr.conf, p_ocr_text: ocr.text });
+      const r = await R.rpc("family_submit_receipt", { p_token: state.token, p_receipt_no: $("#rNo").value.trim(), p_total_hkd: total, p_receipt_at: at, p_shop: ocr.shop, p_source: ocr.fromOcr && !edited ? "ocr" : "manual", p_ocr_confidence: ocr.conf, p_ocr_text: ocr.text, p_image_hash: ocr.fromOcr ? state.imgHash : null });
       showScan("scanIdle"); state.me = r.member;
       if (r.status === "split_requested") { R.toast(t("split_waiting"), 4000); }
       else if (r.status === "approved") { const g = r.visit && r.visit.gold; R.burst(g ? ["#E8B84A", "#F3D27A", "#F6F3E7"] : undefined); R.toast((g ? "✨ " + t("gold_hit") + " " : "") + t("added_points", { n: r.points }) + (r.visit && r.visit.added ? " · " + t("stamp_added") : "") + (r.visit && r.visit.referral_bonus ? " · 👯 +" + r.visit.referral_bonus : ""), 3500); state.lastPoints = r.member.points; state.lastStamps = r.member.visits_total; } else { R.toast(t("queued"), 4000); }

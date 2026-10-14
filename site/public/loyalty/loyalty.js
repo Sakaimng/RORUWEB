@@ -51,7 +51,7 @@ window.RORU = (function () {
       added_points: "+{n} points!", queued: "Sent to staff to check — points land once approved (usually same day).", pending_hint: "{n} receipt(s) waiting for staff approval",
       ladder: "Rewards", ladder_sub: "Use your points on any reward you've unlocked. Points come off when you tap Use; show the code at the counter.", lad_unlocked: "Unlocked", lad_locked: "Locked", lad_use: "Use", claim: "Use {n} pts", need_more: "{n} more", claimed: "Reward unlocked — scratch to reveal", upgrade: "Upgraded! The nori hid something better 🎉",
       receipts: "Your receipts", tier_line: "{spend} spent · {next}", tier_next: "{n} to {name}", kama_note: "Kama is by chef's invitation only",
-      err_receipt_already_used: "This receipt has already been used", err_receipt_too_old: "Receipts count within {h} hours", err_daily_receipt_limit: "Daily receipt limit reached — staff can add it for you", err_receipt_no_required: "Please enter the receipt number", err_bad_total: "Please check the total", err_not_enough_points: "Not enough points yet", err_receipt_in_future: "That date is in the future",
+      err_receipt_already_used: "This receipt has already been used", err_receipt_photo_already_used: "You've already sent this photo", err_receipt_too_old: "Receipts count within {h} hours", err_daily_receipt_limit: "Daily receipt limit reached — staff can add it for you", err_receipt_no_required: "Please enter the receipt number", err_bad_total: "Please check the total", err_not_enough_points: "Not enough points yet", err_receipt_in_future: "That date is in the future",
       install_tip: "Tip: add this page to your home screen"
     },
     zh: {
@@ -98,7 +98,7 @@ window.RORU = (function () {
       added_points: "+{n} 分！", queued: "已交由店員核實 — 批核後積分即到（通常當日）。", pending_hint: "{n} 張收據等待店員批核",
       ladder: "獎賞", ladder_sub: "已解鎖的獎賞可隨時用積分換領。按「換領」即扣分，到櫃枱出示代碼即可。", lad_unlocked: "已解鎖", lad_locked: "未解鎖", lad_use: "換領", claim: "用 {n} 分", need_more: "尚差 {n} 分", claimed: "獎賞解鎖 — 刮開紫菜看看", upgrade: "升級了！紫菜下有更好的 🎉",
       receipts: "你的收據", tier_line: "已消費 {spend} · {next}", tier_next: "再 {n} 升至 {name}", kama_note: "Kama 只限主廚邀請",
-      err_receipt_already_used: "此收據已經使用過", err_receipt_too_old: "收據須於 {h} 小時內", err_daily_receipt_limit: "已達每日收據上限 — 可請店員代為加入", err_receipt_no_required: "請輸入收據號碼", err_bad_total: "請核對總額", err_not_enough_points: "積分尚未足夠", err_receipt_in_future: "日期在未來",
+      err_receipt_already_used: "此收據已經使用過", err_receipt_photo_already_used: "你已經上載過這張相", err_receipt_too_old: "收據須於 {h} 小時內", err_daily_receipt_limit: "已達每日收據上限 — 可請店員代為加入", err_receipt_no_required: "請輸入收據號碼", err_bad_total: "請核對總額", err_not_enough_points: "積分尚未足夠", err_receipt_in_future: "日期在未來",
       install_tip: "提示：可將此頁加到主畫面"
     }
   };
@@ -113,7 +113,7 @@ window.RORU = (function () {
     if (!r.ok) { const e = new Error((body && body.message) || ("http_" + r.status)); e.code = (body && body.message) || ("http_" + r.status); throw e; }
     return body;
   }
-  const errText = (e) => { const m = { bad_phone: "err_bad_phone", wrong_code: "err_wrong_code", code_expired: "err_code_expired", consent_required: "err_consent", too_many_codes: "err_too_many", too_many_attempts: "err_too_many", receipt_already_used: "err_receipt_already_used", receipt_too_old: "err_receipt_too_old", daily_receipt_limit: "err_daily_receipt_limit", receipt_no_required: "err_receipt_no_required", bad_total: "err_bad_total", not_enough_points: "err_not_enough_points", receipt_in_future: "err_receipt_in_future" }; if (e.code && /^rejoin_after:/.test(e.code)) return t("err_rejoin", { d: fmtDay(e.code.split(":")[1]) }); if (!m[e.code] && e.code && (L[lang]["err_" + e.code] || L.en["err_" + e.code])) return t("err_" + e.code); return m[e.code] ? t(m[e.code], { h: 72 }) : (e.code && !/^http_|fetch/i.test(e.code) ? e.code : t("err_net")); };
+  const errText = (e) => { const m = { bad_phone: "err_bad_phone", wrong_code: "err_wrong_code", code_expired: "err_code_expired", consent_required: "err_consent", too_many_codes: "err_too_many", too_many_attempts: "err_too_many", receipt_already_used: "err_receipt_already_used", receipt_photo_already_used: "err_receipt_photo_already_used", receipt_too_old: "err_receipt_too_old", daily_receipt_limit: "err_daily_receipt_limit", receipt_no_required: "err_receipt_no_required", bad_total: "err_bad_total", not_enough_points: "err_not_enough_points", receipt_in_future: "err_receipt_in_future" }; if (e.code && /^rejoin_after:/.test(e.code)) return t("err_rejoin", { d: fmtDay(e.code.split(":")[1]) }); if (!m[e.code] && e.code && (L[lang]["err_" + e.code] || L.en["err_" + e.code])) return t("err_" + e.code); return m[e.code] ? t(m[e.code], { h: 72 }) : (e.code && !/^http_|fetch/i.test(e.code) ? e.code : t("err_net")); };
 
   async function sha256(s) { const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, "0")).join(""); }
   // Preview gate: the pages stay hidden behind a passcode during the dark phase. Resolves when open.
