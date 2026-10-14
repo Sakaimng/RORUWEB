@@ -217,6 +217,17 @@
     const saveStaff = async (tr, b, remove) => { const g = (n) => tr.querySelector("[name=" + n + "]"); b.disabled = true; try { await R.rpc("owner_set_staff", { p_token: st.sess.token, p_id: tr.dataset.id ? +tr.dataset.id : null, p_name: g("name").value, p_pin: g("pin").value || null, p_role: g("role").value, p_shop: g("shop").value, p_active: remove ? false : (g("active") ? g("active").checked : null) }); R.toast(remove ? "Removed ✓" : "Saved ✓"); load(); } catch (e) { R.toast(staffErr(e)); } b.disabled = false; };
     $("#tab-staff").querySelectorAll("[data-save]").forEach(b => b.onclick = () => saveStaff(b.closest("tr"), b, false));
     $("#tab-staff").querySelectorAll("[data-remove]").forEach(b => b.onclick = () => { if (confirm("Remove " + b.closest("tr").querySelector("[name=name]").value + "? Their PIN stops working; their history stays.")) saveStaff(b.closest("tr"), b, true); });
+    // v38: access log (PDPO accountability) — every staff lookup / QR scan / guest-card view, newest first
+    const loadAccess = async () => { let al = null; try { al = await R.rpc("owner_access_log", { p_token: st.sess.token, p_limit: 30 }); } catch (e) {}
+      const old = $("#accessLog"); if (old) old.remove(); const box = document.createElement("div"); box.id = "accessLog";
+      const ACT = { lookup: "Number lookup", scan: "QR / code scan", view: "Opened guest card" };
+      const when = (x) => new Date(x).toLocaleString("en-GB", { timeZone: "Asia/Hong_Kong", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+      box.innerHTML = '<div class="row" style="justify-content:space-between;align-items:center;margin-top:18px"><h2 style="margin:0">🔒 Access log</h2><button class="btn ghost sm" id="alRefresh">Refresh</button></div>' +
+        '<p class="muted small">Staff can see a guest\'s full number, birthday and spend. Every lookup, QR scan and guest-card view is recorded here with who and when (repeats within 2 minutes count on one line). Last 7 days: <b>' + (al ? al.total_7d : "—") + '</b> views.</p>' +
+        (al && al.rows.length ? '<table class="small"><tr><th>When</th><th>Staff</th><th>Guest</th><th>What</th></tr>' + al.rows.map(x => '<tr><td>' + when(x.last_at) + '</td><td>' + esc(x.staff_name || "—") + (x.staff_role && x.staff_role !== "staff" ? ' <span class="tiny" style="margin:0">' + esc(x.staff_role) + '</span>' : '') + '</td><td>' + esc(x.member_name || "—") + ' <span class="tiny" style="margin:0">' + esc(x.member_code) + (x.is_test ? ' · test' : '') + '</span></td><td>' + (ACT[x.action] || esc(x.action)) + (x.hits > 1 ? ' ×' + x.hits : '') + '</td></tr>').join("") + '</table>' : '<p class="muted small">' + (al ? "No staff views yet." : "Couldn't load the log.") + '</p>');
+      $("#tab-staff").appendChild(box); $("#alRefresh").onclick = loadAccess; };
+    loadAccess();
+
     if (!st.meMounted) { st.meMounted = true; window.RORU_MONTHEND.mount($("#tab-month"), () => st.sess.token); }
     // weekly slow nights + cool-off (friendly view of the same settings)
     const odds = (v) => "1 in " + Math.round(1 / Math.max(0.0001, +v || 0));

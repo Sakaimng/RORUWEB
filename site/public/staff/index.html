@@ -17,7 +17,26 @@
 <script src="/loyalty/vendor/qrcode.js"></script>
 <script src="/loyalty/loyalty.js?v=f13"></script>
 <script src="/loyalty/monthend.js?v=f13"></script>
-<style>body{overscroll-behavior:none}</style>
+<style>body{overscroll-behavior:none}
+.gcard{border:1px solid var(--line);background:var(--ink2);border-radius:18px;padding:14px 16px;margin:0 0 12px}
+.gcard .gh{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.gcard .gn{font-size:22px;font-weight:900;line-height:1.15}
+.gcard .bd{display:inline-block;padding:3px 10px;border-radius:99px;background:rgba(232,184,74,.16);color:var(--gold);font-size:13px;font-weight:900}
+.gcard .gl{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px;font-size:16px}
+.gcard .gl b{font-weight:900;letter-spacing:.01em}
+.gcard .gl .k{color:var(--muted);font-size:13px;margin-right:6px}
+.gcard .gs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.gcard .gs div{background:rgba(246,243,231,.05);border-radius:12px;padding:8px 10px;min-width:0}
+.gcard .gs small{display:block;color:var(--muted);font-size:11.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gcard .gs b{display:block;font-size:19px;font-weight:900;margin-top:2px;white-space:nowrap}
+.gcard .gx{margin-top:10px;font-size:14.5px;line-height:1.45}
+.gcard .gx .k{color:var(--muted)}
+.gcard details{margin-top:8px;font-size:13.5px;color:var(--muted)}
+.gcard summary{cursor:pointer;color:var(--cream);font-size:13.5px;list-style:none;display:inline-block;padding:2px 0}
+.gcard summary::-webkit-details-marker{display:none}
+.gcard .lg{margin-top:8px;font-size:11px;color:var(--muted)}
+@media (max-width:520px){.gcard .gs{grid-template-columns:repeat(2,1fr)}.gcard .gn{font-size:20px}}
+</style>
 </head>
 <body>
 <div class="staff" id="app" style="visibility:hidden">
@@ -55,6 +74,7 @@
       <div>
         <div id="members" class="members"></div>
         <div id="actions" class="hide">
+          <div id="gcard" class="gcard hide"></div>
           <div class="big">
             <button class="btn" id="addRoll">🧾 <span data-t="s_add"></span><small id="addSub"></small></button>
             <button class="btn ghost" id="visitBtn">🍣 <span data-t="s_visit"></span><small id="visitSub"></small></button>
@@ -89,11 +109,11 @@
   const R = window.RORU, t0 = R.t, $ = (s) => document.querySelector(s);
   // staff strings
   const S = { en: { s_login: "Staff sign in", s_login_sub: "Pick the shop, then enter your PIN.", s_pin_ph: "PIN", s_type: "Type the guest's number", s_scan: "Scan QR", s_demo: "Demo: ignore the 1-per-day limit",
-      s_add: "ADD BILL", s_visit: "VISIT ONLY", s_visit_sub: "stamp, no bill", s_add_sub2: "points + visit stamp", r_stamp: "+1 visit stamp", r_stamp_already: "Visit already stamped today", r_plate: "Plate full — visit reward unlocked!", r_visit_title: "Visit stamped 🍣", s_stamps: "stamps", s_bonus_checks: "Friend bonus checks", s_each: "each", r_gold_receipt: "✨ GOLD RECEIPT", s_rate: "earned at", s_now: "now", s_visit_log: "visit stamp", s_redeem: "REDEEM", s_today: "Today", s_queue: "To approve", s_total: "Bill total HK$", s_rno: "Receipt no. (optional)", s_award: "Add points", s_approve: "Approve", s_reject: "Reject", s_queue_empty: "Nothing waiting", s_pts: "pts", r_points: "+{n} points", s_back: "Back", s_find: "Type at least 4 digits", s_none: "No member found — ask them to join at rorubaru.com/family", s_already: "Already has today's roll", s_visited: "today ✓",
+      s_add: "ADD BILL", g_life: "Lifetime spend", g_12m: "Last 12 months", g_visits: "Visits", g_avg: "Avg / visit", g_last: "Last visit", g_fav: "Favourites", g_more: "More", g_since: "Member since", g_receipts: "Approved receipts", g_code: "Member code", g_bday: "Birthday", g_nobday: "not given", g_bd_today: "🎂 Birthday today!", g_bd_week: "🎂 Birthday this week", g_bd_month: "🎂 Birthday month", g_today: "today", g_yday: "yesterday", g_ago: "{n} days ago", g_never: "no visits yet", g_hand: " hand roll", g_logged: "Guest views are logged for privacy (PDPO).", g_loading: "Loading guest…", s_visit: "VISIT ONLY", s_visit_sub: "stamp, no bill", s_add_sub2: "points + visit stamp", r_stamp: "+1 visit stamp", r_stamp_already: "Visit already stamped today", r_plate: "Plate full — visit reward unlocked!", r_visit_title: "Visit stamped 🍣", s_stamps: "stamps", s_bonus_checks: "Friend bonus checks", s_each: "each", r_gold_receipt: "✨ GOLD RECEIPT", s_rate: "earned at", s_now: "now", s_visit_log: "visit stamp", s_redeem: "REDEEM", s_today: "Today", s_queue: "To approve", s_total: "Bill total HK$", s_rno: "Receipt no. (optional)", s_award: "Add points", s_approve: "Approve", s_reject: "Reject", s_queue_empty: "Nothing waiting", s_pts: "pts", r_points: "+{n} points", s_back: "Back", s_find: "Type at least 4 digits", s_none: "No member found — ask them to join at rorubaru.com/family", s_already: "Already has today's roll", s_visited: "today ✓",
       r_added: "+1 roll", r_gold: "GOLD ROLL!", r_gold_sub: "Give the gold treat 🎉", r_bonus: "+1 bonus roll (streak)", r_full: "Plate full — reward unlocked", r_full_sub: "They scratch the nori on their phone", r_redeemed: "Redeemed ✓", r_already: "Already got today's roll", r_already_sub: "One roll per guest per day", r_err: "Didn't work",
       wrong_pin: "Wrong PIN", locked_try_later: "Too many tries — wait 15 min", pending_none: "No rewards to redeem", rolls_lbl: "rolls", cam_err: "Camera not available — type the number instead", logout: "Sign out", s_pos: "Log on POS", s_pos_sub: "Ring each item, then tap once", s_pos_give: "GIVE", s_pos_ring: "Ring on POS", s_pos_log: "Logged on POS ✓", s_pos_done: "Logged", s_pos_not: "Not logged yet", s_pos_none: "Nothing to log", s_upgraded: "UPGRADED", s_from: "Guest claimed", s_pos_more: "Show {n} more" },
     zh: { s_login: "店員登入", s_login_sub: "選擇分店，然後輸入你的 PIN。", s_pin_ph: "PIN", s_type: "輸入客人電話號碼", s_scan: "掃描 QR", s_demo: "示範：忽略每日一次限制",
-      s_add: "加單", s_visit: "只蓋到訪印", s_visit_sub: "無單據，只蓋印", s_add_sub2: "積分 + 到訪印", r_stamp: "+1 到訪印", r_stamp_already: "今日已蓋過到訪印", r_plate: "集齊一碟 — 到訪獎賞解鎖！", r_visit_title: "已蓋到訪印 🍣", s_stamps: "個印", s_bonus_checks: "朋友獎賞核實", s_each: "每人", r_gold_receipt: "✨ 金色收據", s_rate: "倍數", s_now: "升至", s_visit_log: "到訪印", s_redeem: "兌換", s_today: "今日", s_queue: "待批核", s_total: "帳單總額 HK$", s_rno: "收據號碼（可選）", s_award: "加積分", s_approve: "批核", s_reject: "拒絕", s_queue_empty: "沒有待批核", s_pts: "分", r_points: "+{n} 分", s_back: "返回", s_find: "請輸入至少 4 位數字", s_none: "找不到會員 — 請客人到 rorubaru.com/family 加入", s_already: "今日已加過", s_visited: "今日 ✓",
+      s_add: "加單", g_life: "累計消費", g_12m: "過去 12 個月", g_visits: "到訪次數", g_avg: "每次平均", g_last: "上次到訪", g_fav: "最愛", g_more: "更多", g_since: "入會日期", g_receipts: "已批核收據", g_code: "會員編號", g_bday: "生日", g_nobday: "未提供", g_bd_today: "🎂 今日生日！", g_bd_week: "🎂 本星期生日", g_bd_month: "🎂 生日月", g_today: "今日", g_yday: "昨日", g_ago: "{n} 日前", g_never: "未有到訪", g_hand: "手卷", g_logged: "查閱會員資料會被記錄（私隱條例）。", g_loading: "載入中…", s_visit: "只蓋到訪印", s_visit_sub: "無單據，只蓋印", s_add_sub2: "積分 + 到訪印", r_stamp: "+1 到訪印", r_stamp_already: "今日已蓋過到訪印", r_plate: "集齊一碟 — 到訪獎賞解鎖！", r_visit_title: "已蓋到訪印 🍣", s_stamps: "個印", s_bonus_checks: "朋友獎賞核實", s_each: "每人", r_gold_receipt: "✨ 金色收據", s_rate: "倍數", s_now: "升至", s_visit_log: "到訪印", s_redeem: "兌換", s_today: "今日", s_queue: "待批核", s_total: "帳單總額 HK$", s_rno: "收據號碼（可選）", s_award: "加積分", s_approve: "批核", s_reject: "拒絕", s_queue_empty: "沒有待批核", s_pts: "分", r_points: "+{n} 分", s_back: "返回", s_find: "請輸入至少 4 位數字", s_none: "找不到會員 — 請客人到 rorubaru.com/family 加入", s_already: "今日已加過", s_visited: "今日 ✓",
       r_added: "+1 手卷", r_gold: "金色手卷！", r_gold_sub: "請送上金色小禮 🎉", r_bonus: "+1 額外手卷（連續到訪）", r_full: "集齊一碟 — 獎賞解鎖", r_full_sub: "客人在手機刮開紫菜", r_redeemed: "已兌換 ✓", r_already: "今日已經加過", r_already_sub: "每位客人每日一個手卷", r_err: "未能完成",
       wrong_pin: "PIN 錯誤", locked_try_later: "嘗試太多次 — 請等 15 分鐘", pending_none: "沒有可兌換的獎賞", rolls_lbl: "手卷", cam_err: "無法使用相機 — 請輸入號碼", logout: "登出", s_pos: "POS 記錄", s_pos_sub: "先在 POS 入單，再按一下", s_pos_give: "送出", s_pos_ring: "POS 入單", s_pos_log: "已入 POS ✓", s_pos_done: "已記錄", s_pos_not: "未記錄", s_pos_none: "暫時沒有", s_upgraded: "已升級", s_from: "客人原本換", s_pos_more: "再顯示 {n} 項" } };
   const t = (k, v) => { let s = (S[R.lang()] && S[R.lang()][k]) || S.en[k]; if (!s) return t0(k, v); if (v) for (const x in v) s = s.replace("{" + x + "}", v[x]); return s; };
@@ -133,7 +153,7 @@
     const digits = st.num.replace(/\D/g, "");
     if (digits.length < 4 && !/^[A-Z0-9]{8}$/.test(st.num)) { st.members = []; $("#members").innerHTML = st.num ? '<p class="muted small">' + t("s_find") + "</p>" : ""; return; }
     try { st.members = await R.rpc("staff_lookup", { p_token: st.sess.token, p_query: st.num }); } catch (e) { if (e.code === "staff_not_signed_in") { $("#logout").click(); return; } st.members = []; }
-    renderMembers(); if (st.members.length === 1 && digits.length >= 8) select(st.members[0]);
+    renderMembers(); if (st.members.length === 1 && (digits.length >= 8 || st.members[0].member_code === st.num)) select(st.members[0]);
   }
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const tierName = (k) => R.t("tier_" + (k || "nori"));
@@ -167,6 +187,27 @@
     st.sel = m; renderMembers(); $("#actions").classList.remove("hide"); $("#award").classList.add("hide"); $("#queue").classList.add("hide");
     $("#addSub").textContent = t("s_add_sub2") + " · " + tierName(m.tier) + " " + mult(m.multiplier); $("#visitSub").textContent = m.visited_today ? t("r_stamp_already") : t("s_visit_sub") + " · 🍣 " + m.stamps + "/" + m.per_plate; $("#visitBtn").disabled = false; $("#redeemSub").textContent = m.pending_rewards ? m.pending_rewards + " 🎁" : t("pending_none");
     $("#redeemBtn").disabled = !m.pending_rewards; $("#pending").innerHTML = ""; $("#addRoll").disabled = false;
+    loadCard(m);
+  }
+  // Guest card (v38, Dominic's call Oct 14): full phone, birthday, spending background. Server logs every view (owner → Staff & roles → Access log).
+  const money = (n) => "HK$" + Math.round(+n || 0).toLocaleString("en-US");
+  const fmtD = (iso) => { if (!iso) return "—"; const [y, mo, d] = String(iso).slice(0, 10).split("-").map(Number); return R.lang() === "zh" ? mo + "月" + d + "日" : d + " " + ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][mo - 1] + (y && y !== new Date().getFullYear() ? " " + y : ""); };
+  const fmtMd = (md) => md ? fmtD("2000-" + md).replace(" 2000", "") : t("g_nobday");
+  const favName = (f) => R.lang() === "zh" ? (f.name_zh || f.name_en) + (f.kind === "roll" ? t("g_hand") : "") : f.name_en + (f.kind === "roll" ? t("g_hand") : "");
+  async function loadCard(m) {
+    const box = $("#gcard"); box.classList.remove("hide"); box.innerHTML = '<p class="muted small" style="margin:0">' + t("g_loading") + "</p>";
+    let me; try { me = await R.rpc("staff_member", { p_token: st.sess.token, p_who: m.member_code }); } catch (e) { if (st.sel === m) box.classList.add("hide"); return; }
+    if (st.sel !== m || !me || !me.profile) return; st.card = me; renderCard(me);
+  }
+  function renderCard(me) {
+    const p = me.profile, box = $("#gcard"); const ago = p.days_since_visit == null ? "" : p.days_since_visit === 0 ? t("g_today") : p.days_since_visit === 1 ? t("g_yday") : t("g_ago", { n: p.days_since_visit });
+    const bd = p.birthday_tag ? '<span class="bd">' + t("g_bd_" + p.birthday_tag) + "</span>" : "";
+    box.innerHTML = '<div class="gh"><span class="gn">' + esc(me.name || "—") + '</span><span class="tag-tier t-' + me.tier + '" style="margin:0">' + tierName(me.tier) + " " + mult(me.multiplier) + "</span>" + bd + "</div>" +
+      '<div class="gl"><span><span class="k">📞</span><b id="gPhone">' + esc(p.phone) + '</b></span><span><span class="k">🎂 ' + t("g_bday") + "</span><b>" + esc(fmtMd(p.birthday_md)) + "</b></span></div>" +
+      '<div class="gs"><div><small>' + t("g_life") + "</small><b>" + money(p.spend_lifetime) + "</b></div><div><small>" + t("g_12m") + "</small><b>" + money(p.spend_12m) + "</b></div><div><small>" + t("g_visits") + "</small><b>" + (p.visits || 0) + "</b></div><div><small>" + t("g_avg") + "</small><b>" + (p.avg_per_visit ? money(p.avg_per_visit) : "—") + "</b></div></div>" +
+      '<div class="gx"><span class="k">' + t("g_last") + ":</span> " + (p.last_visit ? esc(fmtD(p.last_visit)) + " (" + ago + ")" : t("g_never")) +
+      (p.favourites && p.favourites.length ? '<br><span class="k">' + t("g_fav") + ":</span> " + p.favourites.map(f => esc(favName(f))).join(", ") : "") + "</div>" +
+      "<details><summary>▸ " + t("g_more") + "</summary><div>" + t("g_since") + ": " + esc(fmtD(p.member_since)) + " · " + t("g_receipts") + ": " + (p.receipts || 0) + " · " + t("g_code") + ": " + esc(me.member_code) + '</div><div class="lg">' + t("g_logged") + "</div></details>";
   }
   $("#addRoll").onclick = () => { if (!st.sel) return; $("#award").classList.remove("hide"); $("#aTotal").value = ""; $("#aNo").value = ""; $("#aErr").classList.add("hide"); setTimeout(() => $("#aTotal").focus(), 50); };
   $("#aBack").onclick = () => $("#award").classList.add("hide");
@@ -225,7 +266,7 @@
       $("#posList").querySelectorAll("[data-poslog]").forEach(b => b.onclick = async () => { b.disabled = true; try { await R.rpc("staff_pos_log", { p_token: st.sess.token, p_code: b.dataset.poslog }); loadPos(); } catch (e) { b.disabled = false; show("⚠️", t("r_err"), R.errText(e), ""); } });
     } catch (e) {}
   }
-  function reset() { st.num = ""; st.sel = null; st.members = []; renderDisp(); $("#members").innerHTML = ""; $("#actions").classList.add("hide"); $("#award").classList.add("hide"); $("#pending").innerHTML = ""; }
+  function reset() { st.num = ""; st.sel = null; st.members = []; renderDisp(); $("#members").innerHTML = ""; $("#actions").classList.add("hide"); $("#award").classList.add("hide"); $("#pending").innerHTML = ""; $("#gcard").classList.add("hide"); $("#gcard").innerHTML = ""; st.card = null; }
   function show(ico, title, sub, cls) { $("#rIco").textContent = ico; $("#rTitle").textContent = title; $("#rSub").textContent = sub; const el = $("#result"); el.className = "result show " + cls; clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 4000); }
   $("#rOk").onclick = () => $("#result").classList.remove("show"); $("#result").onclick = (e) => { if (e.target === $("#result")) $("#result").classList.remove("show"); };
 
@@ -251,7 +292,7 @@
 
   function render() { R.applyI18n(); document.querySelectorAll("[data-t]").forEach(el => { if (S.en[el.dataset.t]) el.textContent = t(el.dataset.t); }); renderShops();
     const on = !!st.sess; $("#login").classList.toggle("hide", on); $("#main").classList.toggle("hide", !on); $("#logout").classList.toggle("hide", !on);
-    $("#who").textContent = on ? st.sess.staff.name + (st.sess.staff.role && st.sess.staff.role !== "staff" ? " (" + (st.sess.staff.role === "owner" ? "Owner" : "Manager") + ")" : "") + " · " + shopName(st.shop) : ""; $("#monthCard").classList.toggle("hide", !(on && ["manager", "owner"].includes(st.sess.staff.role))); if (on && ["manager", "owner"].includes(st.sess.staff.role) && !st.meMounted) { st.meMounted = true; window.RORU_MONTHEND.mount($("#monthCard"), () => st.sess.token); } if (!on) st.meMounted = false; renderDisp(); renderToday(); }
+    $("#who").textContent = on ? st.sess.staff.name + (st.sess.staff.role && st.sess.staff.role !== "staff" ? " (" + (st.sess.staff.role === "owner" ? "Owner" : "Manager") + ")" : "") + " · " + shopName(st.shop) : ""; $("#monthCard").classList.toggle("hide", !(on && ["manager", "owner"].includes(st.sess.staff.role))); if (on && ["manager", "owner"].includes(st.sess.staff.role) && !st.meMounted) { st.meMounted = true; window.RORU_MONTHEND.mount($("#monthCard"), () => st.sess.token); } if (!on) st.meMounted = false; renderDisp(); renderToday(); if (on && st.card && st.sel) { renderCard(st.card); renderMembers(); } }
   document.addEventListener("roru:lang", () => { render(); loadPos(); });
   render(); if (st.sess) { try { await R.rpc("staff_today", { p_token: st.sess.token }); } catch (e) { if (e.code === "staff_not_signed_in") { st.sess = null; localStorage.removeItem("roru_staff"); render(); } } loadToday(); }
   setInterval(() => { if (document.visibilityState === "visible" && st.sess) loadToday(); }, 30000);
