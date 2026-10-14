@@ -8,10 +8,10 @@
 <title>Roru Family — Owner</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f16">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f17">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f16"></script>
-<script src="/loyalty/monthend.js?v=f16"></script>
+<script src="/loyalty/loyalty.js?v=f17"></script>
+<script src="/loyalty/monthend.js?v=f17"></script>
 <style>
 /* v36 owner dashboard */
 .dash{margin:16px 0 18px}
@@ -268,13 +268,16 @@
       '<table>' + UPR.map(u => '<tr data-up="' + u[3] + '"><td><b>' + u[0] + '</b><div class="small muted">' + u[1] + '</div></td><td>' + (u[2] ? sw(u[2]) : "") + '</td><td style="white-space:nowrap">' + oddsIn(u[3]) + '</td></tr>').join("") + '</table>' +
       (ulog && ulog.recent.length ? '<h2 style="font-size:15px">Recent claims</h2><table class="small"><tr><th>When</th><th>Guest</th><th>Rule</th><th>Result</th></tr>' + ulog.recent.slice(0, 8).map(x => '<tr><td>' + new Date(x.earned_at).toLocaleString("en-GB", { timeZone: "Asia/Hong_Kong", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) + '</td><td>' + esc(x.who) + (x.is_test ? ' <span class="tiny" style="margin:0">test</span>' : '') + '</td><td>' + (RULE[x.rule] || esc(x.rule)) + ' · 1 in ' + oneIn(x.odds) + '</td><td>' + (x.upgraded ? "⬆️ " + esc(x.asked) + " → <b>" + esc(x.got) + "</b>" : esc(x.asked)) + '</td></tr>').join("") + '</table>' : '') + '</div>';
     const sgHtml = '<div class="card" id="suggestSet" style="margin:0 0 14px"><h2 style="margin:0 0 6px">✦ Suggested for you (guest page)</h2><p class="muted small">One card at the top of each guest\'s page: the reward they can use now, or how close the next one is (in visits, never a points number). Once a guest has 2+ scanned receipts, it also uses what they ordered (read from the receipt text against our menu; no photos are kept).</p><table><tr><td><b>Show the card</b></td><td>' + sw("suggest_card_on") + '</td></tr><tr><td><b>Use items from scanned receipts</b><div class="small muted">Off = points-only suggestions; stops reading items from new receipts</div></td><td>' + sw("suggest_items_on") + '</td></tr></table></div>';
-    $("#tab-settings").innerHTML = upHtml + sgHtml + '<p class="muted small">All placeholders — change any number and tap Save; it applies to the next receipt or visit. (otp_test_mode=true means no SMS is sent and the code is fixed; that switches off at launch.)</p><table>' +
+    const tmCur = [30, 60, 90, 120].includes(+d.settings.staff_card_timeout_s) ? +d.settings.staff_card_timeout_s : 60;
+    const tmHtml = '<div class="card" id="cardTimeout" style="margin:0 0 14px"><h2 style="margin:0 0 6px">🔒 Staff iPad: guest card auto-close <span class="muted" style="font-weight:500">· 員工 iPad 自動關閉客人資料</span></h2><p class="muted small">After staff open a guest, their card (phone, birthday, spend) closes by itself when nobody taps the iPad for this long. Staff see a countdown in the last 10 seconds; any tap restarts it. "Done ✓ Next guest" closes it at once. Staff stay signed in.<br>客人資料喺無人操作一段時間後會自動關閉，最後 10 秒會倒數；按一下就重新計時。店員唔會被登出。</p><div class="row" style="gap:8px;align-items:center;flex-wrap:wrap"><select id="tmSel" style="font-size:16px;padding:8px 10px;border-radius:10px">' + [30, 60, 90, 120].map(v => '<option value="' + v + '"' + (v === tmCur ? " selected" : "") + ">" + v + " s / 秒" + (v === 60 ? " (default 預設)" : "") + "</option>").join("") + '</select><button class="btn sm" id="tmSave">Save</button></div></div>';
+    $("#tab-settings").innerHTML = tmHtml + upHtml + sgHtml + '<p class="muted small">All placeholders — change any number and tap Save; it applies to the next receipt or visit. (otp_test_mode=true means no SMS is sent and the code is fixed; that switches off at launch.)</p><table>' +
       Object.keys(EDIT).map(k => '<tr data-k="' + k + '"><td>' + EDIT[k] + '<div class="tiny" style="margin:0">' + k + '</div></td><td><input name="v" inputmode="decimal" value="' + esc(d.settings[k]) + '" style="width:120px"></td><td><button class="btn sm" data-setsave>Save</button></td></tr>').join("") + '</table><h2>Read-only</h2><table>' +
-      Object.entries(d.settings).filter(x => !EDIT[x[0]] && !/^(upgrade_|suggest_)/.test(x[0])).sort().map(x => "<tr><td>" + esc(x[0]) + "</td><td><b>" + esc(x[1]) + "</b></td></tr>").join("") + "</table>";
+      Object.entries(d.settings).filter(x => !EDIT[x[0]] && !/^(upgrade_|suggest_|staff_card_timeout_s)/.test(x[0])).sort().map(x => "<tr><td>" + esc(x[0]) + "</td><td><b>" + esc(x[1]) + "</b></td></tr>").join("") + "</table>";
     const upSave = async (k, v, el) => { if (el) el.disabled = true; try { await R.rpc("owner_save_setting", { p_token: st.sess.token, p_key: k, p_value: String(v) }); R.toast("Saved ✓"); load(); } catch (e) { R.toast(e.code === "bad_value" ? "That value isn't allowed" : R.errText(e)); if (el) el.disabled = false; } };
     $("#suggestSet").querySelectorAll("[data-uk]").forEach(cb => cb.onchange = () => upSave(cb.dataset.uk, cb.checked ? 1 : 0, cb));
     $("#upgradeOdds").querySelectorAll("[data-uk]").forEach(cb => cb.onchange = () => upSave(cb.dataset.uk, cb.checked ? 1 : 0, cb));
     $("#upgradeOdds").querySelectorAll("[data-uosave]").forEach(b => b.onclick = () => { const n = Math.round(+$("#upgradeOdds").querySelector('[data-uo="' + b.dataset.uosave + '"]').value); if (!(n >= 1 && n <= 1000)) { R.toast("Use a whole number, 1 in 1 to 1 in 1000"); return; } upSave(b.dataset.uosave, (1 / n).toFixed(6), b); });
+    $("#tmSave").onclick = () => upSave("staff_card_timeout_s", $("#tmSel").value, $("#tmSave"));
     $("#upDaysSave").onclick = () => upSave("upgrade_lapsed_days", $("#upDays").value, $("#upDaysSave"));
     $("#tab-settings").querySelectorAll("[data-setsave]").forEach(b => b.onclick = async () => { const tr = b.closest("tr"); b.disabled = true; try { await R.rpc("owner_save_setting", { p_token: st.sess.token, p_key: tr.dataset.k, p_value: tr.querySelector("[name=v]").value }); R.toast("Saved ✓"); load(); } catch (e) { R.toast(e.code === "bad_value" ? "That value isn't allowed" : R.errText(e)); b.disabled = false; } });
     try { const x = await R.rpc("owner_extras", { p_token: st.sess.token });

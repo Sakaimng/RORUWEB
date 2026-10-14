@@ -8,9 +8,9 @@
 <title>Roru Family — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f16">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f17">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f16"></script>
+<script src="/loyalty/loyalty.js?v=f17"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -218,9 +218,15 @@
   $("#consent").addEventListener("change", () => { $("#btnJoin").disabled = !$("#consent").checked; });
 
   // ----- member -----
+  let lastTouch = 0; ["pointerdown", "touchstart", "keydown"].forEach(ev => document.addEventListener(ev, () => { lastTouch = Date.now(); }, { capture: true, passive: true }));
+  const guestBusy = () => Date.now() - lastTouch < 8000 || !!document.querySelector(".ask-sheet") || !!document.querySelector('.scratch[data-touched="1"]') || /^(INPUT|SELECT|TEXTAREA)$/.test((document.activeElement || {}).tagName || "");
   async function load(quiet) {
     if (!state.token) { render(); return; }
-    try { const me = await R.rpc("family_me", { p_token: state.token }); state.me = me; render(); if (localStorage.getItem("roru_ref")) trySetReferrer(true); if (localStorage.getItem("roru_unsub")) { localStorage.removeItem("roru_unsub"); setConsents({ p_whatsapp: false, p_push: false, p_source: "unsubscribe" }, t("unsub_done")); $("#privacyCard").scrollIntoView(); } }
+    try { const me = await R.rpc("family_me", { p_token: state.token });
+      // v40: the 10 s live refresh never redraws over what the guest is doing (half-scratched nori, an open sheet, a field being typed, a tap in the last 8 s) and skips the redraw when nothing changed
+      if (quiet && state.me && JSON.stringify(me) === JSON.stringify(state.me)) return;
+      if (quiet && guestBusy()) return;
+      state.me = me; render(); if (localStorage.getItem("roru_ref")) trySetReferrer(true); if (localStorage.getItem("roru_unsub")) { localStorage.removeItem("roru_unsub"); setConsents({ p_whatsapp: false, p_push: false, p_source: "unsubscribe" }, t("unsub_done")); $("#privacyCard").scrollIntoView(); } }
     catch (e) { if (e.code === "not_signed_in") { localStorage.removeItem("roru_member_token"); state.token = null; state.me = null; render(); } else if (!quiet) R.toast(R.errText(e)); }
   }
   const tierName = (k) => t("tier_" + (k || "nori"));
@@ -596,7 +602,7 @@
     const paint = () => { ctx.fillStyle = "#1d2a1c"; ctx.fillRect(0, 0, c.width, c.height); for (let i = 0; i < 700; i++) { ctx.fillStyle = "rgba(" + (10 + Math.random() * 30) + "," + (30 + Math.random() * 40) + "," + (15 + Math.random() * 25) + ",.6)"; ctx.fillRect(Math.random() * c.width, Math.random() * c.height, 4 * devicePixelRatio, 4 * devicePixelRatio); } ctx.fillStyle = "rgba(246,243,231,.85)"; ctx.font = "900 " + (16 * devicePixelRatio) + "px Geist, sans-serif"; ctx.textAlign = "center"; ctx.fillText(t("scratch"), c.width / 2, c.height / 2 + 6 * devicePixelRatio); };
     let down = false, cleared = 0, done = false;
     const pt = (e) => { const r = c.getBoundingClientRect(); const p = e.touches ? e.touches[0] : e; return [(p.clientX - r.left) * devicePixelRatio, (p.clientY - r.top) * devicePixelRatio]; };
-    const scratch = (e) => { if (!down || done) return; e.preventDefault(); const [x, y] = pt(e); ctx.globalCompositeOperation = "destination-out"; ctx.beginPath(); ctx.arc(x, y, 26 * devicePixelRatio, 0, Math.PI * 2); ctx.fill(); ctx.globalCompositeOperation = "source-over"; if (++cleared % 12 === 0) check(); };
+    const scratch = (e) => { if (!down || done) return; e.preventDefault(); el.dataset.touched = "1"; const [x, y] = pt(e); ctx.globalCompositeOperation = "destination-out"; ctx.beginPath(); ctx.arc(x, y, 26 * devicePixelRatio, 0, Math.PI * 2); ctx.fill(); ctx.globalCompositeOperation = "source-over"; if (++cleared % 12 === 0) check(); };
     const check = () => { const d = ctx.getImageData(0, 0, c.width, c.height).data; let clear = 0; for (let i = 3; i < d.length; i += 16 * 4) if (d[i] === 0) clear++; if (clear / (d.length / 64) > 0.45) reveal(); };
     const reveal = async () => { if (done) return; done = true; c.style.transition = "opacity .5s"; c.style.opacity = 0; R.burst(); try { state.me = await R.rpc("family_reveal", { p_token: state.token, p_redemption_id: id }); setTimeout(render, 900); } catch (e) { R.toast(R.errText(e)); } };
     c.addEventListener("pointerdown", e => { down = true; scratch(e); }); c.addEventListener("pointermove", scratch); window.addEventListener("pointerup", () => down = false);
