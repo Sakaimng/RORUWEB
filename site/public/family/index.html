@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="theme-color" content="#0b0d12">
-<title>Roru Family — RORUBARU</title>
+<title data-tt="{prog} — RORUBARU">High Rollers — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f17">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f19">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f17"></script>
+<script src="/loyalty/loyalty.js?v=f19"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -330,7 +330,7 @@
     }
     $("#goldLine").classList.toggle("hide", !(me.gold && me.gold.on)); if (me.gold && me.gold.on) $("#goldLine").textContent = t("gold_line2", { o: Math.round(1 / Math.max(0.0001, me.gold.odds)), x: multTxt(me.gold.mult) });
   }
-  async function shareInvite() { const u = inviteUrl(state.me.member_code); try { if (navigator.share) { await navigator.share({ title: "Roru Family", text: t("share_text"), url: u }); return; } } catch (e) { return; } copyInvite(); }
+  async function shareInvite() { const u = inviteUrl(state.me.member_code); try { if (navigator.share) { await navigator.share({ title: R.prog(), text: t("share_text"), url: u }); return; } } catch (e) { return; } copyInvite(); }
   async function copyInvite() { const u = inviteUrl(state.me.member_code); try { await navigator.clipboard.writeText(u); R.toast(t("copied")); } catch (e) { const ta = document.createElement("textarea"); ta.value = u; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); R.toast(t("copied")); } catch (e2) {} ta.remove(); } }
   $("#friendShare").onclick = shareInvite; $("#friendCopy").onclick = copyInvite;
 

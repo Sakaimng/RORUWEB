@@ -9,14 +9,14 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Roru Staff">
-<title>Roru Staff — RORUBARU</title>
+<title data-tt="{prog} · Staff — RORUBARU">High Rollers · Staff — RORUBARU</title>
 <link rel="manifest" href="/loyalty/staff.webmanifest">
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f17">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f19">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f17"></script>
-<script src="/loyalty/monthend.js?v=f17"></script>
+<script src="/loyalty/loyalty.js?v=f19"></script>
+<script src="/loyalty/monthend.js?v=f19"></script>
 <style>body{overscroll-behavior:none}
 .gcard{border:1px solid var(--line);background:var(--ink2);border-radius:18px;padding:14px 16px;margin:0 0 12px}
 .gcard .gh{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
@@ -49,7 +49,7 @@
 <body>
 <div class="staff" id="app" style="visibility:hidden">
   <div class="top">
-    <div class="brand"><img src="/logo.png" alt="RORUBARU"><span class="fam">Roru Staff</span></div>
+    <div class="brand"><img src="/logo.png" alt="RORUBARU"><span class="fam" data-t="staff_brand">High Rollers · Staff</span></div>
     <div class="row">
       <span class="pill" id="who"></span>
       <div class="langs"><button data-lang="en">EN</button><button data-lang="zh">繁中</button></div>
@@ -127,7 +127,7 @@
       s_add: "加單", g_life: "累計消費", g_12m: "過去 12 個月", g_visits: "到訪次數", g_avg: "每次平均", g_last: "上次到訪", g_fav: "最愛", g_more: "更多", g_since: "入會日期", g_receipts: "已批核收據", g_code: "會員編號", g_bday: "生日", g_nobday: "未提供", g_bd_today: "🎂 今日生日！", g_bd_week: "🎂 本星期生日", g_bd_month: "🎂 生日月", g_today: "今日", g_yday: "昨日", g_ago: "{n} 日前", g_never: "未有到訪", g_hand: "手卷", g_logged: "查閱會員資料會被記錄（私隱條例）。", g_loading: "載入中…", s_visit: "只蓋到訪印", s_visit_sub: "無單據，只蓋印", s_add_sub2: "積分 + 到訪印", r_stamp: "+1 到訪印", r_stamp_already: "今日已蓋過到訪印", r_plate: "集齊一碟 — 到訪獎賞解鎖！", r_visit_title: "已蓋到訪印 🍣", s_stamps: "個印", s_bonus_checks: "朋友獎賞核實", s_each: "每人", r_gold_receipt: "✨ 金色收據", s_rate: "倍數", s_now: "升至", s_visit_log: "到訪印", s_redeem: "兌換", s_today: "今日", s_queue: "待批核", s_total: "帳單總額 HK$", s_rno: "收據號碼（可選）", s_award: "加積分", s_approve: "批核", s_reject: "拒絕", s_queue_empty: "沒有待批核", s_pts: "分", r_points: "+{n} 分", s_back: "返回", s_find: "請輸入至少 4 位數字", s_none: "找不到會員 — 請客人到 rorubaru.com/family 加入", s_already: "今日已加過", s_visited: "今日 ✓",
       r_added: "+1 手卷", r_gold: "金色手卷！", r_gold_sub: "請送上金色小禮 🎉", r_bonus: "+1 額外手卷（連續到訪）", r_full: "集齊一碟 — 獎賞解鎖", r_full_sub: "客人在手機刮開紫菜", r_redeemed: "已兌換 ✓", r_already: "今日已經加過", r_already_sub: "每位客人每日一個手卷", r_err: "未能完成",
       wrong_pin: "PIN 錯誤", locked_try_later: "嘗試太多次 — 請等 15 分鐘", pending_none: "沒有可兌換的獎賞", rolls_lbl: "手卷", cam_err: "無法使用相機 — 請輸入號碼", logout: "登出", s_pos: "POS 記錄", s_pos_sub: "先在 POS 入單，再按一下", s_pos_give: "送出", s_pos_ring: "POS 入單", s_pos_log: "已入 POS ✓", s_pos_done: "已記錄", s_pos_not: "未記錄", s_pos_none: "暫時沒有", s_upgraded: "已升級", s_from: "客人原本換", s_pos_more: "再顯示 {n} 項", s_done: "完成 ✓ 下一位", s_closing: "{n} 秒後關閉", s_closing_long: "{n} 秒無操作會自動關閉" } };
-  const t = (k, v) => { let s = (S[R.lang()] && S[R.lang()][k]) || S.en[k]; if (!s) return t0(k, v); if (v) for (const x in v) s = s.replace("{" + x + "}", v[x]); return s; };
+  const t = (k, v) => { let s = (S[R.lang()] && S[R.lang()][k]) || S.en[k]; if (!s) return t0(k, v); if (v) for (const x in v) s = s.replace("{" + x + "}", v[x]); return s.split("{prog}").join(R.prog()); };
   await R.gate(); $("#app").style.visibility = "visible";
   document.querySelectorAll(".langs button").forEach(b => b.onclick = () => { R.setLang(b.dataset.lang); render(); });
   const st = { sess: JSON.parse(localStorage.getItem("roru_staff") || "null"), cfg: null, shop: localStorage.getItem("roru_shop") || "wanchai", pin: "", num: "", members: [], sel: null, me: null, today: null, stream: null };

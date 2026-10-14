@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="theme-color" content="#0b0d12">
-<title>Roru Family — Owner</title>
+<title data-tt="{prog} — Owner">High Rollers — Owner</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f17">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f19">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f17"></script>
-<script src="/loyalty/monthend.js?v=f17"></script>
+<script src="/loyalty/loyalty.js?v=f19"></script>
+<script src="/loyalty/monthend.js?v=f19"></script>
 <style>
 /* v36 owner dashboard */
 .dash{margin:16px 0 18px}
@@ -70,7 +70,7 @@
 <body>
 <div class="staff" id="app" style="visibility:hidden">
   <div class="top">
-    <div class="brand"><img src="/logo.png" alt="RORUBARU"><span class="fam">Roru Family · Owner</span></div>
+    <div class="brand"><img src="/logo.png" alt="RORUBARU"><span class="fam"><span data-prog="en">High Rollers</span> · Owner</span></div>
     <div class="row"><button class="btn ghost sm hide" id="refresh">↻</button><button class="btn ghost sm hide" id="logout">Sign out</button></div>
   </div>
   <section id="login" class="pin" style="max-width:420px;margin:0 auto">
@@ -296,7 +296,7 @@
   document.querySelectorAll("#tab-export [data-x]").forEach(b => b.onclick = async () => {
     b.disabled = true; try { const rows = await R.rpc("owner_export", { p_token: st.sess.token, p_kind: b.dataset.x }); if (!rows.length) { R.toast("Nothing to export yet"); b.disabled = false; return; }
       const cols = Object.keys(rows[0]); const csv = "\ufeff" + [cols.join(",")].concat(rows.map(r => cols.map(c => { let v = r[c]; if (v == null) v = ""; v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(","))).join("\n");
-      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" })); a.download = "roru-family-" + b.dataset.x + "-" + new Date().toISOString().slice(0, 10) + ".csv"; document.body.appendChild(a); a.click(); a.remove(); } catch (e) { R.toast(R.errText(e)); } b.disabled = false; });
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" })); a.download = R.prog("en").toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + b.dataset.x + "-" + new Date().toISOString().slice(0, 10) + ".csv"; document.body.appendChild(a); a.click(); a.remove(); } catch (e) { R.toast(R.errText(e)); } b.disabled = false; });
   function render() { const on = !!st.sess; $("#login").classList.toggle("hide", on); $("#main").classList.toggle("hide", !on); $("#logout").classList.toggle("hide", !on); $("#refresh").classList.toggle("hide", !on); }
   render(); load();
 })();

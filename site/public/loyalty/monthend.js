@@ -1,6 +1,7 @@
-/* Roru Family · Month-end export (manager + owner). PDF (A4) + CSV of every loyalty event to match against the POS. */
+/* High Rollers (RORUBARU loyalty) · Month-end export (manager + owner). PDF (A4) + CSV of every loyalty event to match against the POS. */
 (function () {
   const R = window.RORU;
+  const slug = () => R.prog("en").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const hk = (iso) => iso ? new Date(iso).toLocaleString("en-GB", { timeZone: "Asia/Hong_Kong", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", hour12: false }) : "";
   const thisMonth = () => { const d = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Hong_Kong" })); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"); };
@@ -20,7 +21,7 @@
   }
   function pdf(d) {
     const { jsPDF } = window.jspdf; const doc = new jsPDF({ unit: "mm", format: "a4" }); const W = 210;
-    doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.text("RORUBARU · Roru Family", 14, 16);
+    doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.text("RORUBARU · " + R.prog("en"), 14, 16);
     doc.setFontSize(12); doc.text("Month-end loyalty events for POS matching: " + monthName(d.month), 14, 23);
     doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(90);
     doc.text("Generated " + hk(d.generated_at) + " (HK) by " + d.by + " (" + d.role + ").  " + live(d.rows).length + " events" + (rev(d.rows).length ? " + " + rev(d.rows).length + " reversed (not counted)" : "") + ".  PREVIEW data: rows marked (test) are test members.", 14, 28.5);
@@ -44,7 +45,7 @@
       body: d.rows.map(r => [hk(r.at), r.type + (r.reversed ? "\nREVERSED" : ""), r.item + (r.pos_item && r.pos_item !== r.item ? "\nPOS: " + r.pos_item : ""), r.code, r.guest + (r.is_test ? " (test)" : ""), r.redeemed_by || "", (r.reversed ? (r.logged ? "Void on POS" : "n/a") : cell(r, "logged") + (r.logged_at ? "\n" + hk(r.logged_at) : "")), r.logged_by || ""]),
       styles: { fontSize: 7.5, cellPadding: 1.4, valign: "top" }, headStyles: { fillColor: [246, 69, 1] }, margin: { left: 10, right: 10 }, columnStyles: { 0: { cellWidth: 20 }, 1: { cellWidth: 21 }, 3: { cellWidth: 19 }, 4: { cellWidth: 17 }, 5: { cellWidth: 22 }, 6: { cellWidth: 19 }, 7: { cellWidth: 20 } },
       didParseCell: (h) => { if (h.section === "body" && h.column.index === 6 && /^NO/.test(h.cell.raw)) { h.cell.styles.textColor = [190, 40, 40]; h.cell.styles.fontStyle = "bold"; } } });
-    const n = doc.getNumberOfPages(); for (let i = 1; i <= n; i++) { doc.setPage(i); doc.setFontSize(7.5); doc.setTextColor(120); doc.text("Page " + i + " of " + n + "  ·  Roru Family month-end  ·  " + monthName(d.month), W / 2, 290, { align: "center" }); }
+    const n = doc.getNumberOfPages(); for (let i = 1; i <= n; i++) { doc.setPage(i); doc.setFontSize(7.5); doc.setTextColor(120); doc.text("Page " + i + " of " + n + "  ·  " + R.prog("en") + " month-end  ·  " + monthName(d.month), W / 2, 290, { align: "center" }); }
     return doc.output("blob");
   }
   window.RORU_MONTHEND = {
@@ -55,7 +56,7 @@
       const get = async (fmt) => R.rpc("staff_month_end", { p_token: token(), p_month: el.querySelector("#meMonth").value, p_format: fmt });
       const show = (d) => { const not = live(d.rows).filter(r => r.logged === false).length, nr = rev(d.rows).length; info.innerHTML = "<b>" + esc(monthName(d.month)) + ":</b> " + live(d.rows).length + " events · " + (nr ? nr + " reversed (not counted) · " : "") + (not ? '<b style="color:var(--orange)">' + not + " not logged on POS</b>" : "all logged ✓") +
           (d.exports && d.exports.length ? '<div class="tiny" style="margin-top:6px">Recent downloads: ' + d.exports.slice(0, 3).map(x => esc(x.by) + " " + x.format.toUpperCase() + " " + esc(x.month) + " (" + hk(x.at) + ")").join(" · ") + "</div>" : ""); };
-      const run = async (fmt, b) => { b.disabled = true; try { const d = await get(fmt); if (fmt === "pdf") { await ensurePdf(); save(pdf(d), "roru-family-month-end-" + d.month + ".pdf"); } else save(csv(d), "roru-family-month-end-" + d.month + ".csv"); show(d); R.toast && R.toast("Downloaded ✓"); } catch (e) { info.textContent = R.errText ? R.errText(e) : String(e.message || e); } b.disabled = false; };
+      const run = async (fmt, b) => { b.disabled = true; try { const d = await get(fmt); if (fmt === "pdf") { await ensurePdf(); save(pdf(d), slug() + "-month-end-" + d.month + ".pdf"); } else save(csv(d), slug() + "-month-end-" + d.month + ".csv"); show(d); R.toast && R.toast("Downloaded ✓"); } catch (e) { info.textContent = R.errText ? R.errText(e) : String(e.message || e); } b.disabled = false; };
       el.querySelector("#mePdf").onclick = (e) => run("pdf", e.currentTarget); el.querySelector("#meCsv").onclick = (e) => run("csv", e.currentTarget);
       el.querySelector("#meMonth").onchange = async () => { try { show(await get("view")); } catch (e) {} };
       get("view").then(show).catch(() => {});

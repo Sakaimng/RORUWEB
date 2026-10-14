@@ -1,4 +1,4 @@
-/* Roru Family — loyalty pages (dark preview). Palette + Geist from the 3D site. */
+/* High Rollers (RORUBARU loyalty) — loyalty pages (dark preview). Palette + Geist from the 3D site. */
 @font-face{font-family:Geist;src:url(/fonts/geist-300.woff2) format("woff2");font-weight:300;font-display:swap}
 @font-face{font-family:Geist;src:url(/fonts/geist-500.woff2) format("woff2");font-weight:500;font-display:swap}
 @font-face{font-family:Geist;src:url(/fonts/geist-900.woff2) format("woff2");font-weight:900;font-display:swap}
@@ -251,3 +251,6 @@ td input,td select{font-size:16px}
 
 /* v36 staff suggest line */
 .member .sg{display:block;margin-top:6px;font-size:14px;line-height:1.35;color:var(--gold,#E8B84A);font-weight:500}
+
+/* v41: longer programme name in the staff header — let the header wrap on phones instead of overflowing */
+@media (max-width:520px){.staff .top{flex-wrap:wrap;row-gap:8px}.staff .top .row{margin-left:auto}}
