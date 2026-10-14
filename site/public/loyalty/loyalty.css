@@ -213,3 +213,21 @@ td input,td select{font-size:16px}
 #perksCard .perkgrp.locked{opacity:.42}
 #perksCard .perkplus{font-size:12px;font-weight:700;opacity:.7;margin:-2px 0 4px 32px}
 #perksCard .perkgrp.locked .perkplus{opacity:1}
+
+/* points rewards ladder (Oct 14 2026) */
+#ladderSec .lad-sub{margin:-4px 0 10px}
+.lad{display:flex;align-items:center;gap:12px;border-radius:16px;background:linear-gradient(135deg,#1d1f27,#14161d);border:1px solid var(--line);padding:12px 12px;margin:8px 0}
+.lad.open{border-color:rgba(246,69,1,.55);box-shadow:0 0 0 1px rgba(246,69,1,.12) inset}
+.lad-pts{flex:0 0 62px;text-align:center;line-height:1.05}
+.lad-pts b{display:block;font-size:17px;font-weight:900;letter-spacing:-.01em}
+.lad-pts span{font-size:11px;opacity:.6}
+.lad.open .lad-pts b{color:#f64501}
+.lad-main{flex:1;min-width:0}
+.lad-name{font-weight:700;font-size:15px;line-height:1.25}
+.lad-detail{font-size:12px;opacity:.6;margin-top:2px}
+.lad-tag{font-size:11px;font-weight:700;color:#f64501;margin-top:5px;letter-spacing:.02em}
+.lad-bar{height:5px;border-radius:9px;background:rgba(255,255,255,.08);margin-top:7px;overflow:hidden}
+.lad-bar i{display:block;height:100%;border-radius:9px;background:rgba(255,255,255,.35)}
+.lad.locked .lad-name,.lad.locked .lad-pts{opacity:.55}
+.lad-lock{flex:0 0 auto;width:40px;text-align:center;font-size:18px;opacity:.6}
+.lad-btn{flex:0 0 auto;min-width:72px}

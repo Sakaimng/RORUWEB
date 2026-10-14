@@ -123,8 +123,11 @@
     </div>
 
     <div id="splitOutbox"></div>
-    <h2 data-t="ladder"></h2>
-    <div id="ladder"></div>
+    <section id="ladderSec">
+      <h2 data-t="ladder"></h2>
+      <p class="small muted lad-sub" data-t="ladder_sub"></p>
+      <div id="ladder"></div>
+    </section>
     <div id="rewards"></div>
 
     <div id="extras">
@@ -374,7 +377,16 @@
     state.lastStamps = me.visits_total;
     state.lastPoints = me.points;
     // ladder
-    $("#ladder").innerHTML = me.ladder.map(l => '<div class="reward row"><div class="grow"><b>' + (zh ? l.name_zh : l.name_en) + '</b><div class="small muted">' + (zh ? l.detail_zh : l.detail_en || "") + '</div></div><button class="btn sm ' + (me.points >= l.points_cost ? "" : "ghost") + '" data-claim="' + l.id + '" ' + (me.points >= l.points_cost ? "" : "disabled") + '>' + (me.points >= l.points_cost ? t("claim", { n: l.points_cost }) : l.points_cost + " " + t("points")) + "</button></div>").join("");
+    const fmt = n => Number(n).toLocaleString("en-US");
+    const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+    $("#ladder").innerHTML = me.ladder.slice().sort((a, b) => a.points_cost - b.points_cost).map(l => {
+      const ok = me.points >= l.points_cost, pct = Math.max(3, Math.min(100, Math.round(100 * me.points / Math.max(1, l.points_cost))));
+      const nm = esc(zh ? (l.name_zh || l.name_en) : l.name_en), dt = esc(zh ? (l.detail_zh || "") : (l.detail_en || ""));
+      return '<div class="lad ' + (ok ? "open" : "locked") + '" data-reward="' + l.id + '"><div class="lad-pts"><b>' + fmt(l.points_cost) + '</b><span>' + t("points") + '</span></div>' +
+        '<div class="lad-main"><div class="lad-name">' + nm + '</div>' + (dt ? '<div class="lad-detail">' + dt + '</div>' : "") +
+        (ok ? '<div class="lad-tag">✓ ' + t("lad_unlocked") + '</div>' : '<div class="lad-bar" aria-label="' + t("lad_locked") + '"><i style="width:' + pct + '%"></i></div>') + '</div>' +
+        (ok ? '<button class="btn sm lad-btn" data-claim="' + l.id + '">' + t("lad_use") + '</button>' : '<div class="lad-lock" aria-label="' + t("lad_locked") + '">🔒</div>') + '</div>';
+    }).join("");
     $("#ladder").querySelectorAll("[data-claim]").forEach(b => b.onclick = async () => { b.disabled = true; try { const r = await R.rpc("family_claim_reward", { p_token: state.token, p_reward_id: +b.dataset.claim }); state.me = r.member; state.lastPoints = r.member.points; render(); R.toast(t("claimed"), 2600); $("#rewards").scrollIntoView({ behavior: "smooth" }); } catch (e) { R.toast(R.errText(e)); b.disabled = false; } });
     // earned / revealed / redeemed rewards
     const box = $("#rewards"); box.innerHTML = "";
