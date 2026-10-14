@@ -248,3 +248,6 @@ td input,td select{font-size:16px}
 .suggest .sg-h{font-size:19px;font-weight:900;line-height:1.25;margin:4px 0 2px}.suggest .sg-s{font-size:13px;color:var(--muted)}
 .suggest .sg-new{margin-top:10px;border:1px dashed rgba(232,184,74,.6);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--fg,#eee);line-height:1.4}
 .suggest .sg-new b{color:var(--gold)}
+
+/* v36 staff suggest line */
+.member .sg{display:block;margin-top:6px;font-size:14px;line-height:1.35;color:var(--gold,#E8B84A);font-weight:500}

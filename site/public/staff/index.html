@@ -13,10 +13,10 @@
 <link rel="manifest" href="/loyalty/staff.webmanifest">
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f12">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f13">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f12"></script>
-<script src="/loyalty/monthend.js?v=f12"></script>
+<script src="/loyalty/loyalty.js?v=f13"></script>
+<script src="/loyalty/monthend.js?v=f13"></script>
 <style>body{overscroll-behavior:none}</style>
 </head>
 <body>
@@ -138,10 +138,30 @@
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const tierName = (k) => R.t("tier_" + (k || "nori"));
   const mult = (x) => (+x || 1).toString().replace(/\.0+$/, "") + "×";
+  // "💡 Suggest" line (v36): the SAME server pick as the guest's "Suggested for you" card (lf_suggest); no phone, no points
+  function sugLine(sg) {
+    if (!sg || !sg.on || !sg.reward) return "";
+    const zh = R.lang() === "zh";
+    const rn = (r) => zh ? r.name_zh : (() => { let s = r.name_en.replace(/ on us$/i, ""); return /^(Any|A|An) /.test(s) ? s[0].toLowerCase() + s.slice(1) : s; })();
+    const v = (n) => zh ? (n === 1 ? "1 次" : /4/.test(String(n)) ? "幾次" : n + " 次") : (n === 1 ? "1 visit" : /4/.test(String(n)) ? "a few visits" : n + " visits");
+    const f = sg.fav ? (zh ? (sg.fav.name_zh || sg.fav.name_en) + (sg.fav.kind === "roll" ? "手卷" : "") : sg.fav.name_en + (sg.fav.kind === "roll" ? " hand roll" : "")) : "";
+    const likes = f ? (zh ? "鍾意" + f : "likes " + f) : "";
+    const now = (r) => zh ? "今晚可換" + rn(r) : "can use " + rn(r) + " now";
+    const away = (n, r) => zh ? "再嚟 " + v(n) + "可換" + rn(r) : v(n) + " from " + rn(r);
+    let parts = [], lead = zh ? "💡 推介：" : "💡 Suggest: ";
+    switch (sg.case) {
+      case "fav_ready": parts = [likes, now(sg.reward)]; break;
+      case "fav_save": parts = [likes, away(sg.visits, sg.reward)]; if (sg.alt) parts.push(now(sg.alt)); break;
+      case "save_next": parts = [likes, away(1, sg.reward), now(sg.alt)]; break;
+      case "ready": if (likes) parts = [likes, now(sg.reward)]; else { lead = zh ? "💡 今晚可換：" : "💡 Can use now: "; parts = [rn(sg.reward)]; } break;
+      default: parts = [likes, zh ? "第一份獎賞係" + rn(sg.reward) + "，再嚟 " + v(sg.visits) : "first reward " + rn(sg.reward) + ", " + v(sg.visits) + " away"];
+    }
+    return "<span class='sg'>" + esc(lead + parts.filter(Boolean).join(" · ")) + "</span>";
+  }
   function renderMembers() {
     const box = $("#members");
     if (!st.members.length) { box.innerHTML = '<p class="muted small">' + t("s_none") + "</p>"; return; }
-    box.innerHTML = ""; st.members.forEach(m => { const b = document.createElement("button"); b.className = "member" + (st.sel && st.sel.phone === m.phone ? " sel" : ""); b.innerHTML = "<div><b>" + esc(m.name || "—") + "<span class='tag-tier t-" + m.tier + "'>" + tierName(m.tier) + " " + mult(m.multiplier) + "</span></b><span class='meta'>" + m.phone_masked + " · " + m.member_code + " · 🍣 " + m.stamps + "/" + m.per_plate + (m.visited_today ? " (" + t("s_visited") + ")" : "") + (m.pending_rewards ? " · 🎁" + m.pending_rewards : "") + (m.pending_receipts ? " · ⏳" + m.pending_receipts : "") + "</span></div><span class='rolls'>" + m.points + " " + t("s_pts") + "</span>"; b.onclick = () => select(m); box.appendChild(b); });
+    box.innerHTML = ""; st.members.forEach(m => { const b = document.createElement("button"); b.className = "member" + (st.sel && st.sel.phone === m.phone ? " sel" : ""); b.innerHTML = "<div><b>" + esc(m.name || "—") + "<span class='tag-tier t-" + m.tier + "'>" + tierName(m.tier) + " " + mult(m.multiplier) + "</span></b><span class='meta'>" + m.phone_masked + " · " + m.member_code + " · 🍣 " + m.stamps + "/" + m.per_plate + (m.visited_today ? " (" + t("s_visited") + ")" : "") + (m.pending_rewards ? " · 🎁" + m.pending_rewards : "") + (m.pending_receipts ? " · ⏳" + m.pending_receipts : "") + "</span>" + sugLine(m.suggest) + "</div><span class='rolls'>" + m.points + " " + t("s_pts") + "</span>"; b.onclick = () => select(m); box.appendChild(b); });
   }
   async function select(m) {
     st.sel = m; renderMembers(); $("#actions").classList.remove("hide"); $("#award").classList.add("hide"); $("#queue").classList.add("hide");

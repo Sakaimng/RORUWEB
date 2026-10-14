@@ -8,9 +8,9 @@
 <title>Roru Family — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f12">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f13">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f12"></script>
+<script src="/loyalty/loyalty.js?v=f13"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -344,30 +344,24 @@
 
   // ----- "Suggested for you" (Oct 14): one rule-based card at the top; item-aware after 2+ scanned receipts. No numbers with a 4. -----
   function renderSuggest(me, zh) {
-    const el = $("#suggestCard"), tz = me.taste || {}, lad = (me.ladder || []).slice().sort((a, b) => a.points_cost - b.points_cost);
-    if (tz.on === false || !lad.length) { el.innerHTML = ""; return; }
+    const el = $("#suggestCard");
     const L = zh ? { tonight: "今晚", save: "儲多少少", first: "你的第一份獎賞", ready: "{r} 已經可以換", use: "換領", useNow: "或者今晚先換 {r}", about: "大約再嚟 {v}", toNext: "大約再嚟 {v} 就有 {r}", love: "你最愛{f}", has: "{r} 包括佢", hasReady: "{r} 包括佢，今晚就可以換", k_for: "為你推介",
         v1: "1 次", vn: "{n} 次", vfew: "幾次", box: "<b>全新系統 ✦</b> 上載幾張單據後，AI 會認識你嘅口味，下次嚟就幫你推介。", roll: "{f}手卷" }
       : { tonight: "Tonight", save: "Save up", first: "Your first reward", ready: "{r} is ready for you", use: "Use", useNow: "Or use {r} tonight", about: "about {v} away", toNext: "About {v} to {r}", love: "You love the {f}", has: "It's part of {r}", hasReady: "It's part of {r}, ready tonight", k_for: "Suggested for you",
         v1: "1 visit", vn: "{n} visits", vfew: "a few visits", box: "<b>New ✦</b> Brand-new system: our AI learns what you like after a couple of receipt uploads, then suggests items for you when you visit.", roll: "{f} hand roll" };
     const F = (s, o) => s.replace(/\{(\w)\}/g, (_, k) => o[k]);
     const nm = (r, mid) => esc(zh ? r.name_zh : (mid && /^(Any|A|An) /.test(r.name_en) ? r.name_en[0].toLowerCase() + r.name_en.slice(1) : r.name_en));
-    const bal = me.points || 0, perVisit = Math.max(1, (+tz.avg_receipt || 300) * (+me.points_per_hkd || 1) * (+me.multiplier || 1));
-    const visits = (need) => { const n = Math.max(1, Math.ceil(need / perVisit)); return n === 1 ? L.v1 : /4/.test(String(n)) ? L.vfew : F(L.vn, { n }); };
-    const afford = lad.filter(l => l.points_cost <= bal), best = afford[afford.length - 1], next = lad.find(l => l.points_cost > bal);
-    const learned = tz.items_on !== false && (tz.receipts_with_items || 0) >= 2 && (tz.top || []).length;
-    const fav = learned ? tz.top[0] : null;
+    // the pick itself is made on the server (lf_suggest, v36) so the guest card and the staff iPad line always agree; this only words it
+    const sg = me.suggest || {}; if (!sg.on || !sg.reward) { el.innerHTML = ""; return; }
+    const visits = (n) => n === 1 ? L.v1 : /4/.test(String(n)) ? L.vfew : F(L.vn, { n });
+    const learned = !!sg.learned, fav = sg.fav, rw = sg.reward, alt = sg.alt;
     const favName = fav ? esc(fav.kind === "roll" ? F(L.roll, { f: zh ? (fav.name_zh || fav.name_en) : fav.name_en }) : (zh ? (fav.name_zh || fav.name_en) : fav.name_en)) : "";
-    let favR = null; if (fav) { const inR = lad.filter(l => (fav.in_rewards || []).includes(l.code)); favR = inR.filter(l => l.points_cost <= bal).pop() || inR[0] || null; }
     let k, h, sub = "", btn = null, btn2 = null;
-    if (fav && favR) {
-      if (favR.points_cost <= bal) { k = L.tonight; h = F(L.love, { f: favName }) + " 🍣"; sub = F(L.hasReady, { r: nm(favR, 1) }); btn = favR; }
-      else { k = L.save; h = F(L.love, { f: favName }) + " 🍣"; sub = F(L.has, { r: nm(favR, 1) }) + (zh ? "，" : ", ") + F(L.about, { v: visits(favR.points_cost - bal) }); if (best) { sub += " · " + F(L.useNow, { r: nm(best, 1) }); btn2 = best; } }
-    } else if (best) {
-      if (next && next.points_cost - bal <= perVisit) { k = L.save; h = F(L.toNext, { v: L.v1, r: nm(next, 1) }); sub = F(L.useNow, { r: nm(best, 1) }); btn2 = best; }
-      else { k = L.tonight; h = F(L.ready, { r: nm(best) }); btn = best; }
-      if (fav) sub = F(L.love, { f: favName }) + (sub ? " · " + sub : "");
-    } else { k = L.first; h = nm(lad[0]); sub = F(L.about, { v: visits(lad[0].points_cost - bal) }); if (fav) sub = F(L.love, { f: favName }) + " · " + sub; }
+    if (sg.case === "fav_ready") { k = L.tonight; h = F(L.love, { f: favName }) + " 🍣"; sub = F(L.hasReady, { r: nm(rw, 1) }); btn = rw; }
+    else if (sg.case === "fav_save") { k = L.save; h = F(L.love, { f: favName }) + " 🍣"; sub = F(L.has, { r: nm(rw, 1) }) + (zh ? "，" : ", ") + F(L.about, { v: visits(sg.visits) }); if (alt) { sub += " · " + F(L.useNow, { r: nm(alt, 1) }); btn2 = alt; } }
+    else if (sg.case === "save_next") { k = L.save; h = F(L.toNext, { v: L.v1, r: nm(rw, 1) }); sub = F(L.useNow, { r: nm(alt, 1) }); btn2 = alt; if (fav) sub = F(L.love, { f: favName }) + " · " + sub; }
+    else if (sg.case === "ready") { k = L.tonight; h = F(L.ready, { r: nm(rw) }); btn = rw; if (fav) sub = F(L.love, { f: favName }); }
+    else { k = L.first; h = nm(rw); sub = F(L.about, { v: visits(sg.visits) }); if (fav) sub = F(L.love, { f: favName }) + " · " + sub; }
     el.innerHTML = '<div class="card suggest" id="suggest"><div class="row" style="justify-content:space-between;align-items:center;gap:12px"><div class="grow" style="min-width:0"><div class="sg-k">✦ ' + L.k_for + " · " + k + '</div><div class="sg-h">' + h + "</div>" + (sub ? '<div class="sg-s">' + sub + "</div>" : "") + "</div>" +
       (btn ? '<button class="btn sm" data-sg="' + btn.id + '">' + L.use + "</button>" : btn2 ? '<button class="btn sm ghost" data-sg="' + btn2.id + '">' + L.use + "</button>" : "") + "</div>" +
       (learned ? "" : '<div class="sg-new">' + L.box + "</div>") + "</div>";

@@ -8,10 +8,64 @@
 <title>Roru Family — Owner</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f12">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f13">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f12"></script>
-<script src="/loyalty/monthend.js?v=f12"></script>
+<script src="/loyalty/loyalty.js?v=f13"></script>
+<script src="/loyalty/monthend.js?v=f13"></script>
+<style>
+/* v36 owner dashboard */
+.dash{margin:16px 0 18px}
+.dash h3{margin:0;font-size:15px;font-weight:600;color:var(--cream)}
+.dash .sub{font-size:13px;color:var(--muted);margin:2px 0 0}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0 4px}
+.kpi{background:var(--ink2);border:1px solid var(--line);border-radius:18px;padding:16px 16px 14px}
+.kpi .lbl{font-size:13px;color:var(--muted)}
+.kpi .val small{font-size:.6em;font-weight:600;margin-right:2px;color:var(--muted)}
+.kpi .val{font-size:26px;font-weight:700;line-height:1.15;margin:6px 0 8px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .chg{font-size:12px;color:var(--muted)}
+.kpi .chg b{font-weight:700;margin-right:4px}
+.chg .up{color:var(--green)} .chg .down{color:#ff7a59} .chg .flat{color:var(--muted)}
+.dcard{background:var(--ink2);border:1px solid var(--line);border-radius:18px;padding:18px 16px;margin:14px 0}
+.dhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.seg{display:inline-flex;background:rgba(246,243,231,.06);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;color:var(--muted);font-size:13px;padding:6px 12px;border-radius:999px;cursor:pointer}
+.seg button.on{background:var(--cream);color:var(--ink);font-weight:600}
+.chart{margin-top:14px;width:100%}
+.chart svg{display:block;width:100%;height:auto}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:10px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.dtot{font-size:13px;color:var(--muted);margin-top:6px}
+.minis{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}
+.minis .dcard{margin:0}
+.donut{display:flex;align-items:center;gap:18px}
+.donut ul,.bars{list-style:none;margin:0;padding:0;font-size:13px}
+.donut li{display:flex;align-items:center;gap:8px;margin:5px 0;color:var(--cream)}
+.donut li span{color:var(--muted);margin-left:auto;padding-left:10px}
+.bars li{margin:10px 0}
+.bars .bl{display:flex;justify-content:space-between;gap:10px;color:var(--cream)}
+.bars .bl span{color:var(--muted)}
+.bars .bt{height:8px;background:rgba(246,243,231,.08);border-radius:6px;margin-top:5px;overflow:hidden}
+.bars .bt i{display:block;height:100%;background:var(--orange);border-radius:6px}
+.posbar{display:flex;height:12px;border-radius:8px;overflow:hidden;background:rgba(246,243,231,.08);margin:14px 0 10px}
+.posbar i{display:block;height:100%}
+.pbig{font-size:26px;font-weight:700;margin-top:10px}
+.dash details{background:var(--ink2);border:1px solid var(--line);border-radius:18px;margin:14px 0;padding:0 16px}
+.dash summary{cursor:pointer;padding:16px 0;font-size:15px;font-weight:600;list-style:none;display:flex;justify-content:space-between}
+.dash summary::-webkit-details-marker{display:none}
+.dash summary::after{content:"Show";font-weight:400;font-size:13px;color:var(--muted)}
+.dash details[open] summary::after{content:"Hide"}
+.dash details .in{padding:0 0 16px}
+.nums{display:grid;grid-template-columns:1fr;gap:0}
+.nums div{display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
+.nums div span{color:var(--muted)}
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dash table{width:100%;border-collapse:collapse;font-size:13px}
+.dash th{text-align:left;color:var(--muted);font-weight:500;padding:8px 10px 8px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+.dash td{padding:8px 10px 8px 0;border-bottom:1px solid rgba(246,243,231,.06);white-space:nowrap}
+.dash td.n,.dash th.n{text-align:right}
+@media (min-width:700px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.kpi .val{font-size:30px}.minis{grid-template-columns:repeat(3,minmax(0,1fr))}.nums{grid-template-columns:1fr 1fr;column-gap:28px}}
+@media (max-width:699px){#tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:10px -16px 6px;padding:0 16px}#tabs::-webkit-scrollbar{display:none}#tabs button{flex:0 0 auto}}
+</style>
 </head>
 <body>
 <div class="staff" id="app" style="visibility:hidden">
@@ -27,9 +81,8 @@
     <div class="pad" id="pinPad"></div>
   </section>
   <section id="main" class="hide">
-    <div class="stats" id="stats"></div>
-    <div class="tabs" id="tabs"><button data-tab="days" class="on">Per day</button><button data-tab="status">Status &amp; Kama</button><button data-tab="top">Top members</button><button data-tab="rewards">Rewards (edit)</button><button data-tab="staff">Staff &amp; roles</button><button data-tab="month">Month-end</button><button data-tab="export">CSV export</button><button data-tab="nights">Weekly nights &amp; cool-off</button><button data-tab="perks">Perks per tier</button><button data-tab="settings">Settings</button><button data-tab="extras">Extras</button><button data-tab="soon">Features on/off</button></div>
-    <div class="card" id="tab-days"></div>
+        <div class="tabs" id="tabs"><button data-tab="days" class="on">Overview</button><button data-tab="status">Status &amp; Kama</button><button data-tab="top">Top members</button><button data-tab="rewards">Rewards (edit)</button><button data-tab="staff">Staff &amp; roles</button><button data-tab="month">Month-end</button><button data-tab="export">CSV export</button><button data-tab="nights">Weekly nights &amp; cool-off</button><button data-tab="perks">Perks per tier</button><button data-tab="settings">Settings</button><button data-tab="extras">Extras</button><button data-tab="soon">Features on/off</button></div>
+    <div id="tab-days" class="dash"></div>
     <div class="card hide" id="tab-top"></div>
     <div class="card hide" id="tab-rewards"></div>
     <div class="card hide" id="tab-staff"></div>
@@ -59,19 +112,89 @@
   });
   $("#logout").onclick = () => { st.sess = null; localStorage.removeItem("roru_owner"); render(); };
   $("#refresh").onclick = load;
-  document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => { document.querySelectorAll("#tabs button").forEach(x => x.classList.toggle("on", x === b)); document.querySelectorAll("[id^=tab-]").forEach(x => x.classList.toggle("hide", x.id !== "tab-" + b.dataset.tab)); });
+  document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => { document.querySelectorAll("#tabs button").forEach(x => x.classList.toggle("on", x === b)); document.querySelectorAll("[id^=tab-]").forEach(x => x.classList.toggle("hide", x.id !== "tab-" + b.dataset.tab)); if (b.dataset.tab === "days") requestAnimationFrame(drawChart); });
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  // ----- v36 Overview dashboard (Dominic 16:20 "i prefer dashboard views"; "something cleaner") -----
+  const fmt = (n) => Math.round(+n || 0).toLocaleString("en-US");
+  const hkd = (n) => "HK$" + fmt(n), hkdK = (n) => '<small>HK$</small>' + fmt(n);
+  st.shopSel = st.shopSel || "all";
+  function chg(cur, prev) {
+    cur = +cur || 0; prev = +prev || 0;
+    if (!prev) return cur ? '<span class="up"><b>New</b></span> vs week before' : '<span class="flat"><b>No change</b></span> vs week before';
+    const p = Math.round((cur - prev) / prev * 100);
+    return (p > 0 ? '<span class="up"><b>▲ ' + p + "%</b></span>" : p < 0 ? '<span class="down"><b>▼ ' + Math.abs(p) + "%</b></span>" : '<span class="flat"><b>No change</b></span>') + " vs week before";
+  }
+  function series(d) {
+    const out = [], today = new Date(d.day + "T00:00:00Z");
+    for (let i = 29; i >= 0; i--) { const dt = new Date(today.getTime() - i * 864e5); out.push({ day: dt.toISOString().slice(0, 10), v: 0, s: 0 }); }
+    const idx = {}; out.forEach((o, i) => idx[o.day] = i);
+    d.per_day.forEach(r => { const i = idx[r.day]; if (i == null) return; if (st.shopSel !== "all" && r.shop !== st.shopSel) return; out[i].v += +r.visits || 0; out[i].s += +r.spend || 0; });
+    return out;
+  }
+  function chartSvg(pts, W) {
+    const H = W < 500 ? 190 : 230, L = 30, Rr = 46, T = 12, B = 26, w = W - L - Rr, h = H - T - B;
+    const nice = (m) => { if (m <= 0) return 1; const p = Math.pow(10, Math.floor(Math.log10(m))), f = m / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p; };
+    const vMax = nice(Math.max(...pts.map(p => p.v))), sMax = nice(Math.max(...pts.map(p => p.s)));
+    const bw = w / pts.length, x = (i) => L + i * bw, yv = (v) => T + h - v / vMax * h, ys = (s) => T + h - s / sMax * h;
+    const kfmt = (n) => n >= 1000 ? (n / 1000).toLocaleString("en-US", { maximumFractionDigits: 1 }) + "k" : String(n);
+    let g = "";
+    for (let k = 0; k <= 2; k++) { const yy = T + h - k / 2 * h; g += '<line x1="' + L + '" x2="' + (L + w) + '" y1="' + yy + '" y2="' + yy + '" stroke="rgba(246,243,231,.08)"/>' +
+      '<text x="' + (L - 6) + '" y="' + (yy + 4) + '" text-anchor="end" font-size="11" fill="rgba(246,243,231,.5)">' + kfmt(Math.round(vMax * k / 2)) + "</text>" +
+      '<text x="' + (L + w + 6) + '" y="' + (yy + 4) + '" font-size="11" fill="rgba(232,184,74,.75)">' + kfmt(Math.round(sMax * k / 2)) + "</text>"; }
+    const bars = pts.map((p, i) => { const bh = Math.max(p.v ? 2 : 0, h - (yv(p.v) - T)); return '<rect x="' + (x(i) + bw * .18).toFixed(1) + '" y="' + (T + h - bh).toFixed(1) + '" width="' + (bw * .64).toFixed(1) + '" height="' + bh.toFixed(1) + '" rx="2" fill="#F64501" opacity=".85"/>'; }).join("");
+    const line = pts.map((p, i) => (i ? "L" : "M") + (x(i) + bw / 2).toFixed(1) + " " + ys(p.s).toFixed(1)).join(" ");
+    const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const xl = pts.map((p, i) => (i % 7 === 1 || i === pts.length - 1) ? '<text x="' + (x(i) + bw / 2).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" font-size="11" fill="rgba(246,243,231,.5)">' + (i === pts.length - 1 ? "Today" : mon[+p.day.slice(5, 7) - 1] + " " + (+p.day.slice(8))) + "</text>" : "").join("");
+    return '<svg viewBox="0 0 ' + W + " " + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Visits and spend, last 30 days">' + g + bars +
+      '<path d="' + line + '" fill="none" stroke="#E8B84A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' + xl + "</svg>";
+  }
+  function drawChart() {
+    const d = st.data, el = $("#dChart"); if (!d || !el) return;
+    const pts = series(d), W = Math.max(280, Math.floor(el.clientWidth || 340));
+    el.innerHTML = chartSvg(pts, W);
+    const tv = pts.reduce((a, p) => a + p.v, 0), ts = pts.reduce((a, p) => a + p.s, 0);
+    $("#dTot").textContent = "30 days: " + fmt(tv) + (tv === 1 ? " visit · " : " visits · ") + hkd(ts) + " spend";
+    document.querySelectorAll("#dSeg button").forEach(b => b.classList.toggle("on", b.dataset.shop === st.shopSel));
+  }
+  function renderDash() {
+    const d = st.data, x = st.dash || {};
+    const kpi = (lbl, val, c) => '<div class="kpi"><div class="lbl">' + lbl + '</div><div class="val">' + val + '</div><div class="chg">' + c + "</div></div>";
+    const tierCol = { nori: "#4CC38A", gohan: "#F6F3E7", tobiko: "#F64501", kama: "#E8B84A" }, tierNm = { nori: "Nori", gohan: "Gohan", tobiko: "Tobiko", kama: "Kama" };
+    const tiers = ["nori", "gohan", "tobiko", "kama"].map(k => [k, +(d.tiers || {})[k] || 0]), tTot = tiers.reduce((a, t) => a + t[1], 0) || 1;
+    let off = 0; const C = 2 * Math.PI * 38;
+    const donut = '<svg viewBox="0 0 100 100" width="104" height="104" style="flex:0 0 auto"><circle cx="50" cy="50" r="38" fill="none" stroke="rgba(246,243,231,.08)" stroke-width="12"/>' +
+      tiers.filter(t => t[1]).map(t => { const len = t[1] / tTot * C, s = '<circle cx="50" cy="50" r="38" fill="none" stroke="' + tierCol[t[0]] + '" stroke-width="12" stroke-dasharray="' + len.toFixed(2) + " " + (C - len).toFixed(2) + '" stroke-dashoffset="' + (-off).toFixed(2) + '" transform="rotate(-90 50 50)"/>'; off += len; return s; }).join("") +
+      '<text x="50" y="49" text-anchor="middle" font-size="18" font-weight="700" fill="#F6F3E7">' + fmt(d.members) + '</text><text x="50" y="64" text-anchor="middle" font-size="9" fill="rgba(246,243,231,.6)">members</text></svg>';
+    const items = (x.by_item || []), iMax = Math.max(1, ...items.map(i => +i.n));
+    const pl = +x.pos_logged || 0, pn = +x.pos_not || 0, pt = pl + pn;
+    const days = {}; d.per_day.forEach(r => { (days[r.day] = days[r.day] || []).push(r); });
+    const shopNm = (id) => id === "wanchai" ? "Wan Chai" : id === "central" ? "Central" : "Other";
+    $("#tab-days").innerHTML =
+      '<h3>Last 7 days</h3><p class="sub">Compared with the 7 days before</p>' +
+      '<div class="kpis">' + kpi("Spend", hkdK(x.spend_7d != null ? x.spend_7d : d.spend_7d), chg(x.spend_7d, x.spend_prev)) + kpi("Visits", fmt(x.visits_7d != null ? x.visits_7d : d.visits_7d), chg(x.visits_7d, x.visits_prev)) +
+        kpi("New members", fmt(x.members_7d != null ? x.members_7d : d.members_7d), chg(x.members_7d, x.members_prev)) + kpi("Rewards redeemed", fmt(x.redeemed_7d || 0), chg(x.redeemed_7d, x.redeemed_prev)) + "</div>" +
+      '<div class="dcard"><div class="dhead"><div><h3>Last 30 days</h3><p class="sub">Visits per day and spend per day</p></div><div class="seg" id="dSeg"><button data-shop="all">All</button><button data-shop="wanchai">Wan Chai</button><button data-shop="central">Central</button></div></div>' +
+        '<div class="chart" id="dChart"></div><div class="legend"><span><i style="background:#F64501"></i>Visits</span><span><i style="background:#E8B84A;height:3px;border-radius:2px;vertical-align:3px"></i>Spend (HK$, right scale)</span></div><div class="dtot" id="dTot"></div></div>' +
+      '<div class="minis">' +
+        '<div class="dcard"><h3>Members by status</h3><p class="sub">Spend in the last 12 months</p><div class="donut" style="margin-top:12px">' + donut + "<ul>" + tiers.map(t => '<li><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + tierCol[t[0]] + '"></i>' + tierNm[t[0]] + "<span>" + fmt(t[1]) + "</span></li>").join("") + "</ul></div></div>" +
+        '<div class="dcard"><h3>Rewards redeemed</h3><p class="sub">By item, last 30 days</p>' + (items.length ? '<ul class="bars">' + items.slice(0, 6).map(i => '<li><div class="bl">' + esc(i.name_en) + "<span>" + fmt(i.n) + '</span></div><div class="bt"><i style="width:' + (100 * i.n / iMax).toFixed(1) + '%"></i></div></li>').join("") + "</ul>" : '<p class="sub" style="margin-top:12px">None yet</p>') + "</div>" +
+        '<div class="dcard"><h3>Logged on POS</h3><p class="sub">Redeemed rewards, last 30 days</p><div class="pbig">' + fmt(pl) + ' <span style="font-size:15px;font-weight:400;color:var(--muted)">of ' + fmt(pt) + "</span></div>" +
+          '<div class="posbar">' + (pt ? '<i style="width:' + (100 * pl / pt).toFixed(1) + '%;background:#4CC38A"></i><i style="width:' + (100 * pn / pt).toFixed(1) + '%;background:#F64501"></i>' : "") + "</div>" +
+          '<div class="legend" style="margin-top:0"><span><i style="background:#4CC38A"></i>Logged ' + fmt(pl) + '</span><span><i style="background:#F64501"></i>Not logged ' + fmt(pn) + "</span></div></div>" +
+      "</div>" +
+      '<details><summary>More numbers</summary><div class="in"><div class="nums">' + [["Members", fmt(d.members)], ["Visits today", fmt(d.visits_today)], ["Receipts today", fmt(d.receipts_today)], ["Waiting approval", fmt(d.pending)], ["Visits, all time", fmt(d.visits_all)], ["Visit-only stamps", fmt(d.visits_only_all)], ["Plates filled", fmt(d.plates_completed)], ["Receipts, all time", fmt(d.receipts_all)], ["Rejected receipts", fmt(d.rejected)], ["Spend captured, all time", hkd(d.spend_all)], ["Points issued", fmt(d.points_issued)], ["Points outstanding", fmt(d.points_outstanding)], ["Rewards unlocked, not used yet", fmt(d.rewards_earned)], ["Rewards redeemed, all time", fmt(d.rewards_redeemed)], ["Kama eligible", fmt(d.kama_eligible.length)]].map(r => "<div>" + r[0] + "<span>" + r[1] + "</span></div>").join("") + "</div>" +
+        '<h3 style="margin-top:18px">By shop, all time</h3><div class="tscroll" style="margin-top:8px"><table><tr><th>Shop</th><th class="n">Visits</th><th class="n">Receipts</th><th class="n">Spend</th><th class="n">Redeemed</th></tr>' + d.per_shop.map(s => "<tr><td>" + esc(s.shop) + '</td><td class="n">' + fmt(s.visits) + '</td><td class="n">' + fmt(s.receipts) + '</td><td class="n">' + hkd(s.spend) + '</td><td class="n">' + fmt(s.redeemed) + "</td></tr>").join("") + "</table></div></div></details>" +
+      '<details><summary>See table · last 30 days</summary><div class="in tscroll"><table><tr><th>Day</th><th>Shop</th><th class="n">Visits</th><th class="n">Receipts</th><th class="n">Spend</th></tr>' +
+        (Object.keys(days).sort().reverse().map(k => days[k].map((r, n) => "<tr><td>" + (n ? "" : k) + "</td><td>" + shopNm(r.shop) + '</td><td class="n">' + fmt(r.visits) + '</td><td class="n">' + fmt(r.receipts) + '</td><td class="n">' + hkd(r.spend) + "</td></tr>").join("")).join("") || '<tr><td colspan="5" class="muted">Nothing yet</td></tr>') + "</table></div></details>";
+    document.querySelectorAll("#dSeg button").forEach(b => b.onclick = () => { st.shopSel = b.dataset.shop; drawChart(); });
+    requestAnimationFrame(drawChart);
+  }
+  let rzT = null; window.addEventListener("resize", () => { clearTimeout(rzT); rzT = setTimeout(drawChart, 150); });
   async function load() {
     if (!st.sess) return;
-    try { st.data = await R.rpc("owner_stats", { p_token: st.sess.token }); } catch (e) { if (e.code === "staff_not_signed_in" || e.code === "owner_only") { $("#logout").click(); return; } R.toast(R.errText(e)); return; }
+    try { const r2 = await Promise.all([R.rpc("owner_stats", { p_token: st.sess.token }), R.rpc("owner_dashboard", { p_token: st.sess.token }).catch(() => null)]); st.data = r2[0]; st.dash = r2[1]; } catch (e) { if (e.code === "staff_not_signed_in" || e.code === "owner_only") { $("#logout").click(); return; } R.toast(R.errText(e)); return; }
     const d = st.data;
-    $("#stats").innerHTML = [["Members", d.members], ["Visits today", d.visits_today], ["Receipts today", d.receipts_today], ["Visits 7 days", d.visits_7d], ["Visits total", d.visits_all], ["Visit-only stamps", d.visits_only_all], ["Plates filled", d.plates_completed], ["Receipts total", d.receipts_all], ["Waiting approval", d.pending], ["Spend captured HK$", Math.round(d.spend_all)], ["Spend 7 days HK$", Math.round(d.spend_7d)], ["Points issued", d.points_issued], ["Points outstanding", d.points_outstanding], ["Rewards unlocked", d.rewards_earned], ["Rewards redeemed", d.rewards_redeemed], ["Kama eligible", d.kama_eligible.length], ["Rejected receipts", d.rejected], ["New members 7d", d.members_7d]].map(x => '<div class="stat"><b>' + x[1] + "</b><span>" + x[0] + "</span></div>").join("");
-    // per day
-    const days = {}; d.per_day.forEach(r => { days[r.day] = days[r.day] || {}; days[r.day][r.shop] = r; });
-    const cell = (x) => x ? x.visits + " 🍣 · " + x.receipts + " 🧾 · HK$" + Math.round(x.spend) : "0";
-    $("#tab-days").innerHTML = '<p class="muted small">Per day, last 30 days: visits stamped 🍣 · approved receipts 🧾 · spend.</p><table><tr><th>Day</th><th>Wan Chai</th><th>Central</th><th>Other</th></tr>' + Object.keys(days).sort().reverse().map(k => "<tr><td>" + k + "</td><td>" + cell(days[k].wanchai) + "</td><td>" + cell(days[k].central) + "</td><td>" + cell(days[k]["?"]) + "</td></tr>").join("") + "</table>" + (Object.keys(days).length ? "" : '<p class="muted small">Nothing yet (last 30 days).</p>') +
-      '<h2>By shop (all time)</h2><table><tr><th>Shop</th><th>Visits</th><th>Receipts</th><th>Spend HK$</th><th>Rewards redeemed</th></tr>' + d.per_shop.map(s => "<tr><td>" + esc(s.shop) + " " + esc(s.shop_zh) + "</td><td>" + s.visits + "</td><td>" + s.receipts + "</td><td>" + Math.round(s.spend) + "</td><td>" + s.redeemed + "</td></tr>").join("") + "</table>" +
-      '<h2>Status (spend, last 12 months)</h2><p>' + Object.entries(d.tiers).map(x => '<span class="pill">' + x[0] + " · " + x[1] + "</span> ").join("") + "</p>";
+    renderDash();
     $("#tab-top").innerHTML = '<table><tr><th>Name</th><th>Phone</th><th>Status</th><th>Spend 12m HK$</th><th>Visits</th><th>Plate</th><th>Receipts</th><th>Points</th><th>Last</th></tr>' + d.top.map(m => "<tr><td>" + esc(m.name || "—") + "</td><td>" + m.phone_masked + "</td><td>" + m.tier + "</td><td><b>" + m.year_spend + "</b></td><td>" + m.visits + "</td><td>" + m.stamps + "/" + (d.settings.rolls_per_plate || 5) + (m.plates ? " (+" + m.plates + ")" : "") + "</td><td>" + m.receipts + "</td><td>" + m.points + "</td><td>" + (m.last ? R.fmtDay(m.last) : "") + "</td></tr>").join("") + "</table>" + (d.top.length ? "" : '<p class="muted small">No members yet.</p>');
     const S0 = d.settings;
     $("#tab-status").innerHTML = '<p class="muted small">Status is set by spend in the last ' + (S0.tier_window_months || 12) + ' months: Nori from the start, Gohan at HK$' + S0.tier_gohan_hkd + '/yr, Tobiko at HK$' + S0.tier_tobiko_hkd + '/yr (automatic). Kama is invite only: guests become eligible at HK$' + S0.kama_eligible_hkd + '+/yr and appear below; tap Invite to make them Kama. Multipliers (placeholders): Nori ' + S0.tier_mult_nori + '×, Gohan ' + S0.tier_mult_gohan + '×, Tobiko ' + S0.tier_mult_tobiko + '×, Kama ' + S0.tier_mult_kama + '×. Change them under Settings.</p>' +
