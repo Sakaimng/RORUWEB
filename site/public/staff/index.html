@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="theme-color" content="#0b0d12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Roru Staff">
+<title>Roru Staff — RORUBARU</title>
+<link rel="manifest" href="/loyalty/staff.webmanifest">
+<link rel="icon" href="/icon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-icon.png">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f2">
+<script src="/loyalty/vendor/qrcode.js"></script>
+<script src="/loyalty/loyalty.js?v=f2"></script>
+<style>body{overscroll-behavior:none}</style>
+</head>
+<body>
+<div class="staff" id="app" style="visibility:hidden">
+  <div class="top">
+    <div class="brand"><img src="/logo.png" alt="RORUBARU"><span class="fam">Roru Staff</span></div>
+    <div class="row">
+      <span class="pill" id="who"></span>
+      <div class="langs"><button data-lang="en">EN</button><button data-lang="zh">繁中</button></div>
+      <button class="btn ghost sm hide" id="logout">⏻</button>
+    </div>
+  </div>
+
+  <!-- PIN login -->
+  <section id="login" class="pin" style="max-width:460px;margin:0 auto">
+    <h1 data-t="s_login"></h1>
+    <p class="muted small" data-t="s_login_sub"></p>
+    <div class="shops" id="shops"></div>
+    <div class="display" id="pinDisp"><span class="ph" data-t="s_pin_ph"></span></div>
+    <div class="err hide" id="pinErr"></div>
+    <div class="pad" id="pinPad"></div>
+  </section>
+
+  <!-- main -->
+  <section id="main" class="hide">
+    <div class="cols">
+      <div>
+        <div class="display" id="disp"><span class="ph" data-t="s_type"></span></div>
+        <div class="pad" id="pad"></div>
+        <div class="row" style="margin-top:12px;gap:8px">
+          <button class="btn ghost sm" id="scanBtn">📷 <span data-t="s_scan"></span></button>
+          <button class="btn ghost sm" id="queueBtn" style="margin-left:auto">⏳ <span data-t="s_queue"></span> <b id="queueN"></b></button>
+        </div>
+        <div class="cam" id="cam"><video id="video" playsinline muted autoplay></video><div class="frame"></div></div>
+      </div>
+      <div>
+        <div id="members" class="members"></div>
+        <div id="actions" class="hide">
+          <div class="big">
+            <button class="btn" id="addRoll">🧾 <span data-t="s_add"></span><small id="addSub"></small></button>
+            <button class="btn gold" id="redeemBtn">🎁 <span data-t="s_redeem"></span><small id="redeemSub"></small></button>
+          </div>
+          <div id="award" class="card hide">
+            <label class="field"><span data-t="s_total"></span><input id="aTotal" type="text" inputmode="decimal" autocomplete="off" style="font-size:28px;font-weight:900"></label>
+            <label class="field"><span data-t="s_rno"></span><input id="aNo" type="text" autocapitalize="characters" autocomplete="off"></label>
+            <div class="err hide" id="aErr"></div>
+            <div class="row"><button class="btn" id="aGo" data-t="s_award"></button><button class="btn ghost sm" id="aBack" data-t="s_back"></button></div>
+          </div>
+          <div id="pending" class="members"></div>
+        </div>
+        <div id="queue" class="card hide"><h2 style="margin-top:0" data-t="s_queue"></h2><div id="queueList" class="members"></div></div>
+        <div class="log card" id="logCard">
+          <div class="row"><h2 style="margin:0" class="grow"><span data-t="s_today"></span> · <span id="shopName"></span></h2><span class="muted small" id="todayNums"></span></div>
+          <div id="log"></div>
+        </div>
+      </div>
+    </div>
+    <p class="tiny" data-t="preview_note"></p>
+  </section>
+</div>
+
+<div class="result" id="result"><div class="box"><div class="big-ico" id="rIco"></div><h1 id="rTitle"></h1><p id="rSub" style="font-size:18px"></p><button class="btn" id="rOk" style="margin-top:18px;max-width:320px;margin-left:auto;margin-right:auto">OK</button></div></div>
+
+<script>
+(async function () {
+  const R = window.RORU, t0 = R.t, $ = (s) => document.querySelector(s);
+  // staff strings
+  const S = { en: { s_login: "Staff sign in", s_login_sub: "Pick the shop, then enter your 4-digit PIN.", s_pin_ph: "PIN", s_type: "Type the guest's number", s_scan: "Scan QR", s_demo: "Demo: ignore the 1-per-day limit",
+      s_add: "ADD POINTS", s_redeem: "REDEEM", s_today: "Today", s_queue: "To approve", s_total: "Bill total HK$", s_rno: "Receipt no. (optional)", s_award: "Add points", s_approve: "Approve", s_reject: "Reject", s_queue_empty: "Nothing waiting", s_pts: "pts", r_points: "+{n} points", s_back: "Back", s_find: "Type at least 4 digits", s_none: "No member found — ask them to join at rorubaru.com/family", s_already: "Already has today's roll", s_visited: "today ✓",
+      r_added: "+1 roll", r_gold: "GOLD ROLL!", r_gold_sub: "Give the gold treat 🎉", r_bonus: "+1 bonus roll (streak)", r_full: "Plate full — reward unlocked", r_full_sub: "They scratch the nori on their phone", r_redeemed: "Redeemed ✓", r_already: "Already got today's roll", r_already_sub: "One roll per guest per day", r_err: "Didn't work",
+      wrong_pin: "Wrong PIN", locked_try_later: "Too many tries — wait 15 min", pending_none: "No rewards to redeem", rolls_lbl: "rolls", cam_err: "Camera not available — type the number instead", logout: "Sign out" },
+    zh: { s_login: "店員登入", s_login_sub: "選擇分店，然後輸入 4 位 PIN。", s_pin_ph: "PIN", s_type: "輸入客人電話號碼", s_scan: "掃描 QR", s_demo: "示範：忽略每日一次限制",
+      s_add: "加積分", s_redeem: "兌換", s_today: "今日", s_queue: "待批核", s_total: "帳單總額 HK$", s_rno: "收據號碼（可選）", s_award: "加積分", s_approve: "批核", s_reject: "拒絕", s_queue_empty: "沒有待批核", s_pts: "分", r_points: "+{n} 分", s_back: "返回", s_find: "請輸入至少 4 位數字", s_none: "找不到會員 — 請客人到 rorubaru.com/family 加入", s_already: "今日已加過", s_visited: "今日 ✓",
+      r_added: "+1 手卷", r_gold: "金色手卷！", r_gold_sub: "請送上金色小禮 🎉", r_bonus: "+1 額外手卷（連續到訪）", r_full: "集齊一碟 — 獎賞解鎖", r_full_sub: "客人在手機刮開紫菜", r_redeemed: "已兌換 ✓", r_already: "今日已經加過", r_already_sub: "每位客人每日一個手卷", r_err: "未能完成",
+      wrong_pin: "PIN 錯誤", locked_try_later: "嘗試太多次 — 請等 15 分鐘", pending_none: "沒有可兌換的獎賞", rolls_lbl: "手卷", cam_err: "無法使用相機 — 請輸入號碼", logout: "登出" } };
+  const t = (k, v) => { let s = (S[R.lang()] && S[R.lang()][k]) || S.en[k]; if (!s) return t0(k, v); if (v) for (const x in v) s = s.replace("{" + x + "}", v[x]); return s; };
+  await R.gate(); $("#app").style.visibility = "visible";
+  document.querySelectorAll(".langs button").forEach(b => b.onclick = () => { R.setLang(b.dataset.lang); render(); });
+  const st = { sess: JSON.parse(localStorage.getItem("roru_staff") || "null"), cfg: null, shop: localStorage.getItem("roru_shop") || "wanchai", pin: "", num: "", members: [], sel: null, me: null, today: null, stream: null };
+  try { st.cfg = await R.rpc("family_config"); } catch (e) {}
+  const shops = (st.cfg && st.cfg.shops) || [{ id: "wanchai", name_en: "Wan Chai", name_zh: "灣仔" }, { id: "central", name_en: "Central", name_zh: "中環" }];
+  const shopName = (id) => { const s = shops.find(x => x.id === id) || shops[0]; return R.lang() === "zh" ? s.name_zh : s.name_en; };
+
+  const pad = (el, onKey) => { el.innerHTML = ""; ["1","2","3","4","5","6","7","8","9","C","0","⌫"].forEach(k => { const b = document.createElement("button"); b.textContent = k; if (k === "C" || k === "⌫") b.className = "alt"; b.onclick = () => onKey(k); el.appendChild(b); }); };
+  // ---- login ----
+  function renderShops() { $("#shops").innerHTML = shops.map(s => '<button data-id="' + s.id + '" class="' + (s.id === st.shop ? "on" : "") + '">' + (R.lang() === "zh" ? s.name_zh : s.name_en) + "</button>").join(""); $("#shops").querySelectorAll("button").forEach(b => b.onclick = () => { st.shop = b.dataset.id; localStorage.setItem("roru_shop", st.shop); renderShops(); }); }
+  pad($("#pinPad"), async (k) => {
+    if (k === "C") st.pin = ""; else if (k === "⌫") st.pin = st.pin.slice(0, -1); else if (st.pin.length < 4) st.pin += k;
+    $("#pinDisp").innerHTML = st.pin ? "•".repeat(st.pin.length) : '<span class="ph">' + t("s_pin_ph") + "</span>"; $("#pinErr").classList.add("hide");
+    if (st.pin.length === 4) { const pin = st.pin; st.pin = "";
+      try { const r = await R.rpc("staff_login", { p_pin: pin, p_shop: st.shop }); st.sess = { token: r.token, staff: r.staff }; localStorage.setItem("roru_staff", JSON.stringify(st.sess)); $("#pinDisp").innerHTML = '<span class="ph">PIN</span>'; render(); loadToday(); }
+      catch (e) { $("#pinDisp").innerHTML = '<span class="ph">PIN</span>'; $("#pinErr").textContent = t(e.code) || R.errText(e); $("#pinErr").classList.remove("hide"); } }
+  });
+  $("#logout").onclick = () => { st.sess = null; localStorage.removeItem("roru_staff"); st.num = ""; st.members = []; st.sel = null; render(); };
+
+  // ---- main keypad ----
+  let lookupT = null;
+  pad($("#pad"), (k) => {
+    if (k === "C") { st.num = ""; st.sel = null; } else if (k === "⌫") st.num = st.num.slice(0, -1); else if (st.num.length < 12) st.num += k;
+    renderDisp(); clearTimeout(lookupT); lookupT = setTimeout(lookup, 250);
+  });
+  function renderDisp() { $("#disp").innerHTML = st.num ? st.num.replace(/(\d{4})(?=\d)/g, "$1 ") : '<span class="ph">' + t("s_type") + "</span>"; }
+  async function lookup() {
+    st.sel = null; $("#actions").classList.add("hide");
+    const digits = st.num.replace(/\D/g, "");
+    if (digits.length < 4 && !/^[A-Z0-9]{8}$/.test(st.num)) { st.members = []; $("#members").innerHTML = st.num ? '<p class="muted small">' + t("s_find") + "</p>" : ""; return; }
+    try { st.members = await R.rpc("staff_lookup", { p_token: st.sess.token, p_query: st.num }); } catch (e) { if (e.code === "staff_not_signed_in") { $("#logout").click(); return; } st.members = []; }
+    renderMembers(); if (st.members.length === 1 && digits.length >= 8) select(st.members[0]);
+  }
+  function renderMembers() {
+    const box = $("#members");
+    if (!st.members.length) { box.innerHTML = '<p class="muted small">' + t("s_none") + "</p>"; return; }
+    box.innerHTML = ""; st.members.forEach(m => { const b = document.createElement("button"); b.className = "member" + (st.sel && st.sel.phone === m.phone ? " sel" : ""); b.innerHTML = "<div><b>" + (m.name || "—") + "</b><span class='meta'>" + m.phone_masked + " · " + m.member_code + " · " + m.tier + (m.pending_rewards ? " · 🎁" + m.pending_rewards : "") + (m.pending_receipts ? " · ⏳" + m.pending_receipts : "") + "</span></div><span class='rolls'>" + m.points + " " + t("s_pts") + "</span>"; b.onclick = () => select(m); box.appendChild(b); });
+  }
+  async function select(m) {
+    st.sel = m; renderMembers(); $("#actions").classList.remove("hide"); $("#award").classList.add("hide"); $("#queue").classList.add("hide");
+    $("#addSub").textContent = (m.name || m.phone_masked) + " · " + m.points + " " + t("s_pts"); $("#redeemSub").textContent = m.pending_rewards ? m.pending_rewards + " 🎁" : t("pending_none");
+    $("#redeemBtn").disabled = !m.pending_rewards; $("#pending").innerHTML = ""; $("#addRoll").disabled = false;
+  }
+  $("#addRoll").onclick = () => { if (!st.sel) return; $("#award").classList.remove("hide"); $("#aTotal").value = ""; $("#aNo").value = ""; $("#aErr").classList.add("hide"); setTimeout(() => $("#aTotal").focus(), 50); };
+  $("#aBack").onclick = () => $("#award").classList.add("hide");
+  $("#aGo").onclick = async () => {
+    if (!st.sel) return; $("#aGo").disabled = true; $("#aErr").classList.add("hide");
+    try { const r = await R.rpc("staff_award", { p_token: st.sess.token, p_who: st.sel.member_code, p_total_hkd: parseFloat(String($("#aTotal").value).replace(/[^0-9.]/g, "")), p_receipt_no: $("#aNo").value.trim() || null, p_shop: st.shop });
+      show("🧾", t("r_points", { n: r.points }), (r.member.name || r.member.phone_masked) + " · " + r.member.points + " " + t("s_pts"), "good"); R.burst(); reset(); loadToday(); }
+    catch (e) { $("#aErr").textContent = e.code === "receipt_already_used" ? "receipt already used" : R.errText(e); $("#aErr").classList.remove("hide"); }
+    $("#aGo").disabled = false;
+  };
+  // approval queue
+  $("#queueBtn").onclick = async () => { const q = $("#queue"); if (!q.classList.contains("hide")) { q.classList.add("hide"); return; } await loadQueue(); q.classList.remove("hide"); $("#actions").classList.add("hide"); };
+  async function loadQueue() {
+    let list = []; try { list = await R.rpc("staff_queue", { p_token: st.sess.token }); } catch (e) { return; }
+    $("#queueN").textContent = list.length ? list.length : "";
+    $("#queueList").innerHTML = list.map(r => '<div class="member" style="cursor:default;flex-wrap:wrap"><div class="grow"><b>' + r.who + ' · HK$' + (+r.total_hkd).toFixed(2) + '</b><span class="meta">#' + r.receipt_no + (r.at ? " · " + R.fmtDay(r.at) + " " + R.fmtTime(r.at) : "") + " · " + r.source + (r.reason ? " · " + r.reason : "") + (r.ocr_confidence != null ? " · OCR " + r.ocr_confidence + "%" : "") + '</span></div><div class="row"><input type="text" inputmode="decimal" value="' + (+r.total_hkd).toFixed(2) + '" style="width:110px;background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:18px"><button class="btn sm" data-ok="' + r.id + '">✓ ' + t("s_approve") + '</button><button class="btn ghost sm" data-no="' + r.id + '">✕</button></div></div>').join("") || '<p class="muted small">' + t("s_queue_empty") + "</p>";
+    $("#queueList").querySelectorAll("[data-ok]").forEach(b => b.onclick = async () => { const tot = parseFloat(b.parentElement.querySelector("input").value); b.disabled = true; try { const r = await R.rpc("staff_review", { p_token: st.sess.token, p_receipt_id: +b.dataset.ok, p_approve: true, p_total_hkd: tot }); R.toast(t("r_points", { n: r.points })); } catch (e) { R.toast(R.errText(e)); } loadQueue(); loadToday(); });
+    $("#queueList").querySelectorAll("[data-no]").forEach(b => b.onclick = async () => { b.disabled = true; try { await R.rpc("staff_review", { p_token: st.sess.token, p_receipt_id: +b.dataset.no, p_approve: false }); } catch (e) { R.toast(R.errText(e)); } loadQueue(); loadToday(); });
+  }
+  $("#redeemBtn").onclick = async () => {
+    if (!st.sel) return;
+    try { const me = await R.rpc("staff_member", { p_token: st.sess.token, p_who: st.sel.member_code }); const pend = me.rewards.filter(r => r.status === "earned" || r.status === "revealed");
+      $("#pending").innerHTML = pend.map(r => '<button class="member" data-code="' + r.code + '"><div><b>' + (R.lang() === "zh" ? r.name_zh : r.name_en) + '</b><span class="meta">' + r.code + (r.status === "earned" ? " · not scratched yet" : "") + "</span></div><span class='rolls'>🎁</span></button>").join("") || '<p class="muted small">' + t("pending_none") + "</p>";
+      $("#pending").querySelectorAll("button").forEach(b => b.onclick = () => redeem(b.dataset.code)); } catch (e) { show("⚠️", t("r_err"), R.errText(e), ""); }
+  };
+  async function redeem(code) {
+    try { const r = await R.rpc("staff_redeem", { p_token: st.sess.token, p_reward_code: code }); show("🎁", t("r_redeemed"), (R.lang() === "zh" ? r.reward.name_zh : r.reward.name_en) + " · " + (r.member.name || r.member.phone_masked), "good"); R.burst(["#E8B84A", "#F6F3E7"]); reset(); loadToday(); }
+    catch (e) { show("⚠️", t("r_err"), e.code === "already_redeemed" ? "already redeemed" : R.errText(e), ""); }
+  }
+  function reset() { st.num = ""; st.sel = null; st.members = []; renderDisp(); $("#members").innerHTML = ""; $("#actions").classList.add("hide"); $("#award").classList.add("hide"); $("#pending").innerHTML = ""; }
+  function show(ico, title, sub, cls) { $("#rIco").textContent = ico; $("#rTitle").textContent = title; $("#rSub").textContent = sub; const el = $("#result"); el.className = "result show " + cls; clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 4000); }
+  $("#rOk").onclick = () => $("#result").classList.remove("show"); $("#result").onclick = (e) => { if (e.target === $("#result")) $("#result").classList.remove("show"); };
+
+  // ---- today log ----
+  async function loadToday() { if (!st.sess) return; try { st.today = await R.rpc("staff_today", { p_token: st.sess.token }); } catch (e) { return; } renderToday(); }
+  function renderToday() { if (!st.today) return; $("#shopName").textContent = shopName(st.shop); $("#todayNums").textContent = st.today.receipts + " 🧾 · " + st.today.points + " " + t("s_pts") + " · " + st.today.redeemed + " 🎁"; $("#queueN").textContent = st.today.pending ? st.today.pending : ""; $("#log").innerHTML = st.today.log.slice(0, 30).map(l => '<div class="hist"><span>' + R.fmtTime(l.at) + " · " + l.who + (l.reward ? " · " + l.reward : "") + (l.amount ? " · HK$" + (+l.amount).toFixed(0) : "") + "</span><span>" + (l.type === "points" ? "+" + l.points + " " + t("s_pts") + (l.source === "staff" ? " (staff)" : "") : l.type === "redeem" ? "🎁 redeemed" : l.type === "rejected" ? "✕ rejected" : l.type) + "</span></div>").join("") || '<p class="muted small">—</p>'; }
+
+  // ---- QR scan (camera; BarcodeDetector first, jsQR fallback) ----
+  let scanning = false, raf = null;
+  $("#scanBtn").onclick = async () => { if (scanning) return stopScan(); try { await startScan(); } catch (e) { R.toast(t("cam_err"), 3000); stopScan(); } };
+  async function startScan() {
+    const v = $("#video"); st.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false }); v.srcObject = st.stream; await v.play(); $("#cam").classList.add("show"); scanning = true;
+    let det = null; if ("BarcodeDetector" in window) { try { det = new BarcodeDetector({ formats: ["qr_code"] }); } catch (e) { det = null; } }
+    if (!det && !window.jsQR) await new Promise((res, rej) => { const s = document.createElement("script"); s.src = "/loyalty/vendor/jsQR.js"; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+    const cv = document.createElement("canvas"), cx = cv.getContext("2d", { willReadFrequently: true });
+    const tick = async () => { if (!scanning) return; let text = null;
+      if (v.readyState >= 2) { if (det) { try { const codes = await det.detect(v); if (codes.length) text = codes[0].rawValue; } catch (e) {} } else { cv.width = v.videoWidth / 2; cv.height = v.videoHeight / 2; cx.drawImage(v, 0, 0, cv.width, cv.height); const img = cx.getImageData(0, 0, cv.width, cv.height); const c = jsQR(img.data, img.width, img.height); if (c) text = c.data; } }
+      if (text) { onCode(text); return; } raf = setTimeout(tick, 150); };
+    tick();
+  }
+  function stopScan() { scanning = false; clearTimeout(raf); if (st.stream) st.stream.getTracks().forEach(tr => tr.stop()); st.stream = null; $("#cam").classList.remove("show"); }
+  function onCode(text) { stopScan(); const m = /^RF:([A-Z0-9]{8})$/.exec(text.trim()); const r = /^RR:(R[A-Z0-9]{7})$/.exec(text.trim()); if (m) { st.num = m[1]; renderDisp(); lookup(); } else if (r) { redeem(r[1]); } else R.toast("?"); }
+
+  function render() { R.applyI18n(); document.querySelectorAll("[data-t]").forEach(el => { if (S.en[el.dataset.t]) el.textContent = t(el.dataset.t); }); renderShops();
+    const on = !!st.sess; $("#login").classList.toggle("hide", on); $("#main").classList.toggle("hide", !on); $("#logout").classList.toggle("hide", !on);
+    $("#who").textContent = on ? st.sess.staff.name + " · " + shopName(st.shop) : ""; renderDisp(); renderToday(); }
+  document.addEventListener("roru:lang", render);
+  render(); if (st.sess) { try { await R.rpc("staff_today", { p_token: st.sess.token }); } catch (e) { if (e.code === "staff_not_signed_in") { st.sess = null; localStorage.removeItem("roru_staff"); render(); } } loadToday(); }
+  setInterval(() => { if (document.visibilityState === "visible" && st.sess) loadToday(); }, 30000);
+})();
+</script>
+</body>
+</html>

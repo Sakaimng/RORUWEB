@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
         /** The two largest story videos are served from the site's mirror (too big for the repo upload path). */
         { source: "/story/story_v3_16x9.mp4", destination: "https://rorubaru-live-counter.sites.tab.bot/story/story_v3_16x9.mp4" },
         { source: "/story/story_v3_9x16.mp4", destination: "https://rorubaru-live-counter.sites.tab.bot/story/story_v3_9x16.mp4" },
+        /** Roru Family loyalty (dark preview, not linked anywhere): static pages in public/, gated by a passcode in the page. */
+        { source: "/family", destination: "/family/index.html" },
+        { source: "/staff", destination: "/staff/index.html" },
+        { source: "/staff/owner", destination: "/staff/owner/index.html" },
       ],
       afterFiles: [],
       fallback: [],
@@ -17,6 +21,12 @@ const nextConfig: NextConfig = {
   /** Anti-framing: other sites can't show rorubaru.com inside their own page (iframe). Tock/delivery links open in new tabs, so they're unaffected. */
   async headers() {
     return [
+      /** Loyalty preview pages: never indexed. */
+      { source: "/family/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }] },
+      { source: "/family", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }] },
+      { source: "/staff/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }] },
+      { source: "/staff", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }] },
+      { source: "/loyalty/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }] },
       {
         source: "/:path*",
         headers: [

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="theme-color" content="#0b0d12">
+<title>Roru Family — Owner</title>
+<link rel="icon" href="/icon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-icon.png">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f2">
+<script src="/loyalty/vendor/qrcode.js"></script>
+<script src="/loyalty/loyalty.js?v=f2"></script>
+</head>
+<body>
+<div class="staff" id="app" style="visibility:hidden">
+  <div class="top">
+    <div class="brand"><img src="/logo.png" alt="RORUBARU"><span class="fam">Roru Family · Owner</span></div>
+    <div class="row"><button class="btn ghost sm hide" id="refresh">↻</button><button class="btn ghost sm hide" id="logout">Sign out</button></div>
+  </div>
+  <section id="login" class="pin" style="max-width:420px;margin:0 auto">
+    <h1>Owner PIN</h1>
+    <p class="muted small">Dominic only — 6 digits, separate from the 4-digit staff PINs.</p>
+    <div class="display" id="pinDisp"><span class="ph">PIN</span></div>
+    <div class="err hide" id="pinErr"></div>
+    <div class="pad" id="pinPad"></div>
+  </section>
+  <section id="main" class="hide">
+    <div class="stats" id="stats"></div>
+    <div class="tabs" id="tabs"><button data-tab="days" class="on">Visits per day</button><button data-tab="top">Top members</button><button data-tab="rewards">Rewards (edit)</button><button data-tab="staff">Staff PINs</button><button data-tab="export">CSV export</button><button data-tab="settings">Settings</button></div>
+    <div class="card" id="tab-days"></div>
+    <div class="card hide" id="tab-top"></div>
+    <div class="card hide" id="tab-rewards"></div>
+    <div class="card hide" id="tab-staff"></div>
+    <div class="card hide" id="tab-export"><p class="muted small">Downloads a .csv (opens in Excel / Numbers / Google Sheets). Phone numbers are included — keep it inside the business (PDPO).</p><div class="row" style="flex-wrap:wrap;gap:8px"><button class="btn sm" data-x="members">Members</button><button class="btn sm" data-x="receipts">Receipts</button><button class="btn sm" data-x="rewards">Rewards</button></div></div>
+    <div class="card hide" id="tab-settings"></div>
+    <p class="tiny">Dark preview build. Test data is flagged is_test and can be wiped before launch.</p>
+  </section>
+</div>
+<script>
+(async function () {
+  const R = window.RORU, $ = (s) => document.querySelector(s);
+  await R.gate(); $("#app").style.visibility = "visible";
+  const st = { sess: JSON.parse(localStorage.getItem("roru_owner") || "null"), data: null, pin: "" };
+  const pad = (el, onKey) => { el.innerHTML = ""; ["1","2","3","4","5","6","7","8","9","C","0","⌫"].forEach(k => { const b = document.createElement("button"); b.textContent = k; if (k === "C" || k === "⌫") b.className = "alt"; b.onclick = () => onKey(k); el.appendChild(b); }); };
+  pad($("#pinPad"), async (k) => {
+    if (k === "C") st.pin = ""; else if (k === "⌫") st.pin = st.pin.slice(0, -1); else if (st.pin.length < 6) st.pin += k;
+    $("#pinDisp").innerHTML = st.pin ? "•".repeat(st.pin.length) : '<span class="ph">PIN</span>'; $("#pinErr").classList.add("hide");
+    if (st.pin.length === 6) { const pin = st.pin; st.pin = "";
+      try { const r = await R.rpc("staff_login", { p_pin: pin }); if (r.staff.role !== "owner") throw Object.assign(new Error("owner_only"), { code: "owner_only" }); st.sess = { token: r.token, staff: r.staff }; localStorage.setItem("roru_owner", JSON.stringify(st.sess)); render(); load(); }
+      catch (e) { $("#pinDisp").innerHTML = '<span class="ph">PIN</span>'; $("#pinErr").textContent = e.code === "owner_only" ? "That is a staff PIN, not the owner PIN" : (e.code === "wrong_pin" ? "Wrong PIN" : R.errText(e)); $("#pinErr").classList.remove("hide"); } }
+  });
+  $("#logout").onclick = () => { st.sess = null; localStorage.removeItem("roru_owner"); render(); };
+  $("#refresh").onclick = load;
+  document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => { document.querySelectorAll("#tabs button").forEach(x => x.classList.toggle("on", x === b)); document.querySelectorAll("[id^=tab-]").forEach(x => x.classList.toggle("hide", x.id !== "tab-" + b.dataset.tab)); });
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  async function load() {
+    if (!st.sess) return;
+    try { st.data = await R.rpc("owner_stats", { p_token: st.sess.token }); } catch (e) { if (e.code === "staff_not_signed_in" || e.code === "owner_only") { $("#logout").click(); return; } R.toast(R.errText(e)); return; }
+    const d = st.data;
+    $("#stats").innerHTML = [["Members", d.members], ["Receipts today", d.receipts_today], ["Receipts total", d.receipts_all], ["Waiting approval", d.pending], ["Spend captured HK$", Math.round(d.spend_all)], ["Spend 7 days HK$", Math.round(d.spend_7d)], ["Points issued", d.points_issued], ["Points outstanding", d.points_outstanding], ["Rewards unlocked", d.rewards_earned], ["Rewards redeemed", d.rewards_redeemed], ["Rejected receipts", d.rejected], ["New members 7d", d.members_7d]].map(x => '<div class="stat"><b>' + x[1] + "</b><span>" + x[0] + "</span></div>").join("");
+    // per day
+    const days = {}; d.per_day.forEach(r => { days[r.day] = days[r.day] || {}; days[r.day][r.shop] = r; });
+    const cell = (x) => x ? x.receipts + " · HK$" + Math.round(x.spend) : "0";
+    $("#tab-days").innerHTML = '<p class="muted small">Approved receipts per day (count · spend), last 30 days.</p><table><tr><th>Day</th><th>Wan Chai</th><th>Central</th><th>Other</th></tr>' + Object.keys(days).sort().reverse().map(k => "<tr><td>" + k + "</td><td>" + cell(days[k].wanchai) + "</td><td>" + cell(days[k].central) + "</td><td>" + cell(days[k]["?"]) + "</td></tr>").join("") + "</table>" + (Object.keys(days).length ? "" : '<p class="muted small">No receipts yet (last 30 days).</p>') +
+      '<h2>By shop (all time)</h2><table><tr><th>Shop</th><th>Receipts</th><th>Spend HK$</th><th>Rewards redeemed</th></tr>' + d.per_shop.map(s => "<tr><td>" + esc(s.shop) + " " + esc(s.shop_zh) + "</td><td>" + s.receipts + "</td><td>" + Math.round(s.spend) + "</td><td>" + s.redeemed + "</td></tr>").join("") + "</table>" +
+      '<h2>Levels</h2><p>' + Object.entries(d.tiers).map(x => '<span class="pill">' + x[0] + " · " + x[1] + "</span> ").join("") + "</p>";
+    $("#tab-top").innerHTML = '<table><tr><th>Name</th><th>Phone</th><th>Spend HK$</th><th>Receipts</th><th>Points</th><th>Level</th><th>Last</th></tr>' + d.top.map(m => "<tr><td>" + esc(m.name || "—") + "</td><td>" + m.phone_masked + "</td><td><b>" + m.spend + "</b></td><td>" + m.receipts + "</td><td>" + m.points + "</td><td>" + m.tier + "</td><td>" + (m.last ? R.fmtDay(m.last) : "") + "</td></tr>").join("") + "</table>" + (d.top.length ? "" : '<p class="muted small">No members yet.</p>');
+    $("#tab-rewards").innerHTML = '<p class="muted small">The points ladder — placeholders until you decide. Points = what a guest spends to unlock it (1 point per HK$1 right now, see Settings). Edits save straight to the database.</p><table><tr><th>Code</th><th>Points</th><th>Name EN</th><th>Name 繁中</th><th>Detail EN</th><th>Detail 繁中</th><th>On</th><th></th></tr>' +
+      d.rewards.map(r => '<tr data-id="' + r.id + '"><td><b>' + esc(r.code) + '</b></td><td><input name="points_cost" type="number" min="0" value="' + r.points_cost + '"></td><td><input name="name_en" value="' + esc(r.name_en) + '"></td><td><input name="name_zh" value="' + esc(r.name_zh) + '"></td><td><input name="detail_en" value="' + esc(r.detail_en) + '"></td><td><input name="detail_zh" value="' + esc(r.detail_zh) + '"></td><td><input name="active" type="checkbox" ' + (r.active ? "checked" : "") + '></td><td><button class="btn sm" data-save>Save</button></td></tr>').join("") + "</table>";
+    $("#tab-rewards").querySelectorAll("[data-save]").forEach(b => b.onclick = async () => { const tr = b.closest("tr"), g = (n) => tr.querySelector("[name=" + n + "]"); b.disabled = true; try { await R.rpc("owner_save_reward", { p_token: st.sess.token, p_id: +tr.dataset.id, p_name_en: g("name_en").value, p_name_zh: g("name_zh").value, p_detail_en: g("detail_en").value, p_detail_zh: g("detail_zh").value, p_weight: null, p_points_cost: +g("points_cost").value, p_active: g("active").checked }); R.toast("Saved ✓"); } catch (e) { R.toast(R.errText(e)); } b.disabled = false; });
+    $("#tab-staff").innerHTML = '<p class="muted small">Each staff member (or each shop iPad) gets a 4-digit PIN; owners get a 6-digit PIN. PINs are stored hashed; to change one, type a new PIN and Save. Owner PINs open this page.</p><table><tr><th>Name</th><th>Role</th><th>Shop</th><th>New PIN</th><th>Active</th><th></th></tr>' +
+      d.staff.map(s => '<tr data-id="' + s.id + '"><td><input name="name" value="' + esc(s.name) + '"></td><td>' + s.role + '</td><td><select name="shop"><option value="wanchai"' + (s.shop === "wanchai" ? " selected" : "") + '>Wan Chai</option><option value="central"' + (s.shop === "central" ? " selected" : "") + '>Central</option></select></td><td><input name="pin" inputmode="numeric" placeholder="unchanged" style="width:110px"></td><td><input name="active" type="checkbox" ' + (s.active ? "checked" : "") + '></td><td><button class="btn sm" data-save>Save</button></td></tr>').join("") +
+      '<tr data-id=""><td><input name="name" placeholder="New staff name"></td><td><select name="role"><option value="staff">staff</option><option value="owner">owner</option></select></td><td><select name="shop"><option value="wanchai">Wan Chai</option><option value="central">Central</option></select></td><td><input name="pin" inputmode="numeric" placeholder="4 digits" style="width:110px"></td><td></td><td><button class="btn sm" data-save>Add</button></td></tr></table>';
+    $("#tab-staff").querySelectorAll("[data-save]").forEach(b => b.onclick = async () => { const tr = b.closest("tr"), g = (n) => tr.querySelector("[name=" + n + "]"); b.disabled = true; try { await R.rpc("owner_set_staff", { p_token: st.sess.token, p_id: tr.dataset.id ? +tr.dataset.id : null, p_name: g("name").value, p_pin: g("pin").value || null, p_role: g("role") ? g("role").value : null, p_shop: g("shop").value, p_active: g("active") ? g("active").checked : null }); R.toast("Saved ✓"); load(); } catch (e) { R.toast(R.errText(e)); } b.disabled = false; });
+    $("#tab-settings").innerHTML = '<p class="muted small">Read-only here (edit in the loyalty_settings table). otp_test_mode=true means no SMS is sent and the code is fixed. points_per_hkd, approve_over_hkd, receipts_per_day, receipt_max_age_hours and the tier thresholds are the knobs.</p><table>' + Object.entries(d.settings).sort().map(x => "<tr><td>" + esc(x[0]) + "</td><td><b>" + esc(x[1]) + "</b></td></tr>").join("") + "</table>";
+  }
+  document.querySelectorAll("#tab-export [data-x]").forEach(b => b.onclick = async () => {
+    b.disabled = true; try { const rows = await R.rpc("owner_export", { p_token: st.sess.token, p_kind: b.dataset.x }); if (!rows.length) { R.toast("Nothing to export yet"); b.disabled = false; return; }
+      const cols = Object.keys(rows[0]); const csv = "\ufeff" + [cols.join(",")].concat(rows.map(r => cols.map(c => { let v = r[c]; if (v == null) v = ""; v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(","))).join("\n");
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" })); a.download = "roru-family-" + b.dataset.x + "-" + new Date().toISOString().slice(0, 10) + ".csv"; document.body.appendChild(a); a.click(); a.remove(); } catch (e) { R.toast(R.errText(e)); } b.disabled = false; });
+  function render() { const on = !!st.sess; $("#login").classList.toggle("hide", on); $("#main").classList.toggle("hide", !on); $("#logout").classList.toggle("hide", !on); $("#refresh").classList.toggle("hide", !on); }
+  render(); load();
+})();
+</script>
+</body>
+</html>

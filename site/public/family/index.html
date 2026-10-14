@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="theme-color" content="#0b0d12">
+<title>Roru Family — RORUBARU</title>
+<link rel="icon" href="/icon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-icon.png">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f2">
+<script src="/loyalty/vendor/qrcode.js"></script>
+<script src="/loyalty/loyalty.js?v=f2"></script>
+</head>
+<body>
+<div class="wrap" id="app" style="visibility:hidden">
+  <div class="top">
+    <div class="brand"><img src="/logo.png" alt="RORUBARU"><span class="fam" data-t="family"></span></div>
+    <div class="langs"><button data-lang="en">EN</button><button data-lang="zh">繁中</button></div>
+  </div>
+
+  <!-- sign in -->
+  <section id="signin">
+    <h1 data-t="p_tag"></h1>
+    <p class="muted" id="subLine"></p>
+    <div class="card">
+      <div id="step1">
+        <label class="field"><span data-t="phone"></span><input id="phone" type="tel" inputmode="tel" autocomplete="tel" data-tp="phone_ph"></label>
+        <div class="err hide" id="err1"></div>
+        <button class="btn" id="btnSend" data-t="send"></button>
+      </div>
+      <div id="step2" class="hide">
+        <p class="small muted"><span id="sentTo"></span> · <a href="#" id="changeNo" data-t="change"></a></p>
+        <div class="notice hide" id="testHint"><span data-t="test_hint"></span> <b class="code" id="testCode"></b></div>
+        <label class="field"><span data-t="code"></span><input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" data-tp="code_ph"></label>
+        <label class="field" id="nameField"><span data-t="name"></span><input id="name" type="text" autocomplete="given-name" data-tp="name_ph"></label>
+        <label class="check" id="consentRow"><input type="checkbox" id="consent"><span data-t="consent"></span></label>
+        <div class="err hide" id="err2"></div>
+        <button class="btn" id="btnJoin" data-t="join"></button>
+        <p class="center small" style="margin-top:10px"><a href="#" id="resend" data-t="resend"></a></p>
+      </div>
+    </div>
+    <p class="tiny" data-t="preview_note"></p>
+  </section>
+
+  <!-- member -->
+  <section id="member" class="hide">
+    <div class="row" style="justify-content:space-between;align-items:flex-start">
+      <div><h1 id="hello" style="margin-bottom:2px"></h1><p class="muted small" id="tierLine"></p></div>
+      <span class="pill on" id="tierPill"></span>
+    </div>
+    <div class="card center" style="padding:22px 16px">
+      <div class="tiny" style="letter-spacing:.1em;text-transform:uppercase" data-t="your_points"></div>
+      <div style="font-size:64px;font-weight:900;line-height:1;margin:6px 0" id="pts">0</div>
+      <div class="muted small" id="nextReward"></div>
+      <div style="height:8px;border-radius:99px;background:var(--ink);margin:12px 0 4px;overflow:hidden"><div id="bar" style="height:100%;width:0;background:var(--orange);transition:width .6s"></div></div>
+      <div class="notice hide" id="pendingNote"></div>
+    </div>
+
+    <div class="card" id="scanCard">
+      <div id="scanIdle">
+        <h2 style="margin-top:0" data-t="scan"></h2>
+        <p class="muted small" data-t="scan_sub"></p>
+        <label class="btn" for="photo" style="margin-top:8px">📷 <span data-t="scan"></span></label>
+        <input id="photo" type="file" accept="image/*" capture="environment" class="hide">
+        <p class="center small" style="margin-top:10px"><a href="#" id="typeInstead" data-t="type_instead"></a></p>
+      </div>
+      <div id="scanBusy" class="hide center" style="padding:10px 0">
+        <img id="thumb" style="max-height:140px;border-radius:12px;display:none;margin:0 auto 10px">
+        <p data-t="reading"></p>
+        <div style="height:6px;border-radius:99px;background:var(--ink);overflow:hidden"><div id="ocrBar" style="height:100%;width:0;background:var(--orange);transition:width .3s"></div></div>
+      </div>
+      <div id="scanForm" class="hide">
+        <p class="small" id="readMsg"></p>
+        <label class="field"><span data-t="receipt_no"></span><input id="rNo" type="text" autocapitalize="characters" autocomplete="off"></label>
+        <label class="field"><span data-t="total"></span><input id="rTotal" type="text" inputmode="decimal" autocomplete="off"></label>
+        <label class="field"><span data-t="when"></span><input id="rAt" type="datetime-local"></label>
+        <label class="field"><span data-t="shop"></span><div class="shops" id="rShops" style="margin:0"></div></label>
+        <div class="err hide" id="rErr"></div>
+        <button class="btn" id="rSubmit" data-t="confirm_add"></button>
+        <p class="center small" style="margin-top:10px"><a href="#" id="rCancel" data-t="retake"></a></p>
+      </div>
+    </div>
+
+    <h2 data-t="ladder"></h2>
+    <div id="ladder"></div>
+    <div id="rewards"></div>
+
+    <div class="card">
+      <h2 style="margin-top:0" data-t="receipts"></h2>
+      <div id="history"></div>
+    </div>
+
+    <div class="card center">
+      <h2 style="margin-top:0" data-t="your_code"></h2>
+      <div class="qr" id="memberQr"></div>
+      <p class="code" id="memberCode"></p>
+      <p class="small muted" id="memberPhone"></p>
+      <p class="small muted" data-t="show_staff"></p>
+      <p class="tiny"><span data-t="member_since"></span> <span id="since"></span></p>
+    </div>
+    <p class="tiny" data-t="privacy"></p>
+    <p class="tiny" data-t="preview_note"></p>
+    <div class="row" style="margin-top:14px"><button class="btn ghost sm" id="signout" data-t="signout"></button><button class="btn ghost sm" id="delete" data-t="delete" style="margin-left:auto;color:#ff8a6a"></button></div>
+  </section>
+</div>
+
+<script>
+(async function () {
+  const R = window.RORU, t = R.t, $ = (s) => document.querySelector(s);
+  await R.gate();
+  $("#app").style.visibility = "visible";
+  document.querySelectorAll(".langs button").forEach(b => b.onclick = () => { R.setLang(b.dataset.lang); render(); });
+  const state = { token: localStorage.getItem("roru_member_token"), me: null, phone: "", cfg: null, lastPoints: null };
+  R.rpc("family_config").then(c => { state.cfg = c; if (c.test_mode) { $("#testHint").classList.remove("hide"); $("#testCode").textContent = "246810"; } }).catch(() => {});
+
+  // ----- sign in -----
+  $("#btnSend").onclick = async () => {
+    const ph = $("#phone").value; $("#err1").classList.add("hide"); $("#btnSend").disabled = true;
+    try { const r = await R.rpc("family_request_code", { p_phone: ph, p_lang: R.lang() }); state.phone = ph; $("#sentTo").textContent = r.phone_masked; $("#step1").classList.add("hide"); $("#step2").classList.remove("hide"); setTimeout(() => $("#code").focus(), 100); }
+    catch (e) { $("#err1").textContent = R.errText(e); $("#err1").classList.remove("hide"); }
+    $("#btnSend").disabled = false;
+  };
+  $("#phone").addEventListener("keydown", e => { if (e.key === "Enter") $("#btnSend").click(); });
+  $("#changeNo").onclick = (e) => { e.preventDefault(); $("#step2").classList.add("hide"); $("#step1").classList.remove("hide"); };
+  $("#resend").onclick = (e) => { e.preventDefault(); $("#btnSend").click(); R.toast("✓"); };
+  $("#btnJoin").onclick = async () => {
+    $("#err2").classList.add("hide"); $("#btnJoin").disabled = true;
+    try {
+      const r = await R.rpc("family_verify_code", { p_phone: state.phone, p_code: $("#code").value.trim(), p_consent: $("#consent").checked, p_name: $("#name").value, p_lang: R.lang() });
+      state.token = r.token; localStorage.setItem("roru_member_token", r.token); state.me = r.member; state.lastPoints = r.member.points; render(); if (r.is_new) R.burst();
+    } catch (e) { $("#err2").textContent = R.errText(e); $("#err2").classList.remove("hide"); }
+    $("#btnJoin").disabled = false;
+  };
+  $("#code").addEventListener("keydown", e => { if (e.key === "Enter") $("#btnJoin").click(); });
+
+  // ----- member -----
+  async function load(quiet) {
+    if (!state.token) { render(); return; }
+    try { const me = await R.rpc("family_me", { p_token: state.token }); state.me = me; render(); }
+    catch (e) { if (e.code === "not_signed_in") { localStorage.removeItem("roru_member_token"); state.token = null; state.me = null; render(); } else if (!quiet) R.toast(R.errText(e)); }
+  }
+  const tierName = (k) => t("tier_" + (k || "nori"));
+  const shops = () => (state.cfg && state.cfg.shops) || [{ id: "wanchai", name_en: "Wan Chai", name_zh: "灣仔" }, { id: "central", name_en: "Central", name_zh: "中環" }];
+  function render() {
+    R.applyI18n();
+    $("#subLine").textContent = t("p_sub", { r: (state.cfg && state.cfg.points_per_hkd) || 1 });
+    const me = state.me;
+    $("#signin").classList.toggle("hide", !!me); $("#member").classList.toggle("hide", !me);
+    if (!me) return;
+    const zh = R.lang() === "zh";
+    $("#hello").textContent = me.name ? (zh ? me.name + "，你好 👋" : "Hey " + me.name + " 👋") : (zh ? "你好 👋" : "Hey there 👋");
+    $("#tierPill").textContent = tierName(me.tier);
+    $("#tierLine").textContent = t("tier_line", { spend: "HK$" + me.spend_lifetime, next: me.tier_next ? t("tier_next", { n: "HK$" + Math.max(0, me.tier_next.at - me.spend_lifetime), name: tierName(me.tier_next.name) }) : (me.tier === "kama" ? t("top_level") : t("kama_note")) });
+    // points + next reward
+    const gained = state.lastPoints !== null && me.points > state.lastPoints;
+    $("#pts").textContent = me.points;
+    const next = me.ladder.find(l => l.points_cost > me.points) || me.ladder[me.ladder.length - 1];
+    if (next) { $("#nextReward").textContent = (me.points >= next.points_cost ? "✓ " : t("need_more", { n: next.points_cost - me.points }) + " → ") + (zh ? next.name_zh : next.name_en); $("#bar").style.width = Math.min(100, 100 * me.points / next.points_cost) + "%"; }
+    $("#pendingNote").classList.toggle("hide", !me.pending_receipts); $("#pendingNote").textContent = "⏳ " + t("pending_hint", { n: me.pending_receipts });
+    if (gained) { R.toast(t("added_points", { n: me.points - state.lastPoints }), 2600); R.burst(); }
+    state.lastPoints = me.points;
+    // ladder
+    $("#ladder").innerHTML = me.ladder.map(l => '<div class="reward row"><div class="grow"><b>' + (zh ? l.name_zh : l.name_en) + '</b><div class="small muted">' + (zh ? l.detail_zh : l.detail_en || "") + '</div></div><button class="btn sm ' + (me.points >= l.points_cost ? "" : "ghost") + '" data-claim="' + l.id + '" ' + (me.points >= l.points_cost ? "" : "disabled") + '>' + (me.points >= l.points_cost ? t("claim", { n: l.points_cost }) : l.points_cost + " " + t("points")) + "</button></div>").join("");
+    $("#ladder").querySelectorAll("[data-claim]").forEach(b => b.onclick = async () => { b.disabled = true; try { const r = await R.rpc("family_claim_reward", { p_token: state.token, p_reward_id: +b.dataset.claim }); state.me = r.member; state.lastPoints = r.member.points; render(); R.toast(t("claimed"), 2600); $("#rewards").scrollIntoView({ behavior: "smooth" }); } catch (e) { R.toast(R.errText(e)); b.disabled = false; } });
+    // earned / revealed / redeemed rewards
+    const box = $("#rewards"); box.innerHTML = "";
+    me.rewards.forEach(rw => {
+      const d = document.createElement("div"); d.className = "reward " + rw.status;
+      const name = zh ? rw.name_zh : rw.name_en, detail = zh ? rw.detail_zh : rw.detail_en;
+      if (rw.status === "earned") {
+        d.innerHTML = '<b>' + t("earned") + '</b><div class="scratch"><div class="under"><b>' + name + (rw.upgraded ? " ⬆️" : "") + '</b><span class="small muted">' + (rw.upgraded ? t("upgrade") : (detail || "")) + '</span></div><canvas></canvas><div class="hint">' + t("scratch_hint") + "</div></div>";
+        box.appendChild(d); setupScratch(d.querySelector(".scratch"), rw.id);
+      } else if (rw.status === "revealed") {
+        d.innerHTML = '<div class="row"><div class="grow"><b style="font-size:18px">' + name + (rw.upgraded ? " ⬆️" : "") + '</b><p class="small muted" style="margin:4px 0">' + (detail || "") + '</p><p class="small">' + t("reveal_done") + '</p><p class="code">' + rw.code + '</p></div><div class="qr">' + R.qrSvg("RR:" + rw.code, 120) + "</div></div>";
+        box.appendChild(d);
+      } else {
+        d.innerHTML = '<div class="row"><span class="grow muted">' + name + "</span><span class='pill'>" + t("redeemed") + " · " + R.fmtDay(rw.redeemed_at) + "</span></div>";
+        box.appendChild(d);
+      }
+    });
+    // receipts
+    $("#history").innerHTML = me.receipts.map(r => '<div class="hist"><span>' + R.fmtDay(r.at) + " · " + (zh ? (r.shop_zh || "") : (r.shop || "")) + " · " + (/^STAFF-/.test(r.receipt_no) ? "(staff)" : "#" + r.receipt_no) + "</span><span>HK$" + (+r.total_hkd).toFixed(0) + " → " + (r.status === "approved" ? "+" + r.points : r.status === "pending" ? "⏳" : "✕") + "</span></div>").join("") || '<p class="muted small">—</p>';
+    $("#memberQr").innerHTML = R.qrSvg("RF:" + me.member_code, 180); $("#memberCode").textContent = me.member_code; $("#memberPhone").textContent = me.phone_masked;
+    $("#since").textContent = R.fmtDay(me.member_since);
+    renderShopPick();
+  }
+  // ----- receipt scan (client-side OCR, tesseract.js from a public CDN, no key) -----
+  let ocr = { conf: null, text: null, fromOcr: false, shop: localStorage.getItem("roru_shop_guess") || "wanchai" };
+  function renderShopPick() { $("#rShops").innerHTML = shops().map(s => '<button type="button" data-id="' + s.id + '" class="' + (s.id === ocr.shop ? "on" : "") + '">' + (R.lang() === "zh" ? s.name_zh : s.name_en) + "</button>").join(""); $("#rShops").querySelectorAll("button").forEach(b => b.onclick = () => { ocr.shop = b.dataset.id; localStorage.setItem("roru_shop_guess", ocr.shop); renderShopPick(); }); }
+  const showScan = (which) => ["scanIdle", "scanBusy", "scanForm"].forEach(id => $("#" + id).classList.toggle("hide", id !== which));
+  $("#typeInstead").onclick = (e) => { e.preventDefault(); ocr = { ...ocr, conf: null, text: null, fromOcr: false }; $("#rNo").value = ""; $("#rTotal").value = ""; $("#rAt").value = localNow(); $("#readMsg").textContent = ""; showScan("scanForm"); $("#rNo").focus(); };
+  $("#rCancel").onclick = (e) => { e.preventDefault(); showScan("scanIdle"); $("#photo").value = ""; };
+  const localNow = () => { const d = new Date(Date.now() + 8 * 3600e3); return d.toISOString().slice(0, 16); };
+  async function downscale(file, max) { const bmp = await createImageBitmap(file); const k = Math.min(1, max / Math.max(bmp.width, bmp.height)); const c = document.createElement("canvas"); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k); const x = c.getContext("2d"); x.drawImage(bmp, 0, 0, c.width, c.height); const d = x.getImageData(0, 0, c.width, c.height), p = d.data; for (let i = 0; i < p.length; i += 4) { const g = 0.299 * p[i] + 0.587 * p[i + 1] + 0.114 * p[i + 2]; const v = g < 150 ? Math.max(0, g - 40) : Math.min(255, g + 40); p[i] = p[i + 1] = p[i + 2] = v; } x.putImageData(d, 0, 0); return c; }
+  function parseReceipt(text) {
+    const lines = text.split(/\n/).map(l => l.trim()).filter(Boolean); const out = { no: "", total: "", at: "" };
+    const money = (s) => { const m = [...s.matchAll(/(?:HK\$|\$|HKD)?\s*(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d{1,2}))?/g)].map(x => parseFloat(x[1].replace(/,/g, "") + "." + (x[2] || "0"))).filter(v => v > 0 && v < 100000); return m; };
+    // total: a line with a total keyword, take the last amount on it (or the next line)
+    for (let i = 0; i < lines.length; i++) { if (/\b(grand\s*total|total|amount\s*due|net|balance|合計|總計|總額|應付|实付|實付)\b/i.test(lines[i]) && !/sub\s*-?total|小計|discount|tax|tip|change|cash|visa|master|card|tender|paid/i.test(lines[i])) { let m = money(lines[i].replace(/\b(grand\s*total|total|amount\s*due|net|balance)\b/ig, "")); if (!m.length && lines[i + 1]) m = money(lines[i + 1]); if (m.length) out.total = m[m.length - 1].toFixed(2); } }
+    if (!out.total) { const all = []; lines.forEach(l => money(l).forEach(v => { if (/\.\d{2}\b/.test(l)) all.push(v); })); if (all.length) out.total = Math.max(...all).toFixed(2); }
+    // receipt number
+    const cands = []; lines.forEach(l => { const m = /(receipt|rcpt|invoice|inv|bill|order|check|chk|cheque|ticket|trans|txn|ref|no|num|number|#|單號|收據|發票|帳單|单号)\.?\s*(no\.?|number|#|:|：)?\s*[:#：]?\s*([A-Z0-9][A-Z0-9\-\/]{2,})/i.exec(l); if (m && /\d/.test(m[3])) cands.push(m[3]); });
+    if (!cands.length) lines.forEach(l => { if (/total|hk\$|\$/i.test(l)) return; const m = l.match(/\b[A-Z]{0,3}[\-]?\d{4,}\b/g); if (m) m.forEach(x => { if (!/^(\d{8}|\d{4}\s?\d{4})$/.test(x) && !/^20\d{6}$/.test(x)) cands.push(x); }); });
+    out.no = (cands.sort((a, b) => (b.replace(/\D/g, "").length - a.replace(/\D/g, "").length))[0] || "").toUpperCase();
+    // date & time (HK: day/month/year)
+    let dm = /(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/.exec(text); let d = null;
+    if (dm) d = { y: +dm[1], m: +dm[2], d: +dm[3] }; else { dm = /(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/.exec(text); if (dm) d = { d: +dm[1], m: +dm[2], y: +dm[3] < 100 ? 2000 + +dm[3] : +dm[3] }; }
+    const tm = /\b([01]?\d|2[0-3]):([0-5]\d)\b/.exec(text);
+    if (d && d.m >= 1 && d.m <= 12 && d.d >= 1 && d.d <= 31) out.at = d.y + "-" + String(d.m).padStart(2, "0") + "-" + String(d.d).padStart(2, "0") + "T" + (tm ? String(+tm[1]).padStart(2, "0") + ":" + tm[2] : "12:00");
+    return out;
+  }
+  $("#photo").addEventListener("change", async () => {
+    const f = $("#photo").files[0]; if (!f) return;
+    showScan("scanBusy"); $("#ocrBar").style.width = "5%";
+    try {
+      const cv = await downscale(f, 1600); $("#thumb").src = cv.toDataURL("image/jpeg", 0.6); $("#thumb").style.display = "block";
+      if (!window.Tesseract) await new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+      const withTimeout = (pr, ms) => Promise.race([pr, new Promise((_, rej) => setTimeout(() => rej(new Error("ocr_timeout")), ms))]);
+      const logger = (m) => { if (m.status === "recognizing text") $("#ocrBar").style.width = (10 + 90 * m.progress) + "%"; else $("#ocrBar").style.width = "10%"; };
+      let data = null, worker = null;
+      for (const opts of [{ logger }, { logger, corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.0/tesseract-core-lstm.wasm.js" }]) {
+        try { worker = await withTimeout(Tesseract.createWorker("eng", 1, opts), 40000); data = (await withTimeout(worker.recognize(cv), 60000)).data; await worker.terminate(); break; }
+        catch (e) { try { if (worker) await worker.terminate(); } catch (e2) {} worker = null; }
+      }
+      if (!data) throw new Error("ocr_failed");
+      const p = parseReceipt(data.text || ""); ocr = { ...ocr, conf: Math.round(data.confidence || 0), text: (data.text || "").slice(0, 2000), fromOcr: true };
+      $("#rNo").value = p.no; $("#rTotal").value = p.total; $("#rAt").value = p.at || localNow(); ocr._no = p.no; ocr._total = p.total;
+      const good = p.no && p.total && p.at && ocr.conf >= 60; $("#readMsg").textContent = (good ? "✓ " + t("read_ok") : "⚠️ " + t("read_fail")) + " (" + ocr.conf + "%)";
+      showScan("scanForm");
+    } catch (e) { ocr = { ...ocr, conf: null, text: null, fromOcr: false }; $("#rNo").value = ""; $("#rTotal").value = ""; $("#rAt").value = localNow(); $("#readMsg").textContent = "⚠️ " + t("read_fail"); showScan("scanForm"); }
+    $("#photo").value = "";
+  });
+  $("#rSubmit").onclick = async () => {
+    $("#rErr").classList.add("hide"); $("#rSubmit").disabled = true;
+    const total = parseFloat(String($("#rTotal").value).replace(/[^0-9.]/g, "")); const at = $("#rAt").value ? new Date($("#rAt").value + ":00+08:00").toISOString() : null;
+    const edited = !ocr.fromOcr || (ocr._no !== undefined && ($("#rNo").value !== ocr._no || $("#rTotal").value !== ocr._total));
+    try {
+      const r = await R.rpc("family_submit_receipt", { p_token: state.token, p_receipt_no: $("#rNo").value.trim(), p_total_hkd: total, p_receipt_at: at, p_shop: ocr.shop, p_source: ocr.fromOcr && !edited ? "ocr" : "manual", p_ocr_confidence: ocr.conf, p_ocr_text: ocr.text });
+      showScan("scanIdle"); state.me = r.member;
+      if (r.status === "approved") { R.burst(); R.toast(t("added_points", { n: r.points }), 3000); state.lastPoints = r.member.points; } else { R.toast(t("queued"), 4000); }
+      render();
+    } catch (e) { $("#rErr").textContent = R.errText(e); $("#rErr").classList.remove("hide"); }
+    $("#rSubmit").disabled = false;
+  };
+  function setupScratch(el, id) {
+    const c = el.querySelector("canvas"), ctx = c.getContext("2d");
+    const size = () => { const r = el.getBoundingClientRect(); c.width = r.width * devicePixelRatio; c.height = r.height * devicePixelRatio; paint(); };
+    const paint = () => { ctx.fillStyle = "#1d2a1c"; ctx.fillRect(0, 0, c.width, c.height); for (let i = 0; i < 700; i++) { ctx.fillStyle = "rgba(" + (10 + Math.random() * 30) + "," + (30 + Math.random() * 40) + "," + (15 + Math.random() * 25) + ",.6)"; ctx.fillRect(Math.random() * c.width, Math.random() * c.height, 4 * devicePixelRatio, 4 * devicePixelRatio); } ctx.fillStyle = "rgba(246,243,231,.85)"; ctx.font = "900 " + (16 * devicePixelRatio) + "px Geist, sans-serif"; ctx.textAlign = "center"; ctx.fillText(t("scratch"), c.width / 2, c.height / 2 + 6 * devicePixelRatio); };
+    let down = false, cleared = 0, done = false;
+    const pt = (e) => { const r = c.getBoundingClientRect(); const p = e.touches ? e.touches[0] : e; return [(p.clientX - r.left) * devicePixelRatio, (p.clientY - r.top) * devicePixelRatio]; };
+    const scratch = (e) => { if (!down || done) return; e.preventDefault(); const [x, y] = pt(e); ctx.globalCompositeOperation = "destination-out"; ctx.beginPath(); ctx.arc(x, y, 26 * devicePixelRatio, 0, Math.PI * 2); ctx.fill(); ctx.globalCompositeOperation = "source-over"; if (++cleared % 12 === 0) check(); };
+    const check = () => { const d = ctx.getImageData(0, 0, c.width, c.height).data; let clear = 0; for (let i = 3; i < d.length; i += 16 * 4) if (d[i] === 0) clear++; if (clear / (d.length / 64) > 0.45) reveal(); };
+    const reveal = async () => { if (done) return; done = true; c.style.transition = "opacity .5s"; c.style.opacity = 0; R.burst(); try { state.me = await R.rpc("family_reveal", { p_token: state.token, p_redemption_id: id }); setTimeout(render, 900); } catch (e) { R.toast(R.errText(e)); } };
+    c.addEventListener("pointerdown", e => { down = true; scratch(e); }); c.addEventListener("pointermove", scratch); window.addEventListener("pointerup", () => down = false);
+    c.addEventListener("touchstart", e => { down = true; scratch(e); }, { passive: false }); c.addEventListener("touchmove", scratch, { passive: false }); c.addEventListener("touchend", () => down = false);
+    size();
+  }
+  $("#signout").onclick = async () => { try { await R.rpc("family_signout", { p_token: state.token }); } catch (e) {} localStorage.removeItem("roru_member_token"); state.token = null; state.me = null; state.lastPoints = null; render(); };
+  $("#delete").onclick = async () => { if (!confirm(t("delete_confirm"))) return; try { await R.rpc("family_delete_me", { p_token: state.token }); } catch (e) { R.toast(R.errText(e)); return; } localStorage.removeItem("roru_member_token"); state.token = null; state.me = null; render(); R.toast("✓"); };
+  document.addEventListener("roru:lang", render);
+  render(); await load();
+  // live refresh so the plate animates when staff add a roll
+  setInterval(() => { if (document.visibilityState === "visible" && state.token && $("#scanForm").classList.contains("hide")) load(true); }, 10000);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") load(true); });
+})();
+</script>
+</body>
+</html>

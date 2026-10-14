@@ -39,7 +39,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/story"],
+        disallow: ["/api/", "/story", "/family", "/staff", "/loyalty/"],
       },
       {
         userAgent: AI_SCRAPERS,
