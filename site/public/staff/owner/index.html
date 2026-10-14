@@ -8,20 +8,21 @@
 <title data-tt="{prog} — Owner">High Rollers — Owner</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f21">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f22">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f21"></script>
-<script src="/loyalty/monthend.js?v=f21"></script>
+<script src="/loyalty/loyalty.js?v=f22"></script>
+<script src="/loyalty/monthend.js?v=f22"></script>
 <style>
 /* v36 owner dashboard */
 .dash{margin:16px 0 18px}
 .dash h3{margin:0;font-size:15px;font-weight:600;color:var(--cream)}
 .dash .sub{font-size:13px;color:var(--muted);margin:2px 0 0}
 .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0 4px}
-.kpi{background:var(--ink2);border:1px solid var(--line);border-radius:18px;padding:16px 16px 14px}
+.kpi{background:var(--ink2);border:1px solid var(--line);border-radius:18px;padding:16px 16px 14px;min-width:0}
 .kpi .lbl{font-size:13px;color:var(--muted)}
 .kpi .val small{font-size:.6em;font-weight:600;margin-right:2px;color:var(--muted)}
-.kpi .val{font-size:26px;font-weight:700;line-height:1.15;margin:6px 0 8px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .val{font-size:26px;font-weight:700;line-height:1.15;margin:6px 0 8px;letter-spacing:-.01em;white-space:nowrap;overflow:visible;text-overflow:clip}
+/* v43: values auto-shrink to fit the card (fitKpis); 6+ digit values switch to a compact form (HK$209.5k) only if the full figure cannot fit */
 .kpi .chg{font-size:12px;color:var(--muted)}
 .kpi .chg b{font-weight:700;margin-right:4px}
 .chg .up{color:var(--green)} .chg .down{color:#ff7a59} .chg .flat{color:var(--muted)}
@@ -57,7 +58,8 @@
 .dash details .in{padding:0 0 16px}
 .nums{display:grid;grid-template-columns:1fr;gap:0}
 .nums div{display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
-.nums div span{color:var(--muted)}
+.nums div span{color:var(--muted);min-width:0}
+.nums div{gap:10px}.nums div b,.nums div strong{white-space:nowrap}
 .tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .dash table{width:100%;border-collapse:collapse;font-size:13px}
 .dash th{text-align:left;color:var(--muted);font-weight:500;padding:8px 10px 8px 0;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -158,21 +160,22 @@
   }
   function renderDash() {
     const d = st.data, x = st.dash || {};
-    const kpi = (lbl, val, c) => '<div class="kpi"><div class="lbl">' + lbl + '</div><div class="val">' + val + '</div><div class="chg">' + c + "</div></div>";
+    const kpi = (lbl, val, c) => { const v = typeof val === "object" ? val : { f: val, s: val }; return '<div class="kpi"><div class="lbl">' + lbl + '</div><div class="val" data-f="' + esc(v.f) + '" data-s="' + esc(v.s) + '">' + v.f + '</div><div class="chg">' + c + "</div></div>"; };
+    const kv = (n, money) => { n = Math.round(+n || 0); const pre = money ? "<small>HK$</small>" : ""; const a = Math.abs(n); const s = a >= 1e6 ? (n / 1e6).toFixed(2).replace(/\.?0+$/, "") + "M" : a >= 1e5 ? (n / 1e3).toFixed(1).replace(/\.0$/, "") + "k" : fmt(n); return { f: pre + fmt(n), s: pre + s }; };
     const tierCol = { nori: "#4CC38A", gohan: "#F6F3E7", tobiko: "#F64501", kama: "#E8B84A" }, tierNm = { nori: "Nori", gohan: "Gohan", tobiko: "Tobiko", kama: "Kama" };
     const tiers = ["nori", "gohan", "tobiko", "kama"].map(k => [k, +(d.tiers || {})[k] || 0]), tTot = tiers.reduce((a, t) => a + t[1], 0) || 1;
     let off = 0; const C = 2 * Math.PI * 38;
     const donut = '<svg viewBox="0 0 100 100" width="104" height="104" style="flex:0 0 auto"><circle cx="50" cy="50" r="38" fill="none" stroke="rgba(246,243,231,.08)" stroke-width="12"/>' +
       tiers.filter(t => t[1]).map(t => { const len = t[1] / tTot * C, s = '<circle cx="50" cy="50" r="38" fill="none" stroke="' + tierCol[t[0]] + '" stroke-width="12" stroke-dasharray="' + len.toFixed(2) + " " + (C - len).toFixed(2) + '" stroke-dashoffset="' + (-off).toFixed(2) + '" transform="rotate(-90 50 50)"/>'; off += len; return s; }).join("") +
-      '<text x="50" y="49" text-anchor="middle" font-size="18" font-weight="700" fill="#F6F3E7">' + fmt(d.members) + '</text><text x="50" y="64" text-anchor="middle" font-size="9" fill="rgba(246,243,231,.6)">members</text></svg>';
+      '<text x="50" y="49" text-anchor="middle" font-size="' + (fmt(d.members).length <= 5 ? 18 : fmt(d.members).length <= 6 ? 15 : 12) + '" font-weight="700" fill="#F6F3E7">' + fmt(d.members) + '</text><text x="50" y="64" text-anchor="middle" font-size="9" fill="rgba(246,243,231,.6)">members</text></svg>';
     const items = (x.by_item || []), iMax = Math.max(1, ...items.map(i => +i.n));
     const pl = +x.pos_logged || 0, pn = +x.pos_not || 0, pt = pl + pn;
     const days = {}; d.per_day.forEach(r => { (days[r.day] = days[r.day] || []).push(r); });
     const shopNm = (id) => id === "wanchai" ? "Wan Chai" : id === "central" ? "Central" : "Other";
     $("#tab-days").innerHTML =
       '<h3>Last 7 days</h3><p class="sub">Compared with the 7 days before</p>' +
-      '<div class="kpis">' + kpi("Spend", hkdK(x.spend_7d != null ? x.spend_7d : d.spend_7d), chg(x.spend_7d, x.spend_prev)) + kpi("Visits", fmt(x.visits_7d != null ? x.visits_7d : d.visits_7d), chg(x.visits_7d, x.visits_prev)) +
-        kpi("New members", fmt(x.members_7d != null ? x.members_7d : d.members_7d), chg(x.members_7d, x.members_prev)) + kpi("Rewards redeemed", fmt(x.redeemed_7d || 0), chg(x.redeemed_7d, x.redeemed_prev)) + "</div>" +
+      '<div class="kpis">' + kpi("Spend", kv(x.spend_7d != null ? x.spend_7d : d.spend_7d, true), chg(x.spend_7d, x.spend_prev)) + kpi("Visits", kv(x.visits_7d != null ? x.visits_7d : d.visits_7d), chg(x.visits_7d, x.visits_prev)) +
+        kpi("New members", kv(x.members_7d != null ? x.members_7d : d.members_7d), chg(x.members_7d, x.members_prev)) + kpi("Rewards redeemed", kv(x.redeemed_7d || 0), chg(x.redeemed_7d, x.redeemed_prev)) + "</div>" +
       '<div class="dcard"><div class="dhead"><div><h3>Last 30 days</h3><p class="sub">Visits per day and spend per day</p></div><div class="seg" id="dSeg"><button data-shop="all">All</button><button data-shop="wanchai">Wan Chai</button><button data-shop="central">Central</button></div></div>' +
         '<div class="chart" id="dChart"></div><div class="legend"><span><i style="background:#F64501"></i>Visits</span><span><i style="background:#E8B84A;height:3px;border-radius:2px;vertical-align:3px"></i>Spend (HK$, right scale)</span></div><div class="dtot" id="dTot"></div></div>' +
       '<div class="minis">' +
@@ -187,9 +190,24 @@
       '<details><summary>See table · last 30 days</summary><div class="in tscroll"><table><tr><th>Day</th><th>Shop</th><th class="n">Visits</th><th class="n">Receipts</th><th class="n">Spend</th></tr>' +
         (Object.keys(days).sort().reverse().map(k => days[k].map((r, n) => "<tr><td>" + (n ? "" : k) + "</td><td>" + shopNm(r.shop) + '</td><td class="n">' + fmt(r.visits) + '</td><td class="n">' + fmt(r.receipts) + '</td><td class="n">' + hkd(r.spend) + "</td></tr>").join("")).join("") || '<tr><td colspan="5" class="muted">Nothing yet</td></tr>') + "</table></div></details>";
     document.querySelectorAll("#dSeg button").forEach(b => b.onclick = () => { st.shopSel = b.dataset.shop; drawChart(); });
-    requestAnimationFrame(drawChart);
+    requestAnimationFrame(() => { drawChart(); fitKpis(); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitKpis);
+    setTimeout(fitKpis, 700); setTimeout(fitKpis, 2000);
   }
-  let rzT = null; window.addEventListener("resize", () => { clearTimeout(rzT); rzT = setTimeout(drawChart, 150); });
+  if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener("loadingdone", () => fitKpis());
+  function fitKpis() {
+    document.querySelectorAll(".kpi .val[data-f]").forEach(el => {
+      const ok = () => el.scrollWidth <= el.clientWidth + 0.5;
+      const shrink = (min) => { let f = parseFloat(getComputedStyle(el).fontSize); while (!ok() && f > min) { f -= 1; el.style.fontSize = f + "px"; } };
+      el.style.whiteSpace = ""; el.style.fontSize = ""; el.innerHTML = el.dataset.f; el.title = "";
+      if (!el.clientWidth) return;
+      shrink(19);
+      if (!ok() && el.dataset.s !== el.dataset.f) { el.style.fontSize = ""; el.innerHTML = el.dataset.s; el.title = el.dataset.f.replace(/<[^>]+>/g, ""); shrink(16); }
+      shrink(12);
+      if (!ok()) el.style.whiteSpace = "normal";
+    });
+  }
+  let rzT = null; window.addEventListener("resize", () => { clearTimeout(rzT); rzT = setTimeout(() => { drawChart(); fitKpis(); }, 150); });
   async function load() {
     if (!st.sess) return;
     try { const r2 = await Promise.all([R.rpc("owner_stats", { p_token: st.sess.token }), R.rpc("owner_dashboard", { p_token: st.sess.token }).catch(() => null)]); st.data = r2[0]; st.dash = r2[1]; } catch (e) { if (e.code === "staff_not_signed_in" || e.code === "owner_only") { $("#logout").click(); return; } R.toast(R.errText(e)); return; }
