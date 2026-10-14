@@ -13,10 +13,10 @@
 <link rel="manifest" href="/loyalty/staff.webmanifest">
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f22">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f23">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f22"></script>
-<script src="/loyalty/monthend.js?v=f22"></script>
+<script src="/loyalty/loyalty.js?v=f23"></script>
+<script src="/loyalty/monthend.js?v=f23"></script>
 <style>body{overscroll-behavior:none}
 .gcard{border:1px solid var(--line);background:var(--ink2);border-radius:18px;padding:14px 16px;margin:0 0 12px}
 .gcard .gh{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
@@ -187,6 +187,12 @@
       case "ready": if (likes) parts = [likes, now(sg.reward)]; else { lead = zh ? "💡 今晚可換：" : "💡 Can use now: "; parts = [rn(sg.reward)]; } break;
       default: { const k = m && +m.used_rewards > 0 ? "sg_next" : "sg_first"; parts = [likes, zh ? t(k) + "係" + rn(sg.reward) + "，再嚟 " + v(sg.visits) : t(k) + " " + rn(sg.reward) + ", " + v(sg.visits) + " away"]; }
     }
+    const vr = st.cfg && st.cfg.visit_reward;
+    if (vr && m && +m.per_plate > 0) {
+      const vn = zh ? vr.name_zh : vr.name_en.charAt(0).toLowerCase() + vr.name_en.slice(1), left = +m.per_plate - (+m.stamps || 0);
+      if (left === 1 && !m.visited_today) parts.unshift(zh ? "今日蓋印即得" + vn : "stamp today = " + vn);
+      else if (left === 1) parts.unshift(zh ? "再嚟 1 次可換" + vn : "1 visit from " + vn);
+    }
     return "<span class='sg'>" + esc(lead + parts.filter(Boolean).join(" · ")) + "</span>";
   }
   function renderMembers() {
@@ -225,7 +231,7 @@
   $("#visitBtn").onclick = async () => {
     if (!st.sel) return; $("#visitBtn").disabled = true;
     try { const r = await R.rpc("staff_visit", { p_token: st.sess.token, p_who: st.sel.member_code, p_shop: st.shop, p_demo: !!($("#demo") && $("#demo").checked && st.cfg && st.cfg.env !== "live") }); const v = r.visit || {};
-      if (v.added) { R.burst(v.gold ? ["#E8B84A", "#F6F3E7"] : undefined); await stayOn(r.member); ok(v.plate_full ? "🎉" : "🍣", v.plate_full ? t("r_plate") : t("r_visit_title"), "🍣 " + r.member.stamps + "/" + r.member.per_plate + (v.demo_day ? " · demo day " + v.day : "")); loadToday(); }
+      if (v.added) { R.burst(v.gold ? ["#E8B84A", "#F6F3E7"] : undefined); await stayOn(r.member); ok(v.plate_full ? "🎉" : "🍣", v.plate_full ? t("r_plate") : t("r_visit_title"), (v.plate_full && v.reward ? "🎁 " + (R.lang() === "zh" ? v.reward.name_zh : v.reward.name_en) + " · " + t("r_full_sub") : "🍣 " + r.member.stamps + "/" + r.member.per_plate) + (v.demo_day ? " · demo day " + v.day : "")); loadToday(); }
       else { show("⚠️", t("r_stamp_already"), t("r_already_sub"), ""); $("#visitBtn").disabled = false; } }
     catch (e) { show("⚠️", t("r_err"), R.errText(e), ""); $("#visitBtn").disabled = false; }
   };
@@ -233,7 +239,7 @@
     if (!st.sel) return; $("#aGo").disabled = true; $("#aErr").classList.add("hide");
     try { const r = await R.rpc("staff_award", { p_token: st.sess.token, p_who: st.sel.member_code, p_total_hkd: parseFloat(String($("#aTotal").value).replace(/[^0-9.]/g, "")), p_receipt_no: $("#aNo").value.trim() || null, p_shop: st.shop });
       const v = r.visit || {}; const okTitle = (v.gold ? t("r_gold_receipt") + " " : "") + t("r_points", { n: r.points }) + (v.added ? "  ·  " + t("r_stamp") : "") + (v.referral_bonus ? "  ·  👯 +" + v.referral_bonus : "");
-      const okSub = t("s_rate") + " " + mult(r.multiplier) + (r.member.tier && r.multiplier && +r.member.multiplier !== +r.multiplier ? " · " + t("s_now") + " " + tierName(r.member.tier) + " ⬆" : " (" + tierName(r.member.tier) + ")") + " · " + r.member.points + " " + t("s_pts") + " · 🍣 " + r.member.stamps + "/" + r.member.per_plate + (v.plate_full ? " — " + t("r_plate") : v.added ? "" : " — " + t("r_stamp_already"));
+      const okSub = t("s_rate") + " " + mult(r.multiplier) + (r.member.tier && r.multiplier && +r.member.multiplier !== +r.multiplier ? " · " + t("s_now") + " " + tierName(r.member.tier) + " ⬆" : " (" + tierName(r.member.tier) + ")") + " · " + r.member.points + " " + t("s_pts") + " · 🍣 " + r.member.stamps + "/" + r.member.per_plate + (v.plate_full ? " — " + t("r_plate") + (v.reward ? " 🎁 " + (R.lang() === "zh" ? v.reward.name_zh : v.reward.name_en) : "") : v.added ? "" : " — " + t("r_stamp_already"));
       R.burst(); $("#award").classList.add("hide"); await stayOn(r.member); ok(v.gold ? "✨" : v.plate_full ? "🎉" : "🧾", okTitle, okSub); loadToday(); }
     catch (e) { $("#aErr").textContent = e.code === "receipt_already_used" ? t("r_receipt_used") : R.errText(e); $("#aErr").classList.remove("hide"); }
     $("#aGo").disabled = false;

@@ -8,9 +8,9 @@
 <title data-tt="{prog} — RORUBARU">High Rollers — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f22">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f23">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f22"></script>
+<script src="/loyalty/loyalty.js?v=f23"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -95,6 +95,7 @@
       <div class="tiny" style="letter-spacing:.1em;text-transform:uppercase" data-t="your_plate"></div>
       <div class="plate-wrap"><div class="plate small-plate" id="plate"></div></div>
       <div style="font-weight:900;font-size:18px;margin-top:6px" id="plateLine"></div>
+      <div class="small" id="plateDetail" style="color:var(--gold,#E8B84A);margin-top:2px"></div>
       <div class="small muted" id="plateSub"></div>
     </div>
 
@@ -267,7 +268,8 @@
     html += '<div class="count"><b>' + n + "/" + per + "</b><span>" + t("visits") + "</span></div>";
     $("#plate").innerHTML = html; $("#plate").classList.toggle("full", n >= per);
     const vr = me.visit_reward, rn = vr ? (zh ? vr.name_zh : vr.name_en) : "";
-    $("#plateLine").textContent = n >= per - 1 && n < per ? t("plate_full_soon") : t("plate_line", { n: per - n, r: rn });
+    $("#plateLine").textContent = n >= per - 1 && n < per ? (rn ? t("plate_full_soon_r", { r: rn }) : t("plate_full_soon")) : t("plate_line", { n: per - n, r: rn });
+    const rd = vr ? (zh ? vr.detail_zh : vr.detail_en) : ""; $("#plateDetail").textContent = rd && !/placeholder|佔位/i.test(rd) ? rd : "";
     $("#plateSub").textContent = (me.visited_today ? t("visited_today") : t("stamp_rule")) + (me.plates_done ? " · " + t("plates_done_n", { n: me.plates_done }) : "");
     if (fresh) { R.toast(t("stamp_added"), 2600); }
   }
