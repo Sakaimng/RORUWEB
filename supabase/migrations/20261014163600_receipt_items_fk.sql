@@ -1,0 +1,2 @@
+alter table public.loyalty_receipt_items add constraint loyalty_receipt_items_receipt_fk foreign key (receipt_id) references public.loyalty_receipts(id) on delete cascade;
+alter table public.loyalty_receipt_items add constraint loyalty_receipt_items_phone_fk foreign key (phone) references public.loyalty_members(phone) on delete cascade on update cascade;

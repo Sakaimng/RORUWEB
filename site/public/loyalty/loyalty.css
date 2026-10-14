@@ -184,6 +184,7 @@ td input,td select{font-size:16px}
 
 .hookbar{display:flex;flex-direction:column;gap:2px;border-radius:14px;padding:12px 14px;margin:10px 0;background:linear-gradient(90deg,rgba(246,69,1,.25),rgba(232,184,74,.18));border:1px solid rgba(246,69,1,.5)}
 .hookbar b{font-size:16px}.hookbar span{font-size:13px;color:var(--muted)}
+.hookbar .hook-up{font-size:12px;color:var(--gold);opacity:.9;margin-top:2px}
 .splitq{border-color:var(--orange)!important;background:linear-gradient(135deg,#2a1608,#14161d)}
 
 /* tier grid v2: strict 4 x 5 grid, identical cells, nothing wraps at 375px (Dominic 14:42) */
@@ -231,3 +232,19 @@ td input,td select{font-size:16px}
 .lad.locked .lad-name,.lad.locked .lad-pts{opacity:.55}
 .lad-lock{flex:0 0 auto;width:40px;text-align:center;font-size:18px;opacity:.6}
 .lad-btn{flex:0 0 auto;min-width:72px}
+
+/* POS logging (staff iPad, Oct 14) */
+.pos .badge{display:inline-block;background:var(--orange);color:#fff;border-radius:999px;font-size:12px;padding:2px 9px;vertical-align:middle;font-weight:800}
+.positem{display:flex;gap:12px;align-items:center;justify-content:space-between;border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:12px;margin-top:10px;background:rgba(255,255,255,.03)}
+.positem.up{border-color:var(--gold);background:linear-gradient(135deg,rgba(232,184,74,.16),rgba(255,255,255,.02))}
+.positem.done{opacity:.6}
+.positem .pi-main{min-width:0;flex:1}.pi-give{font-size:17px;line-height:1.3}.pi-ring{font-size:14px;margin-top:4px}.pi-meta{font-size:12px;color:var(--muted);margin-top:3px}
+.uptag{display:inline-block;background:var(--gold);color:#111;font-weight:900;font-size:12px;letter-spacing:.04em;border-radius:6px;padding:2px 7px;margin-left:4px;white-space:nowrap}
+.pi-done{color:#7bd88f;font-weight:800;text-align:right;white-space:nowrap}.pi-done small{display:block;font-weight:400;color:var(--muted);font-size:11px}
+.positem .btn{white-space:nowrap;flex:none}
+/* suggested-for-you card (guest, Oct 14) */
+.suggest{border-color:var(--orange)!important;background:linear-gradient(135deg,#2a1608,#14161d)}
+.suggest .sg-k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:800}
+.suggest .sg-h{font-size:19px;font-weight:900;line-height:1.25;margin:4px 0 2px}.suggest .sg-s{font-size:13px;color:var(--muted)}
+.suggest .sg-new{margin-top:10px;border:1px dashed rgba(232,184,74,.6);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--fg,#eee);line-height:1.4}
+.suggest .sg-new b{color:var(--gold)}

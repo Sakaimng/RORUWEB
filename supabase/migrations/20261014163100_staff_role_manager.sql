@@ -1,0 +1,1 @@
+alter table public.loyalty_staff drop constraint loyalty_staff_role_check; alter table public.loyalty_staff add constraint loyalty_staff_role_check check (role in ('staff','manager','owner'));
