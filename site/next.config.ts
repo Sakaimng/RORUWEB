@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
         { source: "/family", destination: "/family/index.html" },
         { source: "/staff", destination: "/staff/index.html" },
         { source: "/staff/owner", destination: "/staff/owner/index.html" },
+        { source: "/family/terms", destination: "/family/terms/index.html" },
+        { source: "/family/privacy", destination: "/family/privacy/index.html" },
       ],
       afterFiles: [],
       fallback: [],

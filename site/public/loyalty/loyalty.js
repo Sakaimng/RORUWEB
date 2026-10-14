@@ -4,26 +4,48 @@ window.RORU = (function () {
     url: "https://gpudggbdwghzsanyvvgt.supabase.co",
     key: "sb_publishable_WbZvV4s9WkKYvdGGlIUBbw_-e6W7Yfk",
     passHash: "156a203791b9b43e682aa45904eee434cc46fab681b2ae1cbb8ee76415df1c68",   // sha256 of the preview passcode (dark phase only)
-    build: "v1-preview-2026-10-14"
+    build: "v1d-preview-2026-10-14"
   };
   const L = {
     en: {
+      perks_title: "Your perks", perks_you: "You're here", perks_from: "{t} and up", perks_passes_left: "{n} of {m} left", perks_plus: "Everything in {t}, plus:",
+      your_status: "Your status", mult_line: "Earns {x} points on every HK$1", year_spend: "{n} spent in the last 12 months", kama_eligible: "Kama eligible — by invitation",
+      tier_more: "{n} more this year to {name}", tier_more_kama: "Kama: {n} more this year to be eligible (by invitation)", status_line: "Status = what you spend in a rolling 12 months",
+      tier_start: "Start", invite: "invite only", invite_only_tag: "Invite only", per_year: "/yr", visits: "visits", plate_line: "{n} more visit(s) → {r}", stamp_rule: "1 stamp per visit (max 1 a day)",
+      plates_done_n: "{n} plate(s) finished", stamp_added: "+1 visit stamp 🍣", visit_only_note: "", coming_soon: "Coming soon", soon_tag: "Soon",
+      bday_opt: "Birthday (optional) — for a birthday roll",
+      hook_mon_double: "Monday: double stamps 🍣🍣", hook_mon_double_sub: "Every visit today = {n} stamps on your plate", hook_tue_friends: "Tuesday: friends night 👯", hook_tue_friends_sub: "Bring-a-friend bonus is {x} today",
+      hook_wed_gold: "Wednesday: gold rush ✨", hook_wed_gold_sub: "About 1 in {o} receipts turns gold today", split_q: "Split a receipt with {who}?", split_new: "New", split_each: "{n} people, about {s} each",
+      yes: "Yes, split it", no: "No", split_done: "Split ✓ — shared by {n}", split_declined: "Declined", split_mine: "Shared receipts", split_waiting: "Waiting for the first scanner to confirm the split",
+      split_not_confirmed: "Not confirmed — this receipt stays with the first scanner", deleted_rejoin: "Deleted. You can rejoin from {d}.", err_rejoin: "Welcome back! You can rejoin Roru Family from {d}.",
+      err_split_full: "This receipt is already shared by 6 people", err_split_expired: "That split request has expired", err_split_not_found: "That split request is gone", err_referral_same_device: "Friend links need your friend's own phone", err_already_reviewed: "Already answered",
+      terms_agree_a: "I agree to the", terms_link: "Terms & Conditions", and: "and", privacy_link: "Privacy Policy", optional_title: "Optional — tick only if you want them:",
+      mkt_wa: "Send me rewards and member drops on WhatsApp (optional — stop any time)", mkt_push: "Push notifications on this phone (optional — coming later)",
+      priv_title: "Your privacy choices", terms_update: "Please review and accept the Terms & Privacy Policy.", accept: "I agree", unsub_all: "Unsubscribe from all marketing", unsub_done: "Unsubscribed from all marketing ✓",
+      terms_on: "Terms accepted {d} ({v})", err_terms_required: "Please tick the Terms & Privacy box", month: "Month", day: "Day", friend_title: "Bring a friend", friend_sub: "Share your link. When a friend joins and their first receipt of {m}+ is approved, you both get +{n} points.",
+      share: "Share my link", copy: "Copy", copied: "Link copied ✓", share_text: "Join me at Roru Family — RORUBARU's hand-roll club", invited_pending: "Invited by {who} — your first approved receipt of {m}+ gives you both +{n} points", invited_done: "Invited by {who} ✓",
+      friend_stats: "{j} friend(s) joined · {q} pending · {r} rewarded · +{p} pts earned (max {c} a year)", ref_linked: "Friend link saved — +{n} pts each after your first receipt",
+      bday_title: "Birthday roll", bday_add: "Add your birthday and we'll have a hand roll for you in your birthday week.", save: "Save", bday_now: "Happy birthday week! 🎉 Your birthday roll is ready.", bday_claim: "Claim my birthday roll",
+      bday_claimed: "Enjoy your birthday roll! Show the code above at the counter.", bday_claimed_toast: "🎂 Birthday roll unlocked — show the QR at the counter", bday_wait: "Birthday rolls unlock {n} day(s) after a birthday is added — see you next year!",
+      bday_on_file: "Your birthday: {d}", bday_rule: "In your birthday week a hand roll on us appears here (once a year).", bday_pick: "Pick month and day",
+      gold_line2: "✨ About 1 in {o} receipts turns gold: {x} points", gold_hit: "GOLD RECEIPT!",
+      err_referral_self: "That's your own link", err_referral_already_set: "You already have a friend link", err_referral_new_members_only: "Friend links only work for brand-new members", err_referral_code_unknown: "That invite link isn't valid", err_birthday_locked: "Birthday already set — ask staff to change it", err_birthday_not_available: "Birthday roll isn't available right now", err_bad_birthday: "Pick month and day",
       family: "Roru Family", tag: "Every visit puts a hand roll on your plate.", sub: "5 rolls fill the plate. Scratch the nori. Get a reward.",
-      phone: "Your mobile number", phone_ph: "9123 4567", send: "Send me a code", code: "6-digit code", code_ph: "••••••", name: "Your name (optional)", name_ph: "e.g. Kiki",
+      phone: "Your mobile number", phone_ph: "9123 5678", send: "Send me a code", code: "6-digit code", code_ph: "••••••", name: "Your name (optional)", name_ph: "e.g. Kiki",
       consent: "I agree that RORUBARU (We Rolling Limited) keeps my mobile number and visit history to run Roru Family, and may message me about it. I can delete my data any time below. (PDPO)",
       join: "Join / sign in", test_hint: "Preview mode: no SMS is sent. Use code", resend: "Send again", change: "Change number",
-      your_plate: "Your plate", rolls_of: "of", rolls: "rolls", plate_full_soon: "One more and the plate is full!", visited_today: "Today's roll is on the plate ✓", not_today: "Show this at the counter on your next visit",
+      your_plate: "Your visit plate", rolls_of: "of", rolls: "rolls", plate_full_soon: "One more and the plate is full!", visited_today: "Today's visit is stamped ✓", not_today: "Show this at the counter on your next visit",
       your_code: "Your member code", show_staff: "Show this to staff — or just say your number.", rewards: "Rewards", no_rewards: "Fill the plate to earn your first reward.",
       scratch: "Scratch the nori to reveal", scratch_hint: "← rub here →", reveal_done: "Show this QR at the counter to redeem", redeemed: "Redeemed", earned: "Plate full! Scratch to reveal",
       streak: "Visit streak", streak_line: "{n} of {t} visits in the last {d} days → +1 bonus roll", gold: "Gold roll!", gold_line: "A gold roll landed today — ask staff for the gold treat 🎉",
-      history: "Recent visits", tier: "Level", signout: "Sign out", delete: "Delete my data", delete_confirm: "Delete your Roru Family record and all visits? This cannot be undone.",
-      privacy: "Privacy: we store your mobile number, optional name, language, visit dates and rewards, in RORUBARU's own database. We never sell it. Delete it any time with the button above.",
+      history: "Recent visits", tier: "Level", signout: "Sign out", delete: "Delete my data", delete_confirm: "Delete your Roru Family record, points and visits? This cannot be undone, and this number can only rejoin after a cool-off period.",
+      privacy: "Privacy: we keep your mobile number, optional name and birthday, language, receipts, visits and rewards in RORUBARU's own database to run Roru Family. We never sell it. See the Privacy Policy; delete everything any time with the button below.",
       preview_note: "Dark preview — rewards shown are placeholders until Dominic sets them.", err_bad_phone: "Please enter a valid mobile number", err_wrong_code: "Wrong code, try again", err_code_expired: "Code expired — send a new one",
       err_consent: "Please tick the consent box to join", err_too_many: "Too many tries, wait a bit", err_net: "Connection problem, try again", member_since: "Member since",
       gate_title: "Preview", gate_sub: "Enter the preview passcode", gate_btn: "Enter", gate_err: "Wrong passcode", lang_zh: "繁中", lang_en: "EN",
-      tier_nori: "Nori", tier_gohan: "Gohan", tier_tobiko: "Tobiko", tier_kama: "Kama", plates_done: "plates finished", next_level: "Next level at {n} plates", top_level: "Top level — thank you ❤",
+      tier_nori: "Nori", tier_gohan: "Gohan", tier_tobiko: "Tobiko", tier_kama: "Kama", plates_done: "plates finished", next_level: "Next level at {n} plates", top_level: "Kama — top level, thank you ❤",
       roll_added: "+1 hand roll!", reward_unlocked: "Plate full — reward unlocked!",
-      p_tag: "Scan your receipt. Collect points. Eat better.", p_sub: "{r} point per HK$1 spent at RORUBARU — then spend points on rewards.",
+      p_tag: "Points for every dollar. A stamp for every visit.", p_sub: "{r} point per HK$1 at RORUBARU, plus a hand-roll stamp each visit — 5 stamps fill the plate for a visit reward. Spend more, climb the levels, earn faster.",
       points: "points", your_points: "Your points", scan: "Scan receipt", scan_sub: "Take a photo of the printed receipt — we read the total for you.", type_instead: "Type it instead", reading: "Reading your receipt…", read_ok: "Check and confirm", read_fail: "Couldn't read it clearly — please check the details",
       receipt_no: "Receipt / bill number", total: "Bill total (HK$)", when: "Date & time on the receipt", shop: "Shop", confirm_add: "Confirm & add points", retake: "Retake photo",
       added_points: "+{n} points!", queued: "Sent to staff to check — points land once approved (usually same day).", pending_hint: "{n} receipt(s) waiting for staff approval",
@@ -33,22 +55,44 @@ window.RORU = (function () {
       install_tip: "Tip: add this page to your home screen"
     },
     zh: {
+      perks_title: "你的會員禮遇", perks_you: "你的等級", perks_from: "{t} 或以上", perks_passes_left: "尚餘 {n}/{m} 張", perks_plus: "{t} 全部權益，再加：",
+      your_status: "你的會員級別", mult_line: "每 HK$1 可得 {x} 積分", year_spend: "過去 12 個月消費 {n}", kama_eligible: "已符合 Kama 資格 — 只限邀請",
+      tier_more: "今年再消費 {n} 升至 {name}", tier_more_kama: "Kama：今年再消費 {n} 即符合資格（只限邀請）", status_line: "級別按過去 12 個月消費計算",
+      tier_start: "起步", invite: "只限邀請", invite_only_tag: "只限邀請", per_year: "／年", visits: "次到訪", plate_line: "再到訪 {n} 次 → {r}", stamp_rule: "每次到訪蓋 1 個印（每日最多 1 個）",
+      plates_done_n: "已集齊 {n} 碟", stamp_added: "+1 到訪印 🍣", visit_only_note: "", coming_soon: "即將推出", soon_tag: "即將推出",
+      bday_opt: "生日（可選）— 生日手卷用",
+      hook_mon_double: "星期一：雙倍印章 🍣🍣", hook_mon_double_sub: "今日每次到訪 = {n} 個印", hook_tue_friends: "星期二：朋友之夜 👯", hook_tue_friends_sub: "今日帶朋友獎賞 {x}",
+      hook_wed_gold: "星期三：金色狂熱 ✨", hook_wed_gold_sub: "今日大約每 {o} 張收據有一張變金色", split_q: "與 {who} 平分一張收據？", split_new: "新", split_each: "{n} 人，每人約 {s}",
+      yes: "好，平分", no: "不了", split_done: "已平分 ✓ — 共 {n} 人", split_declined: "已拒絕", split_mine: "共享收據", split_waiting: "等待首位掃描者確認平分",
+      split_not_confirmed: "未獲確認 — 此收據仍屬首位掃描者", deleted_rejoin: "已刪除。你可於 {d} 起重新加入。", err_rejoin: "歡迎回來！你可於 {d} 起重新加入 Roru Family。",
+      err_split_full: "此收據已由 6 人共享", err_split_expired: "平分請求已過期", err_split_not_found: "平分請求已不存在", err_referral_same_device: "朋友連結須用朋友自己的手機", err_already_reviewed: "已經回覆",
+      terms_agree_a: "我同意", terms_link: "條款及細則", and: "及", privacy_link: "私隱政策", optional_title: "可選 — 如想收取才剔選：",
+      mkt_wa: "透過 WhatsApp 向我發送獎賞及會員優惠（可選 — 可隨時停止）", mkt_push: "在此手機接收推送通知（可選 — 稍後推出）",
+      priv_title: "你的私隱選擇", terms_update: "請細閱並同意條款及私隱政策。", accept: "我同意", unsub_all: "取消所有推廣訊息", unsub_done: "已取消所有推廣訊息 ✓",
+      terms_on: "已於 {d} 同意條款（{v}）", err_terms_required: "請剔選同意條款及私隱政策", month: "月", day: "日", friend_title: "帶朋友來", friend_sub: "分享你的連結。朋友加入後，首張 {m} 或以上的收據批核時，你們各得 +{n} 分。",
+      share: "分享我的連結", copy: "複製", copied: "已複製連結 ✓", share_text: "一齊加入 RORUBARU 手卷會 Roru Family", invited_pending: "由 {who} 邀請 — 你首張 {m} 或以上的收據批核後，你們各得 +{n} 分", invited_done: "由 {who} 邀請 ✓",
+      friend_stats: "已加入 {j} 位 · 待定 {q} 位 · 已獎勵 {r} 位 · 共得 +{p} 分（每年最多 {c} 位）", ref_linked: "已記錄朋友連結 — 首張收據後各得 +{n} 分",
+      bday_title: "生日手卷", bday_add: "加入你的生日，生日週我們請你食一個手卷。", save: "儲存", bday_now: "生日週快樂！🎉 你的生日手卷已準備好。", bday_claim: "領取生日手卷",
+      bday_claimed: "請享用生日手卷！在櫃檯出示上方的碼。", bday_claimed_toast: "🎂 生日手卷已解鎖 — 在櫃檯出示 QR", bday_wait: "生日須於加入 {n} 日後才可領取 — 明年見！",
+      bday_on_file: "你的生日：{d}", bday_rule: "生日週會在這裡出現一個免費手卷（每年一次）。", bday_pick: "請選擇月份及日子",
+      gold_line2: "✨ 大約每 {o} 張收據有一張變金色：{x} 積分", gold_hit: "金色收據！",
+      err_referral_self: "這是你自己的連結", err_referral_already_set: "你已有朋友連結", err_referral_new_members_only: "朋友連結只適用於新會員", err_referral_code_unknown: "邀請連結無效", err_birthday_locked: "生日已設定 — 如需更改請找店員", err_birthday_not_available: "暫時未能領取生日手卷", err_bad_birthday: "請選擇月份及日子",
       family: "Roru Family", tag: "每次光臨，碟上多一個手卷。", sub: "集齊 5 個手卷，刮開紫菜，獲得獎賞。",
-      phone: "你的手機號碼", phone_ph: "9123 4567", send: "發送驗證碼", code: "6 位驗證碼", code_ph: "••••••", name: "你的名字（可選）", name_ph: "例如：Kiki",
+      phone: "你的手機號碼", phone_ph: "9123 5678", send: "發送驗證碼", code: "6 位驗證碼", code_ph: "••••••", name: "你的名字（可選）", name_ph: "例如：Kiki",
       consent: "我同意 RORUBARU（We Rolling Limited）保存我的手機號碼及到訪紀錄以運作 Roru Family，並可就此向我發送訊息。我可隨時在下方刪除我的資料。（私隱條例 PDPO）",
       join: "加入 / 登入", test_hint: "預覽模式：不會發送短訊。請輸入驗證碼", resend: "重新發送", change: "更改號碼",
-      your_plate: "你的碟", rolls_of: "／", rolls: "個手卷", plate_full_soon: "再多一個就集齊！", visited_today: "今日的手卷已上碟 ✓", not_today: "下次光臨時在櫃檯出示",
+      your_plate: "你的到訪碟", rolls_of: "／", rolls: "個手卷", plate_full_soon: "再多一個就集齊！", visited_today: "今日到訪已蓋印 ✓", not_today: "下次光臨時在櫃檯出示",
       your_code: "你的會員碼", show_staff: "向店員出示，或直接說出你的電話號碼。", rewards: "獎賞", no_rewards: "集齊一碟即可獲得第一份獎賞。",
       scratch: "刮開紫菜，看看獎賞", scratch_hint: "← 在此刮開 →", reveal_done: "在櫃檯出示此 QR 以兌換", redeemed: "已兌換", earned: "集齊一碟！刮開看看",
       streak: "連續到訪", streak_line: "最近 {d} 日內到訪 {n}／{t} 次 → 額外 +1 手卷", gold: "金色手卷！", gold_line: "今日出現金色手卷 — 向店員領取金色小禮 🎉",
-      history: "最近到訪", tier: "等級", signout: "登出", delete: "刪除我的資料", delete_confirm: "刪除你的 Roru Family 紀錄及所有到訪？此操作無法復原。",
-      privacy: "私隱：我們只會把你的手機號碼、名字（可選）、語言、到訪日期及獎賞儲存在 RORUBARU 自己的資料庫，絕不出售。你可隨時按上方按鈕刪除。",
+      history: "最近到訪", tier: "等級", signout: "登出", delete: "刪除我的資料", delete_confirm: "刪除你的 Roru Family 紀錄、積分及到訪？此操作無法復原，而此號碼須於冷靜期後才可重新加入。",
+      privacy: "私隱：我們把你的手機號碼、名字及生日（可選）、語言、收據、到訪及獎賞儲存在 RORUBARU 自己的資料庫，只用於運作 Roru Family，絕不出售。詳見私隱政策；可隨時按下方按鈕刪除所有資料。",
       preview_note: "內部預覽 — 獎賞內容為佔位，待 Dominic 決定。", err_bad_phone: "請輸入有效的手機號碼", err_wrong_code: "驗證碼錯誤，請再試", err_code_expired: "驗證碼已過期，請重新發送",
       err_consent: "請勾選同意方可加入", err_too_many: "嘗試次數過多，請稍後再試", err_net: "連線問題，請再試", member_since: "加入日期",
       gate_title: "預覽", gate_sub: "請輸入預覽密碼", gate_btn: "進入", gate_err: "密碼錯誤", lang_zh: "繁中", lang_en: "EN",
-      tier_nori: "Nori 紫菜", tier_gohan: "Gohan 飯", tier_tobiko: "Tobiko 飛魚籽", tier_kama: "Kama", plates_done: "已集齊碟數", next_level: "集齊 {n} 碟升級", top_level: "最高等級 — 多謝你 ❤",
+      tier_nori: "Nori 紫菜", tier_gohan: "Gohan 飯", tier_tobiko: "Tobiko 飛魚籽", tier_kama: "Kama", plates_done: "已集齊碟數", next_level: "集齊 {n} 碟升級", top_level: "Kama — 最高級別，多謝你 ❤",
       roll_added: "+1 手卷！", reward_unlocked: "集齊一碟 — 獎賞解鎖！",
-      p_tag: "掃描收據，儲積分，食得更好。", p_sub: "在 RORUBARU 每消費 HK$1 得 {r} 分 — 以積分換獎賞。",
+      p_tag: "消費儲積分，到訪集手卷印。", p_sub: "在 RORUBARU 每消費 HK$1 得 {r} 分，每次到訪再蓋一個手卷印 — 集齊 5 個印換到訪獎賞。消費越多，級別越高，積分越快。",
       points: "分", your_points: "你的積分", scan: "掃描收據", scan_sub: "影一張收據相片 — 我們會自動讀取總額。", type_instead: "改為手動輸入", reading: "正在讀取收據…", read_ok: "請核對後確認", read_fail: "未能清楚讀取 — 請核對資料",
       receipt_no: "收據／單號", total: "總額 (HK$)", when: "收據上的日期及時間", shop: "分店", confirm_add: "確認並加積分", retake: "重新拍攝",
       added_points: "+{n} 分！", queued: "已交由店員核實 — 批核後積分即到（通常當日）。", pending_hint: "{n} 張收據等待店員批核",
@@ -69,7 +113,7 @@ window.RORU = (function () {
     if (!r.ok) { const e = new Error((body && body.message) || ("http_" + r.status)); e.code = (body && body.message) || ("http_" + r.status); throw e; }
     return body;
   }
-  const errText = (e) => { const m = { bad_phone: "err_bad_phone", wrong_code: "err_wrong_code", code_expired: "err_code_expired", consent_required: "err_consent", too_many_codes: "err_too_many", too_many_attempts: "err_too_many", receipt_already_used: "err_receipt_already_used", receipt_too_old: "err_receipt_too_old", daily_receipt_limit: "err_daily_receipt_limit", receipt_no_required: "err_receipt_no_required", bad_total: "err_bad_total", not_enough_points: "err_not_enough_points", receipt_in_future: "err_receipt_in_future" }; return m[e.code] ? t(m[e.code], { h: 48 }) : (e.code && !/^http_|fetch/i.test(e.code) ? e.code : t("err_net")); };
+  const errText = (e) => { const m = { bad_phone: "err_bad_phone", wrong_code: "err_wrong_code", code_expired: "err_code_expired", consent_required: "err_consent", too_many_codes: "err_too_many", too_many_attempts: "err_too_many", receipt_already_used: "err_receipt_already_used", receipt_too_old: "err_receipt_too_old", daily_receipt_limit: "err_daily_receipt_limit", receipt_no_required: "err_receipt_no_required", bad_total: "err_bad_total", not_enough_points: "err_not_enough_points", receipt_in_future: "err_receipt_in_future" }; if (e.code && /^rejoin_after:/.test(e.code)) return t("err_rejoin", { d: fmtDay(e.code.split(":")[1]) }); if (!m[e.code] && e.code && (L[lang]["err_" + e.code] || L.en["err_" + e.code])) return t("err_" + e.code); return m[e.code] ? t(m[e.code], { h: 72 }) : (e.code && !/^http_|fetch/i.test(e.code) ? e.code : t("err_net")); };
 
   async function sha256(s) { const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, "0")).join(""); }
   // Preview gate: the pages stay hidden behind a passcode during the dark phase. Resolves when open.
@@ -101,6 +145,22 @@ window.RORU = (function () {
   function burst(colors) { const b = document.createElement("div"); b.className = "burst"; const cs = colors || ["#F64501", "#F6F3E7", "#E8B84A", "#4CC38A"]; for (let i = 0; i < 40; i++) { const s = document.createElement("i"); s.style.left = "50%"; s.style.top = "45%"; s.style.background = cs[i % cs.length]; s.style.setProperty("--dx", (Math.random() * 2 - 1) * 320 + "px"); s.style.setProperty("--dy", (Math.random() * -1 - .2) * 320 + "px"); s.style.animationDelay = (Math.random() * .2) + "s"; b.appendChild(s); } document.body.appendChild(b); setTimeout(() => b.remove(), 1600); if (navigator.vibrate) navigator.vibrate([30, 40, 30]); }
   const fmtDay = (d) => { try { return new Date(d.length === 10 ? d + "T12:00:00+08:00" : d).toLocaleDateString(lang === "zh" ? "zh-HK" : "en-HK", { day: "numeric", month: "short", timeZone: "Asia/Hong_Kong" }); } catch (e) { return d; } };
   const fmtTime = (d) => { try { return new Date(d).toLocaleTimeString(lang === "zh" ? "zh-HK" : "en-HK", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Hong_Kong" }); } catch (e) { return d; } };
+  // no zoom on double-tap / pinch (iOS ignores user-scalable=no): block gesture zoom, and turn a fast second tap
+  // into a plain click so rapid keypad taps still register (Dominic 14:11)
+  (function noZoom() {
+    document.addEventListener("gesturestart", (e) => e.preventDefault(), { passive: false });
+    document.addEventListener("dblclick", (e) => e.preventDefault(), { passive: false });
+    let last = 0;
+    document.addEventListener("touchend", (e) => {
+      const now = Date.now(), tg = e.target;
+      if (now - last < 350 && e.changedTouches && e.changedTouches.length === 1 && !(tg.closest && tg.closest("input,textarea,select,canvas,video"))) {
+        e.preventDefault();
+        const el = tg.closest && tg.closest("button,a,label,[onclick],.member");
+        if (el && !el.disabled) el.click();
+      }
+      last = now;
+    }, { passive: false });
+  })();
   setLang(lang);
   return { CFG, t, lang: () => lang, setLang, applyI18n, rpc, errText, gate, qrSvg, rollSvg, toast, burst, fmtDay, fmtTime };
 })();

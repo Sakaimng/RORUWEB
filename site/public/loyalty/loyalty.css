@@ -133,3 +133,83 @@ td input[type=number]{width:64px}
 .tabs button{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;font-size:13px}
 .tabs button.on{background:var(--cream);color:var(--ink);font-weight:900}
 .hide{display:none!important}
+
+/* no double-tap / focus zoom on iPad + iPhone (Dominic 14:11) */
+html,body{touch-action:manipulation;-webkit-text-size-adjust:100%}
+button,.btn,.pad button,a,label,.member,.shops button,.langs button{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+input,select,textarea{font-size:16px}
+td input,td select{font-size:16px}
+
+/* status (spend, rolling 12 months) — v1c */
+.status{background:linear-gradient(135deg,#1b1e27,#12141b)}
+.tierbadge{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;flex:none;box-shadow:0 6px 18px rgba(0,0,0,.4)}
+.t-nori{background:linear-gradient(135deg,#46523f,#1c2419);color:var(--cream)}
+.t-gohan{background:linear-gradient(135deg,#fffdf4,#d9d4c2);color:var(--ink)}
+.t-tobiko{background:linear-gradient(135deg,#ff7a3d,#c93400);color:#fff}
+.t-kama{background:linear-gradient(135deg,#f3d27a,#b9862a);color:var(--ink)}
+.tierbar{height:12px;border-radius:99px;background:var(--ink);margin:16px 0 8px;overflow:hidden;border:1px solid var(--line)}
+.tierbar>div{height:100%;width:0;border-radius:99px;transition:width .8s cubic-bezier(.2,.9,.3,1)}
+.tierbar>div.t-nori{background:linear-gradient(90deg,#4CC38A,#F6F3E7)}
+.tierbar>div.t-gohan{background:linear-gradient(90deg,#F6F3E7,#F64501)}
+.tierbar>div.t-tobiko,.tierbar>div.t-kama{background:linear-gradient(90deg,#F64501,#E8B84A)}
+.tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.tiers>div{border:1px solid var(--line);border-radius:10px;padding:7px 6px;display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--muted);text-align:center}
+.tiers>div b{color:var(--cream);font-size:12px}
+.tiers>div.on{border-color:var(--orange);background:rgba(246,69,1,.12)}
+.plate.small-plate{width:240px;height:240px}
+.plate.small-plate .slot{width:64px;height:64px;margin:-32px 0 0 -32px}
+.plate.small-plate .roll{width:56px;height:56px}
+.tag-tier{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;margin-left:6px}
+.stamps-mini{letter-spacing:2px}
+
+/* coming soon teasers */
+.soon{display:flex;flex-direction:column;gap:8px}
+.soon-card{display:flex;align-items:center;gap:12px;border:1px dashed var(--line);border-radius:14px;padding:12px 14px;background:rgba(20,22,29,.6);opacity:.82}
+.soon-card .soon-ico{font-size:24px;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--ink);filter:grayscale(.3)}
+.soon-card b{font-size:15px}
+
+/* extras */
+.sel{flex:1;background:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:16px;color:var(--cream);-webkit-appearance:none;appearance:none}
+.linkbox{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:var(--ink);border:1px dashed var(--line);border-radius:10px;padding:10px;word-break:break-all;-webkit-user-select:all;user-select:all}
+#bdayCard{background:linear-gradient(135deg,#231c12,#14161d)}
+#friendCard{background:linear-gradient(135deg,#1a1f2b,#14161d)}
+
+.optbox{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0}
+.req{color:var(--orange);font-weight:900}
+.check a{color:var(--orange)}
+.btn[disabled]{opacity:.45}
+.legal{max-width:720px;margin:0 auto;line-height:1.6}
+.legal h1{margin-bottom:4px}.legal h2{margin-top:26px;font-size:18px}.legal li{margin:4px 0}
+.draft{background:#3a1a00;border:1px solid var(--orange);color:#ffd2b8;border-radius:12px;padding:10px 14px;font-weight:900;margin:12px 0}
+
+.hookbar{display:flex;flex-direction:column;gap:2px;border-radius:14px;padding:12px 14px;margin:10px 0;background:linear-gradient(90deg,rgba(246,69,1,.25),rgba(232,184,74,.18));border:1px solid rgba(246,69,1,.5)}
+.hookbar b{font-size:16px}.hookbar span{font-size:13px;color:var(--muted)}
+.splitq{border-color:var(--orange)!important;background:linear-gradient(135deg,#2a1608,#14161d)}
+
+/* tier grid v2: strict 4 x 5 grid, identical cells, nothing wraps at 375px (Dominic 14:42) */
+.tiers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:12px;align-items:stretch}
+.tiers>.tcell{display:grid;grid-template-rows:18px 16px 24px 13px 14px;align-items:center;justify-items:center;row-gap:2px;padding:8px 2px;border:1px solid var(--line);border-radius:10px;text-align:center;min-width:0;font-variant-numeric:tabular-nums;color:var(--muted)}
+.tiers>.tcell>*{white-space:nowrap;overflow:hidden;text-overflow:clip;max-width:100%;line-height:1}
+.tiers .tn{font-size:13px;font-weight:900;color:var(--cream)}
+.tiers .tt{font-size:11px;font-weight:500;letter-spacing:-.01em}
+.tiers .tm{font-size:19px;font-weight:900;color:var(--cream)}
+.tiers .tc{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em}
+.tiers .tg{font-size:9.5px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:var(--gold)}
+.tiers>.tcell.on{border-color:var(--orange);background:rgba(246,69,1,.12)}
+.tiers>.tcell.on .tm{color:var(--orange)}
+
+/* perks per tier */
+#perksCard .perkgrp{border-top:1px solid rgba(255,255,255,.08);padding:10px 0 4px}
+#perksCard .perkgrp:first-child{border-top:0;padding-top:0}
+#perksCard .perkhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;font-size:15px}
+#perksCard .perktag{font-size:11px;font-weight:700;letter-spacing:.04em;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.08);color:inherit;white-space:nowrap}
+#perksCard .perktag.you{background:var(--orange);color:#fff}
+#perksCard .perk{display:flex;align-items:flex-start;gap:10px;padding:6px 0;font-size:14px;line-height:1.3}
+#perksCard .perkico{width:22px;flex:0 0 22px;text-align:center}
+#perksCard .perk .grow{min-width:0}
+#perksCard .perkname{display:block;font-weight:700}
+#perksCard .perkdet{display:block;font-size:12px;opacity:.65;margin-top:1px}
+#perksCard .perkcount{flex:0 0 auto;font-size:12px;font-weight:800;padding:3px 8px;border-radius:99px;background:var(--gold);color:#0b0d12;white-space:nowrap}
+#perksCard .perkgrp.locked{opacity:.42}
+#perksCard .perkplus{font-size:12px;font-weight:700;opacity:.7;margin:-2px 0 4px 32px}
+#perksCard .perkgrp.locked .perkplus{opacity:1}

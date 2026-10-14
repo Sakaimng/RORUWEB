@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="theme-color" content="#0b0d12">
 <title>Roru Family — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f2">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f10">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f2"></script>
+<script src="/loyalty/loyalty.js?v=f10"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -34,9 +34,15 @@
         <div class="notice hide" id="testHint"><span data-t="test_hint"></span> <b class="code" id="testCode"></b></div>
         <label class="field"><span data-t="code"></span><input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" data-tp="code_ph"></label>
         <label class="field" id="nameField"><span data-t="name"></span><input id="name" type="text" autocomplete="given-name" data-tp="name_ph"></label>
-        <label class="check" id="consentRow"><input type="checkbox" id="consent"><span data-t="consent"></span></label>
+        <label class="field" id="bdayField"><span data-t="bday_opt"></span><div class="row" style="gap:8px"><select id="bdM" class="sel"></select><select id="bdD" class="sel"></select></div></label>
+        <label class="check" id="consentRow"><input type="checkbox" id="consent"><span><span data-t="terms_agree_a"></span> <a href="/family/terms/" target="_blank" data-t="terms_link"></a> <span data-t="and"></span> <a href="/family/privacy/" target="_blank" data-t="privacy_link"></a> <span class="req">*</span></span></label>
+        <div class="optbox">
+          <div class="tiny" style="margin:0 0 6px" data-t="optional_title"></div>
+          <label class="check"><input type="checkbox" id="mktWa"><span data-t="mkt_wa"></span></label>
+          <label class="check"><input type="checkbox" id="mktPush"><span data-t="mkt_push"></span></label>
+        </div>
         <div class="err hide" id="err2"></div>
-        <button class="btn" id="btnJoin" data-t="join"></button>
+        <button class="btn" id="btnJoin" data-t="join" disabled></button>
         <p class="center small" style="margin-top:10px"><a href="#" id="resend" data-t="resend"></a></p>
       </div>
     </div>
@@ -49,12 +55,46 @@
       <div><h1 id="hello" style="margin-bottom:2px"></h1><p class="muted small" id="tierLine"></p></div>
       <span class="pill on" id="tierPill"></span>
     </div>
+
+    <div class="hookbar hide" id="hookBar"></div>
+    <div id="splitInbox"></div>
+    <!-- status (spend in the last 12 months) -->
+    <div class="card status" id="statusCard">
+      <div class="row" style="align-items:center;gap:12px">
+        <div class="tierbadge" id="tierBadge"></div>
+        <div class="grow">
+          <div class="tiny" style="letter-spacing:.1em;text-transform:uppercase;margin:0" data-t="your_status"></div>
+          <div style="font-size:26px;font-weight:900;line-height:1.1" id="tierName"></div>
+          <div class="small muted" id="multLine"></div>
+        </div>
+      </div>
+      <div class="tierbar"><div id="tierFill"></div></div>
+      <div class="row small" style="justify-content:space-between"><span id="yearSpend"></span><span id="tierNext" style="text-align:right"></span></div>
+      <div class="tiers" id="tierSteps"></div>
+    </div>
+
+    <!-- perks per tier (owner-toggleable, loyalty_perks) -->
+    <div class="card hide" id="perksCard">
+      <h2 style="margin-top:0" data-t="perks_title"></h2>
+      <div id="perksBody"></div>
+    </div>
+
+    <!-- points (spend) -->
     <div class="card center" style="padding:22px 16px">
       <div class="tiny" style="letter-spacing:.1em;text-transform:uppercase" data-t="your_points"></div>
       <div style="font-size:64px;font-weight:900;line-height:1;margin:6px 0" id="pts">0</div>
       <div class="muted small" id="nextReward"></div>
       <div style="height:8px;border-radius:99px;background:var(--ink);margin:12px 0 4px;overflow:hidden"><div id="bar" style="height:100%;width:0;background:var(--orange);transition:width .6s"></div></div>
       <div class="notice hide" id="pendingNote"></div>
+      <div class="tiny hide" id="goldLine" style="margin-top:8px;color:var(--gold)"></div>
+    </div>
+
+    <!-- visits (stamp plate) -->
+    <div class="card center" id="plateCard">
+      <div class="tiny" style="letter-spacing:.1em;text-transform:uppercase" data-t="your_plate"></div>
+      <div class="plate-wrap"><div class="plate small-plate" id="plate"></div></div>
+      <div style="font-weight:900;font-size:18px;margin-top:6px" id="plateLine"></div>
+      <div class="small muted" id="plateSub"></div>
     </div>
 
     <div class="card" id="scanCard">
@@ -82,9 +122,25 @@
       </div>
     </div>
 
+    <div id="splitOutbox"></div>
     <h2 data-t="ladder"></h2>
     <div id="ladder"></div>
     <div id="rewards"></div>
+
+    <div id="extras">
+      <div class="card hide" id="friendCard">
+        <h2 style="margin-top:0">👯 <span data-t="friend_title"></span></h2>
+        <p class="small muted" id="friendSub"></p>
+        <div class="notice hide" id="invitedBy"></div>
+        <div class="linkbox" id="friendLink"></div>
+        <div class="row" style="gap:8px;margin-top:8px"><button class="btn sm" id="friendShare" data-t="share"></button><button class="btn ghost sm" id="friendCopy" data-t="copy"></button></div>
+        <p class="tiny" id="friendStats"></p>
+      </div>
+      <div class="card hide" id="bdayCard">
+        <h2 style="margin-top:0">🎂 <span data-t="bday_title"></span></h2>
+        <div id="bdayBody"></div>
+      </div>
+    </div>
 
     <div class="card">
       <h2 style="margin-top:0" data-t="receipts"></h2>
@@ -99,6 +155,18 @@
       <p class="small muted" data-t="show_staff"></p>
       <p class="tiny"><span data-t="member_since"></span> <span id="since"></span></p>
     </div>
+    <div class="card" id="privacyCard">
+      <h2 style="margin-top:0">🔒 <span data-t="priv_title"></span></h2>
+      <div class="notice hide" id="termsNeeded"><span data-t="terms_update"></span> <button class="btn sm" id="termsAccept" data-t="accept"></button></div>
+      <label class="check"><input type="checkbox" id="pWa"><span data-t="mkt_wa"></span></label>
+      <label class="check"><input type="checkbox" id="pPush"><span data-t="mkt_push"></span></label>
+      <p class="tiny" id="consentMeta"></p>
+      <div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn ghost sm" id="unsubAll" data-t="unsub_all"></button><a class="btn ghost sm" href="/family/privacy/" data-t="privacy_link"></a><a class="btn ghost sm" href="/family/terms/" data-t="terms_link"></a></div>
+    </div>
+    <div id="soonWrap" class="hide">
+      <h2><span data-t="coming_soon"></span> <span class="pill" style="font-size:10px;vertical-align:middle">🔒</span></h2>
+      <div class="soon" id="soon"></div>
+    </div>
     <p class="tiny" data-t="privacy"></p>
     <p class="tiny" data-t="preview_note"></p>
     <div class="row" style="margin-top:14px"><button class="btn ghost sm" id="signout" data-t="signout"></button><button class="btn ghost sm" id="delete" data-t="delete" style="margin-left:auto;color:#ff8a6a"></button></div>
@@ -108,12 +176,16 @@
 <script>
 (async function () {
   const R = window.RORU, t = R.t, $ = (s) => document.querySelector(s);
+  try { if (new URLSearchParams(location.search).get("unsubscribe")) localStorage.setItem("roru_unsub", "1"); } catch (e) {}
+  try { const rf = new URLSearchParams(location.search).get("ref"); if (rf && /^[A-Za-z0-9]{6,12}$/.test(rf)) localStorage.setItem("roru_ref", rf.toUpperCase()); } catch (e) {}
   await R.gate();
   $("#app").style.visibility = "visible";
   document.querySelectorAll(".langs button").forEach(b => b.onclick = () => { R.setLang(b.dataset.lang); render(); });
-  const state = { token: localStorage.getItem("roru_member_token"), me: null, phone: "", cfg: null, lastPoints: null };
-  R.rpc("family_config").then(c => { state.cfg = c; if (c.test_mode) { $("#testHint").classList.remove("hide"); $("#testCode").textContent = "246810"; } }).catch(() => {});
+  const state = { token: localStorage.getItem("roru_member_token"), me: null, phone: "", cfg: null, lastPoints: null, lastStamps: null };
+  R.rpc("family_features").then(fs => { state.features = fs; render(); }).catch(() => {});
+  R.rpc("family_config").then(c => { state.cfg = c; if (state.me) render(); if (c.test_mode) { $("#testHint").classList.remove("hide"); $("#testCode").textContent = "135790"; } }).catch(() => {});
 
+  const deviceId = () => { let d = localStorage.getItem("roru_dev"); if (!d) { d = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now()); localStorage.setItem("roru_dev", d); } return d; };
   // ----- sign in -----
   $("#btnSend").onclick = async () => {
     const ph = $("#phone").value; $("#err1").classList.add("hide"); $("#btnSend").disabled = true;
@@ -127,31 +199,171 @@
   $("#btnJoin").onclick = async () => {
     $("#err2").classList.add("hide"); $("#btnJoin").disabled = true;
     try {
-      const r = await R.rpc("family_verify_code", { p_phone: state.phone, p_code: $("#code").value.trim(), p_consent: $("#consent").checked, p_name: $("#name").value, p_lang: R.lang() });
+      const r = await R.rpc("family_verify_code", { p_phone: state.phone, p_code: $("#code").value.trim(), p_consent: $("#consent").checked, p_name: $("#name").value, p_lang: R.lang(), p_device: deviceId() });
       state.token = r.token; localStorage.setItem("roru_member_token", r.token); state.me = r.member; state.lastPoints = r.member.points; render(); if (r.is_new) R.burst();
+      try { const c = await R.rpc("family_set_consents", { p_token: r.token, p_terms: true, p_whatsapp: $("#mktWa").checked, p_push: $("#mktPush").checked, p_version: TERMS_V, p_wording: wording() }); state.me = c.member; render(); } catch (e) { R.toast(R.errText(e)); }
+      const md = $("#bdM").value && $("#bdD").value ? $("#bdM").value + "-" + $("#bdD").value : null;
+      if (md && !(r.member.birthday || {}).md) { try { const b = await R.rpc("family_set_birthday", { p_token: r.token, p_md: md }); state.me = b.member; render(); } catch (e) {} }
+      await trySetReferrer(false);
     } catch (e) { $("#err2").textContent = R.errText(e); $("#err2").classList.remove("hide"); }
-    $("#btnJoin").disabled = false;
+    $("#btnJoin").disabled = !$("#consent").checked;
   };
   $("#code").addEventListener("keydown", e => { if (e.key === "Enter") $("#btnJoin").click(); });
+  $("#consent").addEventListener("change", () => { $("#btnJoin").disabled = !$("#consent").checked; });
 
   // ----- member -----
   async function load(quiet) {
     if (!state.token) { render(); return; }
-    try { const me = await R.rpc("family_me", { p_token: state.token }); state.me = me; render(); }
+    try { const me = await R.rpc("family_me", { p_token: state.token }); state.me = me; render(); if (localStorage.getItem("roru_ref")) trySetReferrer(true); if (localStorage.getItem("roru_unsub")) { localStorage.removeItem("roru_unsub"); setConsents({ p_whatsapp: false, p_push: false, p_source: "unsubscribe" }, t("unsub_done")); $("#privacyCard").scrollIntoView(); } }
     catch (e) { if (e.code === "not_signed_in") { localStorage.removeItem("roru_member_token"); state.token = null; state.me = null; render(); } else if (!quiet) R.toast(R.errText(e)); }
   }
   const tierName = (k) => t("tier_" + (k || "nori"));
   const shops = () => (state.cfg && state.cfg.shops) || [{ id: "wanchai", name_en: "Wan Chai", name_zh: "灣仔" }, { id: "central", name_en: "Central", name_zh: "中環" }];
+
+  const fmtHK = (n) => "HK$" + Math.round(+n || 0).toLocaleString("en-HK");
+  const multTxt = (x) => (+x).toString().replace(/\.0+$/, "") + "×";
+  function renderStatus(me, zh) {
+    const tier = me.tier || "nori";
+    $("#tierPill").textContent = tierName(tier);
+    $("#tierBadge").className = "tierbadge t-" + tier; $("#tierBadge").textContent = tierName(tier).split(" ")[0].slice(0, 1);
+    $("#tierName").textContent = tierName(tier);
+    $("#multLine").textContent = t("mult_line", { x: multTxt(me.multiplier) });
+    $("#yearSpend").textContent = t("year_spend", { n: fmtHK(me.year_spend) });
+    const at = me.tiers_at || {}, ys = +me.year_spend || 0;
+    let pct = 100, nextTxt = "";
+    if (tier === "kama") { nextTxt = t("top_level"); }
+    else if (me.kama_eligible) { nextTxt = "✨ " + t("kama_eligible"); }
+    else if (me.tier_next) {
+      const n = me.tier_next, from = tier === "nori" ? 0 : tier === "gohan" ? at.gohan : at.tobiko;
+      pct = Math.max(2, Math.min(100, 100 * (ys - from) / Math.max(1, n.at - from)));
+      nextTxt = n.name === "kama" ? t("tier_more_kama", { n: fmtHK(n.more) }) : t("tier_more", { n: fmtHK(n.more), name: tierName(n.name) });
+    }
+    $("#tierFill").style.width = pct + "%"; $("#tierFill").className = "t-" + tier;
+    $("#tierNext").textContent = nextTxt;
+    $("#tierLine").textContent = t("status_line");
+    const steps = [["nori", 0], ["gohan", at.gohan], ["tobiko", at.tobiko], ["kama", at.kama]];
+    $("#tierSteps").innerHTML = steps.map(([k, v]) => '<div class="tcell' + (k === tier ? " on" : "") + '"><b class="tn">' + k.charAt(0).toUpperCase() + k.slice(1) + '</b><span class="tt">' + fmtHK(v || 0) + '</span><span class="tm">' + multTxt((me.mults || {})[k] || 1) + '</span><span class="tc">' + t("points") + '</span><span class="tg">' + (k === "kama" ? t("invite_only_tag") : "&nbsp;") + "</span></div>").join("");
+  }
+  function renderPlate(me, zh) {
+    const per = me.per_plate || 5, n = Math.min(me.stamps || 0, per), plate = me.plate || [];
+    const fresh = state.lastStamps !== undefined && state.lastStamps !== null && me.visits_total > state.lastStamps;
+    let html = "";
+    for (let i = 0; i < per; i++) {
+      const ang = -Math.PI / 2 + i * 2 * Math.PI / per, r = 78, on = i < n, gold = on && plate[i] && plate[i].gold;
+      html += '<div class="slot' + (on ? " on" : "") + (on && fresh && i === n - 1 ? " new" : "") + '" style="--x:' + (Math.cos(ang) * r).toFixed(1) + "px;--y:" + (Math.sin(ang) * r).toFixed(1) + 'px">' + R.rollSvg(gold) + "</div>";
+    }
+    html += '<div class="count"><b>' + n + "/" + per + "</b><span>" + t("visits") + "</span></div>";
+    $("#plate").innerHTML = html; $("#plate").classList.toggle("full", n >= per);
+    const vr = me.visit_reward, rn = vr ? (zh ? vr.name_zh : vr.name_en) : "";
+    $("#plateLine").textContent = n >= per - 1 && n < per ? t("plate_full_soon") : t("plate_line", { n: per - n, r: rn });
+    $("#plateSub").textContent = (me.visited_today ? t("visited_today") : t("stamp_rule")) + (me.plates_done ? " · " + t("plates_done_n", { n: me.plates_done }) : "");
+    if (fresh) { R.toast(t("stamp_added"), 2600); }
+  }
+
+  // ----- perks per tier -----
+  const TIERS = ["nori", "gohan", "tobiko", "kama"];
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  function renderPerks(me, zh) {
+    const perks = me.perks || [], mine = TIERS.indexOf(me.tier), kd = me.kama_dinner || {};
+    $("#perksCard").classList.toggle("hide", !perks.length); if (!perks.length) return;
+    let h = "";
+    TIERS.forEach((tr, ti) => {
+      const list = perks.filter(p => p.tier === tr); if (!list.length) return;
+      const open = ti <= mine;
+      const TN = { nori: "Nori", gohan: "Gohan", tobiko: "Tobiko", kama: "Kama" };
+      h += '<div class="perkgrp' + (open ? "" : " locked") + '"><div class="perkhead"><b>' + TN[tr] + "</b>" + (ti === mine ? '<span class="perktag you">' + t("perks_you") + "</span>" : !open ? '<span class="perktag">🔒 ' + t("perks_from", { t: TN[tr] }) + "</span>" : "") + "</div>";
+      if (ti > 0) h += '<div class="perkplus">' + t("perks_plus", { t: TN[TIERS[ti - 1]] }) + "</div>";
+      list.forEach(p => {
+        const x = (me.mults && me.mults[tr]) || "", name = (zh ? p.name_zh : p.name_en).replace("{x}", x).replace("{p}", kd.passes != null ? kd.passes : 2);
+        const det = zh ? p.detail_zh : p.detail_en;
+        let extra = "";
+        if (p.kind === "dinner" && open && me.tier === "kama") extra = '<span class="perkcount">' + t("perks_passes_left", { n: kd.left, m: kd.passes }) + "</span>";
+        h += '<div class="perk"><span class="perkico">' + (open ? (p.emoji || "✓") : "🔒") + '</span><span class="grow"><span class="perkname">' + esc(name) + "</span>" + (det ? '<span class="perkdet">' + esc(det) + "</span>" : "") + "</span>" + extra + "</div>";
+      });
+      h += "</div>";
+    });
+    $("#perksBody").innerHTML = h;
+  }
+  // ----- extras: bring a friend, birthday roll, gold receipts -----
+  const MONTHS_EN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const fillBday = (mSel, dSel, md) => { const zh = R.lang() === "zh"; mSel.innerHTML = '<option value="">' + t("month") + "</option>" + MONTHS_EN.map((m, i) => '<option value="' + String(i + 1).padStart(2, "0") + '">' + (zh ? (i + 1) + "月" : m) + "</option>").join(""); dSel.innerHTML = '<option value="">' + t("day") + "</option>" + Array.from({ length: 31 }, (_, i) => '<option value="' + String(i + 1).padStart(2, "0") + '">' + (i + 1) + "</option>").join(""); if (md) { mSel.value = md.slice(0, 2); dSel.value = md.slice(3, 5); } };
+  const mdText = (md) => { const m = +md.slice(0, 2), d = +md.slice(3, 5); return R.lang() === "zh" ? m + "月" + d + "日" : d + " " + MONTHS_EN[m - 1]; };
+  const inviteUrl = (code) => location.origin + "/family/?ref=" + code;
+  async function trySetReferrer(silent) {
+    const code = localStorage.getItem("roru_ref"); if (!code || !state.token || !state.me) return;
+    const ref = state.me.referral || {}; if (!ref.on || ref.invited_by || code === state.me.member_code) { localStorage.removeItem("roru_ref"); return; }
+    try { const r = await R.rpc("family_set_referrer", { p_token: state.token, p_code: code }); state.me = r.member; render(); R.toast(t("ref_linked", { n: r.member.referral.bonus }), 3500); } catch (e) { if (!silent) R.toast(R.errText(e)); }
+    localStorage.removeItem("roru_ref");
+  }
+  function renderExtras(me, zh) {
+    const ref = me.referral || {}, bd = me.birthday || {};
+    $("#friendCard").classList.toggle("hide", !ref.on);
+    if (ref.on) {
+      $("#friendSub").textContent = t("friend_sub", { n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 200) });
+      $("#friendLink").textContent = inviteUrl(ref.code);
+      $("#invitedBy").classList.toggle("hide", !ref.invited_by); if (ref.invited_by) $("#invitedBy").textContent = (ref.my_bonus_pending ? t("invited_pending", { who: ref.invited_by, n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 200) }) : t("invited_done", { who: ref.invited_by }));
+      $("#friendStats").textContent = t("friend_stats", { j: ref.joined, q: ref.pending || 0, r: ref.rewarded, p: ref.points_earned, c: ref.cap });
+    }
+    $("#bdayCard").classList.toggle("hide", !bd.on);
+    if (bd.on) {
+      let h = "";
+      if (!bd.md) h = '<p class="small muted">' + t("bday_add") + '</p><div class="row" style="gap:8px"><select id="bdM2" class="sel"></select><select id="bdD2" class="sel"></select><button class="btn sm" id="bdSave" data-t="save">' + t("save") + "</button></div>";
+      else if (bd.claimable) h = '<p><b>' + t("bday_now") + '</b></p><button class="btn" id="bdClaim">🎂 ' + t("bday_claim") + "</button>";
+      else if (bd.claimed && bd.in_window) h = '<p>' + t("bday_claimed") + "</p>";
+      else if (bd.in_window && bd.days_until_eligible > 0) h = '<p class="small muted">' + t("bday_wait", { n: bd.days_until_eligible }) + "</p>";
+      else h = '<p class="small">' + t("bday_on_file", { d: mdText(bd.md) }) + '</p><p class="small muted">' + t("bday_rule") + "</p>";
+      $("#bdayBody").innerHTML = h;
+      if (!bd.md) { fillBday($("#bdM2"), $("#bdD2")); $("#bdSave").onclick = async () => { const md = $("#bdM2").value + "-" + $("#bdD2").value; if (md.length !== 5) return R.toast(t("bday_pick")); try { const r = await R.rpc("family_set_birthday", { p_token: state.token, p_md: md }); state.me = r.member; render(); R.toast("🎂 ✓"); } catch (e) { R.toast(R.errText(e)); } }; }
+      if (bd.claimable) $("#bdClaim").onclick = async () => { $("#bdClaim").disabled = true; try { const r = await R.rpc("family_claim_birthday", { p_token: state.token }); state.me = r.member; render(); R.burst(["#E8B84A", "#F64501", "#F6F3E7"]); R.toast(t("bday_claimed_toast"), 3000); $("#rewards").scrollIntoView({ behavior: "smooth" }); } catch (e) { R.toast(R.errText(e)); $("#bdClaim").disabled = false; } };
+    }
+    $("#goldLine").classList.toggle("hide", !(me.gold && me.gold.on)); if (me.gold && me.gold.on) $("#goldLine").textContent = t("gold_line2", { o: Math.round(1 / Math.max(0.0001, me.gold.odds)), x: multTxt(me.gold.mult) });
+  }
+  async function shareInvite() { const u = inviteUrl(state.me.member_code); try { if (navigator.share) { await navigator.share({ title: "Roru Family", text: t("share_text"), url: u }); return; } } catch (e) { return; } copyInvite(); }
+  async function copyInvite() { const u = inviteUrl(state.me.member_code); try { await navigator.clipboard.writeText(u); R.toast(t("copied")); } catch (e) { const ta = document.createElement("textarea"); ta.value = u; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); R.toast(t("copied")); } catch (e2) {} ta.remove(); } }
+  $("#friendShare").onclick = shareInvite; $("#friendCopy").onclick = copyInvite;
+
+  // ----- consents (PDPO): terms required; WhatsApp + push marketing optional, independent, logged with wording + version -----
+  const TERMS_V = "v1-draft";
+  const wording = () => ({ terms: R.t("terms_agree_a") + " " + R.t("terms_link") + " " + R.t("and") + " " + R.t("privacy_link"), whatsapp: R.t("mkt_wa"), push: R.t("mkt_push") });
+  async function setConsents(args, msg) { try { const r = await R.rpc("family_set_consents", Object.assign({ p_token: state.token, p_version: TERMS_V, p_wording: wording() }, args)); state.me = r.member; render(); if (msg) R.toast(msg, 2600); } catch (e) { R.toast(R.errText(e)); render(); } }
+  $("#pWa").onchange = () => setConsents({ p_whatsapp: $("#pWa").checked }, "✓");
+  $("#pPush").onchange = () => setConsents({ p_push: $("#pPush").checked }, "✓");
+  $("#unsubAll").onclick = () => setConsents({ p_whatsapp: false, p_push: false, p_source: "unsubscribe" }, t("unsub_done"));
+  $("#termsAccept").onclick = () => setConsents({ p_terms: true }, "✓");
+  function renderConsents(me) {
+    const c = me.consents || {};
+    $("#pWa").checked = !!c.whatsapp; $("#pPush").checked = !!c.push;
+    $("#termsNeeded").classList.toggle("hide", !!c.terms_version);
+    $("#consentMeta").textContent = (c.terms_version ? t("terms_on", { d: R.fmtDay(c.terms_at), v: c.terms_version }) : "") + (c.whatsapp ? " · WhatsApp ✓ " + R.fmtDay(c.whatsapp_at) : "") + (c.push ? " · Push ✓ " + R.fmtDay(c.push_at) : "");
+  }
+
+  // ----- weekly hook banner + shared-bill split requests -----
+  function renderHookAndSplits(me, zh) {
+    const hk = me.hook_today, cfg = state.cfg || {};
+    $("#hookBar").classList.toggle("hide", !hk);
+    if (hk) $("#hookBar").innerHTML = '<b>' + t("hook_" + hk) + "</b><span>" + t("hook_" + hk + "_sub", { n: cfg.hook_mon_stamps || 2, x: (cfg.hook_tue_bonus_mult || 2) + "×", o: Math.round(1 / Math.max(0.01, cfg.hook_wed_gold_odds || 0.2)) }) + "</span>";
+    const inbox = me.split_inbox || [];
+    $("#splitInbox").innerHTML = inbox.map(q => '<div class="card splitq"><div class="row" style="justify-content:space-between"><b>🧾 ' + t("split_q", { who: (q.name ? q.name + " " : "") + q.who }) + '</b><span class="pill on">' + t("split_new") + '</span></div><p class="small muted">#' + q.receipt_no + " · HK$" + Math.round(q.bill) + " → " + t("split_each", { n: q.people_after, s: "HK$" + Math.floor(q.bill / q.people_after) }) + '</p><div class="row" style="gap:8px"><button class="btn sm" data-split-yes="' + q.id + '">' + t("yes") + '</button><button class="btn ghost sm" data-split-no="' + q.id + '">' + t("no") + "</button></div></div>").join("");
+    $("#splitInbox").querySelectorAll("[data-split-yes],[data-split-no]").forEach(b => b.onclick = async () => { const yes = !!b.dataset.splitYes; b.disabled = true; try { const r = await R.rpc("family_answer_split", { p_token: state.token, p_request_id: +(b.dataset.splitYes || b.dataset.splitNo), p_yes: yes }); state.me = r.member; state.lastPoints = r.member.points; render(); R.toast(yes ? t("split_done", { n: r.people }) : t("split_declined"), 3000); } catch (e) { R.toast(R.errText(e)); b.disabled = false; } });
+    const out = me.split_outbox || [];
+    $("#splitOutbox").innerHTML = out.length ? '<div class="card"><h2 style="margin-top:0">🧾 ' + t("split_mine") + "</h2>" + out.map(q => '<div class="hist"><span>#' + q.receipt_no + "</span><span>" + (q.status === "pending" ? "⏳ " + t("split_waiting") : q.status === "accepted" ? "✓ +" + (q.points || 0) + " " + t("points") : t("split_not_confirmed")) + "</span></div>").join("") + "</div>" : "";
+    const badge = inbox.length; $("#tierPill").textContent = tierName(me.tier) + (badge ? " · 🔔" + badge : "");
+  }
   function render() {
     R.applyI18n();
+    if (!$("#bdM").options.length) fillBday($("#bdM"), $("#bdD"));
     $("#subLine").textContent = t("p_sub", { r: (state.cfg && state.cfg.points_per_hkd) || 1 });
     const me = state.me;
     $("#signin").classList.toggle("hide", !!me); $("#member").classList.toggle("hide", !me);
     if (!me) return;
     const zh = R.lang() === "zh";
     $("#hello").textContent = me.name ? (zh ? me.name + "，你好 👋" : "Hey " + me.name + " 👋") : (zh ? "你好 👋" : "Hey there 👋");
-    $("#tierPill").textContent = tierName(me.tier);
-    $("#tierLine").textContent = t("tier_line", { spend: "HK$" + me.spend_lifetime, next: me.tier_next ? t("tier_next", { n: "HK$" + Math.max(0, me.tier_next.at - me.spend_lifetime), name: tierName(me.tier_next.name) }) : (me.tier === "kama" ? t("top_level") : t("kama_note")) });
+    renderStatus(me, zh);
+    renderPerks(me, zh);
+    renderPlate(me, zh);
+    renderExtras(me, zh);
+    renderConsents(me);
+    renderHookAndSplits(me, zh);
     // points + next reward
     const gained = state.lastPoints !== null && me.points > state.lastPoints;
     $("#pts").textContent = me.points;
@@ -159,6 +371,7 @@
     if (next) { $("#nextReward").textContent = (me.points >= next.points_cost ? "✓ " : t("need_more", { n: next.points_cost - me.points }) + " → ") + (zh ? next.name_zh : next.name_en); $("#bar").style.width = Math.min(100, 100 * me.points / next.points_cost) + "%"; }
     $("#pendingNote").classList.toggle("hide", !me.pending_receipts); $("#pendingNote").textContent = "⏳ " + t("pending_hint", { n: me.pending_receipts });
     if (gained) { R.toast(t("added_points", { n: me.points - state.lastPoints }), 2600); R.burst(); }
+    state.lastStamps = me.visits_total;
     state.lastPoints = me.points;
     // ladder
     $("#ladder").innerHTML = me.ladder.map(l => '<div class="reward row"><div class="grow"><b>' + (zh ? l.name_zh : l.name_en) + '</b><div class="small muted">' + (zh ? l.detail_zh : l.detail_en || "") + '</div></div><button class="btn sm ' + (me.points >= l.points_cost ? "" : "ghost") + '" data-claim="' + l.id + '" ' + (me.points >= l.points_cost ? "" : "disabled") + '>' + (me.points >= l.points_cost ? t("claim", { n: l.points_cost }) : l.points_cost + " " + t("points")) + "</button></div>").join("");
@@ -169,7 +382,7 @@
       const d = document.createElement("div"); d.className = "reward " + rw.status;
       const name = zh ? rw.name_zh : rw.name_en, detail = zh ? rw.detail_zh : rw.detail_en;
       if (rw.status === "earned") {
-        d.innerHTML = '<b>' + t("earned") + '</b><div class="scratch"><div class="under"><b>' + name + (rw.upgraded ? " ⬆️" : "") + '</b><span class="small muted">' + (rw.upgraded ? t("upgrade") : (detail || "")) + '</span></div><canvas></canvas><div class="hint">' + t("scratch_hint") + "</div></div>";
+        d.innerHTML = '<b>' + (rw.kind === "plate" ? t("earned") : t("claimed")) + '</b><div class="scratch"><div class="under"><b>' + name + (rw.upgraded ? " ⬆️" : "") + '</b><span class="small muted">' + (rw.upgraded ? t("upgrade") : (detail || "")) + '</span></div><canvas></canvas><div class="hint">' + t("scratch_hint") + "</div></div>";
         box.appendChild(d); setupScratch(d.querySelector(".scratch"), rw.id);
       } else if (rw.status === "revealed") {
         d.innerHTML = '<div class="row"><div class="grow"><b style="font-size:18px">' + name + (rw.upgraded ? " ⬆️" : "") + '</b><p class="small muted" style="margin:4px 0">' + (detail || "") + '</p><p class="small">' + t("reveal_done") + '</p><p class="code">' + rw.code + '</p></div><div class="qr">' + R.qrSvg("RR:" + rw.code, 120) + "</div></div>";
@@ -180,10 +393,12 @@
       }
     });
     // receipts
-    $("#history").innerHTML = me.receipts.map(r => '<div class="hist"><span>' + R.fmtDay(r.at) + " · " + (zh ? (r.shop_zh || "") : (r.shop || "")) + " · " + (/^STAFF-/.test(r.receipt_no) ? "(staff)" : "#" + r.receipt_no) + "</span><span>HK$" + (+r.total_hkd).toFixed(0) + " → " + (r.status === "approved" ? "+" + r.points : r.status === "pending" ? "⏳" : "✕") + "</span></div>").join("") || '<p class="muted small">—</p>';
+    $("#history").innerHTML = me.receipts.map(r => '<div class="hist"><span>' + R.fmtDay(r.at) + " · " + (zh ? (r.shop_zh || "") : (r.shop || "")) + " · " + (/^STAFF-/.test(r.receipt_no) ? "(staff)" : "#" + r.receipt_no) + "</span><span>HK$" + (+r.total_hkd).toFixed(0) + " → " + (r.status === "approved" ? "+" + r.points + (r.multiplier && +r.multiplier !== 1 ? " (" + multTxt(r.multiplier) + ")" : "") + (r.stamped ? " · 🍣" : "") + (r.gold ? " ✨" : "") : r.status === "pending" ? "⏳" : "✕") + "</span></div>").join("") || '<p class="muted small">—</p>';
     $("#memberQr").innerHTML = R.qrSvg("RF:" + me.member_code, 180); $("#memberCode").textContent = me.member_code; $("#memberPhone").textContent = me.phone_masked;
     $("#since").textContent = R.fmtDay(me.member_since);
     renderShopPick();
+    const fs = (state.features || []).filter(x => x.status === "soon"); $("#soonWrap").classList.toggle("hide", !fs.length);
+    $("#soon").innerHTML = fs.map(x => '<div class="soon-card"><div class="soon-ico">' + (x.emoji || "🔒") + '</div><div class="grow"><b>' + (zh ? x.name_zh : x.name_en) + '</b><div class="small muted">' + (zh ? x.detail_zh : x.detail_en) + '</div></div><span class="pill">' + t("soon_tag") + "</span></div>").join("");
   }
   // ----- receipt scan (client-side OCR, tesseract.js from a public CDN, no key) -----
   let ocr = { conf: null, text: null, fromOcr: false, shop: localStorage.getItem("roru_shop_guess") || "wanchai" };
@@ -238,7 +453,8 @@
     try {
       const r = await R.rpc("family_submit_receipt", { p_token: state.token, p_receipt_no: $("#rNo").value.trim(), p_total_hkd: total, p_receipt_at: at, p_shop: ocr.shop, p_source: ocr.fromOcr && !edited ? "ocr" : "manual", p_ocr_confidence: ocr.conf, p_ocr_text: ocr.text });
       showScan("scanIdle"); state.me = r.member;
-      if (r.status === "approved") { R.burst(); R.toast(t("added_points", { n: r.points }), 3000); state.lastPoints = r.member.points; } else { R.toast(t("queued"), 4000); }
+      if (r.status === "split_requested") { R.toast(t("split_waiting"), 4000); }
+      else if (r.status === "approved") { const g = r.visit && r.visit.gold; R.burst(g ? ["#E8B84A", "#F3D27A", "#F6F3E7"] : undefined); R.toast((g ? "✨ " + t("gold_hit") + " " : "") + t("added_points", { n: r.points }) + (r.visit && r.visit.added ? " · " + t("stamp_added") : "") + (r.visit && r.visit.referral_bonus ? " · 👯 +" + r.visit.referral_bonus : ""), 3500); state.lastPoints = r.member.points; state.lastStamps = r.member.visits_total; } else { R.toast(t("queued"), 4000); }
       render();
     } catch (e) { $("#rErr").textContent = R.errText(e); $("#rErr").classList.remove("hide"); }
     $("#rSubmit").disabled = false;
@@ -256,8 +472,9 @@
     c.addEventListener("touchstart", e => { down = true; scratch(e); }, { passive: false }); c.addEventListener("touchmove", scratch, { passive: false }); c.addEventListener("touchend", () => down = false);
     size();
   }
-  $("#signout").onclick = async () => { try { await R.rpc("family_signout", { p_token: state.token }); } catch (e) {} localStorage.removeItem("roru_member_token"); state.token = null; state.me = null; state.lastPoints = null; render(); };
-  $("#delete").onclick = async () => { if (!confirm(t("delete_confirm"))) return; try { await R.rpc("family_delete_me", { p_token: state.token }); } catch (e) { R.toast(R.errText(e)); return; } localStorage.removeItem("roru_member_token"); state.token = null; state.me = null; render(); R.toast("✓"); };
+  const resetSignin = () => { $("#step1").classList.remove("hide"); $("#step2").classList.add("hide"); $("#code").value = ""; $("#consent").checked = false; $("#btnJoin").disabled = true; };
+  $("#signout").onclick = async () => { try { await R.rpc("family_signout", { p_token: state.token }); } catch (e) {} localStorage.removeItem("roru_member_token"); state.token = null; state.me = null; state.lastPoints = null; resetSignin(); render(); };
+  $("#delete").onclick = async () => { if (!confirm(t("delete_confirm"))) return; let dr = null; try { dr = await R.rpc("family_delete_me", { p_token: state.token }); } catch (e) { R.toast(R.errText(e)); return; } localStorage.removeItem("roru_member_token"); state.token = null; state.me = null; resetSignin(); render(); R.toast(t("deleted_rejoin", { d: dr && dr.rejoin_after ? R.fmtDay(dr.rejoin_after) : "" }), 4000); };
   document.addEventListener("roru:lang", render);
   render(); await load();
   // live refresh so the plate animates when staff add a roll
