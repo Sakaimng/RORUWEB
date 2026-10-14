@@ -3,7 +3,10 @@
 // before, otherwise the date; gone after 23:59 HKT on the day. Booking = the site's own Book link (read from the header).
 import { upcoming } from './events-data.js?v=ev1';
 
-const LS = 'roru-evbar-x';
+// × hides the banner for this page view only: every load/refresh shows it again.
+const LS = 'roru-evbar-x'; // old "dismissed forever" key: cleared, no longer read
+try { localStorage.removeItem(LS); } catch (e) {}
+let dismissedId = null;
 const hkDay = () => { const d = new Date(Date.now() + 8 * 3600e3); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()); };
 const dayOf = (s) => { const [y, m, d] = s.split('-').map(Number); return Date.UTC(y, m - 1, d); };
 const daysTo = (ev) => Math.round((dayOf(ev.date) - hkDay()) / 864e5);
@@ -55,7 +58,7 @@ function buildBar(ev) {
     <span class="evbar-title">${esc(ev.title)}</span>
   </button><a class="evbar-book" href="${esc(bookHref())}" target="_blank" rel="noopener" data-t="book">Book</a><button class="evbar-x" type="button" aria-label="Close" data-t-aria="close">×</button>`;
   bar.querySelector('.evbar-x').addEventListener('click', () => {
-    try { localStorage.setItem(LS, ev.id); } catch (e) {}
+    dismissedId = ev.id;
     bar.classList.add('gone');
     setTimeout(() => { if (bar) { bar.remove(); bar = null; } }, 260);
   });
@@ -63,8 +66,7 @@ function buildBar(ev) {
   if (window.RORU_I18N) window.RORU_I18N.apply(bar);
 }
 function syncBar(ev) {
-  let dismissed = null; try { dismissed = localStorage.getItem(LS); } catch (e) {}
-  if (!ev || dismissed === ev.id) { if (bar) { bar.remove(); bar = null; } return; }
+  if (!ev || dismissedId === ev.id) { if (bar) { bar.remove(); bar = null; } return; }
   if (bar && bar.dataset.ev !== ev.id) { bar.remove(); bar = null; }
   if (!bar) buildBar(ev);
   const r = bar.querySelector('.evbar-rel'), v = rel(ev);
