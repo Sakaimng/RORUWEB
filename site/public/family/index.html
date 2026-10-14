@@ -8,9 +8,9 @@
 <title>Roru Family — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f13">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f16">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f13"></script>
+<script src="/loyalty/loyalty.js?v=f16"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -113,14 +113,16 @@
       </div>
       <div id="scanForm" class="hide">
         <p class="small" id="readMsg"></p>
-        <label class="field"><span data-t="receipt_no"></span><input id="rNo" type="text" autocapitalize="characters" autocomplete="off"></label>
         <label class="field"><span data-t="total"></span><input id="rTotal" type="text" inputmode="decimal" autocomplete="off"></label>
         <label class="field"><span data-t="when"></span><input id="rAt" type="datetime-local"></label>
+        <label class="field"><span data-t="table"></span><input id="rTable" type="text" inputmode="numeric" autocapitalize="characters" autocomplete="off" maxlength="6"></label>
+        <label class="field hide" id="rNoWrap"><span data-t="receipt_no"></span><input id="rNo" type="text" autocapitalize="characters" autocomplete="off"></label>
         <label class="field"><span data-t="shop"></span><div class="shops" id="rShops" style="margin:0"></div></label>
         <div class="err hide" id="rErr"></div>
         <button class="btn" id="rSubmit" data-t="confirm_add"></button>
         <p class="center small" style="margin-top:10px"><a href="#" id="rCancel" data-t="retake"></a></p>
       </div>
+      <div id="scanDone" class="hide"></div>
     </div>
 
     <div id="splitOutbox"></div>
@@ -373,10 +375,10 @@
     $("#hookBar").classList.toggle("hide", !hk);
     if (hk) $("#hookBar").innerHTML = '<b>' + t("hook_" + hk) + "</b><span>" + t("hook_" + hk + "_sub", { n: cfg.hook_mon_stamps || 2, x: (cfg.hook_tue_bonus_mult || 2) + "×", o: Math.round(1 / Math.max(0.01, cfg.hook_wed_gold_odds || 0.2)) }) + "</span>" + (cfg.upgrade_boost_today ? '<span class="hook-up">' + t("hook_upgrade_line") + "</span>" : "");
     const inbox = me.split_inbox || [];
-    $("#splitInbox").innerHTML = inbox.map(q => '<div class="card splitq"><div class="row" style="justify-content:space-between"><b>🧾 ' + t("split_q", { who: (q.name ? q.name + " " : "") + q.who }) + '</b><span class="pill on">' + t("split_new") + '</span></div><p class="small muted">#' + q.receipt_no + " · HK$" + Math.round(q.bill) + " → " + t("split_each", { n: q.people_after, s: "HK$" + Math.floor(q.bill / q.people_after) }) + '</p><div class="row" style="gap:8px"><button class="btn sm" data-split-yes="' + q.id + '">' + t("yes") + '</button><button class="btn ghost sm" data-split-no="' + q.id + '">' + t("no") + "</button></div></div>").join("");
+    $("#splitInbox").innerHTML = inbox.map(q => '<div class="card splitq"><div class="row" style="justify-content:space-between"><b>🧾 ' + t("split_q", { who: (q.name ? q.name + " " : "") + q.who }) + '</b><span class="pill on">' + t("split_new") + '</span></div><p class="small muted">' + (/^Table /.test(q.receipt_no) ? "" : "#") + q.receipt_no + " · HK$" + Math.round(q.bill) + " → " + t("split_each", { n: q.people_after, s: "HK$" + Math.floor(q.bill / q.people_after) }) + '</p><div class="row" style="gap:8px"><button class="btn sm" data-split-yes="' + q.id + '">' + t("yes") + '</button><button class="btn ghost sm" data-split-no="' + q.id + '">' + t("no") + "</button></div></div>").join("");
     $("#splitInbox").querySelectorAll("[data-split-yes],[data-split-no]").forEach(b => b.onclick = async () => { const yes = !!b.dataset.splitYes; b.disabled = true; try { const r = await R.rpc("family_answer_split", { p_token: state.token, p_request_id: +(b.dataset.splitYes || b.dataset.splitNo), p_yes: yes }); state.me = r.member; state.lastPoints = r.member.points; render(); R.toast(yes ? t("split_done", { n: r.people }) : t("split_declined"), 3000); } catch (e) { R.toast(R.errText(e)); b.disabled = false; } });
     const out = me.split_outbox || [];
-    $("#splitOutbox").innerHTML = out.length ? '<div class="card"><h2 style="margin-top:0">🧾 ' + t("split_mine") + "</h2>" + out.map(q => '<div class="hist"><span>#' + q.receipt_no + "</span><span>" + (q.status === "pending" ? "⏳ " + t("split_waiting") : q.status === "accepted" ? "✓ +" + (q.points || 0) + " " + t("points") : t("split_not_confirmed")) + "</span></div>").join("") + "</div>" : "";
+    $("#splitOutbox").innerHTML = out.length ? '<div class="card"><h2 style="margin-top:0">🧾 ' + t("split_mine") + "</h2>" + out.map(q => '<div class="hist"><span>' + (/^Table /.test(q.receipt_no) ? "" : "#") + q.receipt_no + "</span><span>" + (q.status === "pending" ? "⏳ " + t("split_waiting") : q.status === "accepted" ? "✓ +" + (q.points || 0) + " " + t("points") : t("split_not_confirmed")) + "</span></div>").join("") + "</div>" : "";
     const badge = inbox.length; $("#tierPill").textContent = tierName(me.tier) + (badge ? " · 🔔" + badge : "");
   }
   function render() {
@@ -415,7 +417,7 @@
         (ok ? '<div class="lad-tag">✓ ' + t("lad_unlocked") + '</div>' : '<div class="lad-bar" aria-label="' + t("lad_locked") + '"><i style="width:' + pct + '%"></i></div>') + '</div>' +
         (ok ? '<button class="btn sm lad-btn" data-claim="' + l.id + '">' + t("lad_use") + '</button>' : '<div class="lad-lock" aria-label="' + t("lad_locked") + '">🔒</div>') + '</div>';
     }).join("");
-    $("#ladder").querySelectorAll("[data-claim]").forEach(b => b.onclick = async () => { b.disabled = true; try { const r = await R.rpc("family_claim_reward", { p_token: state.token, p_reward_id: +b.dataset.claim }); state.me = r.member; state.lastPoints = r.member.points; render(); R.toast(t("claimed"), 2600); $("#rewards").scrollIntoView({ behavior: "smooth" }); } catch (e) { R.toast(R.errText(e)); b.disabled = false; } });
+    $("#ladder").querySelectorAll("[data-claim]").forEach(b => b.onclick = async () => { const lr = me.ladder.find(x => x.id === +b.dataset.claim) || {}; if (!(await askConfirm(t("claim_q", { n: fmt(lr.points_cost || 0), r: zh ? (lr.name_zh || lr.name_en) : lr.name_en })))) return; b.disabled = true; try { const r = await R.rpc("family_claim_reward", { p_token: state.token, p_reward_id: +b.dataset.claim }); state.me = r.member; state.lastPoints = r.member.points; render(); R.toast(t("claimed"), 2600); $("#rewards").scrollIntoView({ behavior: "smooth" }); } catch (e) { R.toast(R.errText(e)); b.disabled = false; } });
     // earned / revealed / redeemed rewards
     const box = $("#rewards"); box.innerHTML = "";
     me.rewards.forEach(rw => {
@@ -423,17 +425,17 @@
       const name = zh ? rw.name_zh : rw.name_en, detail = zh ? rw.detail_zh : rw.detail_en;
       if (rw.status === "earned") {
         d.innerHTML = '<b>' + (rw.kind === "plate" ? t("earned") : t("claimed")) + '</b><div class="scratch"><div class="under"><b>' + name + (rw.upgraded ? " ⬆️" : "") + '</b><span class="small muted">' + (rw.upgraded ? t("upgrade") : (detail || "")) + '</span></div><canvas></canvas><div class="hint">' + t("scratch_hint") + "</div></div>";
-        box.appendChild(d); setupScratch(d.querySelector(".scratch"), rw.id);
+        box.appendChild(d); setupScratch(d.querySelector(".scratch"), rw.id); addUndo(d, rw);
       } else if (rw.status === "revealed") {
         d.innerHTML = '<div class="row"><div class="grow"><b style="font-size:18px">' + name + (rw.upgraded ? " ⬆️" : "") + '</b><p class="small muted" style="margin:4px 0">' + (detail || "") + '</p><p class="small">' + t("reveal_done") + '</p><p class="code">' + rw.code + '</p></div><div class="qr">' + R.qrSvg("RR:" + rw.code, 120) + "</div></div>";
-        box.appendChild(d);
+        box.appendChild(d); addUndo(d, rw);
       } else {
         d.innerHTML = '<div class="row"><span class="grow muted">' + name + "</span><span class='pill'>" + t("redeemed") + " · " + R.fmtDay(rw.redeemed_at) + "</span></div>";
         box.appendChild(d);
       }
     });
     // receipts
-    $("#history").innerHTML = me.receipts.map(r => '<div class="hist"><span>' + R.fmtDay(r.at) + " · " + (zh ? (r.shop_zh || "") : (r.shop || "")) + " · " + (/^STAFF-/.test(r.receipt_no) ? "(staff)" : "#" + r.receipt_no) + "</span><span>HK$" + (+r.total_hkd).toFixed(0) + " → " + (r.status === "approved" ? "+" + r.points + (r.multiplier && +r.multiplier !== 1 ? " (" + multTxt(r.multiplier) + ")" : "") + (r.stamped ? " · 🍣" : "") + (r.gold ? " ✨" : "") : r.status === "pending" ? "⏳" : "✕") + "</span></div>").join("") || '<p class="muted small">—</p>';
+    $("#history").innerHTML = me.receipts.map(r => '<div class="hist"><span>' + R.fmtDay(r.at) + " · " + (zh ? (r.shop_zh || "") : (r.shop || "")) + " · " + (/^STAFF-/.test(r.receipt_no) ? "(staff)" : (/^Table /.test(r.receipt_no) ? "" : "#") + r.receipt_no) + "</span><span>HK$" + (+r.total_hkd).toFixed(0) + " → " + (r.status === "approved" ? "+" + r.points + (r.multiplier && +r.multiplier !== 1 ? " (" + multTxt(r.multiplier) + ")" : "") + (r.stamped ? " · 🍣" : "") + (r.gold ? " ✨" : "") : r.status === "pending" ? "⏳" : "✕") + "</span></div>").join("") || '<p class="muted small">—</p>';
     $("#memberQr").innerHTML = R.qrSvg("RF:" + me.member_code, 180); $("#memberCode").textContent = me.member_code; $("#memberPhone").textContent = me.phone_masked;
     $("#since").textContent = R.fmtDay(me.member_since);
     renderShopPick();
@@ -443,26 +445,100 @@
   // ----- receipt scan (client-side OCR, tesseract.js from a public CDN, no key) -----
   let ocr = { conf: null, text: null, fromOcr: false, shop: localStorage.getItem("roru_shop_guess") || "wanchai" };
   function renderShopPick() { $("#rShops").innerHTML = shops().map(s => '<button type="button" data-id="' + s.id + '" class="' + (s.id === ocr.shop ? "on" : "") + '">' + (R.lang() === "zh" ? s.name_zh : s.name_en) + "</button>").join(""); $("#rShops").querySelectorAll("button").forEach(b => b.onclick = () => { ocr.shop = b.dataset.id; localStorage.setItem("roru_shop_guess", ocr.shop); renderShopPick(); }); }
-  const showScan = (which) => ["scanIdle", "scanBusy", "scanForm"].forEach(id => $("#" + id).classList.toggle("hide", id !== which));
-  $("#typeInstead").onclick = (e) => { e.preventDefault(); ocr = { ...ocr, conf: null, text: null, fromOcr: false }; $("#rNo").value = ""; $("#rTotal").value = ""; $("#rAt").value = localNow(); $("#readMsg").textContent = ""; showScan("scanForm"); $("#rNo").focus(); };
+  const showScan = (which) => ["scanIdle", "scanBusy", "scanForm", "scanDone"].forEach(id => $("#" + id).classList.toggle("hide", id !== which));
+  $("#typeInstead").onclick = (e) => { e.preventDefault(); ocr = { ...ocr, conf: null, text: null, fromOcr: false, p: null }; $("#rNo").value = ""; $("#rNoWrap").classList.add("hide"); $("#rTable").value = ""; $("#rTotal").value = ""; $("#rAt").value = localNow(); $("#readMsg").textContent = ""; showScan("scanForm"); $("#rTotal").focus(); };
   $("#rCancel").onclick = (e) => { e.preventDefault(); showScan("scanIdle"); $("#photo").value = ""; };
   const localNow = () => { const d = new Date(Date.now() + 8 * 3600e3); return d.toISOString().slice(0, 16); };
-  async function downscale(file, max) { const bmp = await createImageBitmap(file); const k = Math.min(1, max / Math.max(bmp.width, bmp.height)); const c = document.createElement("canvas"); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k); const x = c.getContext("2d"); x.drawImage(bmp, 0, 0, c.width, c.height); const d = x.getImageData(0, 0, c.width, c.height), p = d.data; for (let i = 0; i < p.length; i += 4) { const g = 0.299 * p[i] + 0.587 * p[i + 1] + 0.114 * p[i + 2]; const v = g < 150 ? Math.max(0, g - 40) : Math.min(255, g + 40); p[i] = p[i + 1] = p[i + 2] = v; } x.putImageData(d, 0, 0); return c; }
-  function parseReceipt(text) {
-    const lines = text.split(/\n/).map(l => l.trim()).filter(Boolean); const out = { no: "", total: "", at: "" };
-    const money = (s) => { const m = [...s.matchAll(/(?:HK\$|\$|HKD)?\s*(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d{1,2}))?/g)].map(x => parseFloat(x[1].replace(/,/g, "") + "." + (x[2] || "0"))).filter(v => v > 0 && v < 100000); return m; };
-    // total: a line with a total keyword, take the last amount on it (or the next line)
-    for (let i = 0; i < lines.length; i++) { if (/\b(grand\s*total|total|amount\s*due|net|balance|合計|總計|總額|應付|实付|實付)\b/i.test(lines[i]) && !/sub\s*-?total|小計|discount|tax|tip|change|cash|visa|master|card|tender|paid/i.test(lines[i])) { let m = money(lines[i].replace(/\b(grand\s*total|total|amount\s*due|net|balance)\b/ig, "")); if (!m.length && lines[i + 1]) m = money(lines[i + 1]); if (m.length) out.total = m[m.length - 1].toFixed(2); } }
-    if (!out.total) { const all = []; lines.forEach(l => money(l).forEach(v => { if (/\.\d{2}\b/.test(l)) all.push(v); })); if (all.length) out.total = Math.max(...all).toFixed(2); }
-    // receipt number
-    const cands = []; lines.forEach(l => { const m = /(receipt|rcpt|invoice|inv|bill|order|check|chk|cheque|ticket|trans|txn|ref|no|num|number|#|單號|收據|發票|帳單|单号)\.?\s*(no\.?|number|#|:|：)?\s*[:#：]?\s*([A-Z0-9][A-Z0-9\-\/]{2,})/i.exec(l); if (m && /\d/.test(m[3])) cands.push(m[3]); });
-    if (!cands.length) lines.forEach(l => { if (/total|hk\$|\$/i.test(l)) return; const m = l.match(/\b[A-Z]{0,3}[\-]?\d{4,}\b/g); if (m) m.forEach(x => { if (!/^(\d{8}|\d{4}\s?\d{4})$/.test(x) && !/^20\d{6}$/.test(x)) cands.push(x); }); });
-    out.no = (cands.sort((a, b) => (b.replace(/\D/g, "").length - a.replace(/\D/g, "").length))[0] || "").toUpperCase();
-    // date & time (HK: day/month/year)
-    let dm = /(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/.exec(text); let d = null;
-    if (dm) d = { y: +dm[1], m: +dm[2], d: +dm[3] }; else { dm = /(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/.exec(text); if (dm) d = { d: +dm[1], m: +dm[2], y: +dm[3] < 100 ? 2000 + +dm[3] : +dm[3] }; }
-    const tm = /\b([01]?\d|2[0-3]):([0-5]\d)\b/.exec(text);
-    if (d && d.m >= 1 && d.m <= 12 && d.d >= 1 && d.d <= 31) out.at = d.y + "-" + String(d.m).padStart(2, "0") + "-" + String(d.d).padStart(2, "0") + "T" + (tm ? String(+tm[1]).padStart(2, "0") + ":" + tm[2] : "12:00");
+  // ----- confirm sheet + undo a reward (Oct 14: Dominic redeemed by mistake; no undo before) -----
+  function askConfirm(msg) {
+    return new Promise(res => {
+      const o = document.createElement("div"); o.className = "ask-sheet"; o.setAttribute("role", "dialog");
+      o.style.cssText = "position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;padding:16px";
+      o.innerHTML = '<div class="card" style="width:100%;max-width:420px;margin:0 0 env(safe-area-inset-bottom)"><p style="font-size:18px;font-weight:700;margin:4px 0 16px">' + escR(msg) + '</p><div class="row" style="gap:10px"><button class="btn ghost" data-a="0" style="flex:1">' + t("c_cancel") + '</button><button class="btn" data-a="1" style="flex:1">' + t("c_ok") + "</button></div></div>";
+      const done = (v) => { o.remove(); res(v); };
+      o.addEventListener("click", e => { const a = e.target.closest("[data-a]"); if (a) done(a.dataset.a === "1"); else if (e.target === o) done(false); });
+      document.body.appendChild(o); o.querySelector('[data-a="1"]').focus();
+    });
+  }
+  function addUndo(d, rw) {
+    if (!(rw.points_spent > 0)) return;
+    const p = document.createElement("p"); p.className = "center small"; p.style.margin = "10px 0 0";
+    p.innerHTML = '<a href="#" class="undo-redeem" data-undo="' + rw.id + '">↩︎ ' + t("undo") + "</a>"; d.appendChild(p);
+    p.querySelector("a").onclick = async (e) => { e.preventDefault(); if (!(await askConfirm(t("undo_q", { n: Number(rw.points_spent).toLocaleString("en-US") })))) return;
+      try { const r = await R.rpc("family_undo_redeem", { p_token: state.token, p_redemption_id: rw.id }); state.me = r.member; state.lastPoints = r.member.points; render(); R.toast("↩︎ " + t("undone", { n: Number(r.refunded).toLocaleString("en-US") }), 3500); } catch (er) { R.toast(R.errText(er), 4000); } };
+  }
+  const escR = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  // receipt photo -> OCR-ready canvas, all on the phone: find the paper, crop, scale to ~1100 px wide, local-mean threshold (shadows, blue tint, dark table edge)
+  async function prepReceipt(file) {
+    const bmp = await createImageBitmap(file);
+    // 1) find the paper: small grey copy, bright columns/rows
+    const sw = 240, sk = sw / bmp.width, shh = Math.round(bmp.height * sk);
+    const s = document.createElement("canvas"); s.width = sw; s.height = shh; const sx = s.getContext("2d"); sx.drawImage(bmp, 0, 0, sw, shh);
+    const sd = sx.getImageData(0, 0, sw, shh).data; const L = new Float32Array(sw * shh);
+    for (let i = 0, j = 0; i < sd.length; i += 4, j++) L[j] = 0.299 * sd[i] + 0.587 * sd[i + 1] + 0.114 * sd[i + 2];
+    const sorted = Float32Array.from(L).sort(); const lo = sorted[Math.floor(L.length * 0.1)], hi = sorted[Math.floor(L.length * 0.9)], cut = (lo + hi) / 2;
+    const colF = new Float32Array(sw), rowF = new Float32Array(shh);
+    for (let y = 0; y < shh; y++) for (let x = 0; x < sw; x++) if (L[y * sw + x] > cut) { colF[x]++; rowF[y]++; }
+    const span = (arr, n, frac) => { let a = 0, b = arr.length - 1; while (a < b && arr[a] / n < frac) a++; while (b > a && arr[b] / n < frac) b--; return [a, b]; };
+    let [x0, x1] = span(colF, shh, 0.25), [y0, y1] = span(rowF, sw, 0.15);
+    if (hi - lo < 40 || (x1 - x0) < sw * 0.2 || (y1 - y0) < shh * 0.2) { x0 = 0; x1 = sw - 1; y0 = 0; y1 = shh - 1; }
+    const pad = 4; x0 = Math.max(0, x0 - pad); y0 = Math.max(0, y0 - pad); x1 = Math.min(sw - 1, x1 + pad); y1 = Math.min(shh - 1, y1 + pad);
+    const cx = x0 / sk, cy = y0 / sk, cw = (x1 - x0 + 1) / sk, ch = (y1 - y0 + 1) / sk;
+    // 2) crop + scale: paper width ~1100 px, capped by total pixels
+    let k = Math.min(1, 1100 / cw); if (cw * k * ch * k > 4.2e6) k = Math.sqrt(4.2e6 / (cw * ch));
+    const W = Math.round(cw * k), H = Math.round(ch * k);
+    const c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d"); x.drawImage(bmp, cx, cy, cw, ch, 0, 0, W, H);
+    const d = x.getImageData(0, 0, W, H), p = d.data; const g = new Float32Array(W * H);
+    for (let i = 0, j = 0; i < p.length; i += 4, j++) g[j] = 0.299 * p[i] + 0.587 * p[i + 1] + 0.114 * p[i + 2];
+    // 3) adaptive threshold (local mean, integral image) -> clean black text on white
+    const I = new Float64Array((W + 1) * (H + 1));
+    for (let yy = 0; yy < H; yy++) { let row = 0; for (let xx = 0; xx < W; xx++) { row += g[yy * W + xx]; I[(yy + 1) * (W + 1) + xx + 1] = I[yy * (W + 1) + xx + 1] + row; } }
+    const bg = cut * 1.1; const r = Math.max(8, Math.round(W / 40));
+    for (let yy = 0; yy < H; yy++) for (let xx = 0; xx < W; xx++) {
+      const xa = Math.max(0, xx - r), xb = Math.min(W, xx + r + 1), ya = Math.max(0, yy - r), yb = Math.min(H, yy + r + 1);
+      const m = (I[yb * (W + 1) + xb] - I[ya * (W + 1) + xb] - I[yb * (W + 1) + xa] + I[ya * (W + 1) + xa]) / ((xb - xa) * (yb - ya));
+      const v = (g[yy * W + xx] < m * 0.82 && m > bg) ? 0 : 255; const o = (yy * W + xx) * 4; p[o] = p[o + 1] = p[o + 2] = v;
+    }
+    x.putImageData(d, 0, 0); return c;
+  }
+  function parseReceipt(text, now) {
+    now = now || new Date();
+    const lines = text.split(/\n/).map(l => l.trim()).filter(Boolean); const out = { no: "", total: "", at: "", table: "", server: "", seats: "", sub: "", svc: "", check: null, timeRead: false };
+    // amounts: $1,280.40 · $1280 40 · $128040 (point lost) · $000
+    const amt = (s) => { const r = []; const re = /[\$£S§]\s?(\d{1,3}(?:,\d{3})+|\d+)(?:[.,\s](\d{2}))?(?!\d)/g; let m; while ((m = re.exec(s))) { let v; const a = m[1].replace(/,/g, ""); if (m[2] !== undefined) v = parseFloat(a + "." + m[2]); else if (/^0+$/.test(a)) v = 0; else if (a.length >= 3 && !/[.,]/.test(m[0])) v = parseFloat(a.slice(0, -2) + "." + a.slice(-2)); else v = parseFloat(a); if (v >= 0 && v < 100000) r.push(v); } return r; };
+    const last = (s) => { const m = amt(s); return m.length ? m[m.length - 1] : null; };
+    const isTotal = (l) => /^\W{0,3}(grand\s*)?t[o0a]t[ae]l\b|^\W{0,3}t[o0a]t[ae][lni1]\W*[:;]|amount\s*due|合計|總計|總額|應付|實付|实付/i.test(l) && !/item|count|tax|sub|小計/i.test(l);
+    for (let i = 0; i < lines.length; i++) {
+      const l = lines[i];
+      if (isTotal(l)) { const v = last(l); if (v) out.total = v.toFixed(2); }
+      else if (/sub\s*-?\s*t[o0]tal|小計/i.test(l)) { const v = last(l); if (v) out.sub = v.toFixed(2); }
+      else if (/s[ae]r?v[il1]?[ce][ec]?\s*charge|服務費/i.test(l)) { const v = last(l); if (v) out.svc = v.toFixed(2); }
+      let m;
+      if (!out.table && (m = /\bt[ae]b[l1i]e?\s*(?:no\.?)?\s*[:;.=#]?\s*([A-Z]?\d{1,3}[A-Z]?)\b/i.exec(l) || /(?:枱|檯|台)號?\s*[:：]?\s*(\d{1,3})/.exec(l))) out.table = m[1].toUpperCase();
+      if (!out.server && (m = /\bs[ae]r[vu][ae]r\s*[:;.=]?\s*([A-Za-z][A-Za-z .'-]{1,24})/i.exec(l))) out.server = m[1].replace(/\s+/g, " ").trim();
+      if (!out.seats && (m = /\bs[ea]{1,2}t\s*(?:count|s)?\s*\W{0,2}\s*(\d{1,2})\b/i.exec(l) || /\b(?:pax|guests?|covers?)\s*\W{0,2}\s*(\d{1,2})\b/i.exec(l) || /人數\s*[:：=]?\s*(\d{1,2})/.exec(l))) out.seats = m[1];
+    }
+    // no "Total:" read (bold line): this POS prints Subtotal = Total when tax is 0
+    if (!out.total && out.sub) out.total = out.sub;
+    if (!out.total) { const all = []; lines.forEach(l => { if (/item|count|each/i.test(l)) return; amt(l).forEach(v => all.push(v)); }); if (all.length) out.total = Math.max(...all).toFixed(2); }
+    // cross-check: item lines + service charge = total (lines with "each" are unit prices)
+    let sum = 0, n = 0; lines.forEach(l => { if (isTotal(l) || /sub\s*-?\s*t[o0]tal|小計|s[ae]r?v[il1]?[ce][ec]?\s*charge|服務費|tax|each|count|change|cash|visa|master|card|octopus|tender|paid/i.test(l) || /^\W*[\$£S§]\s?\d/.test(l)) return; const v = last(l); if (v !== null) { sum += v; n++; } });
+    if (n && out.total) out.check = Math.abs(sum + (+out.svc || 0) - +out.total) < 0.06;
+    // receipt / invoice number, only when the receipt prints one with its label
+    const nm = /(receipt|rcpt|invoice|inv|bill|order|check|chk|ticket|trans|txn)\s*(no\.?|number|#)?\s*[:#：]?\s*([A-Z0-9][A-Z0-9\-\/]{2,})/i.exec(text); if (nm && /\d/.test(nm[3])) out.no = nm[3].toUpperCase();
+    // date & time (HK: DD/MM/YYYY)
+    let dm = /(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/.exec(text), d = null;
+    if (dm) d = { y: +dm[1], m: +dm[2], d: +dm[3] }; else { dm = /(\d{1,2})\s?[\/\-.]\s?(\d{1,2})\s?[\/\-.]\s?(\d{2,4})/.exec(text); if (dm) d = { d: +dm[1], m: +dm[2], y: +dm[3] < 100 ? 2000 + +dm[3] : +dm[3] }; }
+    // time: hh:mm with a colon, on the date's line first (an amount like 0.00 is never a time)
+    const tre = /(?:^|[^\d$.])([01]?\d|2[0-3])\s?[:;]\s?([0-5]\d)(?![\d.])/; const dl = dm ? (text.slice(dm.index).split("\n")[0] || "") : "";
+    const tm = tre.exec(dl) || (dm ? tre.exec(text.slice(dm.index)) : tre.exec(text));
+    if (d && d.m >= 1 && d.m <= 12 && d.d >= 1 && d.d <= 31) {
+      // a misread year digit (2026 read as 2028): receipts only count for a few days, so take this year when that fits
+      const hk = new Date(now.getTime() + 8 * 3600e3), yNow = hk.getUTCFullYear();
+      if (d.y !== yNow) { const tryD = Date.UTC(yNow, d.m - 1, d.d), diff = (hk.getTime() - tryD) / 864e5; if (diff > -2 && diff < 30) d.y = yNow; else if (Math.abs(Date.UTC(yNow - 1, d.m - 1, d.d) - hk.getTime()) / 864e5 < 30) d.y = yNow - 1; }
+      out.timeRead = !!tm;
+      out.at = d.y + "-" + String(d.m).padStart(2, "0") + "-" + String(d.d).padStart(2, "0") + "T" + (tm ? String(+tm[1]).padStart(2, "0") + ":" + tm[2] : "12:00");
+    }
     return out;
   }
   $("#photo").addEventListener("change", async () => {
@@ -471,7 +547,7 @@
     // one-way fingerprint of the photo (the photo itself never leaves the phone): catches the same photo sent twice
     state.imgHash = null; try { const hb = await crypto.subtle.digest("SHA-256", await f.arrayBuffer()); state.imgHash = [...new Uint8Array(hb)].map(b => b.toString(16).padStart(2, "0")).join(""); } catch (e) {}
     try {
-      const cv = await downscale(f, 1600); $("#thumb").src = cv.toDataURL("image/jpeg", 0.6); $("#thumb").style.display = "block";
+      const cv = await prepReceipt(f); $("#thumb").src = cv.toDataURL("image/jpeg", 0.6); $("#thumb").style.display = "block";
       if (!window.Tesseract) await new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
       const withTimeout = (pr, ms) => Promise.race([pr, new Promise((_, rej) => setTimeout(() => rej(new Error("ocr_timeout")), ms))]);
       const logger = (m) => { if (m.status === "recognizing text") $("#ocrBar").style.width = (10 + 90 * m.progress) + "%"; else $("#ocrBar").style.width = "10%"; };
@@ -481,26 +557,39 @@
         catch (e) { try { if (worker) await worker.terminate(); } catch (e2) {} worker = null; }
       }
       if (!data) throw new Error("ocr_failed");
-      const p = parseReceipt(data.text || ""); ocr = { ...ocr, conf: Math.round(data.confidence || 0), text: (data.text || "").slice(0, 2000), fromOcr: true };
-      $("#rNo").value = p.no; $("#rTotal").value = p.total; $("#rAt").value = p.at || localNow(); ocr._no = p.no; ocr._total = p.total;
-      const good = p.no && p.total && p.at && ocr.conf >= 60; $("#readMsg").textContent = (good ? "✓ " + t("read_ok") : "⚠️ " + t("read_fail")) + " (" + ocr.conf + "%)";
+      const p = parseReceipt(data.text || ""); ocr = { ...ocr, conf: Math.round(data.confidence || 0), text: (data.text || "").slice(0, 2000), fromOcr: true, p };
+      $("#rNo").value = p.no; $("#rNoWrap").classList.toggle("hide", !p.no); $("#rTable").value = p.table; $("#rTotal").value = p.total; $("#rAt").value = p.at || localNow();
+      const good = p.total && p.at && p.timeRead && (p.table || p.no) && (ocr.conf >= 60 || p.check);
+      const bits = [p.server ? t("r_server") + " " + escR(p.server) : "", p.seats ? t(+p.seats === 1 ? "seat_1" : "seats_n", { n: p.seats }) : "", p.check ? "✓ " + t("r_adds") : ""].filter(Boolean).join(" · ");
+      $("#readMsg").innerHTML = (good ? "✓ " + t("read_ok") : "⚠️ " + t("read_fail")) + " (" + ocr.conf + "%)" + (bits ? '<br><span class="muted">' + bits + "</span>" : "");
       showScan("scanForm");
-    } catch (e) { ocr = { ...ocr, conf: null, text: null, fromOcr: false }; $("#rNo").value = ""; $("#rTotal").value = ""; $("#rAt").value = localNow(); $("#readMsg").textContent = "⚠️ " + t("read_fail"); showScan("scanForm"); }
+    } catch (e) { ocr = { ...ocr, conf: null, text: null, fromOcr: false, p: null }; $("#rNo").value = ""; $("#rTable").value = ""; $("#rTotal").value = ""; $("#rAt").value = localNow(); $("#readMsg").textContent = "⚠️ " + t("read_fail"); showScan("scanForm"); }
     $("#photo").value = "";
   });
   $("#rSubmit").onclick = async () => {
     $("#rErr").classList.add("hide"); $("#rSubmit").disabled = true;
     const total = parseFloat(String($("#rTotal").value).replace(/[^0-9.]/g, "")); const at = $("#rAt").value ? new Date($("#rAt").value + ":00+08:00").toISOString() : null;
-    const edited = !ocr.fromOcr || (ocr._no !== undefined && ($("#rNo").value !== ocr._no || $("#rTotal").value !== ocr._total));
+    const p = ocr.p || {}; const table = $("#rTable").value.trim().toUpperCase();
+    // anything the guest changed from what the phone read goes to staff to check
+    const edited = !ocr.fromOcr || $("#rTotal").value !== p.total || $("#rAt").value !== p.at || table !== (p.table || "") || $("#rNo").value.trim().toUpperCase() !== (p.no || "");
     try {
-      const r = await R.rpc("family_submit_receipt", { p_token: state.token, p_receipt_no: $("#rNo").value.trim(), p_total_hkd: total, p_receipt_at: at, p_shop: ocr.shop, p_source: ocr.fromOcr && !edited ? "ocr" : "manual", p_ocr_confidence: ocr.conf, p_ocr_text: ocr.text, p_image_hash: ocr.fromOcr ? state.imgHash : null });
-      showScan("scanIdle"); state.me = r.member;
-      if (r.status === "split_requested") { R.toast(t("split_waiting"), 4000); }
-      else if (r.status === "approved") { const g = r.visit && r.visit.gold; R.burst(g ? ["#E8B84A", "#F3D27A", "#F6F3E7"] : undefined); R.toast((g ? "✨ " + t("gold_hit") + " " : "") + t("added_points", { n: r.points }) + (r.visit && r.visit.added ? " · " + t("stamp_added") : "") + (r.visit && r.visit.referral_bonus ? " · 👯 +" + r.visit.referral_bonus : ""), 3500); state.lastPoints = r.member.points; state.lastStamps = r.member.visits_total; } else { R.toast(t("queued"), 4000); }
+      const r = await R.rpc("family_submit_receipt", { p_token: state.token, p_receipt_no: $("#rNo").value.trim(), p_total_hkd: total, p_receipt_at: at, p_shop: ocr.shop, p_source: ocr.fromOcr && !edited && p.timeRead ? "ocr" : "manual", p_ocr_confidence: ocr.conf, p_ocr_text: ocr.text, p_image_hash: ocr.fromOcr ? state.imgHash : null, p_table: table || null, p_server: ocr.fromOcr ? (p.server || null) : null, p_seats: ocr.fromOcr && p.seats ? +p.seats : null });
+      state.me = r.member;
+      if (r.status === "split_requested") { showScan("scanIdle"); R.toast(t("split_waiting"), 4000); }
+      else {
+        const zh = R.lang() === "zh", rd = r.read || {}, g = r.visit && r.visit.gold;
+        const head = r.status === "approved" ? (g ? "✨ " + t("gold_hit") + " " : "") + t("added_points", { n: Number(r.points || 0).toLocaleString("en-US") }) + (r.visit && r.visit.added ? " · " + t("stamp_added") : "") : "⏳ " + t("r_pending");
+        const meta = [rd.table ? t("table").replace(/\s*[（(].*$/, "") + " " + escR(rd.table) : "", rd.at ? escR(rd.at.slice(8, 10) + "/" + rd.at.slice(5, 7) + " " + rd.at.slice(11)) : "", rd.total ? "HK$" + Number(rd.total).toLocaleString("en-US", { minimumFractionDigits: 2 }) : "", rd.server ? t("r_server") + " " + escR(rd.server) : "", rd.seats ? t(+rd.seats === 1 ? "seat_1" : "seats_n", { n: rd.seats }) : ""].filter(Boolean).join(" · ");
+        const items = (r.items || []).map(x => '<span class="pill">' + (x.qty > 1 ? x.qty + "× " : "") + escR(zh && x.zh ? x.zh : String(x.en).replace(/\s*\((per person|(19|20)\d\d)\)$/i, "")) + "</span>").join(" ");
+        $("#scanDone").innerHTML = '<h2 style="margin-top:0">' + head + '</h2><p class="small muted" style="margin:4px 0 10px">' + t("r_read") + ": " + meta + "</p>" + (items ? '<p class="small" style="margin:0 0 6px"><b>' + t("r_items") + '</b></p><div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:12px">' + items + "</div>" : "") + (r.status === "approved" ? "" : '<p class="small muted">' + t("queued") + "</p>") + '<button class="btn" id="rDone">' + t("r_done") + "</button>";
+        showScan("scanDone"); $("#rDone").onclick = () => showScan("scanIdle");
+        if (r.status === "approved") { R.burst(g ? ["#E8B84A", "#F3D27A", "#F6F3E7"] : undefined); R.toast((g ? "✨ " + t("gold_hit") + " " : "") + t("added_points", { n: r.points }) + (r.visit && r.visit.referral_bonus ? " · 👯 +" + r.visit.referral_bonus : ""), 3500); state.lastPoints = r.member.points; state.lastStamps = r.member.visits_total; }
+      }
       render();
     } catch (e) { $("#rErr").textContent = R.errText(e); $("#rErr").classList.remove("hide"); }
     $("#rSubmit").disabled = false;
   };
+
   function setupScratch(el, id) {
     const c = el.querySelector("canvas"), ctx = c.getContext("2d");
     const size = () => { const r = el.getBoundingClientRect(); c.width = r.width * devicePixelRatio; c.height = r.height * devicePixelRatio; paint(); };

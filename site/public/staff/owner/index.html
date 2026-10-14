@@ -8,10 +8,10 @@
 <title>Roru Family — Owner</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f13">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f16">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f13"></script>
-<script src="/loyalty/monthend.js?v=f13"></script>
+<script src="/loyalty/loyalty.js?v=f16"></script>
+<script src="/loyalty/monthend.js?v=f16"></script>
 <style>
 /* v36 owner dashboard */
 .dash{margin:16px 0 18px}
@@ -220,11 +220,11 @@
     // v38: access log (PDPO accountability) — every staff lookup / QR scan / guest-card view, newest first
     const loadAccess = async () => { let al = null; try { al = await R.rpc("owner_access_log", { p_token: st.sess.token, p_limit: 30 }); } catch (e) {}
       const old = $("#accessLog"); if (old) old.remove(); const box = document.createElement("div"); box.id = "accessLog";
-      const ACT = { lookup: "Number lookup", scan: "QR / code scan", view: "Opened guest card" };
+      const ACT = { lookup: "Number lookup", scan: "QR / code scan", view: "Opened guest card", reverse_redeem: "↩︎ Reversed a used reward" };
       const when = (x) => new Date(x).toLocaleString("en-GB", { timeZone: "Asia/Hong_Kong", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
       box.innerHTML = '<div class="row" style="justify-content:space-between;align-items:center;margin-top:18px"><h2 style="margin:0">🔒 Access log</h2><button class="btn ghost sm" id="alRefresh">Refresh</button></div>' +
-        '<p class="muted small">Staff can see a guest\'s full number, birthday and spend. Every lookup, QR scan and guest-card view is recorded here with who and when (repeats within 2 minutes count on one line). Last 7 days: <b>' + (al ? al.total_7d : "—") + '</b> views.</p>' +
-        (al && al.rows.length ? '<table class="small"><tr><th>When</th><th>Staff</th><th>Guest</th><th>What</th></tr>' + al.rows.map(x => '<tr><td>' + when(x.last_at) + '</td><td>' + esc(x.staff_name || "—") + (x.staff_role && x.staff_role !== "staff" ? ' <span class="tiny" style="margin:0">' + esc(x.staff_role) + '</span>' : '') + '</td><td>' + esc(x.member_name || "—") + ' <span class="tiny" style="margin:0">' + esc(x.member_code) + (x.is_test ? ' · test' : '') + '</span></td><td>' + (ACT[x.action] || esc(x.action)) + (x.hits > 1 ? ' ×' + x.hits : '') + '</td></tr>').join("") + '</table>' : '<p class="muted small">' + (al ? "No staff views yet." : "Couldn't load the log.") + '</p>');
+        '<p class="muted small">Staff can see a guest\'s full number, birthday and spend. Every lookup, QR scan, guest-card view and reversed reward is recorded here with who and when (repeats within 2 minutes count on one line). Last 7 days: <b>' + (al ? al.total_7d : "—") + '</b> views.</p>' +
+        (al && al.rows.length ? '<table class="small"><tr><th>When</th><th>Staff</th><th>Guest</th><th>What</th></tr>' + al.rows.map(x => '<tr><td>' + when(x.last_at) + '</td><td>' + esc(x.staff_name || "—") + (x.staff_role && x.staff_role !== "staff" ? ' <span class="tiny" style="margin:0">' + esc(x.staff_role) + '</span>' : '') + '</td><td>' + esc(x.member_name || "—") + ' <span class="tiny" style="margin:0">' + esc(x.member_code) + (x.is_test ? ' · test' : '') + '</span></td><td>' + (ACT[x.action] || esc(x.action)) + (x.hits > 1 ? ' ×' + x.hits : '') + (x.detail ? '<br><span class="tiny" style="margin:0">' + esc(x.detail) + '</span>' : '') + '</td></tr>').join("") + '</table>' : '<p class="muted small">' + (al ? "No staff views yet." : "Couldn't load the log.") + '</p>');
       $("#tab-staff").appendChild(box); $("#alRefresh").onclick = loadAccess; };
     loadAccess();
 

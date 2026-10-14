@@ -13,10 +13,10 @@
 <link rel="manifest" href="/loyalty/staff.webmanifest">
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f13">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f16">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f13"></script>
-<script src="/loyalty/monthend.js?v=f13"></script>
+<script src="/loyalty/loyalty.js?v=f16"></script>
+<script src="/loyalty/monthend.js?v=f16"></script>
 <style>body{overscroll-behavior:none}
 .gcard{border:1px solid var(--line);background:var(--ink2);border-radius:18px;padding:14px 16px;margin:0 0 12px}
 .gcard .gh{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
@@ -258,13 +258,27 @@
           '<div class="pi-main"><div class="pi-give">' + (KIND_ICO[x.kind] || "🎁") + " " + t("s_pos_give") + ": <b>" + esc(zh ? x.give_zh : x.give_en) + "</b>" + (x.upgraded ? ' <span class="uptag">⬆️ ' + t("s_upgraded") + "</span>" : "") + "</div>" +
           (x.upgraded ? '<div class="pi-meta">' + t("s_from") + ": " + esc(zh ? x.from_zh : x.from_en) + "</div>" : "") +
           '<div class="pi-ring">' + t("s_pos_ring") + ": <b>" + esc(x.pos_item) + "</b> · 100% loyalty</div>" +
-          '<div class="pi-meta"><b>' + x.code + "</b> · " + esc(x.who) + " · " + R.fmtTime(x.redeemed_at) + (x.redeemed_by ? " · " + esc(x.redeemed_by) : "") + (x.is_test ? " · test" : "") + "</div></div>" +
+          '<div class="pi-meta"><b>' + x.code + "</b> · " + esc(x.who) + " · " + R.fmtTime(x.redeemed_at) + (x.redeemed_by ? " · " + esc(x.redeemed_by) : "") + (x.is_test ? " · test" : "") + (isMgr() ? ' · <a href="#" class="rev-link" data-rev="' + x.code + '">↩︎ ' + t("s_rev") + "</a>" : "") + '</div><div class="rev-box"></div></div>' +
           (x.logged_at ? '<div class="pi-done">✓ ' + t("s_pos_done") + "<small>" + R.fmtTime(x.logged_at) + (x.logged_by ? " · " + esc(x.logged_by) : "") + "</small></div>" : '<button class="btn gold sm" data-poslog="' + x.code + '">' + t("s_pos_log") + "</button>") + "</div>").join("")
         : '<p class="muted small">' + t("s_pos_none") + "</p>";
       if (q.items.length > shown.length) $("#posList").insertAdjacentHTML("beforeend", '<button class="btn ghost sm" id="posMore" style="margin-top:10px">' + t("s_pos_more", { n: q.items.length - shown.length }) + "</button>");
       if ($("#posMore")) $("#posMore").onclick = () => { st.posAll = true; loadPos(); };
+      $("#posList").querySelectorAll("[data-rev]").forEach(a => a.onclick = (e) => { e.preventDefault(); revForm(a.closest(".positem").querySelector(".rev-box"), a.dataset.rev); });
+      if (isMgr()) $("#posList").insertAdjacentHTML("beforeend", '<details class="rev-code" style="margin-top:12px"><summary class="small muted">↩︎ ' + t("s_rev_code") + '</summary><div class="row" style="gap:8px;margin-top:8px"><input id="revCode" placeholder="R…" autocapitalize="characters" style="flex:1;min-width:0;font-size:16px;padding:8px;border-radius:10px;border:0"><button class="btn ghost sm" id="revGo">' + t("s_rev") + '</button></div><div class="rev-box" id="revCodeBox"></div></details>');
+      if ($("#revGo")) $("#revGo").onclick = () => { const c = $("#revCode").value.trim(); if (c) revForm($("#revCodeBox"), c); };
       $("#posList").querySelectorAll("[data-poslog]").forEach(b => b.onclick = async () => { b.disabled = true; try { await R.rpc("staff_pos_log", { p_token: st.sess.token, p_code: b.dataset.poslog }); loadPos(); } catch (e) { b.disabled = false; show("⚠️", t("r_err"), R.errText(e), ""); } });
     } catch (e) {}
+  }
+  // manager / owner: reverse a reward staff already used (reason required, points back, written to the access log)
+  const isMgr = () => !!(st.sess && st.sess.staff && ["manager", "owner"].includes(st.sess.staff.role));
+  function revForm(box, code) {
+    box.innerHTML = '<div class="row" style="gap:8px;margin-top:8px;flex-wrap:wrap"><input class="rev-reason" placeholder="' + t("s_rev_reason") + '" maxlength="200" style="flex:1;min-width:160px;font-size:16px;padding:8px;border-radius:10px;border:0"><button class="btn sm rev-ok">' + t("s_rev_ok") + "</button></div>";
+    const inp = box.querySelector(".rev-reason"); inp.focus();
+    box.querySelector(".rev-ok").onclick = async (e) => { const b = e.currentTarget; b.disabled = true;
+      try { const r = await R.rpc("staff_reverse_redeem", { p_token: st.sess.token, p_reward_code: code, p_reason: inp.value });
+        show("↩︎", t("s_rev_done", { n: Number(r.refunded || 0).toLocaleString("en-US") }), r.code + (r.was_logged_on_pos ? " · " + t("s_rev_pos") : ""), "");
+        box.innerHTML = ""; loadPos(); if (st.sel) loadCard(st.sel);
+      } catch (er) { b.disabled = false; show("⚠️", t("r_err"), R.errText(er), ""); } };
   }
   function reset() { st.num = ""; st.sel = null; st.members = []; renderDisp(); $("#members").innerHTML = ""; $("#actions").classList.add("hide"); $("#award").classList.add("hide"); $("#pending").innerHTML = ""; $("#gcard").classList.add("hide"); $("#gcard").innerHTML = ""; st.card = null; }
   function show(ico, title, sub, cls) { $("#rIco").textContent = ico; $("#rTitle").textContent = title; $("#rSub").textContent = sub; const el = $("#result"); el.className = "result show " + cls; clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 4000); }
