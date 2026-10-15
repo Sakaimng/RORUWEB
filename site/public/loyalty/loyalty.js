@@ -233,5 +233,30 @@ window.RORU = (function () {
     window.addEventListener("resize", place);
     show(); return true;
   }
-  return { CFG, PROG, prog, t, lang: () => lang, setLang, applyI18n, rpc, errText, gate, qrSvg, rollSvg, tierIcon, TIERS, tierName: (k, l) => (TIERS[k] || TIERS.nori)[(l || lang) === "zh" ? "zh" : "en"], toast, burst, fmtDay, fmtTime, tour };
+
+  // f28: the custom hand-roll emoji replaces every 🍣 the app renders (guest, staff and owner), including text set later
+  const HR = '<img class="hr-emoji" src="/loyalty/img/handroll_32.png" srcset="/loyalty/img/handroll_32.png 1x, /loyalty/img/handroll_64.png 2x, /loyalty/img/handroll_128.png 3x" alt="hand roll" draggable="false">';
+  const HR_SKIP = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, OPTION: 1, TITLE: 1, INPUT: 1, SELECT: 1, SVG: 1, TEXT: 1, TSPAN: 1 };
+  function hrNode(tn) {
+    const p = tn.parentNode; if (!p || HR_SKIP[(p.nodeName || "").toUpperCase()] || (p.closest && p.closest("svg"))) return;
+    const parts = tn.nodeValue.split("🍣"); if (parts.length < 2) return;
+    const frag = document.createDocumentFragment();
+    parts.forEach((s, i) => { if (i) { const t = document.createElement("template"); t.innerHTML = HR; frag.appendChild(t.content.firstChild); } if (s) frag.appendChild(document.createTextNode(s)); });
+    p.replaceChild(frag, tn);
+  }
+  function hrScan(root) {
+    if (!root) return;
+    if (root.nodeType === 3) { if (root.nodeValue.indexOf("🍣") >= 0) hrNode(root); return; }
+    if (root.nodeType !== 1 && root.nodeType !== 11) return;
+    if ((root.textContent || "").indexOf("🍣") < 0) return;
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), hits = []; let n;
+    while ((n = w.nextNode())) if (n.nodeValue.indexOf("🍣") >= 0) hits.push(n);
+    hits.forEach(hrNode);
+  }
+  function hrStart() {
+    hrScan(document.body);
+    new MutationObserver((ms) => { for (const m of ms) { if (m.type === "characterData") hrScan(m.target); else m.addedNodes.forEach(hrScan); } }).observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if (typeof document !== "undefined") { if (document.body) hrStart(); else document.addEventListener("DOMContentLoaded", hrStart); }
+  return { HR, CFG, PROG, prog, t, lang: () => lang, setLang, applyI18n, rpc, errText, gate, qrSvg, rollSvg, tierIcon, TIERS, tierName: (k, l) => (TIERS[k] || TIERS.nori)[(l || lang) === "zh" ? "zh" : "en"], toast, burst, fmtDay, fmtTime, tour };
 })();
