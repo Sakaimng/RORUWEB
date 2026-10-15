@@ -9,12 +9,21 @@ window.RORU = (function () {
   // PROGRAMME NAME — the one place to rename the loyalty programme (EN / 繁中). Every string below uses {prog};
   // page titles, headers, the passcode gate, share text and the month-end PDF/CSV read it from here.
   const PROG = { en: "High Rollers", zh: "卷王會" };
+  // TIER NAMES + ONE-LINERS — the one place to rename the status tiers (EN / 繁中). Keys are the internal tier ids
+  // stored in the database (never shown); change only the words. Every "tier_<id>" / "lad_m_<id>" string and every
+  // {t_<id>} placeholder below reads from here. Order = the ladder, lowest first.
+  const TIERS = {
+    nori:   { en: "Nori",   zh: "紫菜",   line_en: "The seaweed wrap. Every roll starts here.",              line_zh: "包住每條手卷嘅紫菜，人人都由呢度開始。" },
+    gohan:  { en: "Gohan",  zh: "壽司飯", line_en: "The rice. You're a regular now.",                        line_zh: "手卷嘅根本，你而家係熟客喇。" },
+    tobiko: { en: "Tobiko", zh: "飛魚籽", line_en: "The roe on top. The extras, including the secret menu.", line_zh: "鋪面嘅飛魚籽，有額外著數，包括隱藏餐牌。" },
+    kama:   { en: "Kama",   zh: "魚鮫",   line_en: "The collar. The rarest cut, by invitation only.",        line_zh: "最珍貴嘅部位，只限邀請。" }
+  };
   const L = {
     en: {
       perks_title: "Your perks", perks_you: "You're here", perks_from: "{t} and up", perks_passes_left: "{n} of {m} left", perks_plus: "Everything in {t}, plus:",
-      lad_next: "Next: {name}", lad_kama: "Kama is by invitation", lad_top: "Top tier", lad_you: "You're here", lad_pts: "{x} pts", lad_m_nori: "The seaweed wrap. Every roll starts here.", lad_m_gohan: "The rice. You're a regular now.", lad_m_tobiko: "The roe on top. The extras, including the secret menu.", lad_m_kama: "The collar. The rarest cut, by invitation only.",
-      your_status: "Your status", mult_line: "Earns {x} points on every HK$1", year_spend: "{n} spent in the last 12 months", kama_eligible: "Kama eligible — by invitation",
-      tier_more: "{n} more this year to {name}", tier_more_kama: "Kama: {n} more this year to be eligible (by invitation)", status_line: "Status = what you spend in a rolling 12 months",
+      lad_next: "Next: {name}", lad_kama: "{t_kama} is by invitation", lad_top: "Top tier", lad_you: "You're here", lad_pts: "{x} pts",
+      tab_card: "Card", tab_rewards: "Rewards", tab_status: "Status", tab_me: "Me", your_status: "Your status", mult_line: "Earns {x} points on every HK$1", year_spend: "{n} spent in the last 12 months", kama_eligible: "{t_kama} eligible — by invitation",
+      tier_more: "{n} more this year to {name}", tier_more_kama: "{t_kama}: {n} more this year to be eligible (by invitation)", status_line: "Status = what you spend in a rolling 12 months",
       tier_start: "Start", invite: "invite only", invite_only_tag: "Invite only", per_year: "/yr", visits: "visits", plate_line: "{n} more visits → {r}", plate_line_1: "1 more visit → {r}", stamp_rule: "1 stamp per visit (max 1 a day)",
       plates_done_n: "{n} plates finished", plates_done_n_1: "1 plate finished", stamp_added: "+1 visit stamp 🍣", visit_only_note: "", coming_soon: "Coming soon", soon_tag: "Soon",
       bday_opt: "Birthday (optional) — for a birthday roll",
@@ -47,22 +56,22 @@ window.RORU = (function () {
       preview_note: "Dark preview — rewards shown are placeholders until Dominic sets them.", err_bad_phone: "Please enter a valid mobile number", err_wrong_code: "Wrong code, try again", err_code_expired: "Code expired — send a new one",
       err_consent: "Please tick the consent box to join", err_too_many: "Too many tries, wait a bit", err_net: "Connection problem, try again", member_since: "Member since",
       gate_title: "Preview", gate_sub: "Enter the preview passcode", gate_btn: "Enter", gate_err: "Wrong passcode", lang_zh: "繁中", lang_en: "EN",
-      tier_nori: "Nori", tier_gohan: "Gohan", tier_tobiko: "Tobiko", tier_kama: "Kama", plates_done: "plates finished", next_level: "Next level at {n} plates", top_level: "Kama — top level, thank you ❤",
+      plates_done: "plates finished", next_level: "Next level at {n} plates", top_level: "{t_kama} — top level, thank you ❤",
       roll_added: "+1 hand roll!", reward_unlocked: "Plate full — reward unlocked!",
       p_tag: "Points for every dollar. A stamp for every visit.", p_sub: "{r} point per HK$1 at RORUBARU, plus a hand-roll stamp each visit — 5 stamps fill the plate for a visit reward. Spend more, climb the levels, earn faster.",
       points: "points", your_points: "Your points", scan: "Scan receipt", scan_sub: "Take a photo of the printed receipt — we read the total for you.", type_instead: "Type it instead", reading: "Reading your receipt…", read_ok: "Check and confirm", read_fail: "Couldn't read it clearly — please check the details",
       receipt_no: "Receipt / bill number", total: "Bill total (HK$)", when: "Date & time on the receipt", shop: "Shop", confirm_add: "Confirm & add points", retake: "Retake photo", table: "Table no. (on the receipt)", r_read: "Read from your receipt", r_items: "What you had", r_done: "Done", r_adds: "adds up", r_server: "Server", seats_n: "{n} seats", seat_1: "1 seat", claim_q: "Use {n} points for {r}?", c_ok: "Confirm", c_cancel: "Cancel", undo: "Undo", undo_q: "Cancel this reward and get {n} points back?", undone: "Cancelled · {n} points back", err_already_redeemed: "Staff already used this reward. A manager can reverse it at the counter.", err_reward_void: "This reward was already cancelled", err_nothing_to_refund: "Nothing to refund on this one", err_reason_required: "Please write a short reason", err_manager_only: "Manager or owner only", s_rev: "Reverse", s_rev_reason: "Reason (required)", s_rev_ok: "Reverse & refund", s_rev_done: "Reversed · {n} points back", s_rev_pos: "It was logged on the POS: void it there too", s_rev_code: "Reverse a used reward (code)", r_pending: "Sent to staff to check",
       added_points: "+{n} points!", queued: "Sent to staff to check — points land once approved (usually same day).", pending_hint: "{n} receipts waiting for staff approval", pending_hint_1: "1 receipt waiting for staff approval",
       ladder: "Rewards", ladder_sub: "Use your points on any reward you've unlocked. Points come off when you tap Use; show the code at the counter.", lad_unlocked: "Unlocked", lad_locked: "Locked", lad_use: "Use", claim: "Use {n} pts", need_more: "{n} more", claimed: "Reward unlocked — scratch to reveal", upgrade: "Upgraded! The nori hid something better 🎉",
-      receipts: "Your receipts", tier_line: "{spend} spent · {next}", tier_next: "{n} to {name}", kama_note: "Kama is by chef's invitation only",
+      receipts: "Your receipts", tier_line: "{spend} spent · {next}", tier_next: "{n} to {name}", kama_note: "{t_kama} is by chef's invitation only",
       err_receipt_already_used: "This receipt has already been added", err_receipt_photo_already_used: "You've already sent this photo", err_receipt_too_old: "Receipts count within {h} hours", err_daily_receipt_limit: "Daily receipt limit reached — staff can add it for you", err_receipt_no_required: "Please add the date & time and table no. from the receipt", err_bad_total: "Please check the total", err_not_enough_points: "Not enough points yet", err_receipt_in_future: "That date is in the future",
       install_tip: "Tip: add this page to your home screen"
     },
     zh: {
       perks_title: "你的會員禮遇", perks_you: "你的等級", perks_from: "{t} 或以上", perks_passes_left: "尚餘 {n}/{m} 張", perks_plus: "{t} 全部權益，再加：",
-      lad_next: "下一級：{name}", lad_kama: "Kama 只限邀請", lad_top: "最高級別", lad_you: "你而家喺度", lad_pts: "{x} 積分", lad_m_nori: "紫菜，包住每條手卷。人人都由呢度開始。", lad_m_gohan: "壽司飯。你而家係熟客喇。", lad_m_tobiko: "面頭嘅飛魚籽。有額外著數，包括隱藏餐牌。", lad_m_kama: "魚鮫，最矜貴嘅部位。只限邀請。",
-      your_status: "你的會員級別", mult_line: "每 HK$1 可得 {x} 積分", year_spend: "過去 12 個月消費 {n}", kama_eligible: "已符合 Kama 資格 — 只限邀請",
-      tier_more: "今年再消費 {n} 升至 {name}", tier_more_kama: "Kama：今年再消費 {n} 即符合資格（只限邀請）", status_line: "級別按過去 12 個月消費計算",
+      lad_next: "下一級：{name}", lad_kama: "{t_kama}只限邀請", lad_top: "最高級別", lad_you: "你而家喺度", lad_pts: "{x} 積分",
+      tab_card: "會員卡", tab_rewards: "獎賞", tab_status: "級別", tab_me: "我的", your_status: "你的會員級別", mult_line: "每 HK$1 可得 {x} 積分", year_spend: "過去 12 個月消費 {n}", kama_eligible: "已符合{t_kama}資格 — 只限邀請",
+      tier_more: "今年再消費 {n} 升至 {name}", tier_more_kama: "{t_kama}：今年再消費 {n} 即符合資格（只限邀請）", status_line: "級別按過去 12 個月消費計算",
       tier_start: "起步", invite: "只限邀請", invite_only_tag: "只限邀請", per_year: "／年", visits: "次到訪", plate_line: "再到訪 {n} 次 → {r}", stamp_rule: "每次到訪蓋 1 個印（每日最多 1 個）",
       plates_done_n: "已集齊 {n} 碟", stamp_added: "+1 到訪印 🍣", visit_only_note: "", coming_soon: "即將推出", soon_tag: "即將推出",
       bday_opt: "生日（可選）— 生日手卷用",
@@ -95,21 +104,22 @@ window.RORU = (function () {
       preview_note: "內部預覽 — 獎賞內容為佔位，待 Dominic 決定。", err_bad_phone: "請輸入有效的手機號碼", err_wrong_code: "驗證碼錯誤，請再試", err_code_expired: "驗證碼已過期，請重新發送",
       err_consent: "請勾選同意方可加入", err_too_many: "嘗試次數過多，請稍後再試", err_net: "連線問題，請再試", member_since: "加入日期",
       gate_title: "預覽", gate_sub: "請輸入預覽密碼", gate_btn: "進入", gate_err: "密碼錯誤", lang_zh: "繁中", lang_en: "EN",
-      tier_nori: "Nori 紫菜", tier_gohan: "Gohan 飯", tier_tobiko: "Tobiko 飛魚籽", tier_kama: "Kama", plates_done: "已集齊碟數", next_level: "集齊 {n} 碟升級", top_level: "Kama — 最高級別，多謝你 ❤",
+      plates_done: "已集齊碟數", next_level: "集齊 {n} 碟升級", top_level: "{t_kama} — 最高級別，多謝你 ❤",
       roll_added: "+1 手卷！", reward_unlocked: "集齊一碟 — 獎賞解鎖！",
       p_tag: "消費儲積分，到訪集手卷印。", p_sub: "在 RORUBARU 每消費 HK$1 得 {r} 分，每次到訪再蓋一個手卷印 — 集齊 5 個印換到訪獎賞。消費越多，級別越高，積分越快。",
       points: "分", your_points: "你的積分", scan: "掃描收據", scan_sub: "影一張收據相片 — 我們會自動讀取總額。", type_instead: "改為手動輸入", reading: "正在讀取收據…", read_ok: "請核對後確認", read_fail: "未能清楚讀取 — 請核對資料",
       receipt_no: "收據／單號", total: "總額 (HK$)", when: "收據上的日期及時間", shop: "分店", confirm_add: "確認並加積分", retake: "重新拍攝", table: "枱號（收據上）", r_read: "從收據讀到", r_items: "你食咗", r_done: "完成", r_adds: "金額吻合", r_server: "服務員", seats_n: "{n} 位", seat_1: "1 位", claim_q: "用 {n} 分換「{r}」？", c_ok: "確認", c_cancel: "取消", undo: "取消兌換", undo_q: "取消此獎賞並退回 {n} 分？", undone: "已取消 · 退回 {n} 分", err_already_redeemed: "店員已使用此獎賞，可請經理在櫃檯退回。", err_reward_void: "此獎賞已取消", err_nothing_to_refund: "此獎賞沒有積分可退回", err_reason_required: "請寫下簡短原因", err_manager_only: "只限經理或東主", s_rev: "退回", s_rev_reason: "原因（必填）", s_rev_ok: "退回並退分", s_rev_done: "已退回 · 退還 {n} 分", s_rev_pos: "此項已記入 POS：請同時在 POS 作廢", s_rev_code: "退回已使用的獎賞（碼）", r_pending: "已交由店員核實",
       added_points: "+{n} 分！", queued: "已交由店員核實 — 批核後積分即到（通常當日）。", pending_hint: "{n} 張收據等待店員批核",
       ladder: "獎賞", ladder_sub: "已解鎖的獎賞可隨時用積分換領。按「換領」即扣分，到櫃枱出示代碼即可。", lad_unlocked: "已解鎖", lad_locked: "未解鎖", lad_use: "換領", claim: "用 {n} 分", need_more: "尚差 {n} 分", claimed: "獎賞解鎖 — 刮開紫菜看看", upgrade: "升級了！紫菜下有更好的 🎉",
-      receipts: "你的收據", tier_line: "已消費 {spend} · {next}", tier_next: "再 {n} 升至 {name}", kama_note: "Kama 只限主廚邀請",
+      receipts: "你的收據", tier_line: "已消費 {spend} · {next}", tier_next: "再 {n} 升至 {name}", kama_note: "{t_kama}只限主廚邀請",
       err_receipt_already_used: "此收據已經加過積分", err_receipt_photo_already_used: "你已經上載過這張相", err_receipt_too_old: "收據須於 {h} 小時內", err_daily_receipt_limit: "已達每日收據上限 — 可請店員代為加入", err_receipt_no_required: "請填上收據上的日期時間及枱號", err_bad_total: "請核對總額", err_not_enough_points: "積分尚未足夠", err_receipt_in_future: "日期在未來",
       install_tip: "提示：可將此頁加到主畫面"
     }
   };
+  for (const k in TIERS) { L.en["tier_" + k] = TIERS[k].en; L.zh["tier_" + k] = TIERS[k].zh; L.en["lad_m_" + k] = TIERS[k].line_en; L.zh["lad_m_" + k] = TIERS[k].line_zh; }
   let lang = localStorage.getItem("roru_lang") || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
   const prog = (l) => PROG[(l || lang) === "zh" ? "zh" : "en"];
-  const t = (k, vars) => { const one = vars && +vars.n === 1 && L[lang] && L[lang][k + "_1"]; let s = one || (L[lang] && L[lang][k]) || L.en[k] || k; if (vars) for (const v in vars) s = s.replace("{" + v + "}", vars[v]); return s.split("{prog}").join(prog()); };
+  const t = (k, vars) => { const one = vars && +vars.n === 1 && L[lang] && L[lang][k + "_1"]; let s = one || (L[lang] && L[lang][k]) || L.en[k] || k; if (vars) for (const v in vars) s = s.replace("{" + v + "}", vars[v]); return s.split("{prog}").join(prog()).replace(/\{t_(nori|gohan|tobiko|kama)\}/g, (_, k) => TIERS[k][lang === "zh" ? "zh" : "en"]); };
   // Static pages: <title data-tt="{prog} — …">, <span data-prog> (current language) or data-prog="en"/"zh" (fixed language).
   const applyProg = () => { document.querySelectorAll("[data-prog]").forEach(el => { el.textContent = prog(el.dataset.prog || lang); }); const tt = document.querySelector("title[data-tt]"); if (tt) document.title = tt.dataset.tt.split("{prog}").join(prog()); };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", applyProg); else applyProg();
@@ -180,5 +190,5 @@ window.RORU = (function () {
     }, { passive: false });
   })();
   setLang(lang);
-  return { CFG, PROG, prog, t, lang: () => lang, setLang, applyI18n, rpc, errText, gate, qrSvg, rollSvg, tierIcon, toast, burst, fmtDay, fmtTime };
+  return { CFG, PROG, prog, t, lang: () => lang, setLang, applyI18n, rpc, errText, gate, qrSvg, rollSvg, tierIcon, TIERS, tierName: (k, l) => (TIERS[k] || TIERS.nori)[(l || lang) === "zh" ? "zh" : "en"], toast, burst, fmtDay, fmtTime };
 })();
