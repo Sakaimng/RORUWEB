@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
         /** The two largest story videos are served from the site's mirror (too big for the repo upload path). */
         { source: "/story/story_v3_16x9.mp4", destination: "https://rorubaru-live-counter.sites.tab.bot/story/story_v3_16x9.mp4" },
         { source: "/story/story_v3_9x16.mp4", destination: "https://rorubaru-live-counter.sites.tab.bot/story/story_v3_9x16.mp4" },
+        /** Story video v4 (repeat scene replaced, Oct 15 2026): hosted on its own small mirror. */
+        { source: "/story/story_v4_16x9.mp4", destination: "https://rorubaru-story.sites.tab.bot/story/story_v4_16x9.mp4" },
+        { source: "/story/story_v4_9x16.mp4", destination: "https://rorubaru-story.sites.tab.bot/story/story_v4_9x16.mp4" },
       ],
       afterFiles: [],
       fallback: [],

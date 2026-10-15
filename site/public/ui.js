@@ -192,7 +192,7 @@ const storyBlobs = {};
 function storyFile(v) {
   const nc = navigator.connection || {};
   const small = (window.innerWidth || 0) * (window.devicePixelRatio || 1) < 800 || nc.saveData || /(^|-)(2g|3g)$/.test(nc.effectiveType || '');
-  return portrait() ? ((small && v.dataset.v916s) || v.dataset.v916) : v.dataset.v169;
+  return (portrait() && small && v.dataset.v916s) || v.dataset.v916; // one 9:16 cut everywhere; desktop shows it whole with a blurred fill
 }
 function storyBlob(f) {
   if (!storyBlobs[f]) storyBlobs[f] = fetch(f).then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); }).then((b) => URL.createObjectURL(b.type ? b : new Blob([b], { type: 'video/mp4' }))).catch(() => f);
@@ -215,6 +215,7 @@ function placeStoryMute() {
   const nav = document.querySelector('nav.tabs'); let cover = 0;
   if (nav && getComputedStyle(nav).display !== 'none') { const n = nav.getBoundingClientRect(); if (n.height && n.top < r.bottom) cover = r.bottom - n.top; }
   m.style.bottom = Math.round(Math.max(gapB, cover) + 12) + 'px'; m.style.right = Math.round(Math.max(gapR, 0) + 12) + 'px';
+  const bar = pl.querySelector('.os-bar'); if (bar) { const gx = Math.round(Math.max(gapR, 0)); bar.style.left = (gx + 14) + 'px'; bar.style.right = (gx + 12 + 40 + 12) + 'px'; bar.style.bottom = Math.round(Math.max(gapB, cover) + 12 + 6) + 'px'; }
 }
 window.addEventListener('resize', placeStoryMute);
 function storyPlay(v, sound) {
@@ -222,6 +223,47 @@ function storyPlay(v, sound) {
   const p = v.play();
   if (p && p.catch) p.catch(() => { if (!v.muted) { v.muted = true; syncStoryMute(v); const q = v.play(); if (q && q.catch) q.catch(() => {}); } });
 }
+
+// desktop: a blurred, dimmed copy of the story video fills the sides of the 9:16 frame and follows it
+['play', 'pause', 'seeked', 'ended'].forEach((t) => document.addEventListener(t, (e) => {
+  const v = e.target; if (!v.matches || !v.matches('.os-player video:not(.os-bg)')) return;
+  const bg = v.parentNode.querySelector('.os-bg'); if (!bg || !bg.src) return;
+  if (Math.abs(bg.currentTime - v.currentTime) > 0.25) bg.currentTime = v.currentTime;
+  if (t === 'play') { const p = bg.play(); if (p && p.catch) p.catch(() => {}); } else bg.pause();
+}, true));
+
+// seek bar: thin line at the bottom of the frame; tap or drag (touch or mouse) to scrub, arrow keys step 2 s
+function storyBarSync(v) {
+  const bar = v && v.parentNode.querySelector('.os-bar'); if (!bar || !v.duration) return;
+  const p = Math.min(1, v.currentTime / v.duration);
+  bar.style.setProperty('--p', p); bar.setAttribute('aria-valuenow', String(Math.round(p * 100)));
+}
+['timeupdate', 'seeked', 'loadedmetadata', 'play'].forEach((t) => document.addEventListener(t, (e) => {
+  const v = e.target; if (v.matches && v.matches('.os-player video:not(.os-bg)')) storyBarSync(v);
+}, true));
+(function storyBarLoop() { const v = body.querySelector('.os-player:not([hidden]) video'); if (v && !v.paused) storyBarSync(v); requestAnimationFrame(storyBarLoop); })();
+let scrub = null;
+function scrubTo(e) {
+  const v = scrub.v, r = scrub.bar.getBoundingClientRect(); if (!v.duration) return;
+  const p = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+  v.currentTime = Math.min(v.duration - 0.05, p * v.duration); storyBarSync(v);
+}
+body.addEventListener('pointerdown', (e) => {
+  const bar = e.target.closest('[data-story-bar]'); if (!bar) return;
+  const v = bar.parentNode.querySelector('video'); if (!v) return;
+  e.preventDefault(); e.stopPropagation();
+  scrub = { bar, v, was: !v.paused }; bar.classList.add('on'); bar.parentNode.classList.add('scrubbing');
+  try { bar.setPointerCapture(e.pointerId); } catch (_) {}
+  v.pause(); scrubTo(e);
+});
+body.addEventListener('pointermove', (e) => { if (scrub) { e.preventDefault(); scrubTo(e); } });
+const endScrub = () => { if (!scrub) return; const { bar, v, was } = scrub; scrub = null; bar.classList.remove('on'); bar.parentNode.classList.remove('scrubbing'); if (was) storyPlay(v, !v.muted); };
+body.addEventListener('pointerup', endScrub); body.addEventListener('pointercancel', endScrub);
+body.addEventListener('keydown', (e) => {
+  const bar = e.target.closest && e.target.closest('[data-story-bar]'); if (!bar) return;
+  const v = bar.parentNode.querySelector('video'); if (!v || !v.duration) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); v.currentTime = Math.min(v.duration - 0.05, Math.max(0, v.currentTime + (e.key === 'ArrowRight' ? 2 : -2))); }
+});
 function stopStoryVideo() {
   const pl = body.querySelector('.os-player'); if (!pl) return;
   const v = pl.querySelector('video'); if (v) v.pause();
@@ -257,7 +299,7 @@ body.addEventListener('click', (e) => {
   if (!e.target.closest('[data-story-play]') || !STORY_VIDEO) return;
   e.preventDefault();
   const pl = body.querySelector('.os-player'), v = pl && pl.querySelector('video'); if (!v) return;
-  if (!v.dataset.file) { const f = storyFile(v); v.dataset.file = f; const im = body.querySelector('.os-poster'); if (im && im.src) v.poster = im.src; storyBlob(f).then((u) => { if (v.dataset.file !== f) return; v.src = u; if (!pl.hidden) storyPlay(v, v.dataset.sound === '1'); }); }
+  if (!v.dataset.file) { const f = storyFile(v); v.dataset.file = f; const im = body.querySelector('.os-poster'); if (im && im.src) v.poster = im.dataset.p916 || im.src; storyBlob(f).then((u) => { if (v.dataset.file !== f) return; v.src = u; const bg = pl.querySelector('.os-bg'); if (bg && !portrait()) bg.src = u; if (!pl.hidden) storyPlay(v, v.dataset.sound === '1'); }); }
   pl.hidden = false; body.querySelector('.os-hero').classList.add('playing'); document.documentElement.classList.add('story-vid');
   v.dataset.sound = '1'; placeStoryMute();
   if (!v.dataset.armed) { v.dataset.armed = '1'; v.addEventListener('ended', stopStoryVideo); v.addEventListener('pause', () => { if (!pl.hidden && !v.ended) pl.classList.add('paused'); }); v.addEventListener('play', () => pl.classList.remove('paused')); v.addEventListener('volumechange', () => syncStoryMute(v)); v.addEventListener('loadedmetadata', placeStoryMute); }
