@@ -8,9 +8,9 @@
 <title data-tt="{prog} — RORUBARU">High Rollers — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f25">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f26">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f25"></script>
+<script src="/loyalty/loyalty.js?v=f26"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -56,6 +56,8 @@
       <span class="pill on" id="tierPill"></span>
     </div>
 
+    <!-- v48: the card staff see when the guest sits down: tier colour + "Today:" + limited perks -->
+    <div data-tab="card" class="perkhero t-nori" id="perkHero"></div>
     <div data-tab="card" class="hookbar hide" id="hookBar"></div>
     <div data-tab="card" id="splitInbox"></div>
     <div data-tab="rewards" id="suggestCard"></div>
@@ -151,6 +153,23 @@
       </div>
     </div>
 
+    <!-- v48: Me tab: details, progress, invite -->
+    <div data-tab="me" class="card" id="meProfile">
+      <h2 style="margin-top:0" data-t="me_profile"></h2>
+      <label class="field"><span data-t="me_name"></span><div class="row" style="gap:8px"><input id="meName" type="text" maxlength="30" autocomplete="given-name" data-tp="me_name_ph" style="flex:1;min-width:0"><button class="btn sm" id="meNameSave" type="button" data-t="save" style="width:auto"></button></div></label>
+      <div class="field"><span data-t="me_bday"></span><div id="meBday"></div></div>
+    </div>
+    <div data-tab="me" class="card" id="meProgress">
+      <h2 style="margin-top:0" data-t="me_progress"></h2>
+      <div id="meProgLine" style="font-size:19px;font-weight:800;line-height:1.25"></div>
+      <div class="tierbar"><div id="meProgFill"></div></div>
+      <div class="small muted" id="meProgSub"></div>
+    </div>
+    <div data-tab="me" class="card" id="meInvite">
+      <h2 style="margin-top:0">👯 <span data-t="invite_title"></span></h2>
+      <p class="small muted" id="meInviteSub"></p>
+      <button class="btn sm" id="meInviteBtn" type="button" data-t="invite_btn" style="width:auto"></button>
+    </div>
     <div data-tab="me" class="card">
       <h2 style="margin-top:0" data-t="receipts"></h2>
       <div id="history"></div>
@@ -307,7 +326,8 @@
         const x = (me.mults && me.mults[tr]) || "", name = (zh ? p.name_zh : p.name_en).replace("{x}", x).replace("{p}", kd.passes != null ? kd.passes : 2);
         const det = zh ? p.detail_zh : p.detail_en;
         let extra = "";
-        if (p.kind === "dinner" && open && me.tier === "kama") extra = '<span class="perkcount">' + t("perks_passes_left", { n: kd.left, m: kd.passes }) + "</span>";
+        const lx = open ? ((me.perk_status || {}).limited || []).find(x => x.key === p.key) : null; // v48: available / used this month / passes left
+        if (lx) extra = '<span class="perkcount' + (limOn(lx) ? "" : " used") + '">' + esc(limText(lx)) + "</span>";
         h += '<div class="perk"><span class="perkico">' + (open ? (p.emoji || "✓") : "🔒") + '</span><span class="grow"><span class="perkname">' + esc(name) + "</span>" + (det ? '<span class="perkdet">' + esc(det) + "</span>" : "") + "</span>" + extra + "</div>";
       });
       h += "</div>";
@@ -413,7 +433,10 @@
     $("#signin").classList.toggle("hide", !!me); $("#member").classList.toggle("hide", !me);
     if (!me) return;
     const zh = R.lang() === "zh";
-    $("#hello").textContent = me.name ? (zh ? me.name + "，你好 👋" : "Hey " + me.name + " 👋") : (zh ? "你好 👋" : "Hey there 👋");
+    const nm0 = goodName(me.name); // v48: a name with no letters (e.g. "-") reads as blank
+    $("#hello").textContent = nm0 ? (zh ? nm0 + "，你好 👋" : "Hey " + nm0 + " 👋") : (zh ? "你好 👋" : "Hey there 👋");
+    renderHero(me, zh);
+    renderMe(me, zh);
     renderStatus(me, zh);
     renderPerks(me, zh);
     renderPlate(me, zh);
@@ -474,6 +497,82 @@
   $("#rCancel").onclick = (e) => { e.preventDefault(); showScan("scanIdle"); $("#photo").value = ""; };
   const localNow = () => { const d = new Date(Date.now() + 8 * 3600e3); return d.toISOString().slice(0, 16); };
   // ----- confirm sheet + undo a reward (Oct 14: Dominic redeemed by mistake; no undo before) -----
+
+  // ----- v48 (f26): guest card "Today:" hero, limited perks, Me tab -----
+  const goodName = (n) => { const s = String(n == null ? "" : n).trim(); return /\p{L}/u.test(s) ? s : ""; };
+  function limText(x) {
+    if (x.period === "month") return x.state === "available" ? t("perk_avail") : t("perk_used_month");
+    if (x.period === "year") return x.left > 0 ? t("perks_passes_left", { n: x.left, m: x.allowed }) : t("perk_used_year", { d: x.next_reset ? R.fmtDay(x.next_reset) : "" });
+    if (x.period === "birthday") return ({ available: t("perk_bday_avail"), claimed: t("perk_bday_claimed"), used: t("perk_bday_used"), later: t("perk_bday_later"), no_birthday: t("perk_bday_none"), too_new: t("perk_bday_new", { n: x.days_until_eligible || 0 }) })[x.state] || "";
+    return "";
+  }
+  const limOn = (x) => x.state === "available" || x.state === "claimed";
+  function renderHero(me, zh) {
+    const ps = me.perk_status || {}, tier = ps.tier || me.tier || "nori", el = $("#perkHero");
+    el.className = "perkhero t-" + tier;
+    const today = ps.today || [];
+    const items = today.length ? today.map(x => '<span class="ph-it">' + (x.emoji ? x.emoji + " " : "") + esc(zh ? x.zh : x.en) + "</span>").join('<span class="ph-dot"> · </span>') : esc(t("today_none"));
+    const lim = (ps.limited || []).map(x => '<span class="ph-chip' + (limOn(x) ? " on" : "") + '">' + (x.emoji ? x.emoji + " " : "") + esc(zh ? x.name_zh : x.name_en) + " · " + esc(limText(x)) + "</span>").join("");
+    el.innerHTML = '<div class="ph-top"><span class="ph-tier">' + esc(R.tierName(tier, "en")) + '</span><span class="ph-zh">' + esc(R.tierName(tier, "zh")) + "</span></div>" +
+      (goodName(me.name) ? '<div class="ph-name">' + esc(goodName(me.name)) + "</div>" : "") +
+      '<div class="ph-today"><span class="ph-k">' + t("today_k") + ":</span> " + items + "</div>" +
+      (lim ? '<div class="ph-lim">' + lim + "</div>" : "") + '<button type="button" class="ph-show" id="phShow">👀 ' + esc(t("show_staff_btn")) + '</button><div class="ph-hint">' + t("today_show") + "</div>";
+    $("#phShow").onclick = () => showStaffFull(me);
+  }
+  // v48: "Show staff": the whole screen in the tier colour, readable from across the counter. Tap anywhere to close.
+  async function showStaffFull(me) {
+    const ps = me.perk_status || {}, tier = ps.tier || me.tier || "nori", zh = R.lang() === "zh", today = ps.today || [];
+    const o = document.createElement("div"); o.id = "staffFull"; o.className = "staff-full t-" + tier; o.setAttribute("role", "dialog");
+    o.innerHTML = '<div class="sf-tier">' + esc(R.tierName(tier, "en")) + '</div><div class="sf-zh">' + esc(R.tierName(tier, "zh")) + "</div>" +
+      (goodName(me.name) ? '<div class="sf-name">' + esc(goodName(me.name)) + "</div>" : "") +
+      '<div class="sf-k">' + t("today_k") + "</div>" + (today.length ? today.map(x => '<div class="sf-it">' + (x.emoji ? x.emoji + " " : "") + esc(zh ? x.zh : x.en) + (zh ? "" : '<span class="sf-zhl">' + esc(x.zh) + "</span>") + "</div>").join("") : '<div class="sf-it">' + esc(t("today_none")) + "</div>") +
+      '<div class="sf-close">' + esc(t("tap_close")) + "</div>";
+    let lock = null; try { if (navigator.wakeLock) lock = await navigator.wakeLock.request("screen"); } catch (e) {}
+    o.addEventListener("click", () => { o.remove(); try { lock && lock.release(); } catch (e) {} });
+    document.body.appendChild(o);
+  }
+  function renderMe(me, zh) {
+    const inp = $("#meName"); if (document.activeElement !== inp) inp.value = goodName(me.name);
+    const bd = me.birthday || {}, box = $("#meBday");
+    if (bd.md) { if (!box.dataset.md || box.dataset.md !== bd.md + R.lang()) { box.dataset.md = bd.md + R.lang(); box.innerHTML = '<div style="font-size:17px;font-weight:700">🎂 ' + esc(mdText(bd.md)) + ' 🔒</div><p class="tiny" style="margin:4px 0 0">' + esc(t("me_bday_lock")) + "</p>"; } }
+    else if (!$("#meBdM")) { box.dataset.md = ""; box.innerHTML = '<div class="row" style="gap:8px"><select id="meBdM" class="sel"></select><select id="meBdD" class="sel"></select><button class="btn sm" id="meBdSave" type="button" style="width:auto">' + esc(t("save")) + '</button></div><p class="tiny" style="margin:4px 0 0">' + esc(t("me_bday_once")) + " " + esc(t("me_bday_lock")) + "</p>";
+      fillBday($("#meBdM"), $("#meBdD"));
+      $("#meBdSave").onclick = async () => { const md = $("#meBdM").value + "-" + $("#meBdD").value; if (md.length !== 5) return R.toast(t("bday_pick")); if (!(await askConfirm(mdText(md) + " · " + t("me_bday_once")))) return;
+        try { const r = await R.rpc("family_set_birthday", { p_token: state.token, p_md: md }); state.me = r.member; render(); R.toast("🎂 " + t("me_saved")); } catch (e) { R.toast(R.errText(e)); } }; }
+    // progress to the next tier (Kama stays by invitation)
+    const tier = me.tier || "nori", at = me.tiers_at || {}, ys = +me.year_spend || 0, order = ["nori", "gohan", "tobiko", "kama"];
+    let line, pct = 100;
+    if (tier === "kama") line = t("prog_top");
+    else if (me.kama_eligible) line = "✨ " + t("kama_eligible");
+    else { const nx = order[order.indexOf(tier) + 1] || "kama", from = tier === "nori" ? 0 : (+at[tier] || 0), to = +at[nx] || 0;
+      pct = to > from ? Math.max(2, Math.min(100, 100 * (ys - from) / (to - from))) : 2;
+      line = nx === "kama" ? t("lad_kama") : t("prog_to", { n: fmtHK(Math.max(0, to - ys)), name: tierName(nx) }); }
+    $("#meProgLine").textContent = line; $("#meProgFill").style.width = pct + "%"; $("#meProgFill").className = "t-" + tier;
+    $("#meProgSub").textContent = tierName(tier) + " · " + t("year_spend", { n: fmtHK(ys) });
+    const ref = me.referral || {};
+    $("#meInviteSub").textContent = ref.on ? t("friend_sub", { n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 200) }) : t("invite_sub");
+  }
+  $("#meInviteBtn").onclick = () => shareInvite();
+  $("#meNameSave").onclick = async () => { const v = $("#meName").value.trim(); if (!goodName(v) || v.length > 30) return R.toast(t("err_bad_name"));
+    try { const r = await R.rpc("family_update", { p_token: state.token, p_name: v }); state.me = r; $("#meName").blur(); render(); R.toast(t("me_saved")); } catch (e) { R.toast(R.errText(e)); } };
+  $("#meName").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("#meNameSave").click(); } });
+  function deleteSheet() {
+    return new Promise(res => {
+      const o = document.createElement("div"); o.className = "ask-sheet"; o.id = "delSheet"; o.setAttribute("role", "dialog");
+      o.style.cssText = "position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.66);display:flex;align-items:flex-end;justify-content:center;padding:16px";
+      o.innerHTML = '<div class="card" style="width:100%;max-width:420px;margin:0 0 env(safe-area-inset-bottom)"><h2 style="margin-top:0">🗑️ ' + escR(t("del_title")) + '</h2><p class="small" style="line-height:1.45">' + escR(t("del_body")) + '</p><p class="small"><a href="/family/privacy/">' + escR(t("privacy_link")) + '</a></p><div class="row" style="gap:10px;margin-top:12px"><button class="btn ghost" data-a="0" style="flex:1">' + escR(t("del_keep")) + '</button><button class="btn" data-a="1" style="flex:1;background:#d93a1b;color:#fff">' + escR(t("del_go")) + "</button></div></div>";
+      const done = (v) => { o.remove(); res(v); };
+      o.addEventListener("click", e => { const a = e.target.closest("[data-a]"); if (a) done(a.dataset.a === "1"); else if (e.target === o) done(false); });
+      document.body.appendChild(o); o.querySelector('[data-a="0"]').focus();
+    });
+  }
+  function goldSheet(gr) {
+    const o = document.createElement("div"); o.className = "ask-sheet goldwin"; o.id = "goldSheet"; o.setAttribute("role", "dialog");
+    o.style.cssText = "position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:20px";
+    o.innerHTML = '<div class="card center" style="width:100%;max-width:380px;background:linear-gradient(135deg,#f3d27a,#b9862a);color:#0b0d12;border:0"><div style="font-size:64px;line-height:1">✨🥃</div><h2 style="margin:10px 0 6px;font-size:26px;letter-spacing:.04em">' + escR(t("gold_hit")) + '</h2><p style="font-size:17px;font-weight:700;margin:0 0 6px">' + escR(t("gold_won")) + "</p>" + (gr && gr.code ? '<p class="small" style="margin:0 0 14px;opacity:.75">' + escR(R.lang() === "zh" ? gr.name_zh : gr.name_en) + " · " + escR(gr.code) + "</p>" : "") + '<button class="btn" style="background:#0b0d12;color:#f3d27a">' + escR(t("gold_see")) + "</button></div>";
+    o.addEventListener("click", e => { if (e.target.closest("button") || e.target === o) { o.remove(); if (e.target.closest("button")) { setTab("rewards"); const x = $("#rewards"); if (x) x.scrollIntoView({ behavior: "smooth" }); } } });
+    document.body.appendChild(o); R.burst(["#E8B84A", "#F3D27A", "#F6F3E7"]);
+  }
   function askConfirm(msg) {
     return new Promise(res => {
       const o = document.createElement("div"); o.className = "ask-sheet"; o.setAttribute("role", "dialog");
@@ -606,7 +705,10 @@
         const meta = [rd.table ? t("table").replace(/\s*[（(].*$/, "") + " " + escR(rd.table) : "", rd.at ? escR(rd.at.slice(8, 10) + "/" + rd.at.slice(5, 7) + " " + rd.at.slice(11)) : "", rd.total ? "HK$" + Number(rd.total).toLocaleString("en-US", { minimumFractionDigits: 2 }) : "", rd.server ? t("r_server") + " " + escR(rd.server) : "", rd.seats ? t(+rd.seats === 1 ? "seat_1" : "seats_n", { n: rd.seats }) : ""].filter(Boolean).join(" · ");
         const items = (r.items || []).map(x => '<span class="pill">' + (x.qty > 1 ? x.qty + "× " : "") + escR(zh && x.zh ? x.zh : String(x.en).replace(/\s*\((per person|(19|20)\d\d)\)$/i, "")) + "</span>").join(" ");
         $("#scanDone").innerHTML = '<h2 style="margin-top:0">' + head + '</h2><p class="small muted" style="margin:4px 0 10px">' + t("r_read") + ": " + meta + "</p>" + (items ? '<p class="small" style="margin:0 0 6px"><b>' + t("r_items") + '</b></p><div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:12px">' + items + "</div>" : "") + (r.status === "approved" ? "" : '<p class="small muted">' + t("queued") + "</p>") + '<button class="btn" id="rDone">' + t("r_done") + "</button>";
+        const gr = g && r.visit ? r.visit.gold_reward : null; // v48: gold receipt = 2x points + a free highball
+        if (gr && r.status === "approved") $("#scanDone").insertAdjacentHTML("afterbegin", '<div class="notice" style="background:linear-gradient(135deg,#f3d27a,#b9862a);color:#0b0d12;font-weight:800">✨🥃 ' + escR(t("gold_won")) + "</div>");
         showScan("scanDone"); $("#rDone").onclick = () => showScan("scanIdle");
+        if (gr && r.status === "approved") setTimeout(() => goldSheet(gr), 400);
         if (r.status === "approved") { R.burst(g ? ["#E8B84A", "#F3D27A", "#F6F3E7"] : undefined); R.toast((g ? "✨ " + t("gold_hit") + " " : "") + t("added_points", { n: r.points }) + (r.visit && r.visit.referral_bonus ? " · 👯 +" + r.visit.referral_bonus : ""), 3500); state.lastPoints = r.member.points; state.lastStamps = r.member.visits_total; }
       }
       render();
@@ -629,7 +731,7 @@
   }
   const resetSignin = () => { $("#step1").classList.remove("hide"); $("#step2").classList.add("hide"); $("#code").value = ""; $("#consent").checked = false; $("#btnJoin").disabled = true; };
   $("#signout").onclick = async () => { try { await R.rpc("family_signout", { p_token: state.token }); } catch (e) {} localStorage.removeItem("roru_member_token"); state.token = null; state.me = null; state.lastPoints = null; resetSignin(); render(); };
-  $("#delete").onclick = async () => { if (!confirm(t("delete_confirm"))) return; let dr = null; try { dr = await R.rpc("family_delete_me", { p_token: state.token }); } catch (e) { R.toast(R.errText(e)); return; } localStorage.removeItem("roru_member_token"); state.token = null; state.me = null; resetSignin(); render(); R.toast(t("deleted_rejoin", { d: dr && dr.rejoin_after ? R.fmtDay(dr.rejoin_after) : "" }), 4000); };
+  $("#delete").onclick = async () => { if (!(await deleteSheet())) return; let dr = null; try { dr = await R.rpc("family_delete_me", { p_token: state.token }); } catch (e) { R.toast(R.errText(e)); return; } localStorage.removeItem("roru_member_token"); state.token = null; state.me = null; resetSignin(); render(); R.toast(t("deleted_rejoin", { d: dr && dr.rejoin_after ? R.fmtDay(dr.rejoin_after) : "" }), 4000); };
   document.addEventListener("roru:lang", render);
   render(); await load();
   // live refresh so the plate animates when staff add a roll

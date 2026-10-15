@@ -8,10 +8,10 @@
 <title data-tt="{prog} — Owner">High Rollers — Owner</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f25">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f26">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f25"></script>
-<script src="/loyalty/monthend.js?v=f25"></script>
+<script src="/loyalty/loyalty.js?v=f26"></script>
+<script src="/loyalty/monthend.js?v=f26"></script>
 <style>
 /* v36 owner dashboard */
 .dash{margin:16px 0 18px}
@@ -238,7 +238,7 @@
     // v38: access log (PDPO accountability) — every staff lookup / QR scan / guest-card view, newest first
     const loadAccess = async () => { let al = null; try { al = await R.rpc("owner_access_log", { p_token: st.sess.token, p_limit: 30 }); } catch (e) {}
       const old = $("#accessLog"); if (old) old.remove(); const box = document.createElement("div"); box.id = "accessLog";
-      const ACT = { lookup: "Number lookup", scan: "QR / code scan", view: "Opened guest card", reverse_redeem: "↩︎ Reversed a used reward" };
+      const ACT = { lookup: "Number lookup", scan: "QR / code scan", view: "Opened guest card", reverse_redeem: "↩︎ Reversed a used reward", perk_use: "✅ Marked a perk used", perk_undo: "↩︎ Undid a perk" };
       const when = (x) => new Date(x).toLocaleString("en-GB", { timeZone: "Asia/Hong_Kong", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
       box.innerHTML = '<div class="row" style="justify-content:space-between;align-items:center;margin-top:18px"><h2 style="margin:0">🔒 Access log</h2><button class="btn ghost sm" id="alRefresh">Refresh</button></div>' +
         '<p class="muted small">Staff can see a guest\'s full number, birthday and spend. Every lookup, QR scan, guest-card view and reversed reward is recorded here with who and when (repeats within 2 minutes count on one line). Last 7 days: <b>' + (al ? al.total_7d : "—") + '</b> views.</p>' +

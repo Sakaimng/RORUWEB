@@ -13,10 +13,10 @@
 <link rel="manifest" href="/loyalty/staff.webmanifest">
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f25">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f26">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f25"></script>
-<script src="/loyalty/monthend.js?v=f25"></script>
+<script src="/loyalty/loyalty.js?v=f26"></script>
+<script src="/loyalty/monthend.js?v=f26"></script>
 <style>body{overscroll-behavior:none}
 .gcard{border:1px solid var(--line);background:var(--ink2);border-radius:18px;padding:14px 16px;margin:0 0 12px}
 .gcard .gh{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
@@ -219,7 +219,8 @@
   function renderCard(me) {
     const p = me.profile, box = $("#gcard"); const ago = p.days_since_visit == null ? "" : p.days_since_visit === 0 ? t("g_today") : p.days_since_visit === 1 ? t("g_yday") : t("g_ago", { n: p.days_since_visit });
     const bd = p.birthday_tag ? '<span class="bd">' + t("g_bd_" + p.birthday_tag) + "</span>" : "";
-    box.innerHTML = '<div class="gh"><span class="gn">' + esc(me.name || "—") + '</span><span class="tag-tier t-' + me.tier + '" style="margin:0">' + tierName(me.tier) + " " + mult(me.multiplier) + "</span>" + bd + "</div>" +
+    box.innerHTML = '<div class="gh"><span class="gn">' + esc(/\p{L}/u.test(me.name || "") ? me.name : "—") + '</span><span class="tag-tier t-' + me.tier + '" style="margin:0">' + tierName(me.tier) + " " + mult(me.multiplier) + "</span>" + bd + "</div>" +
+      perkBox(me) +
       '<div class="gl"><span><span class="k">📞</span><b id="gPhone">' + esc(p.phone) + '</b></span><span><span class="k">🎂 ' + t("g_bday") + "</span><b>" + esc(fmtMd(p.birthday_md)) + "</b></span></div>" +
       '<div class="gs"><div><small>' + t("g_life") + "</small><b>" + money(p.spend_lifetime) + "</b></div><div><small>" + t("g_12m") + "</small><b>" + money(p.spend_12m) + "</b></div><div><small>" + t("g_visits") + "</small><b>" + (p.visits || 0) + "</b></div><div><small>" + t("g_avg") + "</small><b>" + (p.avg_per_visit ? money(p.avg_per_visit) : "—") + "</b></div></div>" +
       '<div class="gx"><span class="k">' + t("g_last") + ":</span> " + (p.last_visit ? esc(fmtD(p.last_visit)) + " (" + ago + ")" : t("g_never")) +
@@ -238,7 +239,7 @@
   $("#aGo").onclick = async () => {
     if (!st.sel) return; $("#aGo").disabled = true; $("#aErr").classList.add("hide");
     try { const r = await R.rpc("staff_award", { p_token: st.sess.token, p_who: st.sel.member_code, p_total_hkd: parseFloat(String($("#aTotal").value).replace(/[^0-9.]/g, "")), p_receipt_no: $("#aNo").value.trim() || null, p_shop: st.shop });
-      const v = r.visit || {}; const okTitle = (v.gold ? t("r_gold_receipt") + " " : "") + t("r_points", { n: r.points }) + (v.added ? "  ·  " + t("r_stamp") : "") + (v.referral_bonus ? "  ·  👯 +" + v.referral_bonus : "");
+      const v = r.visit || {}; const okTitle = (v.gold ? t("r_gold_receipt") + (v.gold_reward ? " 🥃 " + t("gold_highball") : "") + " · " : "") + t("r_points", { n: r.points }) + (v.added ? "  ·  " + t("r_stamp") : "") + (v.referral_bonus ? "  ·  👯 +" + v.referral_bonus : "");
       const okSub = t("s_rate") + " " + mult(r.multiplier) + (r.member.tier && r.multiplier && +r.member.multiplier !== +r.multiplier ? " · " + t("s_now") + " " + tierName(r.member.tier) + " ⬆" : " (" + tierName(r.member.tier) + ")") + " · " + r.member.points + " " + t("s_pts") + " · 🍣 " + r.member.stamps + "/" + r.member.per_plate + (v.plate_full ? " — " + t("r_plate") + (v.reward ? " 🎁 " + (R.lang() === "zh" ? v.reward.name_zh : v.reward.name_en) : "") : v.added ? "" : " — " + t("r_stamp_already"));
       R.burst(); $("#award").classList.add("hide"); await stayOn(r.member); ok(v.gold ? "✨" : v.plate_full ? "🎉" : "🧾", okTitle, okSub); loadToday(); }
     catch (e) { $("#aErr").textContent = e.code === "receipt_already_used" ? t("r_receipt_used") : R.errText(e); $("#aErr").classList.remove("hide"); }
@@ -305,6 +306,39 @@
       } catch (er) { b.disabled = false; show("⚠️", t("r_err"), R.errText(er), ""); } };
   }
   // v40 (Dominic Oct 14 18:01): after any action STAY on the guest (refresh in place + toast); never re-ask the number.
+
+  // v48 (f26): the same perk info the guest shows on their phone; limited perks are marked used here (one tap, logged, undo)
+  function perkLim(x) {
+    if (x.period === "month") return x.state === "available" ? t("perk_avail") : t("perk_used_month");
+    if (x.period === "year") return x.left > 0 ? t("perks_passes_left", { n: x.left, m: x.allowed }) : t("perk_used_year", { d: x.next_reset ? R.fmtDay(x.next_reset) : "" });
+    return ({ available: t("perk_bday_avail"), claimed: t("perk_bday_claimed"), used: t("perk_bday_used"), later: t("perk_bday_later"), no_birthday: t("perk_bday_none"), too_new: t("perk_bday_new", { n: x.days_until_eligible || 0 }) })[x.state] || "";
+  }
+  function perkBox(me) {
+    const ps = me.perk_status || {}, zh = R.lang() === "zh", today = ps.today || [];
+    const items = today.length ? today.map(x => (x.emoji ? x.emoji + " " : "") + esc(zh ? x.zh : x.en)).join(" · ") : esc(t("today_none"));
+    const rows = (ps.limited || []).map(x => {
+      const canUse = x.period === "birthday" ? (x.state === "available" || x.state === "claimed") : x.left > 0;
+      return '<div class="gp-row"><span>' + (x.emoji ? x.emoji + " " : "") + esc(zh ? x.name_zh : x.name_en) + ' <span class="gp-st">· ' + esc(perkLim(x)) + "</span></span><span>" +
+        (x.last_use_id ? '<button class="btn ghost sm" data-pundo="' + x.last_use_id + '">↩︎ ' + t("st_undo") + "</button> " : "") +
+        (canUse ? '<button class="btn sm" data-puse="' + esc(x.key) + '">' + t("st_mark") + "</button>" : "") + "</span></div>";
+    }).join("");
+    return '<div class="gperks t-' + esc(ps.tier || me.tier || "nori") + '"><div class="gp-today">' + t("st_today") + ": " + items + "</div>" + rows + "</div>";
+  }
+  document.addEventListener("click", async (e) => {
+    const u = e.target.closest("[data-puse]"), un = e.target.closest("[data-pundo]"); if (!u && !un) return;
+    if (!st.sel || !st.card) return; const b = u || un; b.disabled = true;
+    try {
+      let r;
+      if (u) r = await R.rpc("staff_use_perk", { p_token: st.sess.token, p_who: st.card.member_code, p_key: u.dataset.puse });
+      else {
+        try { r = await R.rpc("staff_undo_perk", { p_token: st.sess.token, p_use_id: +un.dataset.pundo, p_reason: null }); }
+        catch (er) { if (er.code !== "reason_required") throw er; const why = prompt(t("st_undo_reason")); if (!why) { b.disabled = false; return; } r = await R.rpc("staff_undo_perk", { p_token: st.sess.token, p_use_id: +un.dataset.pundo, p_reason: why }); }
+      }
+      R.burst(u ? ["#E8B84A", "#F6F3E7"] : undefined);
+      await refreshSel();
+      ok(u ? "✅" : "↩︎", u ? t("st_marked") : t("st_undone"), "", 6000);
+    } catch (er) { b.disabled = false; R.toast(R.errText(er), 3500); }
+  });
   async function stayOn(m) {
     if (!m || !m.member_code) return;
     if (!st.sel || st.sel.member_code !== m.member_code) { st.num = ""; renderDisp(); }

@@ -143,10 +143,10 @@ td input,td select{font-size:16px}
 /* status (spend, rolling 12 months) — v1c */
 .status{background:linear-gradient(135deg,#1b1e27,#12141b)}
 .tierbadge{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;flex:none;box-shadow:0 6px 18px rgba(0,0,0,.4)}
-.t-nori{background:linear-gradient(135deg,#46523f,#1c2419);color:var(--cream)}
-.t-gohan{background:linear-gradient(135deg,#fffdf4,#d9d4c2);color:var(--ink)}
-.t-tobiko{background:linear-gradient(135deg,#ff7a3d,#c93400);color:#fff}
-.t-kama{background:linear-gradient(135deg,#f3d27a,#b9862a);color:var(--ink)}
+.t-nori{background:linear-gradient(135deg,#2f8a4e,#14442a);color:var(--cream)}
+.t-gohan{background:linear-gradient(135deg,#ffffff,#e6e1cf);color:var(--ink)}
+.t-tobiko{background:linear-gradient(135deg,#ff5a1f,#c42a00);color:#fff}
+.t-kama{background:linear-gradient(135deg,#ffe07a,#caa02a);color:var(--ink)}
 .tierbar{height:12px;border-radius:99px;background:var(--ink);margin:16px 0 8px;overflow:hidden;border:1px solid var(--line)}
 .tierbar>div{height:100%;width:0;border-radius:99px;transition:width .8s cubic-bezier(.2,.9,.3,1)}
 .tierbar>div.t-nori{background:linear-gradient(90deg,#4CC38A,#F6F3E7)}
@@ -293,3 +293,47 @@ td input,td select{font-size:16px}
 @media(min-width:560px){.tabbar{border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0}}
 .toast{bottom:calc(84px + env(safe-area-inset-bottom))}
 #member:not([data-tab-on="status"]) #tierLine{display:none}
+
+/* v48 (f26): guest card hero, the screen a guest flashes when they sit down */
+.perkhero{border-radius:22px;padding:18px 18px 14px;margin:12px 0 14px;box-shadow:0 10px 30px rgba(0,0,0,.35);position:relative;overflow:hidden}
+.perkhero .ph-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.perkhero .ph-tier{font-size:40px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;line-height:1}
+.perkhero .ph-zh{font-size:24px;font-weight:900;line-height:1}
+.perkhero .ph-name{font-size:16px;font-weight:700;opacity:.85;margin-top:4px}
+.perkhero .ph-today{font-size:21px;font-weight:800;line-height:1.3;margin-top:12px}
+.perkhero .ph-k{text-transform:uppercase;letter-spacing:.06em;font-size:14px;font-weight:900;opacity:.8;margin-right:2px}
+.perkhero .ph-it{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.perkhero .ph-dot{display:none}
+.perkhero .ph-today .ph-k{display:block;margin-bottom:2px}
+.perkhero .ph-lim{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.perkhero .ph-chip{font-size:13px;font-weight:700;padding:4px 10px;border-radius:99px;background:rgba(0,0,0,.18);opacity:.7}
+.perkhero .ph-chip.on{opacity:1;background:rgba(0,0,0,.3)}
+.perkhero.t-gohan .ph-chip,.perkhero.t-kama .ph-chip{background:rgba(11,13,18,.1)}
+.perkhero.t-gohan .ph-chip.on,.perkhero.t-kama .ph-chip.on{background:rgba(11,13,18,.2)}
+.perkhero .ph-hint{font-size:12px;font-weight:700;opacity:.7;margin-top:10px;letter-spacing:.02em}
+#perksCard .perkcount.used{background:rgba(246,243,231,.14);color:var(--cream)}
+#meProfile .field input{font-size:16px}
+/* staff guest card: same perk info */
+.gperks{border-radius:14px;padding:10px 12px;margin:8px 0}
+.gperks .gp-today{font-size:18px;font-weight:800;line-height:1.3}
+.gperks .gp-row{display:flex;align-items:center;gap:8px;justify-content:space-between;margin-top:8px;font-size:15px;font-weight:600}
+.gperks .gp-row .btn{width:auto;padding:8px 14px;font-size:14px}
+.gperks .gp-row .gp-st{opacity:.75;font-size:13px}
+.gperks.t-gohan .btn.ghost,.gperks.t-kama .btn.ghost{color:#0b0d12;border-color:rgba(11,13,18,.35)}
+
+/* v48: steer 16:30, tier colour readable from across the counter; each tier clearly different */
+.perkhero.t-nori,.staff-full.t-nori{background:linear-gradient(135deg,#2f8a4e,#14442a);color:#f6f3e7}
+.perkhero.t-gohan,.staff-full.t-gohan{background:linear-gradient(135deg,#ffffff,#e6e1cf);color:#0b0d12}
+.perkhero.t-tobiko,.staff-full.t-tobiko{background:linear-gradient(135deg,#ff5a1f,#c42a00);color:#fff}
+.perkhero.t-kama,.staff-full.t-kama{background:linear-gradient(135deg,#ffe07a,#caa02a);color:#0b0d12}
+.perkhero .ph-tier{font-size:44px}
+.perkhero .ph-show{display:block;width:100%;margin-top:12px;padding:12px;border-radius:14px;border:0;font:inherit;font-size:17px;font-weight:900;background:rgba(0,0,0,.28);color:inherit;cursor:pointer}
+.perkhero.t-gohan .ph-show,.perkhero.t-kama .ph-show{background:rgba(11,13,18,.14)}
+.staff-full{position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:24px 20px calc(24px + env(safe-area-inset-bottom))}
+.staff-full .sf-tier{font-size:clamp(56px,19vw,96px);font-weight:900;letter-spacing:.06em;text-transform:uppercase;line-height:1}
+.staff-full .sf-zh{font-size:clamp(40px,13vw,72px);font-weight:900;line-height:1.1;margin-top:4px}
+.staff-full .sf-name{font-size:22px;font-weight:700;opacity:.85;margin-top:10px}
+.staff-full .sf-k{margin-top:26px;font-size:16px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;opacity:.8}
+.staff-full .sf-it{font-size:27px;font-weight:900;line-height:1.25;margin-top:8px}
+.staff-full .sf-zhl{display:block;font-size:18px;font-weight:700;opacity:.8}
+.staff-full .sf-close{position:absolute;bottom:calc(18px + env(safe-area-inset-bottom));left:0;right:0;font-size:13px;font-weight:700;opacity:.65}
