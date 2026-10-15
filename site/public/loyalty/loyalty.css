@@ -262,3 +262,22 @@ td input,td select{font-size:16px}
 /* v42: a POS row already logged stays dimmed, but the manager's reverse form stays fully readable */
 .positem.done{opacity:1}.positem.done .pi-main>:not(.rev-box),.positem.done .pi-done{opacity:.6}
 .rev-box .rev-reason{color:#111;background:#fff;opacity:1;-webkit-text-fill-color:#111}.rev-box .rev-reason::placeholder{color:#6b6b6b;-webkit-text-fill-color:#6b6b6b}
+
+/* v46 guest tier ladder: Nori → Gohan → Tobiko → Kama, icon + one-line meaning, current tier highlighted */
+.ladder{display:flex;flex-direction:column;margin-top:14px}
+.lad{position:relative;display:flex;gap:10px;align-items:flex-start;padding:8px 10px 8px 6px;border:1px solid transparent;border-radius:12px}
+.lad+.lad{margin-top:2px}
+.lad-ic{position:relative;flex:none;width:36px;height:36px;border-radius:50%;background:var(--ink);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;z-index:1}
+.lad-ic svg{width:26px;height:26px;display:block}
+.lad:not(:last-child) .lad-ic::after{content:"";position:absolute;left:50%;top:37px;width:2px;height:22px;margin-left:-1px;background:var(--line)}
+.lad.done .lad-ic::after{background:var(--orange)}
+.lad-tx{min-width:0;flex:1}
+.lad-top{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:6px;row-gap:1px}
+.lad-n{font-size:14px;font-weight:900;color:var(--cream)}
+.lad-you{font-size:9.5px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:var(--ink);background:var(--orange);border-radius:99px;padding:2px 6px;line-height:1.2}
+.lad-ok{font-size:12px;font-weight:900;color:var(--orange)}
+.lad-at{flex-basis:100%;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.lad-m{font-size:12.5px;line-height:1.35;color:var(--cream);opacity:.86;margin-top:2px}
+.lad:not(.on):not(.done) .lad-ic{opacity:.75}
+.lad.on{border-color:var(--orange);background:rgba(246,69,1,.12)}
+.lad.on .lad-ic{border-color:var(--orange);box-shadow:0 0 0 3px rgba(246,69,1,.18)}

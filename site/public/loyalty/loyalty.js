@@ -12,6 +12,7 @@ window.RORU = (function () {
   const L = {
     en: {
       perks_title: "Your perks", perks_you: "You're here", perks_from: "{t} and up", perks_passes_left: "{n} of {m} left", perks_plus: "Everything in {t}, plus:",
+      lad_next: "Next: {name}", lad_kama: "Kama is by invitation", lad_top: "Top tier", lad_you: "You're here", lad_pts: "{x} pts", lad_m_nori: "The seaweed wrap. Every roll starts here.", lad_m_gohan: "The rice. You're a regular now.", lad_m_tobiko: "The roe on top. The extras, including the secret menu.", lad_m_kama: "The collar. The rarest cut, by invitation only.",
       your_status: "Your status", mult_line: "Earns {x} points on every HK$1", year_spend: "{n} spent in the last 12 months", kama_eligible: "Kama eligible — by invitation",
       tier_more: "{n} more this year to {name}", tier_more_kama: "Kama: {n} more this year to be eligible (by invitation)", status_line: "Status = what you spend in a rolling 12 months",
       tier_start: "Start", invite: "invite only", invite_only_tag: "Invite only", per_year: "/yr", visits: "visits", plate_line: "{n} more visits → {r}", plate_line_1: "1 more visit → {r}", stamp_rule: "1 stamp per visit (max 1 a day)",
@@ -59,6 +60,7 @@ window.RORU = (function () {
     },
     zh: {
       perks_title: "你的會員禮遇", perks_you: "你的等級", perks_from: "{t} 或以上", perks_passes_left: "尚餘 {n}/{m} 張", perks_plus: "{t} 全部權益，再加：",
+      lad_next: "下一級：{name}", lad_kama: "Kama 只限邀請", lad_top: "最高級別", lad_you: "你而家喺度", lad_pts: "{x} 積分", lad_m_nori: "紫菜，包住每條手卷。人人都由呢度開始。", lad_m_gohan: "壽司飯。你而家係熟客喇。", lad_m_tobiko: "面頭嘅飛魚籽。有額外著數，包括隱藏餐牌。", lad_m_kama: "魚鮫，最矜貴嘅部位。只限邀請。",
       your_status: "你的會員級別", mult_line: "每 HK$1 可得 {x} 積分", year_spend: "過去 12 個月消費 {n}", kama_eligible: "已符合 Kama 資格 — 只限邀請",
       tier_more: "今年再消費 {n} 升至 {name}", tier_more_kama: "Kama：今年再消費 {n} 即符合資格（只限邀請）", status_line: "級別按過去 12 個月消費計算",
       tier_start: "起步", invite: "只限邀請", invite_only_tag: "只限邀請", per_year: "／年", visits: "次到訪", plate_line: "再到訪 {n} 次 → {r}", stamp_rule: "每次到訪蓋 1 個印（每日最多 1 個）",
@@ -147,6 +149,14 @@ window.RORU = (function () {
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + s + ' ' + s + '" shape-rendering="crispEdges"><rect width="' + s + '" height="' + s + '" fill="#fff"/><path d="' + p + '" fill="#0b0d12"/></svg>';
   }
   // hand roll icon (nori cone, rice, filling) — gold variant
+  // v46: one small icon per tier (seaweed sheet, rice, roe, fish collar) for the guest tier ladder
+  const TIER_ICON = {
+    nori: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="6" y="6" width="20" height="20" rx="2.5" fill="#26301f" stroke="#5a6456" stroke-width="1.4"/><path d="M9 13h14M9 18h14M9 23h9" stroke="#3f4c38" stroke-width="1.2" stroke-linecap="round"/></svg>',
+    gohan: '<svg viewBox="0 0 32 32" aria-hidden="true"><g fill="#F6F3E7" stroke="#bdb7a3" stroke-width=".9"><ellipse cx="11" cy="22" rx="2.6" ry="4.4" transform="rotate(-35 11 22)"/><ellipse cx="17" cy="23" rx="2.6" ry="4.4" transform="rotate(10 17 23)"/><ellipse cx="22.5" cy="21" rx="2.6" ry="4.4" transform="rotate(40 22.5 21)"/><ellipse cx="14" cy="15" rx="2.6" ry="4.4" transform="rotate(-10 14 15)"/><ellipse cx="20" cy="14.5" rx="2.6" ry="4.4" transform="rotate(25 20 14.5)"/><ellipse cx="17" cy="8.5" rx="2.4" ry="4" transform="rotate(5 17 8.5)"/></g></svg>',
+    tobiko: '<svg viewBox="0 0 32 32" aria-hidden="true"><g fill="#F64501" stroke="#ff9a6b" stroke-width=".7"><circle cx="16" cy="16" r="3.6"/><circle cx="9.6" cy="13.5" r="3.6"/><circle cx="22.4" cy="13.5" r="3.6"/><circle cx="12" cy="21.5" r="3.6"/><circle cx="20" cy="21.5" r="3.6"/><circle cx="16" cy="9.5" r="3.6"/></g><g fill="#fff" opacity=".85"><circle cx="15" cy="15" r=".9"/><circle cx="8.6" cy="12.5" r=".9"/><circle cx="21.4" cy="12.5" r=".9"/><circle cx="11" cy="20.5" r=".9"/><circle cx="19" cy="20.5" r=".9"/><circle cx="15" cy="8.5" r=".9"/></g></svg>',
+    kama: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 25C7.5 14 15 6.5 27 6c-4 5-6 11.5-5 20-6 .5-11 .2-16-1z" fill="#E8B84A" stroke="#b9862a" stroke-width="1.2" stroke-linejoin="round"/><path d="M22 26c-3-4-7-6.5-12-7.5M22.5 19c-3.5-2-7-2.8-10.5-2.7M24 12.5c-3-.8-6-.6-8.5.4" stroke="#8a6420" stroke-width="1.1" fill="none" stroke-linecap="round"/></svg>'
+  };
+  const tierIcon = (k) => TIER_ICON[k] || TIER_ICON.nori;
   const rollSvg = (gold) => '<svg class="roll" viewBox="0 0 64 64"><defs><linearGradient id="nori' + (gold ? "g" : "") + '" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="' + (gold ? "#F3D27A" : "#3d463a") + '"/><stop offset="1" stop-color="' + (gold ? "#C9952E" : "#161c15") + '"/></linearGradient></defs><path d="M8 20 L40 8 L52 46 L20 58 Z" fill="url(#nori' + (gold ? "g" : "") + ')" stroke="' + (gold ? "#E8B84A" : "#5a6456") + '" stroke-width="1.5"/><ellipse cx="34" cy="12" rx="13" ry="7" fill="#F6F3E7"/><path d="M26 9 q8 -9 16 -1 q-4 -3 -8 -1 q-4 -2 -8 2z" fill="#F64501"/><path d="M30 6 q4 -8 10 -4 q-3 0 -4 4z" fill="#4CC38A"/><ellipse cx="34" cy="12" rx="13" ry="7" fill="none" stroke="#e2dfd2" stroke-width="1"/></svg>';
 
   function toast(msg, ms) { let el = document.querySelector(".toast"); if (!el) { el = document.createElement("div"); el.className = "toast"; document.body.appendChild(el); } el.textContent = msg; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), ms || 2200); }
@@ -170,5 +180,5 @@ window.RORU = (function () {
     }, { passive: false });
   })();
   setLang(lang);
-  return { CFG, PROG, prog, t, lang: () => lang, setLang, applyI18n, rpc, errText, gate, qrSvg, rollSvg, toast, burst, fmtDay, fmtTime };
+  return { CFG, PROG, prog, t, lang: () => lang, setLang, applyI18n, rpc, errText, gate, qrSvg, rollSvg, tierIcon, toast, burst, fmtDay, fmtTime };
 })();
