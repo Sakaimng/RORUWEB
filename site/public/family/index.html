@@ -8,9 +8,9 @@
 <title data-tt="{prog} — RORUBARU">High Rollers — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f23">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f24">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f23"></script>
+<script src="/loyalty/loyalty.js?v=f24"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -71,7 +71,7 @@
       </div>
       <div class="tierbar"><div id="tierFill"></div></div>
       <div class="row small" style="justify-content:space-between"><span id="yearSpend"></span><span id="tierNext" style="text-align:right"></span></div>
-      <div class="tiers" id="tierSteps"></div>
+      <div class="ladder" id="tierSteps"></div>
     </div>
 
     <!-- perks per tier (owner-toggleable, loyalty_perks) -->
@@ -243,19 +243,25 @@
     $("#multLine").textContent = t("mult_line", { x: multTxt(me.multiplier) });
     $("#yearSpend").textContent = t("year_spend", { n: fmtHK(me.year_spend) });
     const at = me.tiers_at || {}, ys = +me.year_spend || 0;
+    // v46: bar only, no "HK$X to go" number. Fill = rolling 12-month spend between this tier's threshold and the next one.
     let pct = 100, nextTxt = "";
-    if (tier === "kama") { nextTxt = t("top_level"); }
+    if (tier === "kama") { nextTxt = t("lad_top"); }
     else if (me.kama_eligible) { nextTxt = "✨ " + t("kama_eligible"); }
-    else if (me.tier_next) {
-      const n = me.tier_next, from = tier === "nori" ? 0 : tier === "gohan" ? at.gohan : at.tobiko;
-      pct = Math.max(2, Math.min(100, 100 * (ys - from) / Math.max(1, n.at - from)));
-      nextTxt = n.name === "kama" ? t("tier_more_kama", { n: fmtHK(n.more) }) : t("tier_more", { n: fmtHK(n.more), name: tierName(n.name) });
+    else {
+      const order = ["nori", "gohan", "tobiko", "kama"], nx = order[order.indexOf(tier) + 1] || "kama";
+      const from = tier === "nori" ? 0 : (+at[tier] || 0), to = +at[nx] || (me.tier_next && me.tier_next.at) || 0;
+      pct = to > from ? Math.max(2, Math.min(100, 100 * (ys - from) / (to - from))) : 2;
+      nextTxt = nx === "kama" ? t("lad_kama") : t("lad_next", { name: tierName(nx) });
     }
     $("#tierFill").style.width = pct + "%"; $("#tierFill").className = "t-" + tier;
     $("#tierNext").textContent = nextTxt;
     $("#tierLine").textContent = t("status_line");
-    const steps = [["nori", 0], ["gohan", at.gohan], ["tobiko", at.tobiko], ["kama", at.kama]];
-    $("#tierSteps").innerHTML = steps.map(([k, v]) => '<div class="tcell' + (k === tier ? " on" : "") + '"><b class="tn">' + k.charAt(0).toUpperCase() + k.slice(1) + '</b><span class="tt">' + fmtHK(v || 0) + '</span><span class="tm">' + multTxt((me.mults || {})[k] || 1) + '</span><span class="tc">' + t("points") + '</span><span class="tg">' + (k === "kama" ? t("invite_only_tag") : "&nbsp;") + "</span></div>").join("");
+    const steps = [["nori", 0], ["gohan", at.gohan], ["tobiko", at.tobiko], ["kama", at.kama]], mine = steps.findIndex(s => s[0] === tier);
+    $("#tierSteps").innerHTML = steps.map(([k, v], i) => '<div class="lad' + (i === mine ? " on" : i < mine ? " done" : "") + '" data-tier="' + k + '">' +
+      '<div class="lad-ic">' + R.tierIcon(k) + '</div><div class="lad-tx"><div class="lad-top"><b class="lad-n">' + tierName(k) + '</b>' +
+      (i === mine ? '<span class="lad-you">' + t("lad_you") + '</span>' : i < mine ? '<span class="lad-ok">✓</span>' : "") +
+      '<span class="lad-at">' + (k === "nori" ? t("tier_start") : fmtHK(v || 0) + t("per_year")) + " · " + t("lad_pts", { x: multTxt((me.mults || {})[k] || 1) }) + (k === "kama" ? " · " + t("invite_only_tag") : "") + '</span></div>' +
+      '<div class="lad-m">' + t("lad_m_" + k) + "</div></div></div>").join("");
   }
   function renderPlate(me, zh) {
     const per = me.per_plate || 5, n = Math.min(me.stamps || 0, per), plate = me.plate || [];
