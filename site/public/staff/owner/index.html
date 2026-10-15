@@ -8,10 +8,10 @@
 <title data-tt="{prog} — Owner">High Rollers — Owner</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f24">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f25">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f24"></script>
-<script src="/loyalty/monthend.js?v=f24"></script>
+<script src="/loyalty/loyalty.js?v=f25"></script>
+<script src="/loyalty/monthend.js?v=f25"></script>
 <style>
 /* v36 owner dashboard */
 .dash{margin:16px 0 18px}
@@ -162,7 +162,7 @@
     const d = st.data, x = st.dash || {};
     const kpi = (lbl, val, c) => { const v = typeof val === "object" ? val : { f: val, s: val }; return '<div class="kpi"><div class="lbl">' + lbl + '</div><div class="val" data-f="' + esc(v.f) + '" data-s="' + esc(v.s) + '">' + v.f + '</div><div class="chg">' + c + "</div></div>"; };
     const kv = (n, money) => { n = Math.round(+n || 0); const pre = money ? "<small>HK$</small>" : ""; const a = Math.abs(n); const s = a >= 1e6 ? (n / 1e6).toFixed(2).replace(/\.?0+$/, "") + "M" : a >= 1e5 ? (n / 1e3).toFixed(1).replace(/\.0$/, "") + "k" : fmt(n); return { f: pre + fmt(n), s: pre + s }; };
-    const tierCol = { nori: "#4CC38A", gohan: "#F6F3E7", tobiko: "#F64501", kama: "#E8B84A" }, tierNm = { nori: "Nori", gohan: "Gohan", tobiko: "Tobiko", kama: "Kama" };
+    const tierCol = { nori: "#4CC38A", gohan: "#F6F3E7", tobiko: "#F64501", kama: "#E8B84A" }, tierNm = { nori: R.tierName("nori", "en"), gohan: R.tierName("gohan", "en"), tobiko: R.tierName("tobiko", "en"), kama: R.tierName("kama", "en") };
     const tiers = ["nori", "gohan", "tobiko", "kama"].map(k => [k, +(d.tiers || {})[k] || 0]), tTot = tiers.reduce((a, t) => a + t[1], 0) || 1;
     let off = 0; const C = 2 * Math.PI * 38;
     const donut = '<svg viewBox="0 0 100 100" width="104" height="104" style="flex:0 0 auto"><circle cx="50" cy="50" r="38" fill="none" stroke="rgba(246,243,231,.08)" stroke-width="12"/>' +
@@ -215,7 +215,7 @@
     renderDash();
     $("#tab-top").innerHTML = '<table><tr><th>Name</th><th>Phone</th><th>Status</th><th>Spend 12m HK$</th><th>Visits</th><th>Plate</th><th>Receipts</th><th>Points</th><th>Last</th></tr>' + d.top.map(m => "<tr><td>" + esc(m.name || "—") + "</td><td>" + m.phone_masked + "</td><td>" + m.tier + "</td><td><b>" + m.year_spend + "</b></td><td>" + m.visits + "</td><td>" + m.stamps + "/" + (d.settings.rolls_per_plate || 5) + (m.plates ? " (+" + m.plates + ")" : "") + "</td><td>" + m.receipts + "</td><td>" + m.points + "</td><td>" + (m.last ? R.fmtDay(m.last) : "") + "</td></tr>").join("") + "</table>" + (d.top.length ? "" : '<p class="muted small">No members yet.</p>');
     const S0 = d.settings;
-    $("#tab-status").innerHTML = '<p class="muted small">Status is set by spend in the last ' + (S0.tier_window_months || 12) + ' months: Nori from the start, Gohan at HK$' + S0.tier_gohan_hkd + '/yr, Tobiko at HK$' + S0.tier_tobiko_hkd + '/yr (automatic). Kama is invite only: guests become eligible at HK$' + S0.kama_eligible_hkd + '+/yr and appear below; tap Invite to make them Kama. Multipliers (placeholders): Nori ' + S0.tier_mult_nori + '×, Gohan ' + S0.tier_mult_gohan + '×, Tobiko ' + S0.tier_mult_tobiko + '×, Kama ' + S0.tier_mult_kama + '×. Change them under Settings.</p>' +
+    $("#tab-status").innerHTML = '<p class="muted small">Status is set by spend in the last ' + (S0.tier_window_months || 12) + ' months: ' + R.tierName("nori", "en") + ' from the start, ' + R.tierName("gohan", "en") + ' at HK$' + S0.tier_gohan_hkd + '/yr, ' + R.tierName("tobiko", "en") + ' at HK$' + S0.tier_tobiko_hkd + '/yr (automatic). ' + R.tierName("kama", "en") + ' is invite only: guests become eligible at HK$' + S0.kama_eligible_hkd + '+/yr and appear below; tap Invite to make them Kama. Multipliers (placeholders): Nori ' + S0.tier_mult_nori + '×, Gohan ' + S0.tier_mult_gohan + '×, Tobiko ' + S0.tier_mult_tobiko + '×, Kama ' + S0.tier_mult_kama + '×. Change them under Settings.</p>' +
       '<h2>Kama eligible</h2>' + (d.kama_eligible.length ? '<table><tr><th>Name</th><th>Phone</th><th>Spend 12m HK$</th><th></th></tr>' + d.kama_eligible.map(m => '<tr><td>' + esc(m.name || "—") + '</td><td>' + m.phone_masked + '</td><td><b>' + m.year_spend + '</b></td><td><button class="btn sm" data-kama="' + esc(m.phone) + '" data-on="1">Invite to Kama</button></td></tr>').join("") + '</table>' : '<p class="muted small">Nobody yet.</p>') +
       '<h2>Kama members</h2>' + (d.kama_members.length ? '<table><tr><th>Name</th><th>Phone</th><th>Spend 12m HK$</th><th></th></tr>' + d.kama_members.map(m => '<tr><td>' + esc(m.name || "—") + '</td><td>' + m.phone_masked + '</td><td>' + m.year_spend + '</td><td><button class="btn ghost sm" data-kama="' + esc(m.phone) + '" data-on="0">Remove</button></td></tr>').join("") + '</table>' : '<p class="muted small">None yet.</p>');
     $("#tab-status").querySelectorAll("[data-kama]").forEach(b => b.onclick = async () => { b.disabled = true; try { await R.rpc("owner_set_kama", { p_token: st.sess.token, p_phone: b.dataset.kama, p_on: b.dataset.on === "1" }); R.toast(b.dataset.on === "1" ? "Invited to Kama ✓" : "Removed ✓"); load(); } catch (e) { R.toast(R.errText(e)); b.disabled = false; } });
@@ -263,7 +263,7 @@
     $("#tab-nights").querySelectorAll("[data-cool]").forEach(b => b.onclick = () => saveSet("rejoin_cooloff_days", b.dataset.cool, b));
     $("#kdSave").onclick = () => saveSet("kama_dinner_passes", $("#kdPasses").value, $("#kdSave"));
     // perks per tier
-    try { const pk = await R.rpc("owner_perks", { p_token: st.sess.token }); const TN = { nori: "Nori", gohan: "Gohan", tobiko: "Tobiko", kama: "Kama" };
+    try { const pk = await R.rpc("owner_perks", { p_token: st.sess.token }); const TN = { nori: R.tierName("nori", "en"), gohan: R.tierName("gohan", "en"), tobiko: R.tierName("tobiko", "en"), kama: R.tierName("kama", "en") };
       $("#tab-perks").innerHTML = '<p class="muted small">What each level gets. Higher levels also get everything below them. On = shown on the guest page (locked levels appear greyed with the level needed); Off = hidden. Wording is a placeholder: edit and Save. <b>{x}</b> = that level\'s points multiplier, <b>{p}</b> = Kama Dinner passes. "Proposed" = not confirmed yet.</p><table><tr><th>Level</th><th></th><th>Perk (EN / 中)</th><th>Detail (EN / 中)</th><th>Show</th><th></th></tr>' +
         pk.perks.map(p => '<tr data-pk="' + esc(p.key) + '"><td><b>' + TN[p.tier] + '</b>' + (p.confirmed ? "" : '<div class="tiny" style="margin:0;color:var(--gold)">Proposed</div>') + '</td><td style="font-size:20px">' + esc(p.emoji || "") + '</td><td><input name="name_en" value="' + esc(p.name_en) + '"><input name="name_zh" value="' + esc(p.name_zh) + '"></td><td><input name="detail_en" value="' + esc(p.detail_en || "") + '"><input name="detail_zh" value="' + esc(p.detail_zh || "") + '"></td><td><label class="switch"><input type="checkbox" name="on" ' + (p.status === "on" ? "checked" : "") + "> <span>" + (p.status === "on" ? "On" : "Off") + '</span></label></td><td><button class="btn sm" data-pksave>Save</button></td></tr>').join("") + "</table>";
       const savePk = async (tr, b) => { const g = (n) => tr.querySelector("[name=" + n + "]"); if (b) b.disabled = true; try { await R.rpc("owner_save_perk", { p_token: st.sess.token, p_key: tr.dataset.pk, p_status: g("on").checked ? "on" : "off", p_name_en: g("name_en").value, p_name_zh: g("name_zh").value, p_detail_en: g("detail_en").value, p_detail_zh: g("detail_zh").value }); g("on").nextElementSibling.textContent = g("on").checked ? " On" : " Off"; R.toast("Saved ✓"); } catch (e) { R.toast(R.errText(e)); } if (b) b.disabled = false; };
