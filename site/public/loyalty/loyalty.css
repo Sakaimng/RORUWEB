@@ -337,3 +337,14 @@ td input,td select{font-size:16px}
 .staff-full .sf-it{font-size:27px;font-weight:900;line-height:1.25;margin-top:8px}
 .staff-full .sf-zhl{display:block;font-size:18px;font-weight:700;opacity:.8}
 .staff-full .sf-close{position:absolute;bottom:calc(18px + env(safe-area-inset-bottom));left:0;right:0;font-size:13px;font-weight:700;opacity:.65}
+
+/* f27: first-open walkthrough (shared by guest, staff and owner pages) */
+.tour{position:fixed;inset:0;z-index:90}
+.tour-ring{position:fixed;border-radius:16px;box-shadow:0 0 0 3px var(--orange),0 0 0 9999px rgba(5,6,9,.74);transition:all .25s ease;pointer-events:none}
+.tour-tip{position:fixed;background:var(--cream);color:var(--ink);border-radius:18px;padding:14px 16px 12px;box-shadow:0 14px 40px rgba(0,0,0,.55);font-size:16px;line-height:1.4;transition:top .25s ease,left .25s ease}
+.tour-n{font-size:12px;font-weight:900;letter-spacing:.08em;color:var(--orange);margin-bottom:4px}
+.tour-t{font-weight:500}
+.tour-b{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px}
+.tour-b button{appearance:none;-webkit-appearance:none;border:0;font:inherit;cursor:pointer;border-radius:12px;min-height:44px;padding:0 16px;font-size:15px;font-weight:900}
+.tour-skip{background:transparent;color:rgba(11,13,18,.6)}
+.tour-next{background:var(--orange);color:#fff;min-width:110px}

@@ -13,10 +13,10 @@
 <link rel="manifest" href="/loyalty/staff.webmanifest">
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f26">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f27">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f26"></script>
-<script src="/loyalty/monthend.js?v=f26"></script>
+<script src="/loyalty/loyalty.js?v=f27"></script>
+<script src="/loyalty/monthend.js?v=f27"></script>
 <style>body{overscroll-behavior:none}
 .gcard{border:1px solid var(--line);background:var(--ink2);border-radius:18px;padding:14px 16px;margin:0 0 12px}
 .gcard .gh{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
@@ -53,6 +53,7 @@
     <div class="row">
       <span class="pill" id="who"></span>
       <div class="langs"><button data-lang="en">EN</button><button data-lang="zh">繁中</button></div>
+      <button class="btn ghost sm hide" id="helpBtn" type="button" title="How it works" aria-label="How it works">?</button>
       <button class="btn ghost sm hide" id="logout">⏻</button>
     </div>
   </div>
@@ -390,12 +391,26 @@
   function onCode(text) { stopScan(); const m = /^RF:([A-Z0-9]{8})$/.exec(text.trim()); const r = /^RR:(R[A-Z0-9]{7})$/.exec(text.trim()); if (m) { st.num = m[1]; renderDisp(); lookup(); } else if (r) { redeem(r[1]); } else R.toast("?"); }
 
   function render() { R.applyI18n(); document.querySelectorAll("[data-t]").forEach(el => { if (S.en[el.dataset.t]) el.textContent = t(el.dataset.t); }); renderShops();
-    const on = !!st.sess; $("#login").classList.toggle("hide", on); $("#main").classList.toggle("hide", !on); $("#logout").classList.toggle("hide", !on);
+    const on = !!st.sess; $("#login").classList.toggle("hide", on); $("#main").classList.toggle("hide", !on); $("#logout").classList.toggle("hide", !on); $("#helpBtn").classList.toggle("hide", !on); if (on && !window.__stour) { window.__stour = 1; setTimeout(() => staffTour(false), 1200); }
     $("#who").textContent = on ? st.sess.staff.name + (st.sess.staff.role && st.sess.staff.role !== "staff" ? " (" + (st.sess.staff.role === "owner" ? "Owner" : "Manager") + ")" : "") + " · " + shopName(st.shop) : ""; $("#monthCard").classList.toggle("hide", !(on && ["manager", "owner"].includes(st.sess.staff.role))); if (on && ["manager", "owner"].includes(st.sess.staff.role) && !st.meMounted) { st.meMounted = true; window.RORU_MONTHEND.mount($("#monthCard"), () => st.sess.token); } if (!on) st.meMounted = false; renderDisp(); renderToday(); renderPos(true); if (on && st.card && st.sel) { renderCard(st.card); renderMembers(); } }
   document.addEventListener("roru:lang", () => { render(); });
   render(); if (st.sess) { try { await R.rpc("staff_today", { p_token: st.sess.token }); } catch (e) { if (e.code === "staff_not_signed_in") { st.sess = null; localStorage.removeItem("roru_staff"); render(); } } loadToday(); }
   setInterval(() => { if (document.visibilityState === "visible" && st.sess) loadToday(); }, 30000);
 })();
+
+  // ===== f27: first-time staff walkthrough (once per device; replay with ? at the top) =====
+  function staffTour(force) {
+    const R = window.RORU;
+    if (!R.tour || document.querySelector("#main").classList.contains("hide")) return;
+    const zh = R.lang() === "zh";
+    R.tour("staff_f27", [
+      { el: () => document.querySelector("#disp") || document.querySelector("#pad"), en: "Type the guest's phone number to find them. Their card and tier show up.", zh: "輸入客人電話號碼搵佢，會員卡同等級就會出現。" },
+      { el: "#scanBtn", en: "Or tap Scan to read the QR on the guest's phone.", zh: "或者撳掃描，讀客人手機上嘅 QR。" },
+      { el: "#queueBtn", en: "Receipts that need a check wait here. Approve or reject them.", zh: "要人手檢查嘅收據喺度等，批准或者拒絕。" },
+      { el: "#logCard", en: "Today's activity. Undo a mistake from here. Tap ? at the top to see this guide again.", zh: "今日紀錄，撳錯可以喺度復原。撳上面嘅 ? 可以再睇呢個教學。" }
+    ], { force: !!force, lang: zh ? "zh" : "en" });
+  }
+  document.querySelector("#helpBtn").onclick = () => staffTour(true);
 </script>
 </body>
 </html>

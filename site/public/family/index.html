@@ -8,9 +8,9 @@
 <title data-tt="{prog} — RORUBARU">High Rollers — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f26">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f27">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f26"></script>
+<script src="/loyalty/loyalty.js?v=f27"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -197,6 +197,7 @@
     </div>
     <p data-tab="me" class="tiny" data-t="privacy"></p>
     <p data-tab="me" class="tiny" data-t="preview_note"></p>
+    <div data-tab="me" class="card" id="meHow"><button class="btn ghost sm" id="howBtn" type="button" style="width:auto">❓ <span id="howTxt">How it works</span></button></div>
     <div data-tab="me" class="row" style="margin-top:14px"><button class="btn ghost sm" id="signout" data-t="signout"></button><button class="btn ghost sm" id="delete" data-t="delete" style="margin-left:auto;color:#ff8a6a"></button></div>
     <nav class="tabbar" id="tabBar" role="tablist"><button type="button" role="tab" data-tab="card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18M7 15h4"/></svg><span data-t="tab_card"></span></button><button type="button" role="tab" data-tab="rewards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="9" width="17" height="11" rx="1.5"/><path d="M2.5 9h19v-3h-19zM12 6v14M12 6c-2-3.5-6-3-5 0M12 6c2-3.5 6-3 5 0"/></svg><span data-t="tab_rewards"></span></button><button type="button" role="tab" data-tab="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V14M10 20V10M15 20V7M20 20V4"/></svg><span data-t="tab_status"></span></button><button type="button" role="tab" data-tab="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.2-4 4.2-6 7.5-6s6.3 2 7.5 6"/></svg><span data-t="tab_me"></span></button></nav>
   </section>
@@ -211,6 +212,20 @@
   $("#app").style.visibility = "visible";
   document.querySelectorAll(".langs button").forEach(b => b.onclick = () => { R.setLang(b.dataset.lang); render(); });
   // v46: bottom tab bar (Card / Rewards / Status / Me) — content is only regrouped, nothing removed
+
+  // ===== f27: first-time guest walkthrough (once per device; replay from Me -> How it works) =====
+  function guestTour(force) {
+    if (!R.tour || $("#member").classList.contains("hide")) return;
+    const zh = R.lang() === "zh";
+    R.tour("guest_f27", [
+      { before: () => setTab("card"), el: "#perkHero", en: "This is your card: your tier colour and what you get today.", zh: "呢張係你嘅會員卡：等級顏色同今日有咩著數。" },
+      { before: () => setTab("card"), el: "#scanCard", en: "After you pay, scan your receipt here. You get points and a visit stamp.", zh: "埋單之後喺度掃描收據，就有積分同一個到訪印花。" },
+      { before: () => setTab("card"), el: () => $("#phShow") || $("#perkHero"), en: "At the counter, tap Show staff and turn your phone round. The team brings your perk.", zh: "喺櫃檯撳呢個掣，再將手機俾店員睇，佢哋會送上你嘅著數。" },
+      { before: () => setTab("rewards"), el: '#tabBar [data-tab="rewards"]', en: "Rewards: what your points get you. Tap one to use it at the counter.", zh: "獎賞：你嘅積分可以換咩。喺櫃檯撳一個就用得。" },
+      { before: () => setTab("me"), el: '#tabBar [data-tab="me"]', en: "Me: your name, birthday and invite a friend. Replay this guide here any time.", zh: "我：名、生日同邀請朋友。隨時可以喺度再睇呢個教學。" }
+    ], { force: !!force, lang: zh ? "zh" : "en", onEnd: () => setTab("card") });
+  }
+  $("#howBtn").onclick = () => guestTour(true);
   const TABS = ["card", "rewards", "status", "me"];
   function setTab(tb, keepScroll) { if (!TABS.includes(tb)) tb = "card"; $("#member").dataset.tabOn = tb; try { sessionStorage.setItem("roru_tab", tb); } catch (e) {}
     document.querySelectorAll("#tabBar button").forEach(b => { const on = b.dataset.tab === tb; b.classList.toggle("on", on); b.setAttribute("aria-selected", on ? "true" : "false"); });
@@ -433,6 +448,7 @@
     $("#signin").classList.toggle("hide", !!me); $("#member").classList.toggle("hide", !me);
     if (!me) return;
     const zh = R.lang() === "zh";
+    $("#howTxt").textContent = zh ? "點樣用" : "How it works"; if (!window.__gtour) { window.__gtour = 1; setTimeout(() => guestTour(false), 1200); }
     const nm0 = goodName(me.name); // v48: a name with no letters (e.g. "-") reads as blank
     $("#hello").textContent = nm0 ? (zh ? nm0 + "，你好 👋" : "Hey " + nm0 + " 👋") : (zh ? "你好 👋" : "Hey there 👋");
     renderHero(me, zh);

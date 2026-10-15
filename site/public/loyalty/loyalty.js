@@ -193,5 +193,45 @@ window.RORU = (function () {
   Object.assign(L.en, {"today_k": "Today", "today_none": "points + a visit stamp", "today_show": "Show this screen when you sit down", "perk_avail": "Available", "perk_used_month": "Used this month", "perk_used_year": "Used · back {d}", "perk_back": "back {d}", "perk_bday_claimed": "Ready, show staff", "perk_bday_used": "Used this year", "perk_bday_later": "In your birthday week", "perk_bday_none": "Add your birthday in Me", "perk_bday_new": "Available after {n} more days on file", "perk_bday_avail": "Your birthday week!", "me_profile": "Your details", "me_name": "Name", "me_name_ph": "What should we call you?", "me_bday": "Birthday", "me_bday_lock": "Locked once saved, so the birthday roll stays fair. Typo? Ask us in store.", "me_bday_once": "You can set this once.", "me_saved": "Saved ✓", "me_progress": "Your progress", "prog_to": "{n} to {name}", "prog_top": "You're at the top tier", "invite_title": "Invite a friend", "invite_sub": "Send your link. They sign up in a minute.", "invite_btn": "Share my link", "del_title": "Delete my account", "del_body": "This deletes your name, birthday, points, receipts, visits and rewards for good. We keep only a one-way code of your phone number and the date you deleted, so rewards can't be claimed twice. This number can rejoin after a cool-off.", "del_go": "Delete for good", "del_keep": "Keep my account", "gold_highball": "a free highball", "gold_won": "2× points + a free highball! It's in Rewards: show staff.", "gold_see": "See my highball", "show_staff_btn": "Show staff (full screen)", "tap_close": "Tap anywhere to close", "st_today": "Today", "st_mark": "Mark used", "st_marked": "Marked used", "st_undo": "Undo", "st_undone": "Undone", "st_undo_reason": "Reason for the undo (manager):", "st_show_card": "Guest shows this on their phone", "err_bad_name": "Please use letters for your name (max 30)", "err_perk_used_up": "Already used", "err_perk_not_for_tier": "Not part of this guest's tier", "err_already_undone": "Already undone"});
   Object.assign(L.zh, {"today_k": "今日", "today_none": "積分 + 到訪印章", "today_show": "坐低時出示此畫面", "perk_avail": "可使用", "perk_used_month": "本月已使用", "perk_used_year": "已使用 · {d} 再有", "perk_back": "{d} 再有", "perk_bday_claimed": "已領取，出示給員工", "perk_bday_used": "今年已使用", "perk_bday_later": "生日週可用", "perk_bday_none": "喺「我的」加入生日", "perk_bday_new": "生日登記滿 {n} 日後可用", "perk_bday_avail": "生日週快樂！", "me_profile": "你的資料", "me_name": "名字", "me_name_ph": "我們點稱呼你？", "me_bday": "生日", "me_bday_lock": "儲存後會鎖定，確保生日禮遇公平。輸入錯誤？請到店內告訴我們。", "me_bday_once": "只可設定一次。", "me_saved": "已儲存 ✓", "me_progress": "你的進度", "prog_to": "再消費 {n} 升至{name}", "prog_top": "你已是最高級別", "invite_title": "邀請朋友", "invite_sub": "傳送你的連結，一分鐘就加入到。", "invite_btn": "分享我的連結", "del_title": "刪除我的帳戶", "del_body": "會永久刪除你的名字、生日、積分、收據、到訪及獎賞紀錄。我們只保留你電話號碼的單向編碼及刪除日期，以防重複領取獎賞。冷靜期過後此號碼可重新加入。", "del_go": "永久刪除", "del_keep": "保留帳戶", "gold_highball": "免費 Highball 一杯", "gold_won": "雙倍積分 + 免費 Highball 一杯！喺「獎賞」出示給員工。", "gold_see": "查看我的 Highball", "show_staff_btn": "出示給員工（全螢幕）", "tap_close": "按任何位置關閉", "st_today": "今日", "st_mark": "標記已用", "st_marked": "已標記使用", "st_undo": "取消", "st_undone": "已取消", "st_undo_reason": "取消原因（經理）：", "st_show_card": "客人會喺手機出示", "err_bad_name": "名字請用文字（最多 30 個字）", "err_perk_used_up": "已用完", "err_perk_not_for_tier": "此等級不包括此禮遇", "err_already_undone": "已經取消"});
   setLang(lang);
-  return { CFG, PROG, prog, t, lang: () => lang, setLang, applyI18n, rpc, errText, gate, qrSvg, rollSvg, tierIcon, TIERS, tierName: (k, l) => (TIERS[k] || TIERS.nori)[(l || lang) === "zh" ? "zh" : "en"], toast, burst, fmtDay, fmtTime };
+
+  // f27: first-open walkthrough (Dominic 17:31 Oct 15: "a tutorial guide walk through for first time users so they know what to expect").
+  // tour(key, steps, opts): highlights the real element of each step, one short line each (EN / 繁中 by page language), Next / Skip and a step counter.
+  // Shows once per device (localStorage "roru_tour_<key>"); opts.force replays it. Steps whose element is missing or hidden are skipped.
+  function tour(key, steps, opts) {
+    opts = opts || {}; const LS = "roru_tour_" + key;
+    try { if (!opts.force && localStorage.getItem(LS)) return false; } catch (e) {}
+    const old = document.querySelector(".tour"); if (old) old.remove();
+    const zh = (opts.lang || lang) === "zh", W = { next: zh ? "下一步" : "Next", skip: zh ? "略過" : "Skip", done: zh ? "明白" : "Got it" };
+    const ov = document.createElement("div"); ov.className = "tour"; ov.innerHTML = '<div class="tour-ring"></div><div class="tour-tip" role="dialog" aria-live="polite"><div class="tour-n"></div><div class="tour-t"></div><div class="tour-b"><button type="button" class="tour-skip"></button><button type="button" class="tour-next"></button></div></div>';
+    document.body.appendChild(ov);
+    const ring = ov.querySelector(".tour-ring"), tip = ov.querySelector(".tour-tip");
+    const find = (s) => { try { const el = typeof s.el === "function" ? s.el() : document.querySelector(s.el); return el && el.getClientRects().length && getComputedStyle(el).visibility !== "hidden" ? el : null; } catch (e) { return null; } };
+    let list = steps.slice(), i = 0;
+    const end = () => { try { localStorage.setItem(LS, String(Date.now())); } catch (e) {} ov.remove(); window.removeEventListener("resize", place); if (opts.onEnd) opts.onEnd(); };
+    function place() {
+      const s = list[i], el = s && s._el; if (!el) return;
+      const r = el.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight, p = 6;
+      const top = Math.max(4, r.top - p), left = Math.max(4, r.left - p), w = Math.min(vw - 8, r.width + 2 * p), h = Math.min(vh - 8, r.height + 2 * p);
+      Object.assign(ring.style, { top: top + "px", left: left + "px", width: Math.max(0, Math.min(w, vw - left - 4)) + "px", height: h + "px" });
+      const tw = Math.min(340, vw - 24); tip.style.width = tw + "px";
+      tip.style.left = Math.max(12, Math.min(vw - tw - 12, r.left + r.width / 2 - tw / 2)) + "px";
+      const th = tip.offsetHeight || 130, below = top + h + 12;
+      if (below + th < vh - 8) { tip.style.top = below + "px"; } else if (top - th - 12 > 8) { tip.style.top = (top - th - 12) + "px"; } else { tip.style.top = Math.max(8, vh - th - 16) + "px"; }
+    }
+    function show() {
+      while (i < list.length) { const s = list[i]; if (s.before) { try { s.before(); } catch (e) {} } s._el = find(s); if (s._el) break; list.splice(i, 1); }
+      if (i >= list.length) { end(); return; }
+      const s = list[i]; s._el.scrollIntoView({ block: "center", behavior: "auto" });
+      ov.querySelector(".tour-n").textContent = (i + 1) + " / " + list.length;
+      ov.querySelector(".tour-t").textContent = zh ? (s.zh || s.en) : s.en;
+      ov.querySelector(".tour-skip").textContent = W.skip; ov.querySelector(".tour-skip").style.visibility = i === list.length - 1 ? "hidden" : "visible";
+      ov.querySelector(".tour-next").textContent = i === list.length - 1 ? W.done : W.next;
+      requestAnimationFrame(() => { place(); setTimeout(place, 120); });
+    }
+    ov.querySelector(".tour-next").onclick = () => { i++; show(); };
+    ov.querySelector(".tour-skip").onclick = end;
+    window.addEventListener("resize", place);
+    show(); return true;
+  }
+  return { CFG, PROG, prog, t, lang: () => lang, setLang, applyI18n, rpc, errText, gate, qrSvg, rollSvg, tierIcon, TIERS, tierName: (k, l) => (TIERS[k] || TIERS.nori)[(l || lang) === "zh" ? "zh" : "en"], toast, burst, fmtDay, fmtTime, tour };
 })();
