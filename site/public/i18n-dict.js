@@ -247,6 +247,19 @@ export default {
 "One-night takeover": "一晚限定",
 "Tequila pairings, slushies and a party.": "龍舌蘭配搭美食、沙冰，仲有派對。",
 "Book as usual, same as a regular dinner.": "同平時晚餐一樣預約就得。",
+// Vietnam pop-up, 22–24 Oct 2026
+"Thu 22 – Sat 24 Oct": "10月22日（四）至24日（六）",
+"22–24 Oct": "10月22至24日",
+"RORUBARU with Vivaia": "RORUBARU 聯乘 Vivaia",
+"Ho Chi Minh City": "胡志明市",
+"Three-night pop-up": "三晚快閃",
+"Tastemaker Hub, 10 Đ. Mỹ Phú 1A, Phú Mỹ Hưng, Ho Chi Minh City": "Tastemaker Hub，10 Đ. Mỹ Phú 1A, Phú Mỹ Hưng，胡志明市",
+"Our counter heads to Vietnam for three nights, with Vivaia and Koi Fitness & Wellness.": "我哋嘅吧枱移師越南三晚，夥拍 Vivaia 同 Koi Fitness & Wellness。",
+"Booking via Luma.": "經 Luma 預約。",
+"Seatings · Vietnam time": "入座時段 · 越南時間",
+"5:45pm – 7:45pm": "晚上5:45 – 7:45",
+"8:00pm – 10:00pm": "晚上8:00 – 10:00",
+"Vietnam": "越南",
 "Book": "預約"
 },
 "ja": {
@@ -494,6 +507,19 @@ export default {
 "One-night takeover": "一夜限りのテイクオーバー",
 "Tequila pairings, slushies and a party.": "テキーラのペアリング、スラッシー、そしてパーティー。",
 "Book as usual, same as a regular dinner.": "ご予約は通常のディナーと同じです。",
+// Vietnam pop-up, 22–24 Oct 2026 (machine-assisted)
+"Thu 22 – Sat 24 Oct": "10月22日（木）〜24日（土）",
+"22–24 Oct": "10月22日〜24日",
+"RORUBARU with Vivaia": "RORUBARU と Vivaia",
+"Ho Chi Minh City": "ホーチミン市",
+"Three-night pop-up": "3夜限定ポップアップ",
+"Tastemaker Hub, 10 Đ. Mỹ Phú 1A, Phú Mỹ Hưng, Ho Chi Minh City": "Tastemaker Hub、10 Đ. Mỹ Phú 1A, Phú Mỹ Hưng、ホーチミン市",
+"Our counter heads to Vietnam for three nights, with Vivaia and Koi Fitness & Wellness.": "RORUBARU のカウンターが3夜限定でベトナムへ。Vivaia、Koi Fitness & Wellness と一緒に。",
+"Booking via Luma.": "ご予約は Luma から。",
+"Seatings · Vietnam time": "入れ替え制 · ベトナム時間",
+"5:45pm – 7:45pm": "17:45〜19:45",
+"8:00pm – 10:00pm": "20:00〜22:00",
+"Vietnam": "ベトナム",
 "Book": "予約"
 }
 };

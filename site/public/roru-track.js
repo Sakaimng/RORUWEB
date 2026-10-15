@@ -42,6 +42,7 @@
     if (proto === 'mailto:') return ['email_click', {}];
     if (/(^|\.)wa\.me$|whatsapp\.com$/.test(h)) return ['whatsapp_click', {}];
     if (/exploretock\.com$/.test(h)) return ['book_click', { platform: 'tock' }];
+    if (/(^|\.)luma\.com$|(^|\.)lu\.ma$/.test(h)) return ['book_click', { platform: 'luma' }];
     if (/foodpanda\./.test(h)) return ['delivery_click', { platform: 'foodpanda' }];
     if (/keeta|mykeeta/.test(h)) return ['delivery_click', { platform: 'keeta' }];
     if (/(^|\.)instagram\.com$/.test(h)) return ['instagram_click', {}];

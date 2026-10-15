@@ -1,6 +1,6 @@
 // RORUBARU · UI layer: panels, quick tabs, music, deep links (#menu, #visit …).
 // No 3D in here, so the panels still work if the room can't render.
-import TX from './i18n-dict.js?v=ln1';
+import TX from './i18n-dict.js?v=ln2';
 const tr = (s) => ((TX[document.documentElement.dataset.lang] || {})[s] || s);
 const panel = document.getElementById('panel');
 const body = document.getElementById('panelBody');
