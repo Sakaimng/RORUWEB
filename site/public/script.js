@@ -13,7 +13,7 @@
 import * as THREE from './vendor/three.module.min.js';
 import { OrbitControls } from './vendor/OrbitControls.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
-import { buildCity } from './city.js';
+import { buildCity, Path } from './city.js?v=w47';
 import { hkStatus } from './hours.js';
 
 const params = new URLSearchParams(location.search);
@@ -30,20 +30,29 @@ const pick = (arr) => arr[Math.floor(rand() * arr.length)];
 const ORANGE = 0xF64501, CREAM = 0xF6F3E7;
 
 // ---------- layout (metres; x = along Queen's Road East frontage → east, z = toward the back wall is −z) ----------
+// v47 (Oct 15 2026): every number below is measured off Dominic's Wan Chai floor plan (1 px = 4.59 mm on the
+// 4099 px drawing), with the glass line at x = −7.4 and the long lit wall at z = 4.1 as before.
+// PLAN(fx, fy) turns a plan pixel into scene metres.
+const PLAN = (fx, fy) => [-7.4 + (fx - 315) * 0.00459, 4.1 + (fy - 2085) * 0.00459];
 const L = {
   glassX: -7.4,          // glass shopfront on Queen's Road East
-  eastX: 6.5,            // east wall (washrooms beyond)
-  southZ: 4.1,           // side wall along the long counter run (teal panels)
-  backZ: -1.75,          // open kitchen line (bottle fridges)
-  northZ: -4.2,          // rear wall of the kitchen
-  doorZ: -2.9,           // entrance, front-left
-  F: 2.2,                // long counter run, centre line
-  XL: -4.6, XR: 4.9,     // counter legs, centre lines
-  ZB: -0.95,             // where the legs end (U opens to the kitchen)
+  eastX: 6.07,           // the end wall: a black curtain, the two toilets behind it
+  southZ: 4.1,           // the long hallway wall behind the long counter run (the one lit wall)
+  backZ: -1.95,          // fridge fronts along the kitchen's rear wall
+  northZ: -2.51,         // rear wall of the open kitchen
+  frontZ: -2.09,         // the dining room's back wall by the entrance (events wall)
+  doorZ: -0.84,          // entrance, front-left (plan: 1750 mm opening)
+  doorW: 1.75,
+  F: 2.12,               // long counter run, centre line (plan: 9565 mm run)
+  XL: -4.09, XR: 3.94,   // counter legs, centre lines
+  ZB: -1.06,             // where the left leg ends (toward the kitchen)
+  ZBR: 0.68,             // the right leg is shorter (bar flap above it)
   CH: 1.0,               // counter height
-  walkX: -5.95,          // aisle between shopfront and the left leg
-  corrZ: 3.45,           // corridor behind the long-run seats
-  laneZ: 1.35,           // chefs' lane inside the U
+  walkX: -5.6,           // aisle between the shopfront (reception, DJ booth) and the left leg
+  corrZ: 3.5,            // the hallway behind the long-run seats
+  laneZ: 1.12,           // chefs' lane inside the U
+  aisleR: 5.42,          // aisle between the right-leg seats and the curtain
+  wcX0: 6.76, wcX1: 8.0, // the two WC cubicles (plan: doors open into the lobby behind the curtain)
 };
 
 // ---------- LIVE data adapter ----------
@@ -117,8 +126,8 @@ function pLight(color, intensity, dist, x, y, z) { const l = new THREE.PointLigh
 pLight(0xffc48a, 26, 9, -2.2, 2.6, 1.0);
 pLight(0xffc48a, 26, 9, 2.6, 2.6, 1.0);
 pLight(0x2fe0d0, 18, 8, 0.5, 1.4, 3.7);
-pLight(0x2fe0d0, 12, 7, 6.0, 1.6, 0.6);
-const djLight = pLight(ORANGE, 14, 6, -6.0, 1.9, 1.6);
+pLight(0xffc896, 5, 4, 3.2, 2.6, 2.9);   // v47: the end wall is NOT neon (Dominic Oct 15): a soft warm light by the curtain instead
+const djLight = pLight(ORANGE, 14, 6, -6.0, 1.9, 2.3);
 pLight(0xffd0a8, 10, 6, -6.2, 2.7, -1.0);
 pLight(0xff6a9a, 8, 7, -6.4, 2.4, -2.2);
 // the room's own lights (not the street lamps outside the glass) dim after hours
@@ -168,13 +177,21 @@ const world = new THREE.Group(); scene.add(world);
 
 // ---------- the room shell ----------
 const floorMat = mat(0x68635d);   // light grey polished concrete floor (his photos: DSC07596, DSC07643)
-box(L.eastX - L.glassX, 0.06, L.southZ - L.northZ, floorMat, (L.eastX + L.glassX) / 2, 0.03, (L.southZ + L.northZ) / 2);
+box(L.wcX1 + 0.1 - L.glassX, 0.06, L.southZ - L.northZ, floorMat, (L.wcX1 + 0.1 + L.glassX) / 2, 0.03, (L.southZ + L.northZ) / 2);
 const stoneTex = new THREE.TextureLoader().load('tex/meshstone.jpg'); stoneTex.colorSpace = THREE.SRGBColorSpace; stoneTex.wrapS = stoneTex.wrapT = THREE.RepeatWrapping;
 const wallMat = new THREE.MeshLambertMaterial({ color: 0x5f5a54, map: stoneTex }); wallMat.userData.wuv = 1.8;   // split-face stone behind perforated metal mesh (his hero photo)
 const H = 3.2;
-box(L.eastX - L.glassX + 0.3, H, 0.16, wallMat, (L.eastX + L.glassX) / 2, H / 2, L.northZ);    // rear wall
-box(0.16, H, L.southZ - L.northZ, wallMat, L.eastX, H / 2, (L.southZ + L.northZ) / 2);         // east wall
-box(L.eastX - L.glassX, 1.05, 0.16, wallMat, (L.eastX + L.glassX) / 2, 0.525, L.southZ);       // side wall (cut low for the view)
+// walls straight off the plan (v47): the back wall by the entrance, the kitchen's rear wall a step further back,
+// the store room beside the kitchen, then the end of the room: curtain, toilet lobby, two WC cubicles
+const SOLID = [];   // footprints you cannot walk through (walk mode): [x0, z0, x1, z1]
+function wallXZ(x0, z0, x1, z1, m = wallMat, h = H, solid = true) { const w = Math.abs(x1 - x0) || 0.16, d = Math.abs(z1 - z0) || 0.16; box(w, h, d, m, (x0 + x1) / 2, h / 2, (z0 + z1) / 2); if (solid) SOLID.push([Math.min(x0, x1) - (x0 === x1 ? 0.08 : 0), Math.min(z0, z1) - (z0 === z1 ? 0.08 : 0), Math.max(x0, x1) + (x0 === x1 ? 0.08 : 0), Math.max(z0, z1) + (z0 === z1 ? 0.08 : 0)]); }
+wallXZ(L.glassX, L.frontZ, -4.26, L.frontZ);            // back wall by the entrance (events wall)
+wallXZ(-4.26, L.frontZ, -4.26, L.northZ);               // step back to the kitchen
+wallXZ(-4.26, L.northZ, 2.51, L.northZ);                // kitchen rear wall
+wallXZ(2.51, L.northZ, 2.51, -0.4);                     // store room beside the kitchen
+wallXZ(2.51, -0.4, 7.67, -0.4);                         // back wall of the bar flap + toilet lobby
+box(L.wcX1 + 0.1 - L.glassX, 1.05, 0.16, wallMat, (L.wcX1 + 0.1 + L.glassX) / 2, 0.525, L.southZ);       // side wall (cut low for the view)
+SOLID.push([L.glassX, L.southZ - 0.08, L.wcX1 + 0.1, L.southZ + 0.3]);
 // backlit walls: rough stone behind perforated metal mesh in black steel frames, lit teal (and red after dark), as in his photos
 const WALL_TEAL = new THREE.Color(0x6ff0e4), WALL_RED = new THREE.Color(0xff3a2c);
 const teal = new THREE.MeshBasicMaterial({ color: 0x23d6c4 });
@@ -182,29 +199,30 @@ const meshTex = new THREE.TextureLoader().load('tex/meshstone.jpg'); meshTex.col
 const tealPanel = new THREE.MeshBasicMaterial({ color: 0x6ff0e4, map: meshTex }); tealPanel.userData.wuv = 1.3;
 const frameBlk = mat(0x0b0b0d);
 box(L.eastX - L.glassX - 0.5, 0.82, 0.03, tealPanel, (L.eastX + L.glassX) / 2 + 0.05, 0.6, L.southZ - 0.1);
-for (let x = -6.85; x <= 6.2; x += 1.2) box(0.05, 0.84, 0.05, frameBlk, x, 0.6, L.southZ - 0.12);
+for (let x = -6.85; x <= L.eastX - 0.2; x += 1.2) box(0.05, 0.84, 0.05, frameBlk, x, 0.6, L.southZ - 0.12);
 box(L.eastX - L.glassX - 0.4, 0.05, 0.05, frameBlk, (L.eastX + L.glassX) / 2, 1.03, L.southZ - 0.12);
 box(L.eastX - L.glassX - 0.4, 0.05, 0.05, frameBlk, (L.eastX + L.glassX) / 2, 0.18, L.southZ - 0.12);
-box(0.03, 2.5, 5.4, tealPanel, L.eastX - 0.1, 1.45, 1.25);
-for (let z = -1.45; z <= 3.95; z += 1.08) box(0.05, 2.52, 0.05, frameBlk, L.eastX - 0.12, 1.45, z);
-for (const y of [0.2, 2.1, 2.7]) box(0.05, 0.05, 5.45, frameBlk, L.eastX - 0.12, y, 1.25);
+// (v47) the old backlit panel on the end wall is gone: Dominic, Oct 15: only the long hallway wall lights up; the end wall is the curtain + 2 toilets
 // the light spills onto the floor in front of the backlit walls
 const wallWash = new THREE.MeshBasicMaterial({ color: 0x6ff0e4, transparent: true, opacity: 0.1, depthWrite: false, blending: THREE.AdditiveBlending, map: (() => { const c = document.createElement('canvas'); c.width = 8; c.height = 64; const g = c.getContext('2d'); const gr = g.createLinearGradient(0, 0, 0, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 8, 64); return new THREE.CanvasTexture(c); })() });
-{ const w1 = plane(L.eastX - L.glassX - 0.4, 0.9, wallWash, (L.eastX + L.glassX) / 2, 0.075, L.southZ - 0.55); w1.rotation.set(-Math.PI / 2, 0, Math.PI); w1.userData.keep = true;
-  const w2 = plane(5.4, 1.1, wallWash, L.eastX - 0.65, 0.075, 1.25); w2.rotation.set(-Math.PI / 2, 0, -Math.PI / 2); w2.userData.keep = true; }
+{ const w1 = plane(L.eastX - L.glassX - 0.4, 0.9, wallWash, (L.eastX + L.glassX) / 2, 0.075, L.southZ - 0.55); w1.rotation.set(-Math.PI / 2, 0, Math.PI); w1.userData.keep = true; }
 
 // glass shopfront on Queen's Road East, with the door at the front-left
 const glassMat = new THREE.MeshPhongMaterial({ color: 0xa9c6d6, transparent: true, opacity: 0.12, shininess: 90, depthWrite: false, side: THREE.DoubleSide });
-const gz0 = L.doorZ + 0.6, gz1 = L.southZ;
+const gz0 = L.doorZ + L.doorW / 2, gz1 = L.southZ;
 plane(gz1 - gz0, H, glassMat, L.glassX, H / 2, (gz0 + gz1) / 2, Math.PI / 2);
 box(0.1, H, 0.1, mat(0x111216), L.glassX, H / 2, gz0);
 box(0.1, H, 0.1, mat(0x111216), L.glassX, H / 2, gz1);
 box(0.12, 0.12, L.southZ - L.northZ, mat(0x111216), L.glassX, H, (L.southZ + L.northZ) / 2);
-box(0.16, H, L.doorZ - 0.6 - L.northZ, wallMat, L.glassX, H / 2, (L.doorZ - 0.6 + L.northZ) / 2); // solid return by the kitchen
+box(0.16, H, L.doorZ - L.doorW / 2 + 4.5, wallMat, L.glassX, H / 2, (L.doorZ - L.doorW / 2 - 4.5) / 2); // solid front of the building lobby, north of the door
+SOLID.push([L.glassX - 0.1, -4.5, L.glassX + 0.1, L.doorZ - L.doorW / 2], [L.glassX - 0.1, gz0, L.glassX + 0.1, gz1]);
 // door frame + open door leaf
-box(0.12, 0.12, 1.2, mat(0x111216), L.glassX, 2.3, L.doorZ);
-const door = new THREE.Group(); door.position.set(L.glassX, 0, L.doorZ - 0.6); scene.add(door);
+box(0.12, 0.12, L.doorW, mat(0x111216), L.glassX, 2.3, L.doorZ);
+box(0.12, H - 2.3, L.doorW, mat(0x111216), L.glassX, 2.3 + (H - 2.3) / 2, L.doorZ);
+const door = new THREE.Group(); door.position.set(L.glassX, 0, L.doorZ - L.doorW / 2); scene.add(door);
 box(0.05, 2.25, 1.15, new THREE.MeshPhongMaterial({ color: 0xa9c6d6, transparent: true, opacity: 0.2, depthWrite: false }), 0, 1.15, 0.58, door);
+// fixed glass side panel beside the door leaf (the opening is 1750 mm on the plan)
+plane(L.doorW - 1.2, 2.3, glassMat, L.glassX, 1.15, L.doorZ + L.doorW / 2 - (L.doorW - 1.2) / 2, Math.PI / 2);
 door.rotation.y = -0.9;
 // frosted RORUBARU letters on the glass (read from the street; mirrored from inside, as in the footage)
 // real shopfront, from Dominic's own storefront photo: frosted teal glass with the RORUBARU letters, black fascia with the ロールバール neon
@@ -212,9 +230,10 @@ const texL = new THREE.TextureLoader();
 function photoTex(src, rep) { const t = texL.load(src); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; if (rep) { t.wrapS = t.wrapT = THREE.RepeatWrapping; } return t; }
 const GLASS_H = 2.35;
 const glassLetters = plane(gz1 - gz0, GLASS_H, new THREE.MeshBasicMaterial({ map: photoTex('tex/glass.jpg'), transparent: true, opacity: 0.94, depthWrite: false }), L.glassX - 0.03, GLASS_H / 2, (gz0 + gz1) / 2, -Math.PI / 2);
-box(0.08, H - GLASS_H, gz1 - gz0 + 0.1, mat(0x07080b), L.glassX - 0.02, GLASS_H + (H - GLASS_H) / 2, (gz0 + gz1) / 2); // black fascia band
+const fz0 = L.doorZ - L.doorW / 2;   // v47: the fascia runs over the door too, so the neon photo keeps its proportions
+box(0.08, H - GLASS_H, gz1 - fz0 + 0.1, mat(0x07080b), L.glassX - 0.02, GLASS_H + (H - GLASS_H) / 2, (fz0 + gz1) / 2); // black fascia band
 // the fascia photo itself carries the real neon (icy blue-white ロールバール, as on the street); it dims by day
-const neon = plane(gz1 - gz0, H - GLASS_H - 0.04, new THREE.MeshBasicMaterial({ map: photoTex('tex/fascia.jpg') }), L.glassX - 0.075, GLASS_H + (H - GLASS_H) / 2, (gz0 + gz1) / 2, -Math.PI / 2);
+const neon = plane(gz1 - fz0, H - GLASS_H - 0.04, new THREE.MeshBasicMaterial({ map: photoTex('tex/fascia.jpg') }), L.glassX - 0.075, GLASS_H + (H - GLASS_H) / 2, (fz0 + gz1) / 2, -Math.PI / 2);
 // the projecting GF RORUBARU light box at the right-hand end of the front
 { const lbm = new THREE.MeshBasicMaterial({ map: photoTex('tex/lightbox.jpg'), side: THREE.DoubleSide });
   box(0.42, 0.86, 0.06, mat(0x0c0d10), L.glassX - 0.42, 2.72, gz1 + 0.12);
@@ -235,7 +254,7 @@ plane(1.0, 0.54, new THREE.MeshBasicMaterial({ map: logoTex, transparent: true }
 
 
 // ---------- past events photo wall (rear wall by the entrance) — real photos from rorubaru.com ----------
-const EVW = { x: -6.0, y: 1.95, z: L.northZ + 0.1, w: 2.5, h: 1.62 };
+const EVW = { x: -5.85, y: 1.95, z: L.frontZ + 0.1, w: 2.5, h: 1.62 };
 {
   const c = document.createElement('canvas'); c.width = 1200; c.height = 780;
   const g = c.getContext('2d'); g.fillStyle = '#14151b'; g.fillRect(0, 0, c.width, c.height);
@@ -260,9 +279,13 @@ const EVW = { x: -6.0, y: 1.95, z: L.northZ + 0.1, w: 2.5, h: 1.62 };
 }
 
 // reception (front-left, by the door): dark ribbed metal desk
-box(0.7, 1.05, 1.1, mat(0x1b1c21), -6.85, 0.525, -1.75);
-for (let z = -2.25; z < -1.2; z += 0.09) box(0.02, 0.95, 0.03, mat(0x2f3138), -6.49, 0.5, z);
-box(0.75, 0.04, 1.15, mat(0x3a332d), -6.85, 1.07, -1.75);
+// (v47) where the plan puts it: on the right as you step in, beside the pier at the door's edge
+{ const [rx0, rz0] = PLAN(425, 1200), [rx1, rz1] = PLAN(575, 1290), rcx = (rx0 + rx1) / 2, rcz = (rz0 + rz1) / 2;
+  box(0.5, H, rz1 - rz0 + 0.05, wallMat, L.glassX + 0.25, H / 2, rcz);   // the pier (solid on the plan)
+  box(rx1 - rx0, 1.05, rz1 - rz0 + 0.1, mat(0x1b1c21), rcx, 0.525, rcz);
+  for (let x = rx0 + 0.04; x < rx1; x += 0.09) box(0.03, 0.95, 0.02, mat(0x2f3138), x, 0.5, rz0 - 0.04);
+  box(rx1 - rx0 + 0.05, 0.04, rz1 - rz0 + 0.15, mat(0x3a332d), rcx, 1.07, rcz);
+  SOLID.push([L.glassX, rz0 - 0.07, rx1 + 0.03, rz1 + 0.08]); }
 
 // ---------- the U-shaped hand-roll counter ----------
 const _tl = new THREE.TextureLoader();
@@ -290,7 +313,8 @@ function counterRun(x0, z0, x1, z1, guestDir) {
 }
 counterRun(L.XL - 0.39, L.F, L.XR + 0.39, L.F, [0, 1]);
 counterRun(L.XL, L.ZB, L.XL, L.F - 0.39, [-1, 0]);
-counterRun(L.XR, L.ZB, L.XR, L.F - 0.39, [1, 0]);
+counterRun(L.XR, L.ZBR, L.XR, L.F - 0.39, [1, 0]);
+SOLID.push([L.XL - 0.4, L.ZB, L.XR + 0.4, L.F + 0.4]);   // the whole U (counter + chefs' side): guests walk round it
 // nori boxes, sauce bottles, hinoki boxes along the counter
 for (let x = L.XL + 0.6; x < L.XR - 0.4; x += 1.3) {
   box(0.24, 0.06, 0.14, mat(0xc9a77a), x, L.CH + 0.17, L.F - 0.28);
@@ -298,11 +322,13 @@ for (let x = L.XL + 0.6; x < L.XR - 0.4; x += 1.3) {
 }
 
 // central bar + preparation station inside the U (stainless)
-box(5.2, 0.92, 1.0, steel, 0, 0.46, 0.05);
-box(5.3, 0.04, 1.1, mat(0x737980), 0, 0.93, 0.05);
-for (let x = -2.2; x <= 2.2; x += 1.1) { cyl(0.17, 0.17, 0.2, 12, mat(0xa47c4e), x, 1.04, 0.05); cyl(0.172, 0.172, 0.025, 12, mat(0x6b6f75), x, 1.0, 0.05); }   // hinoki rice ohitsu, metal band
-for (let x = -1.65; x <= 1.7; x += 1.1) box(0.42, 0.05, 0.3, mat(0x1d2a1e), x, 0.98, 0.05);   // nori stacks
-cyl(0.22, 0.22, 0.34, 10, mat(0xd8dde4), 2.75, 0.17 + 0.92, -0.75); // rice cooker
+// (v47) on the plan it is one bench across the back of the U, 5.3 m × 0.75 m, the kitchen right behind it
+{ const [px0, pz0] = PLAN(1310, 1131), [px1, pz1] = PLAN(2473, 1294), pcx = (px0 + px1) / 2, pcz = (pz0 + pz1) / 2, pw = px1 - px0, pd = pz1 - pz0;
+  box(pw, 0.92, pd, steel, pcx, 0.46, pcz);
+  box(pw + 0.1, 0.04, pd + 0.08, mat(0x737980), pcx, 0.93, pcz);
+  for (let x = pcx - 2.2; x <= pcx + 2.2; x += 1.1) { cyl(0.17, 0.17, 0.2, 12, mat(0xa47c4e), x, 1.04, pcz); cyl(0.172, 0.172, 0.025, 12, mat(0x6b6f75), x, 1.0, pcz); }   // hinoki rice ohitsu, metal band
+  for (let x = pcx - 1.65; x <= pcx + 1.7; x += 1.1) box(0.42, 0.05, 0.3, mat(0x1d2a1e), x, 0.98, pcz);   // nori stacks
+  cyl(0.22, 0.22, 0.34, 10, mat(0xd8dde4), 2.05, 0.17 + 0.92, -1.25); } // rice cooker
 
 // open kitchen line: glass-door fridges lit cool white, bottles on glass shelves, stainless frames (his drive photos 184035, trip.com counter shot)
 const fridgeTex = (() => {
@@ -327,36 +353,35 @@ const fridgeTex = (() => {
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
 })();
 const fridgeFace = new THREE.MeshBasicMaterial({ map: fridgeTex, color: 0xdfe9f2 });
-for (let i = 0; i < 6; i++) {
-  const x = -3.7 + i * 1.5;
-  if (i === 3) { box(1.2, 2.3, 0.1, mat(0x101114), x, 1.15, L.backZ - 0.2); continue; } // pass to the kitchen
+for (let i = 0; i < 4; i++) {
+  const x = -2.2 + i * 1.25;
+  if (i === 2) { box(1.2, 2.3, 0.1, mat(0x101114), x, 1.15, L.backZ - 0.2); continue; } // pass to the kitchen
   box(1.2, 2.0, 0.6, steel, x, 1.0, L.backZ - 0.35);
   plane(1.05, 1.75, fridgeFace, x, 1.05, L.backZ - 0.04);
   box(0.04, 1.8, 0.03, mat(0x2a2d32), x, 1.05, L.backZ - 0.03);   // door split
 }
-box(9.2, 0.07, 0.02, glow(0xff8a5c), 0, 2.45, L.backZ - 0.02);
+box(5.0, 0.07, 0.02, glow(0xff8a5c), -0.3, 2.45, L.backZ - 0.02);
 // back kitchen (behind the line)
-box(4.6, 0.92, 0.7, steel, -2.3, 0.46, L.northZ + 0.5);
-box(3.0, 0.92, 0.7, steel, 3.3, 0.46, L.northZ + 0.5);
-cyl(0.25, 0.25, 0.3, 10, mat(0x9aa1ab), -3.2, 1.07, L.northZ + 0.5);
-box(1.2, 0.5, 0.6, mat(0x5b616a), 1.0, 2.2, L.northZ + 0.45);
+box(0.7, 0.92, 1.3, steel, 2.1, 0.46, -1.15);    // side benches in the kitchen (v47: the rear wall now carries the fridges)
+box(0.7, 0.92, 1.3, steel, -3.4, 0.46, -1.75);
+cyl(0.25, 0.25, 0.3, 10, mat(0x9aa1ab), -3.4, 1.07, -1.95);
+box(1.0, 0.5, 0.8, mat(0x5b616a), -3.4, 2.3, -1.75);
 
 // rear wall behind the kitchen: full-height brushed stainless panels (L1052984, L1053624), a red light slit beside the events wall (L1053430)
-{ const sw = plane(9.0, 2.9, steel, 0.3, 1.47, L.northZ + 0.09);
-  for (let x = -4.0; x <= 4.6; x += 1.2) box(0.012, 2.9, 0.01, mat(0x5c6168), x, 1.47, L.northZ + 0.1);
-  box(0.07, 2.3, 0.03, glow(0xff2a1c), -4.5, 1.45, L.northZ + 0.11);
-  const rw = plane(0.9, 1.6, new THREE.MeshBasicMaterial({ color: 0xff2a1c, transparent: true, opacity: 0.18, depthWrite: false, blending: THREE.AdditiveBlending }), -4.5, 1.45, L.northZ + 0.12); rw.userData.keep = true; }
+{ const sw = plane(6.7, 2.9, steel, -0.87, 1.47, L.northZ + 0.09);
+  for (let x = -4.0; x <= 2.4; x += 1.2) box(0.012, 2.9, 0.01, mat(0x5c6168), x, 1.47, L.northZ + 0.1);
+  box(0.07, 2.3, 0.03, glow(0xff2a1c), -4.45, 1.45, L.frontZ + 0.11);
+  const rw = plane(0.9, 1.6, new THREE.MeshBasicMaterial({ color: 0xff2a1c, transparent: true, opacity: 0.18, depthWrite: false, blending: THREE.AdditiveBlending }), -4.45, 1.45, L.frontZ + 0.12); rw.userData.keep = true; }
 // exposed silver ducts under the black ceiling, over the back kitchen
-cyl(0.16, 0.16, 9.0, 12, mat(0xaab0b8), 0.3, 2.98, L.northZ + 0.55).rotation.z = Math.PI / 2;
-for (let x = -4; x <= 4; x += 4) cyl(0.17, 0.17, 0.05, 12, mat(0x6d737b), x, 2.98, L.northZ + 0.55).rotation.z = Math.PI / 2;
+cyl(0.16, 0.16, 6.6, 12, mat(0xaab0b8), -0.87, 2.98, L.northZ + 0.55).rotation.z = Math.PI / 2;
+for (let x = -4; x <= 2; x += 3) cyl(0.17, 0.17, 0.05, 12, mat(0x6d737b), x, 2.98, L.northZ + 0.55).rotation.z = Math.PI / 2;
 
 // washrooms (right)
-box(0.12, H, 3.0, wallMat, L.eastX - 1.6, H / 2, L.northZ + 1.5);
-box(0.04, 2.1, 0.85, mat(0x3b2a22), L.eastX - 1.66, 1.05, L.northZ + 2.4);
+// (v47) built in full further down: curtain, lobby, double basin, two washlet cubicles
 
 // ceiling LED outline above the counter (the white light loop in the photos)
 const ledMat = glow(0xdfe6f5);
-const ledPts = [[-5.4, -1.3], [-5.4, 2.55], [-4.75, 3.2], [5.05, 3.2], [5.7, 2.55], [5.7, -1.3]];
+const ledPts = [[-5.35, -1.0], [-5.35, 2.6], [-4.75, 3.25], [4.5, 3.25], [5.15, 2.6], [5.15, 0.1]];
 for (let i = 0; i < ledPts.length - 1; i++) {
   const [ax, az] = ledPts[i], [bx, bz] = ledPts[i + 1];
   const len = Math.hypot(bx - ax, bz - az);
@@ -365,15 +390,163 @@ for (let i = 0; i < ledPts.length - 1; i++) {
 }
 // exposed ducts (painted black ceiling services)
 
+
+// ---------- (v47) the end of the room, off the plan: header + black curtain, toilet lobby, double basin, two washlet cubicles ----------
+// Dominic, Oct 15: "only 1 light up wall which is the long hallway … the back wall … is where the curtain and 2 toilets are";
+// the toilets are Japanese washlets (lid opens as you walk up, closes as you leave); the cubicle light comes on as you step in.
+const WC = { lids: [], cubes: [], curtain: [], taps: [] };
+{
+  const cx = L.eastX, [, czA] = PLAN(0, 1430);            // curtain line, from the plan's dashed line (fy 1430) to the long wall
+  const [, zTop] = PLAN(0, 1295), [, zD1a] = PLAN(0, 1395), [, zPart] = PLAN(0, 1517), [, zD2b] = PLAN(0, 1655), [, zBot] = PLAN(0, 1900);
+  const x0 = L.wcX0, x1 = L.wcX1;
+  const [vx0, vz0] = PLAN(3525, 1135), [vx1, vz1] = PLAN(3580, 1295);   // double basin vanity
+  const basinWallX = PLAN(3595, 0)[0];
+  const tile = new THREE.MeshLambertMaterial({ color: 0x222120, emissive: 0x1c1a16 }); WC.tile = tile;   // toilet walls: neutral dark tile (no photo of the toilets yet: placeholder finish)
+  const doorMat = mat(0x1a1a1e), chromeM = mat(0xc8ccd2), white = new THREE.MeshLambertMaterial({ color: 0xf4f2ee, emissive: 0x2a2a2a });
+  // toilet block walls
+  wallXZ(basinWallX, -0.4, basinWallX, zTop, tile);              // wall behind the basins
+  wallXZ(x0, zTop, basinWallX, zTop, tile);                      // top of the cubicle block
+  wallXZ(x0, zTop, x0, zD1a, tile);                              // lobby side, up to door 1
+  wallXZ(x0, zPart - 0.03, x0, zPart + 0.03, tile);              // between the two doors
+  wallXZ(x0, zD2b, x0, zBot, tile);                              // below door 2
+  wallXZ(x0, zPart, x1, zPart, tile);                            // partition between the cubicles
+  wallXZ(x1, zTop, x1, zBot, tile);                              // back wall (cisterns)
+  wallXZ(x0, zBot, x1 + 0.09, zBot, tile);                       // stair behind, below the cubicles
+  const [sx] = PLAN(3430, 0);
+  wallXZ(sx, zBot, sx, L.southZ, tile);                          // lobby ends at the stair wall
+  box(0.04, 2.1, 0.8, doorMat, sx - 0.03, 1.05, (zBot + L.southZ) / 2);   // stair door (closed, staff)
+  // floor tiles + ceiling light panel per cubicle; the light comes on when you step in
+  for (const [za, zb] of [[zTop, zPart], [zPart, zBot]]) {
+    const fm = new THREE.MeshLambertMaterial({ color: 0x8d8780, emissive: 0x000000 });
+    const f = plane(x1 - x0, zb - za, fm, (x0 + x1) / 2, 0.065, (za + zb) / 2); f.rotation.x = -Math.PI / 2;
+    const lm = new THREE.MeshBasicMaterial({ color: 0x3a3833 });
+    const lp = plane(0.5, 0.5, lm, (x0 + x1) / 2, H - 0.02, (za + zb) / 2); lp.rotation.x = Math.PI / 2;
+    WC.cubes.push({ x0, x1, z0: za, z1: zb, fm, lm, k: 0 });
+  }
+  // doors: both hinge at the partition and open out into the lobby (as drawn), shown standing open
+  for (const [hz, len, a] of [[zPart - 0.05, zPart - 0.05 - zD1a, 1.4], [zPart + 0.05, zD2b - zPart - 0.05, -1.4]]) {
+    const g = new THREE.Group(); g.position.set(x0, 0, hz); scene.add(g);
+    const leaf = box(0.04, 2.05, len, doorMat, 0, 1.03, a > 0 ? -len / 2 : len / 2, g);
+    box(0.06, 0.03, 0.12, chromeM, -0.04, 1.0, a > 0 ? -len + 0.08 : len - 0.08, g);
+    g.rotation.y = a;
+  }
+  // double basin vanity + mirror
+  const vcx = (basinWallX + vx0) / 2 - 0.05, vd = basinWallX - vx0 + 0.15;
+  box(vd, 0.08, vz1 - vz0 + 0.1, mat(0x2b2724), vcx, 0.85, (vz0 + vz1) / 2);
+  box(vd - 0.06, 0.7, vz1 - vz0, mat(0x1e1c1b), vcx + 0.02, 0.45, (vz0 + vz1) / 2);
+  SOLID.push([vcx - vd / 2, vz0 - 0.05, basinWallX, vz1 + 0.05]);
+  for (const bz of [PLAN(0, 1155)[1], PLAN(0, 1245)[1]]) {
+    const b = cyl(0.15, 0.1, 0.12, 16, white, vcx - 0.02, 0.93, bz); b.scale.set(0.8, 1, 1);
+    cyl(0.012, 0.012, 0.2, 6, chromeM, basinWallX - 0.09, 1.0, bz);
+    box(0.14, 0.012, 0.012, chromeM, basinWallX - 0.15, 1.09, bz);
+  }
+  const mir = new THREE.MeshPhongMaterial({ color: 0x9aa4ad, shininess: 120, specular: 0xffffff, emissive: 0x111418 });
+  plane(0.82, 0.9, mir, basinWallX - 0.07, 1.55, (vz0 + vz1) / 2, -Math.PI / 2);
+  box(0.02, 0.04, 0.9, glow(0xffe6c4), basinWallX - 0.08, 2.05, (vz0 + vz1) / 2);   // warm strip over the mirror
+  // the two washlets (TOTO-style: rounded elongated bowl, seat with the side control arm, low cistern)
+  const toiletGeo = { ped: new THREE.CylinderGeometry(0.13, 0.11, 0.36, 16), rim: new THREE.CylinderGeometry(0.19, 0.17, 0.07, 20), lid: new THREE.CylinderGeometry(0.195, 0.195, 0.025, 20) };
+  for (const tz of [PLAN(0, 1460)[1], PLAN(0, 1608)[1]]) {
+    const tx = x1 - 0.42;   // bowl centre; faces −x (toward the door)
+    const g = new THREE.Group(); g.position.set(tx, 0, tz); scene.add(g);
+    const ped = new THREE.Mesh(toiletGeo.ped, white); ped.position.set(0.05, 0.18, 0); ped.scale.set(1.3, 1, 1); g.add(ped);
+    const rim = new THREE.Mesh(toiletGeo.rim, white); rim.position.set(0, 0.39, 0); rim.scale.set(1.35, 1, 1); g.add(rim);
+    const seat = new THREE.Mesh(toiletGeo.lid, mat(0xe9e6df)); seat.position.set(0, 0.44, 0); seat.scale.set(1.35, 1, 1); g.add(seat);
+    box(0.18, 0.12, 0.4, white, 0.27, 0.48, 0, g);                  // washlet body at the back
+    box(0.2, 0.36, 0.46, white, 0.34, 0.66, 0, g);                  // low cistern
+    box(0.21, 0.025, 0.47, mat(0xdedbd4), 0.34, 0.855, 0, g);
+    box(0.24, 0.05, 0.07, white, 0.02, 0.5, 0.25, g);              // side control arm (right hand)
+    for (let k = 0; k < 3; k++) box(0.03, 0.008, 0.03, glow(k ? 0x5fb8ff : 0xff8a3c), -0.06 + k * 0.05, 0.527, 0.25, g);
+    box(0.02, 0.08, 0.12, mat(0xb8bcc2), 0.5, 1.15, -0.35, g);     // paper holder
+    cyl(0.055, 0.055, 0.11, 10, white, 0.47, 1.1, -0.35, g).rotation.x = Math.PI / 2;
+    // lid on a hinge at the back of the seat; lies flat when closed, swings up ~100° when it opens
+    const hinge = new THREE.Group(); hinge.position.set(0.2, 0.47, 0); g.add(hinge);
+    const lid = new THREE.Mesh(toiletGeo.lid, white); lid.position.set(-0.2, 0, 0); lid.scale.set(1.35, 1, 1); hinge.add(lid);
+    WC.lids.push({ hinge, x: tx, z: tz, k: 0, want: 0, tap: 0 });
+    SOLID.push([tx - 0.3, tz - 0.24, x1, tz + 0.24]);
+    WC.taps.push({ g, l: WC.lids[WC.lids.length - 1] });
+  }
+  // black velvet curtain, floor to ceiling, one run across the whole end wall (Kurate RORU-32/33), parting where you walk through
+  const curtMat = new THREE.MeshLambertMaterial({ color: 0x141418, side: THREE.DoubleSide });
+  const split = (czA + L.southZ) / 2 - 0.15;
+  WC.split = split;
+  for (const [za, zb] of [[-0.35, split], [L.southZ, split]]) {
+    const w = Math.abs(zb - za), geo = new THREE.PlaneGeometry(w, H - 0.08, Math.max(12, Math.round(w * 22)), 1);
+    const p = geo.attributes.position;
+    for (let i = 0; i < p.count; i++) { const u = p.getX(i) + w / 2; p.setZ(i, Math.sin(u * Math.PI * 2 / 0.2) * 0.035); p.setX(i, u); }
+    geo.computeVertexNormals();
+    const g = new THREE.Group(); g.position.set(cx + 0.02, 0, za); scene.add(g);
+    const m = new THREE.Mesh(geo, curtMat); m.position.y = (H - 0.08) / 2; m.rotation.y = zb > za ? -Math.PI / 2 : Math.PI / 2; g.add(m);
+    box(0.03, 0.03, w, chromeM, 0, H - 0.05, (zb - za) / 2, g);         // ceiling track
+    WC.curtain.push({ g, w, dir: Math.sign(zb - za), k: 0 });
+  }
+  SOLID.push([cx - 0.05, -0.4, cx + 0.05, split - 0.55], [cx - 0.05, split + 0.55, cx + 0.05, L.southZ]);
+  // the sign at the hallway: Toilets / 洗手間
+  const sm = new THREE.MeshBasicMaterial({ map: textTexture(['TOILETS  洗手間'], { w: 1024, h: 200, font: '800 104px Geist, "PingFang HK", "Noto Sans CJK TC", "Noto Sans TC", sans-serif', color: '#F6F3E7', bg: '#111216' }) });
+  const sg = plane(1.1, 0.215, sm, cx - 0.12, 2.82, split, -Math.PI / 2);
+  box(0.012, 0.36, 0.012, chromeM, cx - 0.12, 3.03, split - 0.45); box(0.012, 0.36, 0.012, chromeM, cx - 0.12, 3.03, split + 0.45);   // hangs from the ceiling
+  box(0.012, 0.012, 1.1, glow(ORANGE), cx - 0.125, 2.7, split);
+  // back of house around the room (stairs, store rooms, building lobby): plain blocks up to the first floor
+  const boh = mat(0x2a2b31);
+  for (const [a, b, c, d] of [[-7.32, -4.5, -4.34, -2.17], [-4.34, -4.5, 10.1, -2.59], [2.59, -2.59, 10.1, -0.48], [x1 + 0.13, -0.48, 10.1, 4.45], [basinWallX + 0.08, -0.48, x1 + 0.13, zTop - 0.04], [sx + 0.08, zBot + 0.08, x1 + 0.13, 4.45]])
+    box(c - a, 3.33, d - b, boh, (a + c) / 2, 3.33 / 2, (b + d) / 2);
+}
+function stepWC(dt, cam, walking, t) {
+  // lids: open when you are within ~1.25 m in walk mode (or after a tap), close as you leave
+  for (const l of WC.lids) {
+    const near = walking && Math.hypot(cam.x - l.x, cam.z - l.z) < 1.25 && Math.abs(cam.z - l.z) < 0.6;
+    if (l.tap > 0) l.tap -= dt;
+    l.want = near || l.tap > 0 ? 1 : 0;
+    l.k += (l.want - l.k) * Math.min(1, dt * (l.want ? 2.2 : 1.6));
+    const e = l.k * l.k * (3 - 2 * l.k);
+    l.hinge.rotation.z = -1.78 * e;
+  }
+  // cubicle lights
+  let anyIn = 0;
+  for (const c of WC.cubes) {
+    const inside = walking && cam.x > c.x0 - 0.05 && cam.x < c.x1 && cam.z > c.z0 && cam.z < c.z1;
+    c.k += ((inside ? 1 : 0) - c.k) * Math.min(1, dt * 4);
+    anyIn = Math.max(anyIn, c.k);
+    c.lm.color.setRGB(0.23 + 0.77 * c.k, 0.22 + 0.76 * c.k, 0.2 + 0.7 * c.k);
+    c.fm.emissive.setRGB(0.16 * c.k, 0.15 * c.k, 0.13 * c.k);
+  }
+  WC.tile.emissive.setRGB(0.05 + 0.1 * anyIn, 0.043 + 0.08 * anyIn, 0.032 + 0.05 * anyIn);   // warm light comes up
+  // curtain: the two panels gather to the sides as you come close, with a little sway
+  const dc = walking ? Math.hypot(cam.x - L.eastX, cam.z - WC.split) : 9;
+  for (const c of WC.curtain) {
+    const want = dc < 1.7 ? 1 : 0;
+    c.k += (want - c.k) * Math.min(1, dt * 2.4);
+    c.g.scale.z = 1 - Math.min(0.62, 0.95 / c.w) * c.k;
+    c.g.rotation.z = Math.sin(t * 1.9 + c.dir) * 0.012 * (0.3 + c.k);
+  }
+}
+// tap a toilet (walk mode) and its lid opens for a few seconds
+{ const rc = new THREE.Raycaster(), nd = new THREE.Vector2(); let d0 = null;
+  canvas.addEventListener('pointerdown', (e) => { d0 = { x: e.clientX, y: e.clientY }; });
+  canvas.addEventListener('pointerup', (e) => {
+    if (!d0 || Math.hypot(e.clientX - d0.x, e.clientY - d0.y) > 10) { d0 = null; return; } d0 = null;
+    nd.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); rc.setFromCamera(nd, camera);
+    for (const t of WC.taps) if (rc.intersectObject(t.g, true).length) { t.l.tap = 6; break; }
+  }); }
+
 // stools: 26 seats (6 on each leg, 14 on the long run) — straight from the floor plan
 // stools as in his photos (DSC07596, DSC07643): taupe leather seat, curved padded back rail, dark wood legs, chrome foot ring
-const stoolSeat = mat(0x8f775c), stoolFrame = mat(0x3a2418), chrome = mat(0x9ea4ab);
+const stoolSeat = mat(0xd8cbb2),   // v47: cream upholstery (Kurate photos)
+     _sOld = 0, stoolFrame = mat(0x3a2418), chrome = mat(0x9ea4ab);
 const plateRim = mat(0x6f9a94), plateIn = mat(0xe6e0d4), chopMat = mat(0x2a1a12), porcelain = mat(0xf1eee6);
 const seats = [];
-const legZs = [-0.7, -0.2, 0.3, 0.8, 1.3, 1.8];
-for (const z of legZs) seats.push({ x: L.XL - 0.62, z, side: 'L' });
-for (let i = 0; i < 14; i++) seats.push({ x: L.XL + 0.45 + i * (L.XR - L.XL - 0.9) / 13, z: L.F + 0.62, side: 'F' });
-for (const z of legZs) seats.push({ x: L.XR + 0.62, z, side: 'R' });
+// (v47) counted and placed off the plan: 6 on the left leg + the corner seat, 14 on the long run (5, a column, 9),
+// 5 on the shorter right leg = 26. Positions are the plan's stool centres, pulled ~0.1 m in toward the counter.
+for (const fy of [1100, 1210, 1340, 1445, 1550, 1655]) seats.push({ x: L.XL - 0.8, z: PLAN(0, fy)[1], side: 'L' });
+seats.push({ x: L.XL - 0.66, z: L.F + 0.55, side: 'C' });
+for (const fx of [1033, 1165, 1297, 1426, 1558, 1823, 1943, 2059, 2173, 2288, 2404, 2520, 2635, 2746]) seats.push({ x: PLAN(fx, 0)[0], z: L.F + 0.75, side: 'F' });
+for (const fy of [1290, 1392, 1493, 1596, 1698]) seats.push({ x: L.XR + 0.8, z: PLAN(0, fy)[1], side: 'R' });
+// columns where the plan draws them (one in the left leg, two in the long-run stool line); stainless-clad in his photos
+const colMat = new THREE.MeshPhongMaterial({ color: 0x7d858d, specular: 0xffffff, shininess: 140 });   // mirror-polished stainless cladding (Kurate RORU-32/33/35)
+for (const [fx0, fy0, fx1, fy1] of [[935, 1205, 1065, 1285], [1620, 1755, 1720, 1867], [2805, 1755, 2947, 1867]]) {
+  const [x0, z0] = PLAN(fx0, fy0), [x1, z1] = PLAN(fx1, fy1);
+  box(x1 - x0, H, z1 - z0, colMat, (x0 + x1) / 2, H / 2, (z0 + z1) / 2); SOLID.push([x0, z0, x1, z1]);
+}
+SOLID.push([-4.26, L.northZ, 2.51, -0.28], [3.5, -0.4, 4.4, 0.72]);   // the kitchen and the bar flap are staff only
 const _arcGeo = new THREE.TorusGeometry(0.21, 0.034, 6, 16, Math.PI);
 const _ringGeo = new THREE.TorusGeometry(0.165, 0.009, 4, 18);
 seats.forEach((s, si) => {
@@ -381,6 +554,7 @@ seats.forEach((s, si) => {
   if (s.side === 'F') { s.face = Math.PI; s.chef = { x: s.x, z: L.F - 0.6 }; s.chefFace = 0; s.plate = { x: s.x, z: L.F + 0.2 }; }
   if (s.side === 'L') { s.face = Math.PI / 2; s.chef = { x: L.XL + 0.6, z: s.z }; s.chefFace = -Math.PI / 2; s.plate = { x: L.XL - 0.2, z: s.z }; }
   if (s.side === 'R') { s.face = -Math.PI / 2; s.chef = { x: L.XR - 0.6, z: s.z }; s.chefFace = Math.PI / 2; s.plate = { x: L.XR + 0.2, z: s.z }; }
+  if (s.side === 'C') { s.face = 3 * Math.PI / 4; s.chef = { x: L.XL + 0.55, z: L.F - 0.55 }; s.chefFace = -Math.PI / 4; s.plate = { x: L.XL - 0.18, z: L.F + 0.18 }; }
   const bx = -Math.sin(s.face), bz = -Math.cos(s.face);   // toward the stool's back (away from the counter)
   const px = -bz, pz = bx;
   cyl(0.2, 0.19, 0.08, 14, stoolSeat, s.x, 0.72, s.z);
@@ -393,7 +567,7 @@ seats.forEach((s, si) => {
   const _n0 = scene.children.length;
   cyl(0.125, 0.115, 0.012, 16, plateRim, s.plate.x, L.CH + 0.036, s.plate.z);
   cyl(0.1, 0.1, 0.014, 16, plateIn, s.plate.x, L.CH + 0.038, s.plate.z);
-  const ch = box(0.22, 0.008, 0.012, chopMat, s.plate.x + 0.15 * bx, L.CH + 0.035, s.plate.z + 0.15 * bz); ch.rotation.y = s.side === 'F' ? 0 : Math.PI / 2;
+  const ch = box(0.22, 0.008, 0.012, chopMat, s.plate.x + 0.15 * bx, L.CH + 0.035, s.plate.z + 0.15 * bz); ch.rotation.y = s.side === 'F' ? 0 : s.side === 'C' ? Math.PI / 4 : Math.PI / 2;
   cyl(0.04, 0.035, 0.015, 10, porcelain, s.plate.x - 0.16 * px + 0.06 * ux, L.CH + 0.038, s.plate.z - 0.16 * pz + 0.06 * uz);
   if (si % 3 === 1) { const tx = s.plate.x - 0.17 * px - 0.06 * ux, tz = s.plate.z - 0.17 * pz - 0.06 * uz; cyl(0.022, 0.045, 0.1, 10, porcelain, tx, L.CH + 0.08, tz); cyl(0.012, 0.022, 0.05, 10, porcelain, tx, L.CH + 0.155, tz); }
   for (let k = _n0; k < scene.children.length; k++) scene.children[k].userData.setting = true;   // cleared when the shop is closed
@@ -408,7 +582,7 @@ seats.forEach((s, si) => {
       cyl(0.016, 0.006, 0.07, 5, bloom, vx + Math.cos(a) * tl * 1.1, L.CH + 0.06 + h, vz + Math.sin(a) * tl * 1.1); } } }
 
 // ---------- DJ booth (on the plan against the glass, DJ faces into the room) ----------
-const dj = { x: -6.55, z: 1.55 };
+const dj = { x: -6.53, z: 2.27 };   // v47: plan PLAN(420..590, 1515..1860)
 box(0.7, 1.0, 1.5, mat(0x121216), dj.x, 0.5, dj.z);
 box(0.02, 0.06, 1.5, glow(ORANGE), dj.x + 0.36, 0.12, dj.z);
 const boothFront = plane(1.5, 0.55, new THREE.MeshBasicMaterial({ map: textTexture('RORUBARU', { font: '900 150px Geist, sans-serif', color: '#F64501' }), transparent: true }), dj.x + 0.356, 0.62, dj.z, Math.PI / 2);
@@ -421,6 +595,7 @@ for (const dz of [-0.45, 0.45]) {
 }
 box(0.36, 0.05, 0.3, mat(0x1a1b1f), dj.x, 1.06, dj.z);
 for (let i = 0; i < 4; i++) box(0.04, 0.012, 0.04, glow(i % 2 ? 0x37e3ff : 0xff3dbb), dj.x + 0.1, 1.09, dj.z - 0.1 + i * 0.065);
+SOLID.push([dj.x - 0.4, dj.z - 1.3, dj.x + 0.4, dj.z + 1.3]);
 // speakers
 for (const dz of [-1.05, 1.05]) { box(0.38, 0.62, 0.38, mat(0x101013), dj.x, 1.35, dj.z + dz); cyl(0.1, 0.1, 0.02, 12, mat(0x2b2c31), dj.x + 0.2, 1.4, dj.z + dz).rotation.z = Math.PI / 2; }
 
@@ -579,10 +754,10 @@ function spawnArrival(direct = false) {
 }
 const freeSeats = () => seats.filter(s => !s.occupied && !s.reserved);
 function seatPath(s) {
-  const p = [{ x: -8.0, z: L.doorZ }, { x: L.glassX + 0.6, z: L.doorZ }, { x: L.walkX, z: L.doorZ + 0.7 }];
-  if (s.side === 'L') p.push({ x: L.walkX, z: s.z }, { x: s.x, z: s.z });
+  const p = [{ x: -8.0, z: L.doorZ }, { x: L.glassX + 0.6, z: L.doorZ }, { x: L.walkX, z: L.doorZ - 0.1 }];
+  if (s.side === 'L' || s.side === 'C') p.push({ x: L.walkX, z: s.z }, { x: s.x, z: s.z });
   else if (s.side === 'F') p.push({ x: L.walkX, z: L.corrZ }, { x: s.x, z: L.corrZ }, { x: s.x, z: s.z });
-  else p.push({ x: L.walkX, z: L.corrZ }, { x: 6.05, z: L.corrZ }, { x: 6.05, z: s.z }, { x: s.x, z: s.z });
+  else p.push({ x: L.walkX, z: L.corrZ }, { x: L.aisleR, z: L.corrZ }, { x: L.aisleR, z: s.z }, { x: s.x, z: s.z });
   return p;
 }
 function seatGuest(g, s, direct = false) {
@@ -592,7 +767,7 @@ function seatGuest(g, s, direct = false) {
     s.reserved = false; s.occupied = g; g.state = 'seated';
     g.place(s.x, s.z); g.sit(s.face);
     g.cup = new THREE.Mesh(G.cup, mat(CREAM)); scene.add(g.cup);
-    const off = s.side === 'F' ? [0.22, 0] : [0, s.side === 'L' ? -0.22 : 0.22];
+    const off = s.side === 'F' ? [0.22, 0] : s.side === 'C' ? [0.2, -0.06] : [0, s.side === 'L' ? -0.22 : 0.22];
     g.cup.position.set(s.plate.x + off[0], L.CH + 0.06, s.plate.z + off[1]);
     order(g);
     g.setAnim(guestIdle);
@@ -651,7 +826,7 @@ function guestIdle(p, t, dt) {
 }
 
 // chefs (black tees, grey aprons, caps — as on opening night)
-const CHEF_HOMES = [-3.4, -1.9, -0.4, 1.1, 2.6, 3.9].map(x => ({ x, z: 0.95 }));
+const CHEF_HOMES = [-3.3, -1.9, -0.5, 0.9, 2.3, 3.2].map(x => ({ x, z: 1.05 }));
 CHEF_HOMES.forEach((h, i) => {
   const c = new Person({ shirt: 0x17171a, pants: 0x1c1c20, apron: 0x6f737b, cap: i === 2 ? ORANGE : (i % 2 ? 0x111111 : CREAM), speed: 1.7, scale: 1 });
   c.place(h.x, h.z); c.home = h; c.state = 'idle'; c.heading = c.targetHeading = Math.PI; c.group.rotation.y = Math.PI;
@@ -734,10 +909,10 @@ djP.setAnim((p, t) => {
   if (t % 16 > 13) p.arms[0].rotation.x = -2.6 + Math.sin(beat) * 0.2; // hands up for the drop
 });
 const host = new Person({ shirt: 0x17171a, pants: 0x1c1c20, speed: 1 });
-host.place(-6.2, -0.95); host.heading = host.targetHeading = -2.3; host.group.rotation.y = -2.3;
+host.place(-6.55, 0.85); host.heading = host.targetHeading = Math.PI; host.group.rotation.y = Math.PI;
 const cook = new Person({ shirt: 0xf6f3e7, pants: 0x1c1c20, apron: 0x6f737b, cap: 0x111111, speed: 1.1 });
-cook.place(-2.5, L.northZ + 1.2);
-function cookLoop() { cook.go([{ x: 2.8, z: L.northZ + 1.2 }], () => { cook.targetHeading = Math.PI; cook.setAnim(chefRolling); setTimeoutSim(() => { cook.setAnim(null); cook.head.rotation.x = 0; cook.go([{ x: -2.5, z: L.northZ + 1.2 }], () => { cook.targetHeading = Math.PI; cook.setAnim(chefRolling); setTimeoutSim(() => { cook.setAnim(null); cook.head.rotation.x = 0; cookLoop(); }, 5); }); }, 4); }); }
+cook.place(-1.9, -1.2);
+function cookLoop() { cook.go([{ x: 1.4, z: -1.2 }], () => { cook.targetHeading = Math.PI; cook.setAnim(chefRolling); setTimeoutSim(() => { cook.setAnim(null); cook.head.rotation.x = 0; cook.go([{ x: -1.9, z: -1.2 }], () => { cook.targetHeading = Math.PI; cook.setAnim(chefRolling); setTimeoutSim(() => { cook.setAnim(null); cook.head.rotation.x = 0; cookLoop(); }, 5); }); }, 4); }); }
 const simTimers = [];
 function setTimeoutSim(fn, s) { simTimers.push({ fn, at: sim.t + s }); }
 cookLoop();
@@ -807,13 +982,13 @@ const keyChef = sim.chefs[2];
 const HOT = {
   menu:    { label: 'Menu',            anchor: new THREE.Vector3(0.9, 1.75, L.F + 0.1), view: { t: [0.2, 0.9, 2.0], az: -0.25, pol: 0.95, d: 10.5 } },
   build:   { label: 'How it’s rolled', anchor: () => _hotA.copy(keyChef.group.position).setY(2.15), view: { t: () => [keyChef.group.position.x, 1.2, 1.0], az: -0.12, pol: 1.0, d: 7.6 } },
-  dj:      { label: 'DJ night',        anchor: new THREE.Vector3(dj.x, 2.1, dj.z), view: { t: [-6.6, 1.1, 1.5], az: 1.12, pol: 1.04, d: 6.6 } },
+  dj:      { label: 'DJ night',        anchor: new THREE.Vector3(dj.x, 2.1, dj.z), view: { t: [-6.6, 1.1, dj.z], az: 1.12, pol: 1.04, d: 6.6 } },
   drinks:  { label: 'Drinks',          anchor: new THREE.Vector3(-2.2, 2.65, L.backZ - 0.3), view: { t: [-1.4, 1.2, -2.0], az: -0.1, pol: 1.05, d: 9.5 } },
   walkin:  { label: 'Walk-ins',        anchor: new THREE.Vector3(QX, 2.2, QZ0 - 1.3), view: { t: [-8.3, 0.8, -6.2], az: -0.9, pol: 0.95, d: 11 } },
-  visit:   { label: 'Visit',           anchor: new THREE.Vector3(L.glassX - 0.3, 2.6, L.doorZ - 1.35), view: { t: [-7.6, 1.2, -2.9], az: -1.2, pol: 1.05, d: 9.5 } },
+  visit:   { label: 'Visit',           anchor: new THREE.Vector3(L.glassX - 0.3, 2.6, L.doorZ - 1.35), view: { t: [-7.6, 1.2, L.doorZ], az: -1.2, pol: 1.05, d: 9.5 } },
   central: { label: 'Central · coming soon', anchor: new THREE.Vector3(CENTRAL.x, 6.7, CENTRAL.z), view: { t: [CENTRAL.x, 2.0, CENTRAL.z + 4], az: -0.75, pol: 0.86, d: 30 } },
   events:  { label: 'Events',     anchor: new THREE.Vector3(EVW.x + 1.5, EVW.y + EVW.h / 2 + 1.75, EVW.z + 0.2), view: { t: [EVW.x + 0.3, 1.95, EVW.z + 0.4], az: -0.22, pol: 1.36, d: 4.4 } },
-  delivery: { label: 'Delivery', anchor: new THREE.Vector3(L.glassX, 0.3, 2.5), view: { t: [-7.6, 1.2, -2.9], az: -1.2, pol: 1.05, d: 9.5 } },
+  delivery: { label: 'Delivery', anchor: new THREE.Vector3(L.glassX, 0.3, 2.5), view: { t: [-7.6, 1.2, L.doorZ], az: -1.2, pol: 1.05, d: 9.5 } },
   lunch:   { view: { t: [2.6, 0.9, 2.0], az: 0.12, pol: 0.92, d: 10.5 } },
   social:  { label: 'IG · FB',         anchor: new THREE.Vector3(3.35, 1.55, L.F + 0.13), view: { t: [3.2, 1.0, 2.2], az: 0.3, pol: 0.82, d: 5.2 } },
 };
@@ -821,10 +996,10 @@ const _hotA = new THREE.Vector3();
 // proxies (what a tap on the 3D room hits)
 proxy('menu', L.XR - L.XL + 1.6, 1.3, 1.3, (L.XL + L.XR) / 2, 0.65, L.F);
 proxy('menu', 1.3, 1.3, L.F - L.ZB + 0.6, L.XL, 0.65, (L.F + L.ZB) / 2);
-proxy('menu', 1.3, 1.3, L.F - L.ZB + 0.6, L.XR, 0.65, (L.F + L.ZB) / 2);
+proxy('menu', 1.3, 1.3, L.F - L.ZBR + 0.6, L.XR, 0.65, (L.F + L.ZBR) / 2);
 for (const c of sim.chefs) { proxy('build', 0.75, 1.9, 0.75, 0, 0.95, 0, c.group); }
 proxy('dj', 1.3, 2.2, 3.8, dj.x, 1.1, dj.z);
-proxy('drinks', 9.4, 2.5, 0.9, 0, 1.25, L.backZ - 0.3);
+proxy('drinks', 5.2, 2.5, 0.9, -0.3, 1.25, L.backZ - 0.3);
 proxy('walkin', 1.8, 2.2, 10, QX, 1.1, QZ0 - 4.6);
 proxy('visit', 1.2, 3.2, 2.6, L.glassX - 0.2, 1.6, L.doorZ - 0.4);
 proxy('central', 2.2, 7, 2.2, CENTRAL.x, 3.5, CENTRAL.z);
@@ -1071,8 +1246,13 @@ camera.far = 3200; camera.updateProjectionMatrix();
 scene.fog = new THREE.Fog(0x0b0d12, 150, 640);
 // pieces that only exist while you walk inside: a ceiling and the full-height side wall
 const walkShell = new THREE.Group(); walkShell.visible = false; scene.add(walkShell);
-box(L.eastX - L.glassX, 0.08, L.southZ - L.northZ, mat(0x1b1b20), (L.eastX + L.glassX) / 2, H + 0.06, (L.southZ + L.northZ) / 2, walkShell);
-box(L.eastX - L.glassX, H - 1.05, 0.16, wallMat, (L.eastX + L.glassX) / 2, 1.05 + (H - 1.05) / 2, L.southZ, walkShell);
+box(L.wcX1 + 0.1 - L.glassX, 0.08, L.southZ - L.northZ, mat(0x1b1b20), (L.wcX1 + 0.1 + L.glassX) / 2, H + 0.06, (L.southZ + L.northZ) / 2, walkShell);
+box(L.wcX1 + 0.1 - L.glassX, H - 1.05, 0.16, wallMat, (L.wcX1 + 0.1 + L.glassX) / 2, 1.05 + (H - 1.05) / 2, L.southZ, walkShell);
+// (v47) at eye level the long hallway wall is the one lit wall, floor to ~2.7 m: backlit stone behind mesh in black steel frames (Kurate RORU-30/32)
+box(L.eastX - L.glassX - 0.5, 1.62, 0.03, tealPanel, (L.eastX + L.glassX) / 2 + 0.05, 1.04 + 0.81, L.southZ - 0.1, walkShell);
+for (let x = -6.85; x <= L.eastX - 0.2; x += 1.2) box(0.05, 1.66, 0.05, frameBlk, x, 1.85, L.southZ - 0.12, walkShell);
+box(L.eastX - L.glassX - 0.4, 0.05, 0.12, frameBlk, (L.eastX + L.glassX) / 2, 2.67, L.southZ - 0.14, walkShell);
+cyl(0.13, 0.13, 12.4, 10, mat(0xaab0b8), -0.4, 2.92, 3.55, walkShell).rotation.z = Math.PI / 2;   // chrome duct along the hallway ceiling
 walkShell.children.forEach(worldUV);
 // a halo behind the ロールバール neon, on at night
 const haloTex = (() => { const c = document.createElement('canvas'); c.width = 256; c.height = 128; const g = c.getContext('2d'); const gr = g.createRadialGradient(128, 64, 4, 128, 64, 120); gr.addColorStop(0, 'rgba(120,200,255,0.75)'); gr.addColorStop(1, 'rgba(60,140,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 256, 128); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
@@ -1135,7 +1315,7 @@ shopPin.el.type = 'button'; shopPin.el.addEventListener('click', () => setMode('
 function updateCityLabels() {
   const cp = camera.position; let shown = 0;
   for (const l of cityLabels) {
-    let on = l.modes.includes(mode) && !document.body.classList.contains('panel-open') && cp.distanceTo(l.pos) < l.maxD;
+    let on = l.modes.includes(mode) && !document.body.classList.contains('panel-open') && cp.distanceTo(l.pos) < l.maxD && !(mode === 'walk' && WALK.indoors);
     let s;
     if (on) { s = project(l.pos); on = s.vis && s.x > -40 && s.x < innerWidth + 40 && s.y > 60 && s.y < innerHeight - 70; }
     if (on && l.kind.startsWith('road') && mode === 'street' && !l.kind.includes('major') && shown > 22) on = false;
@@ -1187,18 +1367,39 @@ const hint = document.getElementById('hint');
 
 const WALK = { s: 0, yaw: 0, pitch: -0.03, auto: true, speed: params.has('walkspeed') ? +params.get('walkspeed') : 4.4, userYaw: 0, userPitch: 0, lastLook: 0, pos: new THREE.Vector3(), keys: {}, joy: { x: 0, y: 0 }, arrived: false, bob: 0 };
 const walkHud = document.getElementById('walkHud'), walkWhere = document.getElementById('walkWhere'), walkAuto = document.getElementById('walkAuto'), arriveEl = document.getElementById('arrive');
-const DOOR_S = city.walkDoor, TURN_S = city.walkTurn;
+// (v47) the walk no longer stops at the door: it goes in, past reception and the DJ booth, along the counter
+// and the lit hallway, through the curtain and into the second toilet. The street part is city.js's route.
+const WP = (() => {
+  const st = city.walk.p, k = st.findIndex((q) => q[1] < 30 && q[0] < -9);   // the old door approach starts here
+  const pts = st.slice(0, k > 0 ? k : st.length).map((q) => [q[0], q[1]]);
+  const inside = [[-9.7, 0.2], [-8.9, L.doorZ], [L.glassX, L.doorZ], [-6.35, L.doorZ - 0.05], [L.walkX, -0.45], [L.walkX, 3.05], [-5.0, L.corrZ], [5.05, L.corrZ],
+    [5.55, 3.05], [L.eastX, WC.split], [6.42, WC.split - 0.2], [6.42, 1.86], [6.7, 1.87], [6.74, 1.88]];
+  return new Path(pts.concat(inside).flat());
+})();
+const DOOR_S = WP.nearest(L.glassX, L.doorZ).s, TURN_S = city.walkTurn;
+const IN_S = { reception: WP.nearest(L.walkX, -0.45).s, hall: WP.nearest(-5.0, L.corrZ).s, curtain: WP.nearest(5.05, L.corrZ).s, lobby: WP.nearest(6.42, WC.split - 0.2).s };
+// free walk inside the shop: circles slide along the SOLID footprints (walls, counter, columns, booth, toilets)
+function collide(p, r = 0.24) {
+  if (p.x < L.glassX - 0.3 || p.x > 10.2 || p.z < -4.6 || p.z > 4.5) return;   // only inside the building
+  for (const [x0, z0, x1, z1] of SOLID) {
+    const qx = Math.max(x0, Math.min(p.x, x1)), qz = Math.max(z0, Math.min(p.z, z1));
+    const dx = p.x - qx, dz = p.z - qz, d2 = dx * dx + dz * dz;
+    if (d2 >= r * r) continue;
+    if (d2 > 1e-8) { const d = Math.sqrt(d2), k = (r - d) / d; p.x += dx * k; p.z += dz * k; }
+    else { const o = [[p.x - x0 + r, -1, 0], [x1 - p.x + r, 1, 0], [p.z - z0 + r, 0, -1], [z1 - p.z + r, 0, 1]].sort((a, b) => a[0] - b[0])[0]; p.x += o[1] * o[0]; p.z += o[2] * o[0]; }
+  }
+}
 const _pa = { x: 0, z: 0 }, _pb = { x: 0, z: 0 };
 const angDiff = (a, b) => Math.atan2(Math.sin(a - b), Math.cos(a - b));
 function syncWalkUI() {
   if (walkAuto) { walkAuto.textContent = WALK.auto ? 'Pause' : (WALK.arrived ? 'Walk it again' : 'Resume the walk'); walkAuto.setAttribute('aria-pressed', String(WALK.auto)); }
 }
 function enterWalk(s0) {
-  WALK.s = Math.max(0, Math.min(city.walk.L, s0 ?? 0)); WALK.auto = true; WALK.arrived = false; WALK.userYaw = 0; WALK.userPitch = 0;
+  WALK.s = Math.max(0, Math.min(WP.L, s0 ?? 0)); WALK.auto = true; WALK.arrived = false; WALK.userYaw = 0; WALK.userPitch = 0;
   fly.on = false; controls.enabled = false; controls.autoRotate = false; viewOff = [0, 0]; camera.clearViewOffset();
   city.setGhost(false); walkShell.visible = true;
   camera.fov = innerWidth / innerHeight < 0.9 ? 72 : 62; camera.near = 0.08; camera.updateProjectionMatrix();
-  city.walk.at(WALK.s, _pa); city.walk.at(WALK.s + 6, _pb); WALK.pos.set(_pa.x, 1.62, _pa.z); WALK.yaw = Math.atan2(_pb.x - _pa.x, _pb.z - _pa.z);
+  WP.at(WALK.s, _pa); WP.at(WALK.s + 6, _pb); WALK.pos.set(_pa.x, 1.62, _pa.z); WALK.yaw = Math.atan2(_pb.x - _pa.x, _pb.z - _pa.z);
   walkHud.hidden = false; arriveEl.hidden = true; hint.classList.add('gone');
   syncWalkUI(); stepWalk(0);
 }
@@ -1208,9 +1409,9 @@ function exitWalk() {
   controls.target.copy(camera.position).addScaledVector(f, 10).setY(0.4);
   camera.fov = (innerWidth / innerHeight < 0.9 ? VIEW.tall : VIEW.wide).fov; camera.updateProjectionMatrix();
 }
-const END_YAW = Math.atan2(5.6, 2.6); // last steps: turn to face the counter and the chefs
+const END_YAW = Math.PI / 2; // (v47) last steps: inside the second cubicle, facing the washlet
 function stepWalk(dt) {
-  const P = city.walk;
+  const P = WP;
   const kx = (WALK.keys.d || WALK.keys.arrowright ? 1 : 0) - (WALK.keys.a || WALK.keys.arrowleft ? 1 : 0);
   const ky = (WALK.keys.s || WALK.keys.arrowdown ? 1 : 0) - (WALK.keys.w || WALK.keys.arrowup ? 1 : 0);
   const mx = Math.max(-1, Math.min(1, WALK.joy.x + kx)), my = Math.max(-1, Math.min(1, WALK.joy.y + ky));
@@ -1218,22 +1419,26 @@ function stepWalk(dt) {
   if (Math.abs(mx) + Math.abs(my) > 0.08) {
     if (WALK.auto) { WALK.auto = false; WALK.yaw += WALK.userYaw; WALK.userYaw = 0; syncWalkUI(); }
     arriveEl.hidden = true;
-    const sp = 3.8 * dt; const fx = Math.sin(WALK.yaw), fz = Math.cos(WALK.yaw);
+    const indoors = WALK.pos.x > L.glassX - 0.2 && WALK.pos.x < 10.2 && WALK.pos.z > -4.6 && WALK.pos.z < 4.5;
+    const sp = (indoors ? 1.6 : 3.8) * dt; const fx = Math.sin(WALK.yaw), fz = Math.cos(WALK.yaw);
     // stick: up = forward, sideways = turn (feels right on a phone), keys A/D strafe-turn the same way
     WALK.yaw -= mx * dt * 1.6;
     WALK.pos.x += fx * -my * sp; WALK.pos.z += fz * -my * sp;
     const r = Math.hypot(WALK.pos.x, WALK.pos.z); if (r > city.R - 25) { WALK.pos.x *= (city.R - 25) / r; WALK.pos.z *= (city.R - 25) / r; }
+    collide(WALK.pos);
     moving = Math.abs(my) > 0.1;
   } else if (WALK.auto) {
-    WALK.s = Math.min(P.L, WALK.s + WALK.speed * dt * (WALK.s > DOOR_S - 2 ? 0.6 : 1));
+    WALK.s = Math.min(P.L, WALK.s + WALK.speed * dt * (WALK.s > DOOR_S + 0.6 ? 0.3 : WALK.s > DOOR_S - 2 ? 0.6 : 1));   // indoors at a stroll (~1.3 m/s)
     P.at(WALK.s, _pa); WALK.pos.x = _pa.x; WALK.pos.z = _pa.z;
     let ty;
     const left = P.L - WALK.s;
     if (left < 0.05) { ty = END_YAW; if (!WALK.arrived) { WALK.arrived = true; WALK.auto = false; arriveEl.hidden = false; syncWalkUI(); } }
-    else { P.at(Math.min(P.L, WALK.s + 7), _pb); ty = Math.atan2(_pb.x - _pa.x, _pb.z - _pa.z); if (left < 5) ty = ty + angDiff(END_YAW, ty) * (1 - left / 5); }
+    else { const ins = WALK.s > DOOR_S - 1, la = ins ? 2.2 : 7, eb = ins ? 1.2 : 5; P.at(Math.min(P.L, WALK.s + la), _pb); ty = Math.atan2(_pb.x - _pa.x, _pb.z - _pa.z); if (left < eb) ty = ty + angDiff(END_YAW, ty) * (1 - left / eb); }
     WALK.yaw += angDiff(ty, WALK.yaw) * Math.min(1, dt * 2.6);
     moving = left > 0.05;
   }
+  { const lf = WP.L - WALK.s; WALK.pitch += ((lf < 2.0 && WALK.auto || WALK.arrived ? -0.62 : -0.03) - WALK.pitch) * Math.min(1, dt * 2); }
+  WALK.indoors = WALK.pos.x > L.glassX - 0.05 && WALK.pos.x < 10.2 && WALK.pos.z > -4.6 && WALK.pos.z < 4.5;
   if (performance.now() - WALK.lastLook > 2600 && WALK.auto) { WALK.userYaw *= 1 - Math.min(1, dt * 1.4); WALK.userPitch *= 1 - Math.min(1, dt * 1.4); }
   if (moving) WALK.bob += dt * 8.5;
   const yaw = WALK.yaw + WALK.userYaw, pitch = Math.max(-0.7, Math.min(0.7, WALK.pitch + WALK.userPitch));
@@ -1248,7 +1453,12 @@ function stepWalk(dt) {
     else if (WALK.s < 12) t = tri('MTR Wan Chai · Exit D', '港鐵灣仔站 D 出口', 'MTR ワンチャイ駅 D出口');
     else if (WALK.s < TURN_S) t = tri(`Lee Tung Avenue · ${m10} m to go`, `利東街 · 仲有 ${m10} 米`, `利東街 · あと ${m10} m`);
     else if (WALK.s < DOOR_S - 4) t = tri(`Queen’s Road East · ${m5} m to go`, `皇后大道東 · 仲有 ${m5} 米`, `皇后大道東 · あと ${m5} m`);
-    else t = tri('RORUBARU · G/F, 100–102 Queen’s Road East', 'RORUBARU · 皇后大道東 100–102 號地下', 'RORUBARU · 皇后大道東 100–102 1階');
+    else if (WALK.s < DOOR_S + 0.8) t = tri('RORUBARU · G/F, 100–102 Queen’s Road East', 'RORUBARU · 皇后大道東 100–102 號地下', 'RORUBARU · 皇后大道東 100–102 1階');
+    else if (WALK.s < IN_S.reception + 1.2) t = tri('Reception · on your right', '接待處 · 喺你右手邊', '受付 · 右手');
+    else if (WALK.s < IN_S.hall - 0.5) t = tri('DJ booth on the glass · the counter on your left', '玻璃窗前係 DJ 台 · 左手邊係吧枱', '窓際に DJ ブース · 左手にカウンター');
+    else if (WALK.s < IN_S.curtain - 1) t = tri('The long counter · 26 seats round the U', '長吧枱 · U 形吧枱共 26 個座位', 'ロングカウンター · U字に 26 席');
+    else if (WALK.s < IN_S.lobby) t = tri('Toilets · through the curtain', '洗手間 · 穿過布簾', 'トイレ · カーテンの奥');
+    else t = tri('Toilets · 洗手間', '洗手間 · Toilets', 'トイレ · 洗手間');
     if (walkWhere._t !== t) { walkWhere.innerHTML = t; walkWhere._t = t; }
   }
 }
@@ -1256,7 +1466,7 @@ walkAuto?.addEventListener('click', () => {
   if (WALK.auto) { WALK.auto = false; }
   else {
     if (WALK.arrived) { WALK.s = 0; WALK.arrived = false; arriveEl.hidden = true; }
-    else { const n = city.walk.nearest(WALK.pos.x, WALK.pos.z); WALK.s = n.s; }
+    else { const n = WP.nearest(WALK.pos.x, WALK.pos.z); WALK.s = n.s; }
     WALK.yaw += WALK.userYaw; WALK.userYaw = 0; WALK.auto = true;
   }
   syncWalkUI();
@@ -1521,6 +1731,7 @@ function render(dt) {
     if (az < homeView.az - 0.35) controls.autoRotateSpeed = -0.35;
   } else if (activeKey && controls.autoRotate) controls.autoRotate = false;
   if (mode === 'walk') stepWalk(dt); else if (fly.on) stepFly(dt); else controls.update(dt);
+  stepWC(dt, camera.position, mode === 'walk', clockT);
   if (mode === 'street' && !fly.on) { const t = controls.target; const r = Math.hypot(t.x, t.z); if (r > 300) { t.x *= 300 / r; t.z *= 300 / r; } t.y = Math.max(0, Math.min(30, t.y)); }
   if (Math.abs(DN.k - DN.target) > 0.002) { DN.k += Math.sign(DN.target - DN.k) * Math.min(Math.abs(DN.target - DN.k), dt / 1.1); applyDN(DN.k); }
   const camD = camera.position.distanceTo(controls.target);
@@ -1535,9 +1746,10 @@ function loop(now) {
   render(dt);
   requestAnimationFrame(loop);
 }
-window.__roru = { ready: true, hots: () => proxies.map((o) => o.userData.hot), buzz: () => { PHONE.buzzAt = 0; }, shop: { get state() { return SHOP.state; }, get k() { return SHOP.k; }, figures: shopFigures, check: checkShop }, step: (sec) => { for (let i = 0; i < sec * 30; i++) stepSim(1 / 30); }, wallGlow, sim, LIVE, camera, controls, renderer, homeView: () => homeView, flyTo, setMode, city, WALK, DN, applyDN, get mode() { return mode; }, get activeKey() { return activeKey; } };
+window.__roru = { WC, WP, SOLID, DOOR_S, L, seats, walkS: () => WALK.s, walk: WALK, ready: true, hots: () => proxies.map((o) => o.userData.hot), buzz: () => { PHONE.buzzAt = 0; }, shop: { get state() { return SHOP.state; }, get k() { return SHOP.k; }, figures: shopFigures, check: checkShop }, step: (sec) => { for (let i = 0; i < sec * 30; i++) stepSim(1 / 30); }, wallGlow, sim, LIVE, camera, controls, renderer, homeView: () => homeView, flyTo, setMode, city, WALK, DN, applyDN, get mode() { return mode; }, get activeKey() { return activeKey; } };
 // deep links: …/#street and …/#walk
-{ const h = location.hash.slice(1); if (h === 'street' || h === 'walk') setTimeout(() => setMode(h, { quiet: true }), 80); }
+{ const h = location.hash.slice(1); if (h === 'street' || h === 'walk') setTimeout(() => setMode(h, { quiet: true }), 80);
+  if (h === 'inside') setTimeout(() => setMode('walk', { quiet: true, s: DOOR_S - 6 }), 80); }   // v47: …/#inside starts the walk at the door
 addEventListener('hashchange', () => { const h = location.hash.slice(1); if ((h === 'street' || h === 'walk') && h !== mode) setMode(h, { quiet: true }); });
 window.__tick = (ms) => { const n = Math.max(1, Math.round(ms / (1000 / 60))); for (let i = 0; i < n - 1; i++) { stepSim(1 / 60); if (mode === 'walk') stepWalk(1 / 60); city.update(1 / 60, camera, controls.target, mode); if (Math.abs(DN.k - DN.target) > 0.002) { DN.k += Math.sign(DN.target - DN.k) * Math.min(Math.abs(DN.target - DN.k), (1 / 60) / 1.1); applyDN(DN.k); } } if (fly.on) fly.t += (n - 1) / 60 / fly.dur; render(1 / 60); updateHUD(); };
 window.__cam = (az, pol, dist, tx, ty, tz) => { controls.target.set(tx, ty, tz); camera.position.copy(controls.target).add(new THREE.Vector3().setFromSphericalCoords(dist, pol, az)); camera.lookAt(controls.target); };

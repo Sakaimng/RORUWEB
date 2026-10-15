@@ -5,7 +5,7 @@
 // lamps and walkers are instanced, so the whole street is ~40 draw calls.
 import * as THREE from './vendor/three.module.min.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
-import CITY from './city-data.js';
+import CITY from './city-data.js?v=w47';  // v47: the old 3.3 m filler block behind the room is gone (the toilets live there now)
 
 const pairs = (a) => { const o = []; for (let i = 0; i < a.length; i += 2) o.push([a[i], a[i + 1]]); return o; };
 const hash = (n) => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
