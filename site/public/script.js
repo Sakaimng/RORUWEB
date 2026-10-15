@@ -443,24 +443,28 @@ const WC = { lids: [], cubes: [], curtain: [], taps: [] };
   const mir = new THREE.MeshPhongMaterial({ color: 0x9aa4ad, shininess: 120, specular: 0xffffff, emissive: 0x111418 });
   plane(0.82, 0.9, mir, basinWallX - 0.07, 1.55, (vz0 + vz1) / 2, -Math.PI / 2);
   box(0.02, 0.04, 0.9, glow(0xffe6c4), basinWallX - 0.08, 2.05, (vz0 + vz1) / 2);   // warm strip over the mirror
-  // the two washlets (TOTO-style: rounded elongated bowl, seat with the side control arm, low cistern)
-  const toiletGeo = { ped: new THREE.CylinderGeometry(0.13, 0.11, 0.36, 16), rim: new THREE.CylinderGeometry(0.19, 0.17, 0.07, 20), lid: new THREE.CylinderGeometry(0.195, 0.195, 0.025, 20) };
+  // the two washlets: INAX SATIS S (S618), Dominic Oct 15 ("inax s618 is the toilet exact model"): one-piece all-ceramic, tankless,
+  // a skirted bowl that tapers toward the floor, a low rear unit with a side grille, one big flat rounded lid, no side arm (wall remote)
+  const s618Ped = new THREE.CylinderGeometry(0.2, 0.145, 0.4, 20, 1);
+  { const p = s618Ped.attributes.position; for (let i = 0; i < p.count; i++) { const y = p.getY(i); if (y < 0) p.setX(i, p.getX(i) + 0.05); } s618Ped.computeVertexNormals(); }   // foot sits back under the bowl
+  const toiletGeo = { ped: s618Ped, rim: new THREE.CylinderGeometry(0.2, 0.2, 0.03, 20), lid: new THREE.CylinderGeometry(0.205, 0.2, 0.04, 20) };
+  const ventM = mat(0x9aa0a6);
   for (const tz of [PLAN(0, 1460)[1], PLAN(0, 1608)[1]]) {
     const tx = x1 - 0.42;   // bowl centre; faces −x (toward the door)
     const g = new THREE.Group(); g.position.set(tx, 0, tz); scene.add(g);
-    const ped = new THREE.Mesh(toiletGeo.ped, white); ped.position.set(0.05, 0.18, 0); ped.scale.set(1.3, 1, 1); g.add(ped);
-    const rim = new THREE.Mesh(toiletGeo.rim, white); rim.position.set(0, 0.39, 0); rim.scale.set(1.35, 1, 1); g.add(rim);
-    const seat = new THREE.Mesh(toiletGeo.lid, mat(0xe9e6df)); seat.position.set(0, 0.44, 0); seat.scale.set(1.35, 1, 1); g.add(seat);
-    box(0.18, 0.12, 0.4, white, 0.27, 0.48, 0, g);                  // washlet body at the back
-    box(0.2, 0.36, 0.46, white, 0.34, 0.66, 0, g);                  // low cistern
-    box(0.21, 0.025, 0.47, mat(0xdedbd4), 0.34, 0.855, 0, g);
-    box(0.24, 0.05, 0.07, white, 0.02, 0.5, 0.25, g);              // side control arm (right hand)
-    for (let k = 0; k < 3; k++) box(0.03, 0.008, 0.03, glow(k ? 0x5fb8ff : 0xff8a3c), -0.06 + k * 0.05, 0.527, 0.25, g);
+    const ped = new THREE.Mesh(toiletGeo.ped, white); ped.position.set(0, 0.2, 0); ped.scale.set(1.35, 1, 1); g.add(ped);   // skirted, tapering bowl
+    const rim = new THREE.Mesh(toiletGeo.rim, mat(0xeeece7)); rim.position.set(0, 0.415, 0); rim.scale.set(1.35, 1, 1); g.add(rim);   // seat
+    box(0.26, 0.41, 0.33, white, 0.3, 0.205, 0, g);                 // skirt continues to the back
+    box(0.22, 0.13, 0.4, white, 0.33, 0.48, 0, g);                  // low rear unit (no cistern: tankless)
+    box(0.23, 0.012, 0.41, mat(0xe2e0da), 0.33, 0.548, 0, g);      // top lip of the unit
+    for (const sz of [-1, 1]) for (let k = 0; k < 4; k++) box(0.012, 0.006, 0.006, ventM, 0.36 + k * 0.02, 0.48, sz * 0.201, g);   // side grille
     box(0.02, 0.08, 0.12, mat(0xb8bcc2), 0.5, 1.15, -0.35, g);     // paper holder
     cyl(0.055, 0.055, 0.11, 10, white, 0.47, 1.1, -0.35, g).rotation.x = Math.PI / 2;
+    box(0.02, 0.13, 0.075, white, 0.5, 0.85, -0.35, g);            // slim wall remote below the holder
+    for (let k = 0; k < 3; k++) box(0.006, 0.018, 0.018, k ? ventM : glow(0x5fb8ff), 0.488, 0.89 - k * 0.03, -0.35, g);
     // lid on a hinge at the back of the seat; lies flat when closed, swings up ~100° when it opens
-    const hinge = new THREE.Group(); hinge.position.set(0.2, 0.47, 0); g.add(hinge);
-    const lid = new THREE.Mesh(toiletGeo.lid, white); lid.position.set(-0.2, 0, 0); lid.scale.set(1.35, 1, 1); hinge.add(lid);
+    const hinge = new THREE.Group(); hinge.position.set(0.17, 0.45, 0); g.add(hinge);
+    const lid = new THREE.Mesh(toiletGeo.lid, white); lid.position.set(-0.19, 0, 0); lid.scale.set(1.35, 1, 1); hinge.add(lid);
     WC.lids.push({ hinge, x: tx, z: tz, k: 0, want: 0, tap: 0 });
     SOLID.push([tx - 0.3, tz - 0.24, x1, tz + 0.24]);
     WC.taps.push({ g, l: WC.lids[WC.lids.length - 1] });
