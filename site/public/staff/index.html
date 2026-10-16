@@ -13,12 +13,14 @@
 <link rel="manifest" href="/loyalty/staff.webmanifest">
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f29">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f29">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f31">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f31">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f31">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f29"></script>
-<script src="/loyalty/passport.js?v=f29"></script>
-<script src="/loyalty/monthend.js?v=f29"></script>
+<script src="/loyalty/loyalty.js?v=f31"></script>
+<script src="/loyalty/passport.js?v=f31"></script>
+<script src="/loyalty/scratch.js?v=f31"></script>
+<script src="/loyalty/monthend.js?v=f31"></script>
 <style>body{overscroll-behavior:none}
 .gcard{border:1px solid var(--line);background:var(--ink2);border-radius:18px;padding:14px 16px;margin:0 0 12px}
 .gcard .gh{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
@@ -417,6 +419,9 @@
       g.innerHTML = '<div class="gh"><span class="gn">' + (zh ? "示範客人" : "Sample guest") + '</span><span class="tag-tier t-gohan" style="margin:0">Gohan</span></div>' +
         '<div class="gperks t-gohan"><div class="gp-today">' + (zh ? "今日" : "Today") + ": " + (zh ? "一杯免費 highball" : "a free highball") + '</div><div class="gp-row"><span>' + (zh ? "免費 highball" : "Free highball") + ' <span class="gp-st">· ' + (zh ? "今個月可用" : "available this month") + '</span></span><span><button class="btn sm" type="button" tabindex="-1">' + (zh ? "標記已用" : "Mark used") + "</button></span></div></div>" +
         '<div class="pp-st"><div class="pp-st-h">' + ic + '<div class="pp-st-t"><b>' + (zh ? "護照 5/27" : "Passport 5/27") + "</b><small>" + (zh ? "再集 2 個就換 7 個印花獎品" : "2 more to the 7-stamp prize") + '</small></div><button class="btn sm" type="button" tabindex="-1">' + (zh ? "蓋護照印花" : "Stamp passport") + "</button></div></div>" +
+        '<div class="sc-st"><div class="sc-st-h"><svg class="sc-tk" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 9.5a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2V13a3 3 0 0 0 0 6v3.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V19a3 3 0 0 0 0-6z" fill="#F64501" stroke="#16181F" stroke-width="1.8"/><path d="M11 10v12" stroke="#F6F3E7" stroke-width="1.8" stroke-dasharray="2 2.2"/><path d="M18.6 10.6l1.3 3.6 3.6 1.3-3.6 1.3-1.3 3.6-1.3-3.6-3.6-1.3 3.6-1.3z" fill="#F6F3E7"/></svg><div class="sc-st-t"><b>' + (zh ? "Roru Day 刮刮卡" : "Roru Day scratch card") + "</b><small>" + (zh ? "客人掃描滿 HK$388 嘅收據就自動有" : "comes by itself when the guest scans a receipt of HK$388+") + '</small></div></div>' +
+        '<div class="sc-row s-unused"><img class="sc-ic" src="/loyalty/img/highball_64.png" srcset="/loyalty/img/highball_64.png 1x, /loyalty/img/highball_128.png 2x" alt=""><div class="sc-row-t"><b>' + (zh ? "角瓶 Highball" : "Kaku Highball") + "</b><small>" + (zh ? "收據掃描 7:32pm · 未用 · 而家用得" : "From receipt scan 7:32pm · unused · can be used now") + '</small></div><div class="sc-row-b"><button class="btn sm" type="button" tabindex="-1">' + (zh ? "標記已用" : "Mark used") + "</button></div></div>" +
+        '<div class="sc-st-fb"><span>' + (zh ? "掃唔到收據？" : "Receipt scan didn't work?") + '</span><button class="btn ghost sm" type="button" tabindex="-1">' + (zh ? "人手派（經理）" : "Give by hand (manager)") + "</button></div></div>" +
         '<div class="gx muted small">' + (zh ? "呢張係示範卡，教學完就會消失。" : "This is a sample card for the walkthrough. It disappears at the end.") + "</div>";
       $("#addSub").textContent = zh ? "輸入總數同單號" : "type the total + bill no."; $("#visitSub").textContent = zh ? "每日一個" : "one a day"; $("#redeemSub").textContent = zh ? "客人嘅獎賞" : "the guest's rewards";
       ["#addRoll", "#visitBtn", "#redeemBtn"].forEach(s => $(s).disabled = true);
@@ -429,13 +434,14 @@
       window.__ppCard = sample.pp; sample = null;
     };
     const vis = (...sels) => () => { for (const s of sels) { const x = typeof s === "function" ? s() : $(s); if (x && x.offsetParent) return x; } return null; };
-    R.tour("staff_f29", [
+    R.tour("staff_f31", [
       { before: clearSample, el: () => $("#disp"), en: "Find a guest by typing their phone number here, or tap Scan QR to read the card on their phone.", zh: "喺度輸入客人電話號碼搵佢，或者撳「掃描 QR」讀佢手機上嘅會員卡。" },
       { before: showSample, el: "#addRoll", en: "Tap ADD BILL to type in the bill total and receipt number when a guest's receipt can't be scanned.", zh: "客人收據掃唔到嘅時候，撳「加單」輸入總數同單號。" },
       { before: showSample, el: "#visitBtn", en: "The bill gives the guest their points, and VISIT ONLY gives one visit stamp a day when there is no bill.", zh: "張單會俾客人積分，冇單嘅時候撳「只蓋到訪印」，每日一個到訪印花。" },
       { before: showSample, el: vis(".gperks", "#redeemBtn"), en: "When a guest shows their flash card, tap Mark used on that perk, or REDEEM for a points reward.", zh: "客人出示閃卡嗰陣，喺嗰個著數撳「標記已用」，積分獎賞就撳「兌換」。" },
       { before: showSample, el: "#logCard", en: "Tapped the wrong thing? Undo it from today's list here, and after the undo window a manager can undo it with a reason.", zh: "撳錯咗？喺今日紀錄度復原；過咗時限就要經理寫低原因先復原到。" },
       { before: showSample, el: vis(".pp-st", "#gcard"), en: "If a receipt didn't stamp the guest's Menu Passport, tap Stamp passport and tick the food from their bill.", zh: "如果收據冇幫客人嘅菜單護照蓋到印花，撳「蓋護照印花」再剔返張單上面嘅食物。" },
+      { before: showSample, el: vis(".sc-st", "#gcard"), en: "On Roru Day the scratch card comes by itself: when the guest who paid scans a receipt of HK$388 or more, it lands on their phone. You just tap Mark used when they use the prize. If the scan doesn't work, a manager can give one by hand with their PIN and a reason.", zh: "Roru Day 當晚刮刮卡會自動派：埋單嗰位客人掃描滿 HK$388 嘅收據，張卡就會出現喺佢手機。佢用獎品嗰陣你撳「標記已用」就得。掃唔到收據嘅話，經理可以用佢嘅 PIN 同寫低原因人手派。" },
       { before: clearSample, el: "#queueBtn", en: "Big or unclear bills wait in To approve, so only approve one that matches the paper bill and leave the rest for the manager or owner.", zh: "大額或者睇唔清嘅單會喺「待批核」等，同張紙單對得上先好批准，其他留俾經理或者老闆。" },
       { before: clearSample, el: "#helpBtn", en: "Tap ? up here any time to see this walkthrough again.", zh: "隨時撳上面嘅 ? 就可以再睇呢個教學。" }
     ], { force: !!force, lang: zh ? "zh" : "en", onEnd: clearSample });

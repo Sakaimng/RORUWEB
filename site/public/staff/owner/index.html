@@ -8,12 +8,14 @@
 <title data-tt="{prog} — Owner">High Rollers — Owner</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f29">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f29">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f31">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f31">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f31">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f29"></script>
-<script src="/loyalty/passport.js?v=f29"></script>
-<script src="/loyalty/monthend.js?v=f29"></script>
+<script src="/loyalty/loyalty.js?v=f31"></script>
+<script src="/loyalty/passport.js?v=f31"></script>
+<script src="/loyalty/scratch.js?v=f31"></script>
+<script src="/loyalty/monthend.js?v=f31"></script>
 <style>
 /* v36 owner dashboard */
 .dash{margin:16px 0 18px}
@@ -344,8 +346,9 @@ body.thB{--muted:rgba(22,24,31,.64)}
       <button data-go="guests"><i>👥</i>Guests</button>
       <button data-go="rewards"><i>🎁</i>Rewards</button>
       <button data-go="passport"><i><img src="/loyalty/img/stampcard_64.png" alt="" style="width:1.3em;height:1.3em;vertical-align:-.3em"></i>Passport</button>
+      <button data-go="scratch"><i><svg viewBox="0 0 32 32" aria-hidden="true" style="width:1.3em;height:1.3em;vertical-align:-.3em"><path d="M4 9.5a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2V13a3 3 0 0 0 0 6v3.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V19a3 3 0 0 0 0-6z" fill="#F64501" stroke="currentColor" stroke-width="1.6"/><path d="M11 10v12" stroke="#fff" stroke-width="1.8" stroke-dasharray="2 2.2"/><path d="M18.6 10.6l1.3 3.6 3.6 1.3-3.6 1.3-1.3 3.6-1.3-3.6-3.6-1.3 3.6-1.3z" fill="#fff"/></svg></i>Scratch card</button>
       <hr>
-      <button data-go="staff"><i>🧑‍🍳</i>Staff &amp; PINs</button>
+      <button data-go="staff"><i>🔑</i>Staff &amp; PINs</button>
       <button data-go="reports"><i>📄</i>Reports</button>
       <button data-go="settings"><i>⚙️</i>Settings</button>
       <hr>
@@ -357,6 +360,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
       <section class="view" id="v-guests"></section>
       <section class="view" id="v-rewards"></section>
       <section class="view" id="v-passport"></section>
+      <section class="view" id="v-scratch"></section>
       <section class="view" id="v-staff"></section>
       <section class="view" id="v-reports"></section>
       <section class="view" id="v-settings"></section>
@@ -372,7 +376,8 @@ body.thB{--muted:rgba(22,24,31,.64)}
   <div class="menu" id="menu"><div class="mp">
     <h3>Menu</h3>
     <button class="mi" data-go="passport"><i><img src="/loyalty/img/stampcard_64.png" alt="" style="width:1.3em;height:1.3em;vertical-align:-.3em"></i><span>Menu Passport<small>Who's playing, most and least tried dishes, season &amp; prizes</small></span></button>
-    <button class="mi" data-go="staff"><i>🧑‍🍳</i><span>Staff &amp; PINs<small>Who can sign in, PINs, who looked at what</small></span></button>
+    <button class="mi" data-go="scratch"><i><svg viewBox="0 0 32 32" aria-hidden="true" style="width:1.3em;height:1.3em;vertical-align:-.3em"><path d="M4 9.5a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2V13a3 3 0 0 0 0 6v3.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V19a3 3 0 0 0 0-6z" fill="#F64501" stroke="currentColor" stroke-width="1.6"/><path d="M11 10v12" stroke="#fff" stroke-width="1.8" stroke-dasharray="2 2.2"/><path d="M18.6 10.6l1.3 3.6 3.6 1.3-3.6 1.3-1.3 3.6-1.3-3.6-3.6-1.3 3.6-1.3z" fill="#fff"/></svg></i><span>Roru Day scratch card<small>Cards given, prizes won, cost, minimum bill &amp; odds</small></span></button>
+    <button class="mi" data-go="staff"><i>🔑</i><span>Staff &amp; PINs<small>Who can sign in, PINs, who looked at what</small></span></button>
     <button class="mi" data-go="reports"><i>📄</i><span>Reports<small>Month-end report, downloads, charts</small></span></button>
     <button class="mi" data-go="settings"><i>⚙️</i><span>Settings<small>Points, levels, special nights, extras</small></span></button>
     <button class="mi" data-help><i>❓</i><span>How it works<small>Show the quick tour again</small></span></button>
@@ -670,7 +675,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
   const ROLES = [["staff", "Staff"], ["manager", "Manager"], ["owner", "Owner"]], RN = { staff: "Staff", manager: "Manager", owner: "Owner" };
   const roleSel = (cur) => '<select class="fin" name="role">' + ROLES.map(r => '<option value="' + r[0] + '"' + (cur === r[0] ? " selected" : "") + ">" + r[1] + "</option>").join("") + "</select>";
   const shopSel = (cur) => '<select class="fin" name="shop"><option value="wanchai"' + (cur === "wanchai" ? " selected" : "") + '>Wan Chai</option><option value="central"' + (cur === "central" ? " selected" : "") + ">Central</option></select>";
-  const ACT = { lookup: "Looked up a phone number", scan: "Scanned a guest's QR code", view: "Opened a guest's card", reverse_redeem: "↩︎ Undid a claimed reward", perk_use: "✅ Marked a benefit as used", perk_undo: "↩︎ Undid a used benefit", passport_stamp: "🎫 Stamped a guest's passport", passport_undo: "↩︎ Undid a passport stamp", passport_prize: "✅ Marked a passport prize as used", passport_prize_undo: "↩︎ Undid a passport prize", passport_settings: "⚙️ Changed the passport season or prizes" };
+  const ACT = { lookup: "Looked up a phone number", scan: "Scanned a guest's QR code", view: "Opened a guest's card", reverse_redeem: "↩︎ Undid a claimed reward", perk_use: "✅ Marked a benefit as used", perk_undo: "↩︎ Undid a used benefit", passport_stamp: "🎫 Stamped a guest's passport", passport_undo: "↩︎ Undid a passport stamp", passport_prize: "✅ Marked a passport prize as used", passport_prize_undo: "↩︎ Undid a passport prize", passport_settings: "⚙️ Changed the passport season or prizes", scratch_give: "🎟 Gave a Roru Day scratch card", scratch_fallback: "🔑 Gave a scratch card by hand (scan failed, manager OK)", scratch_undo: "↩︎ Cancelled a scratch card", scratch_reveal: "🎟 Revealed a scratch card on the iPad", scratch_use: "✅ Marked a scratch card prize as used", scratch_use_undo: "↩︎ Undid a used scratch card prize", scratch_settings: "⚙️ Changed the scratch card rules or odds", scratch_prize: "⚙️ Changed a scratch card prize" };
   function renderStaff() {
     const d = st.data, al = st.alog;
     $("#v-staff").innerHTML = vh("Staff & PINs", d.staff.filter(s => s.active).length + " people can sign in", '<button class="btn sm" id="stAdd">+ Add a person</button>') + '<p class="purpose">Who can sign in to the staff iPad and with which PIN, plus a record of every time staff look at a guest\'s details.</p>' +
@@ -805,7 +810,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
     if (st.view !== "today") go("today");
     const vis = (...sels) => () => { for (const s of sels) { const x = typeof s === "function" ? s() : $(s); if (x && x.offsetParent) return x; } return null; };
     const secBy = (re) => () => [...document.querySelectorAll("#v-today h2")].map(h => h.closest(".sec") || h).find(h => h.offsetParent && re.test(h.textContent));
-    R.tour("owner_f29", [
+    R.tour("owner_f31", [
       { before: () => go("today"), el: "#todayKpis", en: "These are today's numbers, and the grey line under each one tells you what it means." },
       { before: () => go("guests"), el: vis("#gq", "#v-guests .vh"), en: "To find a guest, type their name or the last 4 digits of their phone here." },
       { before: () => go("rewards"), el: vis(() => [...document.querySelectorAll("#v-rewards [data-rw]")].find(x => x.offsetParent), "#v-rewards .vh"), en: "Tap any reward to change its name or points, or switch it off, and guests see it straight away." },
@@ -815,6 +820,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
       { before: () => go("settings"), el: vis("#g-nums", "#v-settings .vh"), en: "Settings holds the rules, like points per HK$1 and level thresholds, each with an example." },
       { before: () => go("today"), el: vis("#themeBtn", "#side [data-theme]"), en: "Tap the sun or moon to switch between light and dark, and this device remembers your choice." },
       { before: () => go("passport"), el: vis("#ppOwnerKpis", "#v-passport .vh"), en: "Menu Passport shows who's collecting dish stamps, who reached each prize, and which dishes get tried least." },
+      { before: () => go("scratch"), el: vis("#scOwnerKpis", "#v-scratch .vh"), en: "Scratch card shows the Roru Day cards guests got automatically by scanning a receipt of HK$388+, any a manager gave by hand, what they won and what it cost, and Change prizes & rules sets the minimum bill and the odds." },
       { before: () => go("today"), el: vis("#menuBtn", "#side [data-help]"), en: "To replay this walkthrough, open the menu and tap How it works." }
     ], { force: !!force, lang: "en", onEnd: () => go("today") });
   }

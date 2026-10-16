@@ -8,11 +8,13 @@
 <title data-tt="{prog} — RORUBARU">High Rollers — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f29">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f29">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f31">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f31">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f31">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f29"></script>
-<script src="/loyalty/passport.js?v=f29"></script>
+<script src="/loyalty/loyalty.js?v=f31"></script>
+<script src="/loyalty/passport.js?v=f31"></script>
+<script src="/loyalty/scratch.js?v=f31"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -730,6 +732,8 @@
         if (gr && r.status === "approved") $("#scanDone").insertAdjacentHTML("afterbegin", '<div class="notice" style="background:linear-gradient(135deg,#f3d27a,#b9862a);color:#0b0d12;font-weight:800">✨🥃 ' + escR(t("gold_won")) + "</div>");
         showScan("scanDone"); $("#rDone").onclick = () => showScan("scanIdle");
         if (gr && r.status === "approved") setTimeout(() => goldSheet(gr), 400);
+        // f31: the server checked this receipt for a Roru Day scratch card; if it earned one, say so right here
+        if (r.status === "approved" && window.RORU_SC && RORU_SC.afterReceipt) RORU_SC.afterReceipt(r.id).then(c => { if (c && c.state === "new" && !$("#scanDone").classList.contains("hide")) RORU_SC.scanWin($("#scanDone"), c); });
         if (r.status === "approved") { R.burst(g ? ["#E8B84A", "#F3D27A", "#F6F3E7"] : undefined); R.toast((g ? "✨ " + t("gold_hit") + " " : "") + t("added_points", { n: r.points }) + (r.visit && r.visit.referral_bonus ? " · 👯 +" + r.visit.referral_bonus : ""), 3500); state.lastPoints = r.member.points; state.lastStamps = r.member.visits_total; }
       }
       render();
