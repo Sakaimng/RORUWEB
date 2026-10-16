@@ -8,10 +8,12 @@
 <title data-tt="{prog} — Owner">High Rollers — Owner</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f28">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f29">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f29">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f28"></script>
-<script src="/loyalty/monthend.js?v=f28"></script>
+<script src="/loyalty/loyalty.js?v=f29"></script>
+<script src="/loyalty/passport.js?v=f29"></script>
+<script src="/loyalty/monthend.js?v=f29"></script>
 <style>
 /* v36 owner dashboard */
 .dash{margin:16px 0 18px}
@@ -341,6 +343,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
       <button data-go="today"><i>🏠</i>Today<span class="badge hide" data-badge></span></button>
       <button data-go="guests"><i>👥</i>Guests</button>
       <button data-go="rewards"><i>🎁</i>Rewards</button>
+      <button data-go="passport"><i><img src="/loyalty/img/stampcard_64.png" alt="" style="width:1.3em;height:1.3em;vertical-align:-.3em"></i>Passport</button>
       <hr>
       <button data-go="staff"><i>🧑‍🍳</i>Staff &amp; PINs</button>
       <button data-go="reports"><i>📄</i>Reports</button>
@@ -353,6 +356,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
       <section class="view" id="v-today"></section>
       <section class="view" id="v-guests"></section>
       <section class="view" id="v-rewards"></section>
+      <section class="view" id="v-passport"></section>
       <section class="view" id="v-staff"></section>
       <section class="view" id="v-reports"></section>
       <section class="view" id="v-settings"></section>
@@ -367,6 +371,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
   </div>
   <div class="menu" id="menu"><div class="mp">
     <h3>Menu</h3>
+    <button class="mi" data-go="passport"><i><img src="/loyalty/img/stampcard_64.png" alt="" style="width:1.3em;height:1.3em;vertical-align:-.3em"></i><span>Menu Passport<small>Who's playing, most and least tried dishes, season &amp; prizes</small></span></button>
     <button class="mi" data-go="staff"><i>🧑‍🍳</i><span>Staff &amp; PINs<small>Who can sign in, PINs, who looked at what</small></span></button>
     <button class="mi" data-go="reports"><i>📄</i><span>Reports<small>Month-end report, downloads, charts</small></span></button>
     <button class="mi" data-go="settings"><i>⚙️</i><span>Settings<small>Points, levels, special nights, extras</small></span></button>
@@ -450,7 +455,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
   $$("[data-refresh]").forEach(b => b.onclick = () => { closeMenu(); load(); });
   $$("[data-help]").forEach(b => b.onclick = () => { closeMenu(); tour(true); });
   function go(v, keep) {
-    st.view = v; closeMenu();
+    st.view = v; window.__ppOwner = st.sess; closeMenu();
     $$(".view").forEach(x => x.classList.toggle("on", x.id === "v-" + v));
     $$("[data-go]").forEach(b => b.classList.toggle("on", b.dataset.go === v));
     placeDash(); if (!keep) window.scrollTo(0, 0);
@@ -665,7 +670,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
   const ROLES = [["staff", "Staff"], ["manager", "Manager"], ["owner", "Owner"]], RN = { staff: "Staff", manager: "Manager", owner: "Owner" };
   const roleSel = (cur) => '<select class="fin" name="role">' + ROLES.map(r => '<option value="' + r[0] + '"' + (cur === r[0] ? " selected" : "") + ">" + r[1] + "</option>").join("") + "</select>";
   const shopSel = (cur) => '<select class="fin" name="shop"><option value="wanchai"' + (cur === "wanchai" ? " selected" : "") + '>Wan Chai</option><option value="central"' + (cur === "central" ? " selected" : "") + ">Central</option></select>";
-  const ACT = { lookup: "Looked up a phone number", scan: "Scanned a guest's QR code", view: "Opened a guest's card", reverse_redeem: "↩︎ Undid a claimed reward", perk_use: "✅ Marked a benefit as used", perk_undo: "↩︎ Undid a used benefit" };
+  const ACT = { lookup: "Looked up a phone number", scan: "Scanned a guest's QR code", view: "Opened a guest's card", reverse_redeem: "↩︎ Undid a claimed reward", perk_use: "✅ Marked a benefit as used", perk_undo: "↩︎ Undid a used benefit", passport_stamp: "🎫 Stamped a guest's passport", passport_undo: "↩︎ Undid a passport stamp", passport_prize: "✅ Marked a passport prize as used", passport_prize_undo: "↩︎ Undid a passport prize", passport_settings: "⚙️ Changed the passport season or prizes" };
   function renderStaff() {
     const d = st.data, al = st.alog;
     $("#v-staff").innerHTML = vh("Staff & PINs", d.staff.filter(s => s.active).length + " people can sign in", '<button class="btn sm" id="stAdd">+ Add a person</button>') + '<p class="purpose">Who can sign in to the staff iPad and with which PIN, plus a record of every time staff look at a guest\'s details.</p>' +
@@ -798,13 +803,20 @@ body.thB{--muted:rgba(22,24,31,.64)}
     if (!R.tour || !st.sess) return;
     const pick = (a, b) => () => { const x = $(a); return x && x.offsetParent ? x : $(b); };
     if (st.view !== "today") go("today");
-    R.tour("owner_f27", [
-      { el: "#todayKpis", en: "Today's numbers: guest visits, points given out, free items claimed, and bills waiting for your OK. The grey line under each says what it means." },
-      { el: "#quick", en: "Quick jobs: find a guest, approve bills, change a reward, and the month-end report for Florencia." },
-      { el: pick('#otabs [data-go="guests"]', '#side [data-go="guests"]'), en: "Guests: search by name or the last 4 digits of their phone, see your best guests, and invite top spenders to Kama." },
-      { el: pick('#otabs [data-go="rewards"]', '#side [data-go="rewards"]'), en: "Rewards: tap any free item or level benefit to change its name or points, or hide it from guests." },
-      { el: pick("#menuBtn", '#side [data-go="staff"]'), en: "Everything else is in ☰: staff PINs, reports and settings. You can see this tour again from there." }
-    ], { force: !!force, lang: "en" });
+    const vis = (...sels) => () => { for (const s of sels) { const x = typeof s === "function" ? s() : $(s); if (x && x.offsetParent) return x; } return null; };
+    const secBy = (re) => () => [...document.querySelectorAll("#v-today h2")].map(h => h.closest(".sec") || h).find(h => h.offsetParent && re.test(h.textContent));
+    R.tour("owner_f29", [
+      { before: () => go("today"), el: "#todayKpis", en: "These are today's numbers, and the grey line under each one tells you what it means." },
+      { before: () => go("guests"), el: vis("#gq", "#v-guests .vh"), en: "To find a guest, type their name or the last 4 digits of their phone here." },
+      { before: () => go("rewards"), el: vis(() => [...document.querySelectorAll("#v-rewards [data-rw]")].find(x => x.offsetParent), "#v-rewards .vh"), en: "Tap any reward to change its name or points, or switch it off, and guests see it straight away." },
+      { before: () => go("today"), el: vis('#quick [data-q="approve"]', secBy(/Bills waiting/i), "#quick"), en: "Big or unclear bills wait for your OK, so tap here to approve the real ones and turn down the rest." },
+      { before: () => go("staff"), el: vis(() => [...document.querySelectorAll("#v-staff [data-st]")].find(x => x.offsetParent), "#v-staff .vh"), en: "Staff & PINs is where you add staff, change a PIN, and see who looked up which guest." },
+      { before: () => go("reports"), el: vis("#monthSlot", "#v-reports .vh"), en: "Reports has the charts and the month-end PDF to send Florencia, one tap to download." },
+      { before: () => go("settings"), el: vis("#g-nums", "#v-settings .vh"), en: "Settings holds the rules, like points per HK$1 and level thresholds, each with an example." },
+      { before: () => go("today"), el: vis("#themeBtn", "#side [data-theme]"), en: "Tap the sun or moon to switch between light and dark, and this device remembers your choice." },
+      { before: () => go("passport"), el: vis("#ppOwnerKpis", "#v-passport .vh"), en: "Menu Passport shows who's collecting dish stamps, who reached each prize, and which dishes get tried least." },
+      { before: () => go("today"), el: vis("#menuBtn", "#side [data-help]"), en: "To replay this walkthrough, open the menu and tap How it works." }
+    ], { force: !!force, lang: "en", onEnd: () => go("today") });
   }
   function chg(cur, prev) {
     cur = +cur || 0; prev = +prev || 0;

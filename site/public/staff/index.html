@@ -13,10 +13,12 @@
 <link rel="manifest" href="/loyalty/staff.webmanifest">
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f28">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f29">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f29">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f28"></script>
-<script src="/loyalty/monthend.js?v=f28"></script>
+<script src="/loyalty/loyalty.js?v=f29"></script>
+<script src="/loyalty/passport.js?v=f29"></script>
+<script src="/loyalty/monthend.js?v=f29"></script>
 <style>body{overscroll-behavior:none}
 .gcard{border:1px solid var(--line);background:var(--ink2);border-radius:18px;padding:14px 16px;margin:0 0 12px}
 .gcard .gh{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
@@ -217,7 +219,7 @@
     let me; try { me = await R.rpc("staff_member", { p_token: st.sess.token, p_who: m.member_code }); } catch (e) { if (st.sel === m) box.classList.add("hide"); return; }
     if (st.sel !== m || !me || !me.profile) return; st.card = me; renderCard(me);
   }
-  function renderCard(me) {
+  function renderCard(me) { window.__ppCard = me; window.__ppSess = st.sess;
     const p = me.profile, box = $("#gcard"); const ago = p.days_since_visit == null ? "" : p.days_since_visit === 0 ? t("g_today") : p.days_since_visit === 1 ? t("g_yday") : t("g_ago", { n: p.days_since_visit });
     const bd = p.birthday_tag ? '<span class="bd">' + t("g_bd_" + p.birthday_tag) + "</span>" : "";
     box.innerHTML = '<div class="gh"><span class="gn">' + esc(/\p{L}/u.test(me.name || "") ? me.name : "—") + '</span><span class="tag-tier t-' + me.tier + '" style="margin:0">' + tierName(me.tier) + " " + mult(me.multiplier) + "</span>" + bd + "</div>" +
@@ -398,17 +400,45 @@
   setInterval(() => { if (document.visibilityState === "visible" && st.sess) loadToday(); }, 30000);
 })();
 
-  // ===== f27: first-time staff walkthrough (once per device; replay with ? at the top) =====
+  // ===== f29: first-time staff walkthrough, 8 steps (Dominic 19:06 Oct 15: "staff also needs tutorial"); once per device, replay with ? at the top =====
+  // Steps 3, 4 and 6 point at the guest card's own buttons. With no guest open, the tour shows a SAMPLE card (no lookup, nothing saved, nothing logged) and clears it at the end.
   function staffTour(force) {
-    const R = window.RORU;
-    if (!R.tour || document.querySelector("#main").classList.contains("hide")) return;
+    const R = window.RORU, $ = (s) => document.querySelector(s);
+    if (!R.tour || $("#main").classList.contains("hide")) return;
     const zh = R.lang() === "zh";
-    R.tour("staff_f27", [
-      { el: () => document.querySelector("#disp") || document.querySelector("#pad"), en: "Type the guest's phone number to find them. Their card and tier show up.", zh: "輸入客人電話號碼搵佢，會員卡同等級就會出現。" },
-      { el: "#scanBtn", en: "Or tap Scan to read the QR on the guest's phone.", zh: "或者撳掃描，讀客人手機上嘅 QR。" },
-      { el: "#queueBtn", en: "Receipts that need a check wait here. Approve or reject them.", zh: "要人手檢查嘅收據喺度等，批准或者拒絕。" },
-      { el: "#logCard", en: "Today's activity. Undo a mistake from here. Tap ? at the top to see this guide again.", zh: "今日紀錄，撳錯可以喺度復原。撳上面嘅 ? 可以再睇呢個教學。" }
-    ], { force: !!force, lang: zh ? "zh" : "en" });
+    let sample = null;
+    const showSample = () => {
+      if (sample || !$("#actions").classList.contains("hide")) return;
+      sample = { pp: window.__ppCard, subs: ["#addSub", "#visitSub", "#redeemSub"].map(s => $(s).textContent), dis: ["#addRoll", "#visitBtn", "#redeemBtn"].map(s => $(s).disabled) };
+      window.__ppCard = null;
+      ["#award", "#pending", "#okToast", "#queue"].forEach(s => { const x = $(s); if (x) x.classList.add("hide"); });
+      const ic = '<img class="pp-card-ic" src="/loyalty/img/stampcard_64.png" srcset="/loyalty/img/stampcard_64.png 1x, /loyalty/img/stampcard_128.png 2x" alt="">';
+      const g = $("#gcard"); g.classList.remove("hide"); g.dataset.sample = "1";
+      g.innerHTML = '<div class="gh"><span class="gn">' + (zh ? "示範客人" : "Sample guest") + '</span><span class="tag-tier t-gohan" style="margin:0">Gohan</span></div>' +
+        '<div class="gperks t-gohan"><div class="gp-today">' + (zh ? "今日" : "Today") + ": " + (zh ? "一杯免費 highball" : "a free highball") + '</div><div class="gp-row"><span>' + (zh ? "免費 highball" : "Free highball") + ' <span class="gp-st">· ' + (zh ? "今個月可用" : "available this month") + '</span></span><span><button class="btn sm" type="button" tabindex="-1">' + (zh ? "標記已用" : "Mark used") + "</button></span></div></div>" +
+        '<div class="pp-st"><div class="pp-st-h">' + ic + '<div class="pp-st-t"><b>' + (zh ? "護照 5/27" : "Passport 5/27") + "</b><small>" + (zh ? "再集 2 個就換 7 個印花獎品" : "2 more to the 7-stamp prize") + '</small></div><button class="btn sm" type="button" tabindex="-1">' + (zh ? "蓋護照印花" : "Stamp passport") + "</button></div></div>" +
+        '<div class="gx muted small">' + (zh ? "呢張係示範卡，教學完就會消失。" : "This is a sample card for the walkthrough. It disappears at the end.") + "</div>";
+      $("#addSub").textContent = zh ? "輸入總數同單號" : "type the total + bill no."; $("#visitSub").textContent = zh ? "每日一個" : "one a day"; $("#redeemSub").textContent = zh ? "客人嘅獎賞" : "the guest's rewards";
+      ["#addRoll", "#visitBtn", "#redeemBtn"].forEach(s => $(s).disabled = true);
+      $("#actions").classList.remove("hide");
+    };
+    const clearSample = () => {
+      if (!sample) return;
+      const g = $("#gcard"); g.innerHTML = ""; delete g.dataset.sample; $("#actions").classList.add("hide");
+      ["#addSub", "#visitSub", "#redeemSub"].forEach((s, k) => $(s).textContent = sample.subs[k]); ["#addRoll", "#visitBtn", "#redeemBtn"].forEach((s, k) => $(s).disabled = sample.dis[k]);
+      window.__ppCard = sample.pp; sample = null;
+    };
+    const vis = (...sels) => () => { for (const s of sels) { const x = typeof s === "function" ? s() : $(s); if (x && x.offsetParent) return x; } return null; };
+    R.tour("staff_f29", [
+      { before: clearSample, el: () => $("#disp"), en: "Find a guest by typing their phone number here, or tap Scan QR to read the card on their phone.", zh: "喺度輸入客人電話號碼搵佢，或者撳「掃描 QR」讀佢手機上嘅會員卡。" },
+      { before: showSample, el: "#addRoll", en: "Tap ADD BILL to type in the bill total and receipt number when a guest's receipt can't be scanned.", zh: "客人收據掃唔到嘅時候，撳「加單」輸入總數同單號。" },
+      { before: showSample, el: "#visitBtn", en: "The bill gives the guest their points, and VISIT ONLY gives one visit stamp a day when there is no bill.", zh: "張單會俾客人積分，冇單嘅時候撳「只蓋到訪印」，每日一個到訪印花。" },
+      { before: showSample, el: vis(".gperks", "#redeemBtn"), en: "When a guest shows their flash card, tap Mark used on that perk, or REDEEM for a points reward.", zh: "客人出示閃卡嗰陣，喺嗰個著數撳「標記已用」，積分獎賞就撳「兌換」。" },
+      { before: showSample, el: "#logCard", en: "Tapped the wrong thing? Undo it from today's list here, and after the undo window a manager can undo it with a reason.", zh: "撳錯咗？喺今日紀錄度復原；過咗時限就要經理寫低原因先復原到。" },
+      { before: showSample, el: vis(".pp-st", "#gcard"), en: "If a receipt didn't stamp the guest's Menu Passport, tap Stamp passport and tick the food from their bill.", zh: "如果收據冇幫客人嘅菜單護照蓋到印花，撳「蓋護照印花」再剔返張單上面嘅食物。" },
+      { before: clearSample, el: "#queueBtn", en: "Big or unclear bills wait in To approve, so only approve one that matches the paper bill and leave the rest for the manager or owner.", zh: "大額或者睇唔清嘅單會喺「待批核」等，同張紙單對得上先好批准，其他留俾經理或者老闆。" },
+      { before: clearSample, el: "#helpBtn", en: "Tap ? up here any time to see this walkthrough again.", zh: "隨時撳上面嘅 ? 就可以再睇呢個教學。" }
+    ], { force: !!force, lang: zh ? "zh" : "en", onEnd: clearSample });
   }
   document.querySelector("#helpBtn").onclick = () => staffTour(true);
 </script>

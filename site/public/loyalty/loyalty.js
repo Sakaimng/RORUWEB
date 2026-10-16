@@ -218,10 +218,23 @@ window.RORU = (function () {
       const th = tip.offsetHeight || 130, below = top + h + 12;
       if (below + th < vh - 8) { tip.style.top = below + "px"; } else if (top - th - 12 > 8) { tip.style.top = (top - th - 12) + "px"; } else { tip.style.top = Math.max(8, vh - th - 16) + "px"; }
     }
+    // f29: a step whose screen loads data (e.g. the owner Passport) gets up to ~2.4 s for its element to appear before it is skipped
+    let gen = 0;
     function show() {
-      while (i < list.length) { const s = list[i]; if (s.before) { try { s.before(); } catch (e) {} } s._el = find(s); if (s._el) break; list.splice(i, 1); }
-      if (i >= list.length) { end(); return; }
-      const s = list[i]; s._el.scrollIntoView({ block: "center", behavior: "auto" });
+      const my = ++gen;
+      const step = () => {
+        if (my !== gen || !ov.isConnected) return;
+        if (i >= list.length) { end(); return; }
+        const s = list[i];
+        if (!s._ran) { s._ran = 1; s._t0 = Date.now(); if (s.before) { try { s.before(); } catch (e) {} } }
+        s._el = find(s);
+        if (!s._el) { if (Date.now() - s._t0 < (opts.wait || 2400)) { setTimeout(step, 150); return; } list.splice(i, 1); step(); return; }
+        paint(s);
+      };
+      step();
+    }
+    function paint(s) {
+      s._el.scrollIntoView({ block: "center", behavior: "auto" });
       ov.querySelector(".tour-n").textContent = (i + 1) + " / " + list.length;
       ov.querySelector(".tour-t").textContent = zh ? (s.zh || s.en) : s.en;
       ov.querySelector(".tour-skip").textContent = W.skip; ov.querySelector(".tour-skip").style.visibility = i === list.length - 1 ? "hidden" : "visible";
