@@ -8,14 +8,14 @@
 <title data-tt="{prog} — Owner">High Rollers — Owner</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f31">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f31">
-<link rel="stylesheet" href="/loyalty/scratch.css?v=f31">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f32">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f32">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f32">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f31"></script>
-<script src="/loyalty/passport.js?v=f31"></script>
-<script src="/loyalty/scratch.js?v=f31"></script>
-<script src="/loyalty/monthend.js?v=f31"></script>
+<script src="/loyalty/loyalty.js?v=f32"></script>
+<script src="/loyalty/passport.js?v=f32"></script>
+<script src="/loyalty/scratch.js?v=f32"></script>
+<script src="/loyalty/monthend.js?v=f32"></script>
 <style>
 /* v36 owner dashboard */
 .dash{margin:16px 0 18px}
@@ -331,7 +331,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
 <div class="staff" id="app" style="visibility:hidden">
   <header class="oh">
     <div class="brand"><img src="/logo.png" alt="RORUBARU"><span class="fam"><span data-prog="en">High Rollers</span> · Owner</span></div>
-    <div class="acts"><button class="icb phone thbtn" id="themeBtn" data-theme aria-label="Switch light/dark"><i>☀️</i></button><button class="icb hide desk" id="refresh" title="Refresh">↻</button><button class="icb hide phone" id="menuBtn" aria-label="Menu">☰</button><button class="icb hide desk" id="logout"><span>Sign out</span></button></div>
+    <div class="acts"><button class="icb phone thbtn" id="themeBtn" data-theme aria-label="Switch light/dark"><i>☀️</i></button><button class="icb hide desk" id="refresh" title="Refresh" aria-label="Refresh"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-.12em"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg></button><button class="icb hide phone" id="menuBtn" aria-label="Menu">☰</button><button class="icb hide desk" id="logout"><span>Sign out</span></button></div>
   </header>
   <section id="login" class="pin" style="max-width:420px;margin:0 auto">
     <h1>Owner PIN</h1>
@@ -381,7 +381,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
     <button class="mi" data-go="reports"><i>📄</i><span>Reports<small>Month-end report, downloads, charts</small></span></button>
     <button class="mi" data-go="settings"><i>⚙️</i><span>Settings<small>Points, levels, special nights, extras</small></span></button>
     <button class="mi" data-help><i>❓</i><span>How it works<small>Show the quick tour again</small></span></button>
-    <button class="mi" data-refresh><i>↻</i><span>Refresh</span></button>
+    <button class="mi" data-refresh><i><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-.12em"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg></i><span>Refresh</span></button>
     <button class="mi dim" data-logout><i>🚪</i><span>Sign out</span></button>
   </div></div>
   <div class="sheet" id="sheet"><div class="sw0">
@@ -413,7 +413,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
   if (window.matchMedia) window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", () => { if (!localStorage.getItem("roru_owner_theme")) setTheme(sysLight() ? "B" : "A", false); });
   const st = { sess: JSON.parse(localStorage.getItem("roru_owner") || "null"), data: null, pin: "", view: "today", open: {} };
   const isDesk = () => window.matchMedia("(min-width:900px)").matches;
-  const pad = (el, onKey) => { el.innerHTML = ""; ["1","2","3","4","5","6","7","8","9","C","0","⌫"].forEach(k => { const b = document.createElement("button"); b.textContent = k; if (k === "C" || k === "⌫") b.className = "alt"; b.onclick = () => onKey(k); el.appendChild(b); }); };
+  const pad = (el, onKey) => { el.innerHTML = ""; ["1","2","3","4","5","6","7","8","9","C","0","⌫"].forEach(k => { const b = document.createElement("button"); if (k === "⌫") { b.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M17 9.5l-5 5M12 9.5l5 5"/></svg>'; b.setAttribute("aria-label", "Delete"); } else b.textContent = k; if (k === "C" || k === "⌫") b.className = "alt"; b.onclick = () => onKey(k); el.appendChild(b); }); };
   pad($("#pinPad"), async (k) => {
     if (k === "C") st.pin = ""; else if (k === "⌫") st.pin = st.pin.slice(0, -1); else if (st.pin.length < 6) st.pin += k;
     $("#pinDisp").innerHTML = st.pin ? "•".repeat(st.pin.length) : '<span class="ph">PIN</span>'; $("#pinErr").classList.add("hide");
@@ -618,7 +618,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
   }
 
   // ===== REWARDS =====
-  const KIND = { plate: "🍣 Free after visits", ladder: "★ Swap for points", birthday: "🎂 Birthday treat", gold: "✨ Gold receipt" };
+  const KIND = { plate: "🍣 Free after visits", ladder: "★ Swap for points", birthday: "🎂 Birthday treat", gold: "✨⁠ Gold receipt" };
   function renderRewards() {
     const d = st.data, S0 = d.settings, pk = st.perks;
     $("#v-rewards").innerHTML = vh("Rewards", d.rewards.filter(r => r.active).length + " shown to guests · tap one to change it") + '<p class="purpose">What guests can get for their points and visits, and the extra benefits each level gets.</p>' +
@@ -718,7 +718,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
     v.innerHTML = vh("Reports", "Month-end report, downloads and numbers") + '<p class="purpose">Your month-end report for Florencia, spreadsheets to download, and how the extras are doing.</p>' + '<div id="monthSlot"></div>' +
       sec("Download spreadsheets") + '<p class="hint">Opens in Excel, Numbers or Google Sheets. They include phone numbers, so keep them inside the business (HK privacy law).</p>' +
       '<div class="qa" id="csvBtns">' + [["members", "👥", "All members"], ["receipts", "🧾", "All bills"], ["visits", "🍣", "All visits"], ["rewards", "🎁", "Free items claimed"], ["consents", "✍️", "Sign-up agreements"], ["marketing_optins", "📣", "Who said yes to messages"]].map(c => '<button data-x="' + c[0] + '"><i>' + c[1] + "</i>" + c[2] + "<small>Spreadsheet</small></button>").join("") + "</div>" +
-      (x ? sec("How the extras are doing") + '<p class="hint">Totals since the programme started.</p><div class="stats">' + [["Gold receipts won ✨", x.gold_receipts], ["Friends who joined 👯", x.referrals_joined], ["Friend bonuses paid", x.referrals_rewarded], ["Points given for friends", x.referral_points], ["Birthdays saved 🎂", x.birthdays_on_file], ["Birthday rolls given", x.birthday_rolls]].map(y => '<div class="stat"><b>' + fmt(y[1]) + "</b><span>" + y[0] + "</span></div>").join("") + "</div>" +
+      (x ? sec("How the extras are doing") + '<p class="hint">Totals since the programme started.</p><div class="stats">' + [["Gold receipts won ✨⁠", x.gold_receipts], ["Friends who joined 👯", x.referrals_joined], ["Friend bonuses paid", x.referrals_rewarded], ["Points given for friends", x.referral_points], ["Birthdays saved 🎂", x.birthdays_on_file], ["Birthday rolls given", x.birthday_rolls]].map(y => '<div class="stat"><b>' + fmt(y[1]) + "</b><span>" + y[0] + "</span></div>").join("") + "</div>" +
         '<p class="muted" style="font-size:14px;margin:16px 0 10px">Members who brought the most friends</p>' + (x.top_referrers.length ? x.top_referrers.map(b => '<div class="li"><div class="bd"><div class="t1">' + esc(b.name || "—") + '</div><div class="t2">' + esc(b.phone_masked) + " · " + fmt(b.joined) + (+b.joined === 1 ? " friend joined" : " friends joined") + "</div></div></div>").join("") : '<p class="empty">None yet.</p>') : "");
     $("#monthSlot").appendChild(st.monthEl);
     $$("#csvBtns [data-x]").forEach(b => b.onclick = async () => {

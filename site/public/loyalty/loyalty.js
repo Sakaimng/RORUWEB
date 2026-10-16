@@ -28,7 +28,7 @@ window.RORU = (function () {
       plates_done_n: "{n} plates finished", plates_done_n_1: "1 plate finished", stamp_added: "+1 visit stamp 🍣", visit_only_note: "", coming_soon: "Coming soon", soon_tag: "Soon",
       bday_opt: "Birthday (optional) — for a birthday roll",
       hook_mon_double: "Monday: double stamps 🍣🍣", hook_mon_double_sub: "Every visit today = {n} stamps on your plate", hook_tue_friends: "Tuesday: friends night 👯", hook_tue_friends_sub: "Bring-a-friend bonus is {x} today",
-      hook_wed_gold: "Wednesday: gold rush ✨", hook_wed_gold_sub: "About 1 in {o} receipts turns gold today", hook_upgrade_line: "✨ Surprise upgrades more likely Mon–Wed", split_q: "Split a receipt with {who}?", split_new: "New", split_each: "{n} people, about {s} each",
+      hook_wed_gold: "Wednesday: gold rush ✨\u2060", hook_wed_gold_sub: "About 1 in {o} receipts turns gold today", hook_upgrade_line: "✨ Surprise upgrades more likely Mon–Wed", split_q: "Split a receipt with {who}?", split_new: "New", split_each: "{n} people, about {s} each",
       yes: "Yes, split it", no: "No", split_done: "Split ✓ — shared by {n}", split_declined: "Declined", split_mine: "Shared receipts", split_waiting: "Waiting for the first scanner to confirm the split",
       split_not_confirmed: "Not confirmed — this receipt stays with the first scanner", deleted_rejoin: "Deleted. You can rejoin from {d}.", err_rejoin: "Welcome back! You can rejoin {prog} from {d}.",
       err_split_full: "This receipt is already shared by 6 people", err_split_expired: "That split request has expired", err_split_not_found: "That split request is gone", err_referral_same_device: "Friend links need your friend's own phone", err_already_reviewed: "Already answered",
@@ -41,7 +41,7 @@ window.RORU = (function () {
       bday_title: "Birthday roll", bday_add: "Add your birthday and we'll have a hand roll for you in your birthday week.", save: "Save", bday_now: "Happy birthday week! 🎉 Your birthday roll is ready.", bday_claim: "Claim my birthday roll",
       bday_claimed: "Enjoy your birthday roll! Show the code above at the counter.", bday_claimed_toast: "🎂 Birthday roll unlocked — show the QR at the counter", bday_wait: "Birthday rolls unlock {n} days after a birthday is added — see you next year!", bday_wait_1: "Birthday rolls unlock 1 day after a birthday is added — see you next year!",
       bday_on_file: "Your birthday: {d}", bday_rule: "Gohan and up: in your birthday week a hand roll on us appears here (once a year).", bday_pick: "Pick month and day",
-      gold_line2: "✨ About 1 in {o} receipts turns gold: {x} points + a free highball", gold_hit: "GOLD RECEIPT!",
+      gold_line2: "✨\u2060 About 1 in {o} receipts turns gold: {x} points + a free highball", gold_hit: "GOLD RECEIPT!",
       err_referral_self: "That's your own link", err_referral_already_set: "You already have a friend link", err_referral_new_members_only: "Friend links only work for brand-new members", err_referral_code_unknown: "That invite link isn't valid", err_birthday_locked: "Birthday already set — ask staff to change it", err_birthday_not_available: "Birthday roll isn't available right now", err_bad_birthday: "Pick month and day",
       family: "{prog}", staff_brand: "{prog} · Staff", owner_brand: "{prog} · Owner", tag: "Every visit puts a hand roll on your plate.", sub: "5 rolls fill the plate. Scratch the nori. Get a reward.",
       phone: "Your mobile number", phone_ph: "9123 5678", send: "Send me a code", code: "6-digit code", code_ph: "••••••", name: "Your name (optional)", name_ph: "e.g. Kiki",
@@ -63,7 +63,7 @@ window.RORU = (function () {
       receipt_no: "Receipt / bill number", total: "Bill total (HK$)", when: "Date & time on the receipt", shop: "Shop", confirm_add: "Confirm & add points", retake: "Retake photo", table: "Table no. (on the receipt)", r_read: "Read from your receipt", r_items: "What you had", r_done: "Done", r_adds: "adds up", r_server: "Server", seats_n: "{n} seats", seat_1: "1 seat", claim_q: "Use {n} points for {r}?", c_ok: "Confirm", c_cancel: "Cancel", undo: "Undo", undo_q: "Cancel this reward and get {n} points back?", undone: "Cancelled · {n} points back", err_already_redeemed: "Staff already used this reward. A manager can reverse it at the counter.", err_reward_void: "This reward was already cancelled", err_nothing_to_refund: "Nothing to refund on this one", err_reason_required: "Please write a short reason", err_manager_only: "Manager or owner only", s_rev: "Reverse", s_rev_reason: "Reason (required)", s_rev_ok: "Reverse & refund", s_rev_done: "Reversed · {n} points back", s_rev_pos: "It was logged on the POS: void it there too", s_rev_code: "Reverse a used reward (code)", r_pending: "Sent to staff to check",
       added_points: "+{n} points!", queued: "Sent to staff to check — points land once approved (usually same day).", pending_hint: "{n} receipts waiting for staff approval", pending_hint_1: "1 receipt waiting for staff approval",
       ladder: "Rewards", ladder_sub: "Use your points on any reward you've unlocked. Points come off when you tap Use; show the code at the counter.", lad_unlocked: "Unlocked", lad_locked: "Locked", lad_use: "Use", claim: "Use {n} pts", need_more: "{n} more", claimed: "Reward unlocked — scratch to reveal", upgrade: "Upgraded! The nori hid something better 🎉",
-      receipts: "Your receipts", tier_line: "{spend} spent · {next}", tier_next: "{n} to {name}", kama_note: "{t_kama} is by chef's invitation only",
+      receipts: "Your receipts", tier_line: "{spend} spent · {next}", tier_next: "{n} to {name}", kama_note: "{t_kama} is by invitation only",
       err_receipt_already_used: "This receipt has already been added", err_receipt_photo_already_used: "You've already sent this photo", err_receipt_too_old: "Receipts count within {h} hours", err_daily_receipt_limit: "Daily receipt limit reached — staff can add it for you", err_receipt_no_required: "Please add the date & time and table no. from the receipt", err_bad_total: "Please check the total", err_not_enough_points: "Not enough points yet", err_receipt_in_future: "That date is in the future",
       install_tip: "Tip: add this page to your home screen"
     },
@@ -76,7 +76,7 @@ window.RORU = (function () {
       plates_done_n: "已集齊 {n} 碟", stamp_added: "+1 到訪印 🍣", visit_only_note: "", coming_soon: "即將推出", soon_tag: "即將推出",
       bday_opt: "生日（可選）— 生日手卷用",
       hook_mon_double: "星期一：雙倍印章 🍣🍣", hook_mon_double_sub: "今日每次到訪 = {n} 個印", hook_tue_friends: "星期二：朋友之夜 👯", hook_tue_friends_sub: "今日帶朋友獎賞 {x}",
-      hook_wed_gold: "星期三：金色狂熱 ✨", hook_wed_gold_sub: "今日大約每 {o} 張收據有一張變金色", hook_upgrade_line: "✨ 星期一至三，驚喜升級機會更高", split_q: "與 {who} 平分一張收據？", split_new: "新", split_each: "{n} 人，每人約 {s}",
+      hook_wed_gold: "星期三：金色狂熱 ✨\u2060", hook_wed_gold_sub: "今日大約每 {o} 張收據有一張變金色", hook_upgrade_line: "✨ 星期一至三，驚喜升級機會更高", split_q: "與 {who} 平分一張收據？", split_new: "新", split_each: "{n} 人，每人約 {s}",
       yes: "好，平分", no: "不了", split_done: "已平分 ✓ — 共 {n} 人", split_declined: "已拒絕", split_mine: "共享收據", split_waiting: "等待首位掃描者確認平分",
       split_not_confirmed: "未獲確認 — 此收據仍屬首位掃描者", deleted_rejoin: "已刪除。你可於 {d} 起重新加入。", err_rejoin: "歡迎回來！你可於 {d} 起重新加入{prog}。",
       err_split_full: "此收據已由 6 人共享", err_split_expired: "平分請求已過期", err_split_not_found: "平分請求已不存在", err_referral_same_device: "朋友連結須用朋友自己的手機", err_already_reviewed: "已經回覆",
@@ -89,7 +89,7 @@ window.RORU = (function () {
       bday_title: "生日手卷", bday_add: "加入你的生日，生日週我們請你食一個手卷。", save: "儲存", bday_now: "生日週快樂！🎉 你的生日手卷已準備好。", bday_claim: "領取生日手卷",
       bday_claimed: "請享用生日手卷！在櫃檯出示上方的碼。", bday_claimed_toast: "🎂 生日手卷已解鎖 — 在櫃檯出示 QR", bday_wait: "生日須於加入 {n} 日後才可領取 — 明年見！",
       bday_on_file: "你的生日：{d}", bday_rule: "壽司飯或以上：生日週會在這裡出現一個免費手卷（每年一次）。", bday_pick: "請選擇月份及日子",
-      gold_line2: "✨ 大約每 {o} 張收據有一張變金色：{x} 積分 + 免費 Highball 一杯", gold_hit: "金色收據！",
+      gold_line2: "✨\u2060 大約每 {o} 張收據有一張變金色：{x} 積分 + 免費 Highball 一杯", gold_hit: "金色收據！",
       err_referral_self: "這是你自己的連結", err_referral_already_set: "你已有朋友連結", err_referral_new_members_only: "朋友連結只適用於新會員", err_referral_code_unknown: "邀請連結無效", err_birthday_locked: "生日已設定 — 如需更改請找店員", err_birthday_not_available: "暫時未能領取生日手卷", err_bad_birthday: "請選擇月份及日子",
       family: "{prog}", staff_brand: "{prog} · 員工", owner_brand: "{prog} · 東主", tag: "每次光臨，碟上多一個手卷。", sub: "集齊 5 個手卷，刮開紫菜，獲得獎賞。",
       phone: "你的手機號碼", phone_ph: "9123 5678", send: "發送驗證碼", code: "6 位驗證碼", code_ph: "••••••", name: "你的名字（可選）", name_ph: "例如：Kiki",
@@ -111,7 +111,7 @@ window.RORU = (function () {
       receipt_no: "收據／單號", total: "總額 (HK$)", when: "收據上的日期及時間", shop: "分店", confirm_add: "確認並加積分", retake: "重新拍攝", table: "枱號（收據上）", r_read: "從收據讀到", r_items: "你食咗", r_done: "完成", r_adds: "金額吻合", r_server: "服務員", seats_n: "{n} 位", seat_1: "1 位", claim_q: "用 {n} 分換「{r}」？", c_ok: "確認", c_cancel: "取消", undo: "取消兌換", undo_q: "取消此獎賞並退回 {n} 分？", undone: "已取消 · 退回 {n} 分", err_already_redeemed: "店員已使用此獎賞，可請經理在櫃檯退回。", err_reward_void: "此獎賞已取消", err_nothing_to_refund: "此獎賞沒有積分可退回", err_reason_required: "請寫下簡短原因", err_manager_only: "只限經理或東主", s_rev: "退回", s_rev_reason: "原因（必填）", s_rev_ok: "退回並退分", s_rev_done: "已退回 · 退還 {n} 分", s_rev_pos: "此項已記入 POS：請同時在 POS 作廢", s_rev_code: "退回已使用的獎賞（碼）", r_pending: "已交由店員核實",
       added_points: "+{n} 分！", queued: "已交由店員核實 — 批核後積分即到（通常當日）。", pending_hint: "{n} 張收據等待店員批核",
       ladder: "獎賞", ladder_sub: "已解鎖的獎賞可隨時用積分換領。按「換領」即扣分，到櫃枱出示代碼即可。", lad_unlocked: "已解鎖", lad_locked: "未解鎖", lad_use: "換領", claim: "用 {n} 分", need_more: "尚差 {n} 分", claimed: "獎賞解鎖 — 刮開紫菜看看", upgrade: "升級了！紫菜下有更好的 🎉",
-      receipts: "你的收據", tier_line: "已消費 {spend} · {next}", tier_next: "再 {n} 升至 {name}", kama_note: "{t_kama}只限主廚邀請",
+      receipts: "你的收據", tier_line: "已消費 {spend} · {next}", tier_next: "再 {n} 升至 {name}", kama_note: "{t_kama}只限邀請",
       err_receipt_already_used: "此收據已經加過積分", err_receipt_photo_already_used: "你已經上載過這張相", err_receipt_too_old: "收據須於 {h} 小時內", err_daily_receipt_limit: "已達每日收據上限 — 可請店員代為加入", err_receipt_no_required: "請填上收據上的日期時間及枱號", err_bad_total: "請核對總額", err_not_enough_points: "積分尚未足夠", err_receipt_in_future: "日期在未來",
       install_tip: "提示：可將此頁加到主畫面"
     }
@@ -248,22 +248,28 @@ window.RORU = (function () {
   }
 
   // f28: the custom hand-roll emoji replaces every 🍣 the app renders (guest, staff and owner), including text set later
-  const HR = '<img class="hr-emoji" src="/loyalty/img/handroll_32.png" srcset="/loyalty/img/handroll_32.png 1x, /loyalty/img/handroll_64.png 2x, /loyalty/img/handroll_128.png 3x" alt="hand roll" draggable="false">';
+  // f32: the same swap for the other custom Roru emoji: 🍶 sake, 🥃 highball, 🍽️ stamp card, and ✨+U+2060 (word joiner) = gold receipt.
+  //      A plain ✨ stays a stock sparkle; plain-text spots (inputs, options, titles) keep the stock glyph, which never shows as a box.
+  const HRI = (n, alt) => '<img class="hr-emoji" src="/loyalty/img/' + n + '_32.png" srcset="/loyalty/img/' + n + '_32.png 1x, /loyalty/img/' + n + '_64.png 2x, /loyalty/img/' + n + '_128.png 3x" alt="' + alt + '" draggable="false">';
+  const HR = HRI("handroll", "hand roll");
+  const HR_MAP = { "🍣": HR, "🍶": HRI("sake", "sake"), "🥃": HRI("highball", "highball"), "🍽\uFE0F": HRI("stampcard", "stamp card"), "🍽": HRI("stampcard", "stamp card"), "✨\u2060": HRI("goldreceipt", "gold receipt") };
+  const HR_RX = /🍣|🍶|🥃|🍽\uFE0F?|✨\u2060/;
+  const HR_SPLIT = /(🍣|🍶|🥃|🍽\uFE0F?|✨\u2060)/;
   const HR_SKIP = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, OPTION: 1, TITLE: 1, INPUT: 1, SELECT: 1, SVG: 1, TEXT: 1, TSPAN: 1 };
   function hrNode(tn) {
     const p = tn.parentNode; if (!p || HR_SKIP[(p.nodeName || "").toUpperCase()] || (p.closest && p.closest("svg"))) return;
-    const parts = tn.nodeValue.split("🍣"); if (parts.length < 2) return;
+    const parts = tn.nodeValue.split(HR_SPLIT); if (parts.length < 2) return;
     const frag = document.createDocumentFragment();
-    parts.forEach((s, i) => { if (i) { const t = document.createElement("template"); t.innerHTML = HR; frag.appendChild(t.content.firstChild); } if (s) frag.appendChild(document.createTextNode(s)); });
+    parts.forEach((s, i) => { if (!s) return; if (i % 2) { const t = document.createElement("template"); t.innerHTML = HR_MAP[s] || HR; frag.appendChild(t.content.firstChild); } else frag.appendChild(document.createTextNode(s)); });
     p.replaceChild(frag, tn);
   }
   function hrScan(root) {
     if (!root) return;
-    if (root.nodeType === 3) { if (root.nodeValue.indexOf("🍣") >= 0) hrNode(root); return; }
+    if (root.nodeType === 3) { if (HR_RX.test(root.nodeValue)) hrNode(root); return; }
     if (root.nodeType !== 1 && root.nodeType !== 11) return;
-    if ((root.textContent || "").indexOf("🍣") < 0) return;
+    if (!HR_RX.test(root.textContent || "")) return;
     const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), hits = []; let n;
-    while ((n = w.nextNode())) if (n.nodeValue.indexOf("🍣") >= 0) hits.push(n);
+    while ((n = w.nextNode())) if (HR_RX.test(n.nodeValue)) hits.push(n);
     hits.forEach(hrNode);
   }
   function hrStart() {
@@ -271,5 +277,5 @@ window.RORU = (function () {
     new MutationObserver((ms) => { for (const m of ms) { if (m.type === "characterData") hrScan(m.target); else m.addedNodes.forEach(hrScan); } }).observe(document.body, { childList: true, subtree: true, characterData: true });
   }
   if (typeof document !== "undefined") { if (document.body) hrStart(); else document.addEventListener("DOMContentLoaded", hrStart); }
-  return { HR, CFG, PROG, prog, t, lang: () => lang, setLang, applyI18n, rpc, errText, gate, qrSvg, rollSvg, tierIcon, TIERS, tierName: (k, l) => (TIERS[k] || TIERS.nori)[(l || lang) === "zh" ? "zh" : "en"], toast, burst, fmtDay, fmtTime, tour };
+  return { HR, HRI, CFG, PROG, prog, t, lang: () => lang, setLang, applyI18n, rpc, errText, gate, qrSvg, rollSvg, tierIcon, TIERS, tierName: (k, l) => (TIERS[k] || TIERS.nori)[(l || lang) === "zh" ? "zh" : "en"], toast, burst, fmtDay, fmtTime, tour };
 })();

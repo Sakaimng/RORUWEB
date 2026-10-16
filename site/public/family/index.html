@@ -8,13 +8,13 @@
 <title data-tt="{prog} — RORUBARU">High Rollers — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f31">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f31">
-<link rel="stylesheet" href="/loyalty/scratch.css?v=f31">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f32">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f32">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f32">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f31"></script>
-<script src="/loyalty/passport.js?v=f31"></script>
-<script src="/loyalty/scratch.js?v=f31"></script>
+<script src="/loyalty/loyalty.js?v=f32"></script>
+<script src="/loyalty/passport.js?v=f32"></script>
+<script src="/loyalty/scratch.js?v=f32"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -223,13 +223,16 @@
   function guestTour(force) {
     if (!R.tour || $("#member").classList.contains("hide")) return;
     const zh = R.lang() === "zh";
-    R.tour("guest_f27", [
-      { before: () => setTab("card"), el: "#perkHero", en: "This is your card: your tier colour and what you get today.", zh: "呢張係你嘅會員卡：等級顏色同今日有咩著數。" },
-      { before: () => setTab("card"), el: "#scanCard", en: "After you pay, scan your receipt here. You get points and a visit stamp.", zh: "埋單之後喺度掃描收據，就有積分同一個到訪印花。" },
-      { before: () => setTab("card"), el: () => $("#phShow") || $("#perkHero"), en: "At the counter, tap Show staff and turn your phone round. The team brings your perk.", zh: "喺櫃檯撳呢個掣，再將手機俾店員睇，佢哋會送上你嘅著數。" },
+    // f32: one step per guest feature, in order: card/points, stamps, tiers, gold receipt, passport, Roru Day scratch card, bring a friend
+    const shown = (el) => el && el.getClientRects().length && !el.closest(".hide") ? el : null;
+    R.tour("guest_f32", [
+      { before: () => setTab("card"), el: () => shown($("#scanCard")) || $("#perkHero"), en: "Your card 🍣. After you pay, scan your receipt here: every HK$1 earns points. Spend them in Rewards.", zh: "你嘅會員卡 🍣。埋單後喺度掃描收據：每 HK$1 都有積分，可以喺「獎賞」換嘢。" },
+      { before: () => setTab("card"), el: () => shown($("#plateCard")) || $("#scanCard"), en: "Stamps: each visit adds one. Fill the plate and the next hand roll is on us.", zh: "印花：每次到訪加一個。集滿一碟，下一條手卷我哋請。" },
+      { before: () => setTab("status"), el: () => shown($("#statusCard")) || $('#tabBar [data-tab="status"]'), en: "Tiers: Nori, Gohan, Tobiko. The more you spend in a year, the higher you go, with more points per HK$1 and more perks. Kama is by invitation.", zh: "等級：紫菜、壽司飯、飛魚籽。一年內消費越多升得越高，每 HK$1 積分更多，著數更多。魚鮫只限邀請。" },
+      { before: () => setTab("card"), el: () => shown($("#goldLine")) || $("#scanCard"), en: "Gold receipt ✨\u2060: about 1 in 20 scans turns gold. That's 2× points and a free highball 🥃.", zh: "金色收據 ✨\u2060：大約每 20 次掃描有 1 次變金色，雙倍積分再送 Highball 一杯 🥃。" },
       { before: () => setTab("passport"), el: '#tabBar [data-tab="passport"]', en: "Passport: one stamp for every dish you try. Collect them for free food.", zh: "護照：每試一款菜就有一個印花，集夠有免費嘢食。" },
-      { before: () => setTab("rewards"), el: '#tabBar [data-tab="rewards"]', en: "Rewards: what your points get you. Tap one to use it at the counter.", zh: "獎賞：你嘅積分可以換咩。喺櫃檯撳一個就用得。" },
-      { before: () => setTab("me"), el: '#tabBar [data-tab="me"]', en: "Me: your name, birthday and invite a friend. Replay this guide here any time.", zh: "我：名、生日同邀請朋友。隨時可以喺度再睇呢個教學。" }
+      { before: () => setTab("card"), el: () => shown($("#scWrap")) || $("#scanCard"), en: "Roru Day: members' first drink is free (any drink except draft sake). Scan a receipt of HK$388+ and a scratch card pops up. Scratch it, then show staff to use your prize.", zh: "Roru Day：會員第一杯飲品免費（生清酒除外）。掃描 HK$388 或以上嘅收據，就會彈出刮刮卡。刮開之後俾店員睇，就可以用獎品。" },
+      { before: () => setTab("me"), el: () => shown($("#meInvite")) || $('#tabBar [data-tab="me"]'), en: "Bring a friend: share your link and you both get bonus points. Replay this guide from Me any time.", zh: "帶朋友來：分享你嘅連結，你哋都有額外積分。隨時可以喺「我」再睇呢個教學。" }
     ], { force: !!force, lang: zh ? "zh" : "en", onEnd: () => setTab("card") });
   }
   $("#howBtn").onclick = () => guestTour(true);
@@ -505,7 +508,7 @@
       }
     });
     // receipts
-    $("#history").innerHTML = me.receipts.map(r => '<div class="hist"><span>' + R.fmtDay(r.at) + " · " + (zh ? (r.shop_zh || "") : (r.shop || "")) + " · " + (/^STAFF-/.test(r.receipt_no) ? "(staff)" : (/^Table /.test(r.receipt_no) ? "" : "#") + r.receipt_no) + "</span><span>HK$" + (+r.total_hkd).toFixed(0) + " → " + (r.status === "approved" ? "+" + r.points + (r.multiplier && +r.multiplier !== 1 ? " (" + multTxt(r.multiplier) + ")" : "") + (r.stamped ? " · 🍣" : "") + (r.gold ? " ✨" : "") : r.status === "pending" ? "⏳" : "✕") + "</span></div>").join("") || '<p class="muted small">—</p>';
+    $("#history").innerHTML = me.receipts.map(r => '<div class="hist"><span>' + R.fmtDay(r.at) + " · " + (zh ? (r.shop_zh || "") : (r.shop || "")) + " · " + (/^STAFF-/.test(r.receipt_no) ? "(staff)" : (/^Table /.test(r.receipt_no) ? "" : "#") + r.receipt_no) + "</span><span>HK$" + (+r.total_hkd).toFixed(0) + " → " + (r.status === "approved" ? "+" + r.points + (r.multiplier && +r.multiplier !== 1 ? " (" + multTxt(r.multiplier) + ")" : "") + (r.stamped ? " · 🍣" : "") + (r.gold ? " ✨⁠" : "") : r.status === "pending" ? "⏳" : "✕") + "</span></div>").join("") || '<p class="muted small">—</p>';
     $("#memberQr").innerHTML = R.qrSvg("RF:" + me.member_code, 180); $("#memberCode").textContent = me.member_code; $("#memberPhone").textContent = me.phone_masked;
     $("#since").textContent = R.fmtDay(me.member_since);
     renderShopPick();
@@ -592,7 +595,7 @@
   function goldSheet(gr) {
     const o = document.createElement("div"); o.className = "ask-sheet goldwin"; o.id = "goldSheet"; o.setAttribute("role", "dialog");
     o.style.cssText = "position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:20px";
-    o.innerHTML = '<div class="card center" style="width:100%;max-width:380px;background:linear-gradient(135deg,#f3d27a,#b9862a);color:#0b0d12;border:0"><div style="font-size:64px;line-height:1">✨🥃</div><h2 style="margin:10px 0 6px;font-size:26px;letter-spacing:.04em">' + escR(t("gold_hit")) + '</h2><p style="font-size:17px;font-weight:700;margin:0 0 6px">' + escR(t("gold_won")) + "</p>" + (gr && gr.code ? '<p class="small" style="margin:0 0 14px;opacity:.75">' + escR(R.lang() === "zh" ? gr.name_zh : gr.name_en) + " · " + escR(gr.code) + "</p>" : "") + '<button class="btn" style="background:#0b0d12;color:#f3d27a">' + escR(t("gold_see")) + "</button></div>";
+    o.innerHTML = '<div class="card center" style="width:100%;max-width:380px;background:linear-gradient(135deg,#f3d27a,#b9862a);color:#0b0d12;border:0"><div style="font-size:64px;line-height:1">✨⁠🥃</div><h2 style="margin:10px 0 6px;font-size:26px;letter-spacing:.04em">' + escR(t("gold_hit")) + '</h2><p style="font-size:17px;font-weight:700;margin:0 0 6px">' + escR(t("gold_won")) + "</p>" + (gr && gr.code ? '<p class="small" style="margin:0 0 14px;opacity:.75">' + escR(R.lang() === "zh" ? gr.name_zh : gr.name_en) + " · " + escR(gr.code) + "</p>" : "") + '<button class="btn" style="background:#0b0d12;color:#f3d27a">' + escR(t("gold_see")) + "</button></div>";
     o.addEventListener("click", e => { if (e.target.closest("button") || e.target === o) { o.remove(); if (e.target.closest("button")) { setTab("rewards"); const x = $("#rewards"); if (x) x.scrollIntoView({ behavior: "smooth" }); } } });
     document.body.appendChild(o); R.burst(["#E8B84A", "#F3D27A", "#F6F3E7"]);
   }
@@ -724,17 +727,17 @@
       if (r.status === "split_requested") { showScan("scanIdle"); R.toast(t("split_waiting"), 4000); }
       else {
         const zh = R.lang() === "zh", rd = r.read || {}, g = r.visit && r.visit.gold;
-        const head = r.status === "approved" ? (g ? "✨ " + t("gold_hit") + " " : "") + t("added_points", { n: Number(r.points || 0).toLocaleString("en-US") }) + (r.visit && r.visit.added ? " · " + t("stamp_added") : "") : "⏳ " + t("r_pending");
+        const head = r.status === "approved" ? (g ? "✨⁠ " + t("gold_hit") + " " : "") + t("added_points", { n: Number(r.points || 0).toLocaleString("en-US") }) + (r.visit && r.visit.added ? " · " + t("stamp_added") : "") : "⏳ " + t("r_pending");
         const meta = [rd.table ? t("table").replace(/\s*[（(].*$/, "") + " " + escR(rd.table) : "", rd.at ? escR(rd.at.slice(8, 10) + "/" + rd.at.slice(5, 7) + " " + rd.at.slice(11)) : "", rd.total ? "HK$" + Number(rd.total).toLocaleString("en-US", { minimumFractionDigits: 2 }) : "", rd.server ? t("r_server") + " " + escR(rd.server) : "", rd.seats ? t(+rd.seats === 1 ? "seat_1" : "seats_n", { n: rd.seats }) : ""].filter(Boolean).join(" · ");
         const items = (r.items || []).map(x => '<span class="pill">' + (x.qty > 1 ? x.qty + "× " : "") + escR(zh && x.zh ? x.zh : String(x.en).replace(/\s*\((per person|(19|20)\d\d)\)$/i, "")) + "</span>").join(" ");
         $("#scanDone").innerHTML = '<h2 style="margin-top:0">' + head + '</h2><p class="small muted" style="margin:4px 0 10px">' + t("r_read") + ": " + meta + "</p>" + (items ? '<p class="small" style="margin:0 0 6px"><b>' + t("r_items") + '</b></p><div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:12px">' + items + "</div>" : "") + (r.status === "approved" ? "" : '<p class="small muted">' + t("queued") + "</p>") + '<button class="btn" id="rDone">' + t("r_done") + "</button>";
         const gr = g && r.visit ? r.visit.gold_reward : null; // v48: gold receipt = 2x points + a free highball
-        if (gr && r.status === "approved") $("#scanDone").insertAdjacentHTML("afterbegin", '<div class="notice" style="background:linear-gradient(135deg,#f3d27a,#b9862a);color:#0b0d12;font-weight:800">✨🥃 ' + escR(t("gold_won")) + "</div>");
+        if (gr && r.status === "approved") $("#scanDone").insertAdjacentHTML("afterbegin", '<div class="notice" style="background:linear-gradient(135deg,#f3d27a,#b9862a);color:#0b0d12;font-weight:800">✨⁠🥃 ' + escR(t("gold_won")) + "</div>");
         showScan("scanDone"); $("#rDone").onclick = () => showScan("scanIdle");
         if (gr && r.status === "approved") setTimeout(() => goldSheet(gr), 400);
         // f31: the server checked this receipt for a Roru Day scratch card; if it earned one, say so right here
         if (r.status === "approved" && window.RORU_SC && RORU_SC.afterReceipt) RORU_SC.afterReceipt(r.id).then(c => { if (c && c.state === "new" && !$("#scanDone").classList.contains("hide")) RORU_SC.scanWin($("#scanDone"), c); });
-        if (r.status === "approved") { R.burst(g ? ["#E8B84A", "#F3D27A", "#F6F3E7"] : undefined); R.toast((g ? "✨ " + t("gold_hit") + " " : "") + t("added_points", { n: r.points }) + (r.visit && r.visit.referral_bonus ? " · 👯 +" + r.visit.referral_bonus : ""), 3500); state.lastPoints = r.member.points; state.lastStamps = r.member.visits_total; }
+        if (r.status === "approved") { R.burst(g ? ["#E8B84A", "#F3D27A", "#F6F3E7"] : undefined); R.toast((g ? "✨⁠ " + t("gold_hit") + " " : "") + t("added_points", { n: r.points }) + (r.visit && r.visit.referral_bonus ? " · 👯 +" + r.visit.referral_bonus : ""), 3500); state.lastPoints = r.member.points; state.lastStamps = r.member.visits_total; }
       }
       render();
     } catch (e) { $("#rErr").textContent = R.errText(e); $("#rErr").classList.remove("hide"); }
