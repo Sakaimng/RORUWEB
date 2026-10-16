@@ -8,13 +8,13 @@
 <title data-tt="{prog} — RORUBARU">High Rollers — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f32">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f32">
-<link rel="stylesheet" href="/loyalty/scratch.css?v=f32">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f33">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f33">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f33">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f32"></script>
-<script src="/loyalty/passport.js?v=f32"></script>
-<script src="/loyalty/scratch.js?v=f32"></script>
+<script src="/loyalty/loyalty.js?v=f33"></script>
+<script src="/loyalty/passport.js?v=f33"></script>
+<script src="/loyalty/scratch.js?v=f33"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -323,12 +323,12 @@
     let html = "";
     for (let i = 0; i < per; i++) {
       const ang = -Math.PI / 2 + i * 2 * Math.PI / per, r = 78, on = i < n, gold = on && plate[i] && plate[i].gold;
-      html += '<div class="slot' + (on ? " on" : "") + (on && fresh && i === n - 1 ? " new" : "") + '" style="--x:' + (Math.cos(ang) * r).toFixed(1) + "px;--y:" + (Math.sin(ang) * r).toFixed(1) + 'px">' + R.rollSvg(gold) + "</div>";
+      html += '<div class="slot' + (on ? " on" : "") + (on && fresh && i === n - 1 ? " new" : "") + (R.stampStyle === "roll_logo" && i === per - 1 ? " rw-slot" : "") + '" style="--x:' + (Math.cos(ang) * r).toFixed(1) + "px;--y:" + (Math.sin(ang) * r).toFixed(1) + 'px">' + R.stamp(i, per, on, gold) + "</div>";
     }
     html += '<div class="count"><b>' + n + "/" + per + "</b><span>" + t("visits") + "</span></div>";
-    $("#plate").innerHTML = html; $("#plate").classList.toggle("full", n >= per);
+    $("#plate").innerHTML = html; $("#plate").setAttribute("role", "img"); $("#plate").setAttribute("aria-label", n + "/" + per + " " + t("visits")); $("#plate").classList.toggle("full", n >= per);
     const vr = me.visit_reward, rn = vr ? (zh ? vr.name_zh : vr.name_en) : "";
-    $("#plateLine").textContent = n >= per - 1 && n < per ? (rn ? t("plate_full_soon_r", { r: rn }) : t("plate_full_soon")) : t("plate_line", { n: per - n, r: rn });
+    $("#plateLine").textContent = n >= per ? t("reward_unlocked") : n >= per - 1 ? (rn ? t("plate_full_soon_r", { r: rn }) : t("plate_full_soon")) : t("plate_line", { n: per - n, r: rn });
     const rd = vr ? (zh ? vr.detail_zh : vr.detail_en) : ""; $("#plateDetail").textContent = rd && !/placeholder|佔位/i.test(rd) ? rd : "";
     $("#plateSub").textContent = (me.visited_today ? t("visited_today") : t("stamp_rule")) + (me.plates_done ? " · " + t("plates_done_n", { n: me.plates_done }) : "");
     if (fresh) { R.toast(t("stamp_added"), 2600); }

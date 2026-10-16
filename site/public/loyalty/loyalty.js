@@ -9,6 +9,13 @@ window.RORU = (function () {
   // PROGRAMME NAME — the one place to rename the loyalty programme (EN / 繁中). Every string below uses {prog};
   // page titles, headers, the passcode gate, share text and the month-end PDF/CSV read it from here.
   const PROG = { en: "High Rollers", zh: "卷王會" };
+  // STAMP STYLE (f33) — the ONE switch for the stamps on the guest's visit plate. Change only this word:
+  //   "roll_logo" = option B: salmon hand-roll stamps, the last slot is the RORUBARU logo = the reward slot
+  //   "logo"      = option B2 (DEFAULT, Dominic Oct 16 15:37 "Let's go all logo"): every stamp is the RORUBARU logo
+  //   "roll"      = option A: every stamp is the salmon hand roll
+  // Filled stamps show in full colour; empty ones are a ghost of the same stamp, so the guest sees exactly what is left.
+  // Preview only: ?stamps=roll|logo|roll_logo in the address overrides it for a quick compare.
+  const STAMP_STYLE = "logo";
   // TIER NAMES + ONE-LINERS — the one place to rename the status tiers (EN / 繁中). Keys are the internal tier ids
   // stored in the database (never shown); change only the words. Every "tier_<id>" / "lad_m_<id>" string and every
   // {t_<id>} placeholder below reads from here. Order = the ladder, lowest first.
@@ -167,6 +174,17 @@ window.RORU = (function () {
     kama: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 25C7.5 14 15 6.5 27 6c-4 5-6 11.5-5 20-6 .5-11 .2-16-1z" fill="#E8B84A" stroke="#b9862a" stroke-width="1.2" stroke-linejoin="round"/><path d="M22 26c-3-4-7-6.5-12-7.5M22.5 19c-3.5-2-7-2.8-10.5-2.7M24 12.5c-3-.8-6-.6-8.5.4" stroke="#8a6420" stroke-width="1.1" fill="none" stroke-linecap="round"/></svg>'
   };
   const tierIcon = (k) => TIER_ICON[k] || TIER_ICON.nori;
+  // f33: visit-plate stamps drawn with the custom Roru emoji (see STAMP_STYLE above); the old generic rollSvg stays for reference only.
+  const STAMP_MODES = { roll: 1, logo: 1, roll_logo: 1 };
+  const stampStyle = (() => { try { const q = new URLSearchParams(location.search).get("stamps"); if (q && STAMP_MODES[q]) return q; } catch (e) {} return STAMP_MODES[STAMP_STYLE] ? STAMP_STYLE : "roll_logo"; })();
+  const stampImg = (n, cls, alt) => '<img class="stamp ' + cls + '" src="/loyalty/img/' + n + '_64.png" srcset="/loyalty/img/' + n + '_64.png 1x, /loyalty/img/' + n + '_128.png 2x, /loyalty/img/' + n + '_192.png 3x" alt="' + alt + '" draggable="false">';
+  // stamp(i, per, on, gold): slot i of a plate of `per`; on = stamped; gold = a gold-receipt stamp (gets a gold glow)
+  function stamp(i, per, on, gold) {
+    const reward = stampStyle === "roll_logo" && i === per - 1, logo = stampStyle === "logo" || reward;
+    const n = logo ? (on ? "roru_logo" : reward ? "roru_logo_ghost" : "roru_logo_ghost_plain") : (on ? "handroll" : "handroll_ghost");
+    const alt = on ? (logo ? "RORUBARU stamp" : "hand roll stamp") : (reward ? "reward stamp, still to go" : "empty stamp");
+    return stampImg(n, (logo ? "s-logo" : "s-roll") + (reward ? " s-reward" : "") + (on && gold ? " s-gold" : ""), alt);
+  }
   const rollSvg = (gold) => '<svg class="roll" viewBox="0 0 64 64"><defs><linearGradient id="nori' + (gold ? "g" : "") + '" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="' + (gold ? "#F3D27A" : "#3d463a") + '"/><stop offset="1" stop-color="' + (gold ? "#C9952E" : "#161c15") + '"/></linearGradient></defs><path d="M8 20 L40 8 L52 46 L20 58 Z" fill="url(#nori' + (gold ? "g" : "") + ')" stroke="' + (gold ? "#E8B84A" : "#5a6456") + '" stroke-width="1.5"/><ellipse cx="34" cy="12" rx="13" ry="7" fill="#F6F3E7"/><path d="M26 9 q8 -9 16 -1 q-4 -3 -8 -1 q-4 -2 -8 2z" fill="#F64501"/><path d="M30 6 q4 -8 10 -4 q-3 0 -4 4z" fill="#4CC38A"/><ellipse cx="34" cy="12" rx="13" ry="7" fill="none" stroke="#e2dfd2" stroke-width="1"/></svg>';
 
   function toast(msg, ms) { let el = document.querySelector(".toast"); if (!el) { el = document.createElement("div"); el.className = "toast"; document.body.appendChild(el); } el.textContent = msg; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), ms || 2200); }
@@ -201,8 +219,8 @@ window.RORU = (function () {
     opts = opts || {}; const LS = "roru_tour_" + key;
     try { if (!opts.force && localStorage.getItem(LS)) return false; } catch (e) {}
     const old = document.querySelector(".tour"); if (old) old.remove();
-    const zh = (opts.lang || lang) === "zh", W = { next: zh ? "下一步" : "Next", skip: zh ? "略過" : "Skip", done: zh ? "明白" : "Got it" };
-    const ov = document.createElement("div"); ov.className = "tour"; ov.innerHTML = '<div class="tour-ring"></div><div class="tour-tip" role="dialog" aria-live="polite"><div class="tour-n"></div><div class="tour-t"></div><div class="tour-b"><button type="button" class="tour-skip"></button><button type="button" class="tour-next"></button></div></div>';
+    const zh = (opts.lang || lang) === "zh", W = { next: zh ? "下一步" : "Next", back: zh ? "返回" : "Back", skip: zh ? "略過" : "Skip", done: zh ? "明白" : "Got it" };
+    const ov = document.createElement("div"); ov.className = "tour"; ov.innerHTML = '<div class="tour-ring"></div><div class="tour-tip" role="dialog" aria-live="polite"><div class="tour-n"></div><div class="tour-t"></div><div class="tour-b"><button type="button" class="tour-skip"></button><div class="tour-nav"><button type="button" class="tour-back"></button><button type="button" class="tour-next"></button></div></div></div>';
     document.body.appendChild(ov);
     const ring = ov.querySelector(".tour-ring"), tip = ov.querySelector(".tour-tip");
     const find = (s) => { try { const el = typeof s.el === "function" ? s.el() : document.querySelector(s.el); return el && el.getClientRects().length && getComputedStyle(el).visibility !== "hidden" ? el : null; } catch (e) { return null; } };
@@ -239,9 +257,12 @@ window.RORU = (function () {
       ov.querySelector(".tour-t").textContent = zh ? (s.zh || s.en) : s.en;
       ov.querySelector(".tour-skip").textContent = W.skip; ov.querySelector(".tour-skip").style.visibility = i === list.length - 1 ? "hidden" : "visible";
       ov.querySelector(".tour-next").textContent = i === list.length - 1 ? W.done : W.next;
+      const bk = ov.querySelector(".tour-back"); bk.textContent = W.back; bk.style.visibility = i === 0 ? "hidden" : "visible"; bk.disabled = i === 0; // f33: Back (Dominic Oct 16), hidden on step 1
       requestAnimationFrame(() => { place(); setTimeout(place, 120); });
     }
     ov.querySelector(".tour-next").onclick = () => { i++; show(); };
+    // f33: Back = previous step, same place in the walkthrough; its setup (e.g. switching to that tab) runs again
+    ov.querySelector(".tour-back").onclick = () => { if (i <= 0) return; i--; for (let j = i; j < list.length; j++) list[j]._ran = 0; show(); };
     ov.querySelector(".tour-skip").onclick = end;
     window.addEventListener("resize", place);
     show(); return true;
@@ -277,5 +298,5 @@ window.RORU = (function () {
     new MutationObserver((ms) => { for (const m of ms) { if (m.type === "characterData") hrScan(m.target); else m.addedNodes.forEach(hrScan); } }).observe(document.body, { childList: true, subtree: true, characterData: true });
   }
   if (typeof document !== "undefined") { if (document.body) hrStart(); else document.addEventListener("DOMContentLoaded", hrStart); }
-  return { HR, HRI, CFG, PROG, prog, t, lang: () => lang, setLang, applyI18n, rpc, errText, gate, qrSvg, rollSvg, tierIcon, TIERS, tierName: (k, l) => (TIERS[k] || TIERS.nori)[(l || lang) === "zh" ? "zh" : "en"], toast, burst, fmtDay, fmtTime, tour };
+  return { HR, HRI, CFG, PROG, prog, t, lang: () => lang, setLang, applyI18n, rpc, errText, gate, qrSvg, rollSvg, stamp, stampStyle, tierIcon, TIERS, tierName: (k, l) => (TIERS[k] || TIERS.nori)[(l || lang) === "zh" ? "zh" : "en"], toast, burst, fmtDay, fmtTime, tour };
 })();

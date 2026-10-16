@@ -348,6 +348,27 @@ td input,td select{font-size:16px}
 .tour-b button{appearance:none;-webkit-appearance:none;border:0;font:inherit;cursor:pointer;border-radius:12px;min-height:44px;padding:0 16px;font-size:15px;font-weight:900}
 .tour-skip{background:transparent;color:rgba(11,13,18,.6)}
 .tour-next{background:var(--orange);color:#fff;min-width:110px}
+/* f33: walkthrough Back button, left of Next */
+.tour-nav{display:flex;gap:8px;align-items:center}
+.tour-back{background:rgba(11,13,18,.08);color:var(--ink);min-width:84px;border:1px solid rgba(11,13,18,.16)!important}
+.tour-back:disabled{opacity:0}
 
 /* f28 custom hand-roll emoji (replaces 🍣) */
 .hr-emoji{display:inline-block;height:1.2em;width:auto;vertical-align:middle;margin:-.15em .05em 0;object-fit:contain;-webkit-user-drag:none;user-select:none}
+
+.plate.small-plate .slot{width:68px;height:68px;margin:-34px 0 0 -34px}
+/* f33: visit-plate stamps = custom Roru emoji (STAMP_STYLE in loyalty.js). Filled = full colour + a small glow; empty = ghost of the same stamp */
+.plate .stamp{width:76px;height:76px;object-fit:contain;display:block;-webkit-user-drag:none;user-select:none;-webkit-user-select:none;transform:scale(.9);transition:transform .35s cubic-bezier(.3,1.5,.5,1),filter .35s}
+.plate .slot.on .stamp{transform:scale(1);filter:drop-shadow(0 4px 6px rgba(0,0,0,.5)) drop-shadow(0 0 8px rgba(246,69,1,.28))}
+.plate .slot.on .stamp.s-gold{filter:drop-shadow(0 4px 6px rgba(0,0,0,.5)) drop-shadow(0 0 10px rgba(232,184,74,.75))}
+.plate .stamp.s-logo{width:54px;height:54px}
+.plate .stamp.s-reward{width:60px;height:60px}
+.plate .slot.on .stamp.s-reward{filter:drop-shadow(0 4px 6px rgba(0,0,0,.5)) drop-shadow(0 0 14px rgba(246,69,1,.65))}
+.plate .slot:not(.on) .stamp.s-reward{animation:rwpulse 2.6s ease-in-out infinite}
+@keyframes rwpulse{0%,100%{transform:scale(.92)}50%{transform:scale(1)}}
+.plate .slot.new .stamp{animation:drop .6s cubic-bezier(.2,1.4,.4,1) both}
+@media (prefers-reduced-motion:reduce){.plate .slot:not(.on) .stamp.s-reward,.plate .slot.new .stamp{animation:none}}
+
+/* f33 all-logo: empty logo slots get a solid backing so the plate's dashed ring doesn't show through the ghost */
+.plate .slot{z-index:1}
+.plate .slot:not(.on) .stamp.s-logo{background:radial-gradient(circle,#24272f 0 66%,transparent 70%);border-radius:50%}
