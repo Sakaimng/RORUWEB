@@ -77,3 +77,61 @@
 /* f29 review: owner header wraps on phone (the button pushed the page 11px wide) */
 @media (max-width:899px){#v-passport .vh{flex-direction:column;align-items:stretch}#v-passport .vh .obtn{align-self:flex-start;max-width:100%}}
 @media (max-width:600px){.pp-trow{grid-template-columns:96px 1fr 40px}.pp-trow label:nth-child(1){grid-row:1;grid-column:1}.pp-trow label:nth-child(2){grid-row:2;grid-column:1/-1}.pp-trow label:nth-child(3){grid-row:3;grid-column:1/-1}.pp-trow .pp-trm{grid-row:1;grid-column:3;align-self:end}}
+
+/* ===== f36: Food | Drinks toggle, progress view for both, bottle passport ===== */
+.pp-tog{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;margin:0 0 12px;border-radius:18px;background:rgba(20,22,28,.94);border:1px solid rgba(255,255,255,.12);position:sticky;top:8px;z-index:5;box-shadow:0 8px 20px rgba(0,0,0,.35);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.pp-tog button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px;border:0;border-radius:14px;background:transparent;color:inherit;font:inherit;font-weight:800;font-size:16px;cursor:pointer;opacity:.7}
+.pp-tog button .pp-roll{width:30px;height:30px}.pp-tog button .dk-bot{width:18px;height:28px}
+.pp-tog button em{font-style:normal;font-size:12px;font-weight:800;padding:2px 7px;border-radius:99px;background:rgba(255,255,255,.12)}
+.pp-tog button.on{opacity:1;background:linear-gradient(160deg,#FF4D00,#d63a00);color:#fff;box-shadow:0 6px 18px rgba(255,77,0,.35)}.pp-tog button.on em{background:rgba(255,255,255,.25)}
+.pp-togo{display:flex;align-items:center;gap:12px;margin:2px 0 4px;padding:10px 12px;border-radius:14px;background:rgba(255,77,0,.12);border:1px solid rgba(255,77,0,.35)}
+.pp-togo b{font-size:30px;font-weight:900;line-height:1;color:#FF4D00;min-width:30px;text-align:center}
+.pp-togo span{display:flex;flex-direction:column;font-weight:800;font-size:15px;line-height:1.2}.pp-togo small{font-size:12.5px;font-weight:600;opacity:.75;margin-top:2px}
+.pp-togo.done{background:rgba(47,138,78,.18);border-color:rgba(143,224,168,.5)}.pp-togo.done b{color:#8fe0a8}
+.pp-badges{display:grid;grid-template-columns:1fr;gap:6px;margin-top:12px}
+.pp-badge{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.18)}
+.pp-badge-ic{position:relative;width:34px;height:34px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,.06);filter:grayscale(1);opacity:.55}
+.pp-badge-ic img,.pp-badge-ic .pp-svg{width:26px;height:26px}.pp-badge-ic .dk-bot{width:15px;height:24px}
+.pp-badge-ic i{position:absolute;right:-3px;bottom:-3px;width:16px;height:16px;border-radius:50%;background:#E8B84A;color:#16181F;font-style:normal;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.pp-badge-t{flex:1;display:flex;flex-direction:column;line-height:1.2;min-width:0}.pp-badge-t b{font-size:14px}.pp-badge-t small{font-size:12px;opacity:.65}
+.pp-badge em{font-style:normal;font-weight:800;font-size:13px;opacity:.75}
+.pp-badge.on{border:1px solid rgba(232,184,74,.75);background:linear-gradient(160deg,rgba(232,184,74,.2),rgba(232,184,74,.04))}.pp-badge.on .pp-badge-ic{filter:none;opacity:1;background:rgba(232,184,74,.22)}.pp-badge.on b{color:#F2CF7A}
+.pp-lock{width:11px;height:11px;vertical-align:-1px;opacity:.8}
+/* bottles, drawn in CSS colours so they can be ghosts or filled */
+.dk-bot{width:26px;height:40px;display:block}
+.dk-bot .dk-glass{fill:#2e5a3c;stroke:#cfe6d4;stroke-width:1.4}.dk-bot .dk-cap{fill:#FF4D00}.dk-bot .dk-lab{fill:#F6F3E7}.dk-bot .dk-ink{fill:none;stroke:#FF4D00;stroke-width:1.8;stroke-linecap:round}
+.dk-bot circle.dk-ink{fill:#FF4D00;stroke:none}
+[data-cat="sake"] .dk-bot .dk-glass,[data-cat="shochu"] .dk-bot .dk-glass,.dk-hero-ic .dk-bot:first-child .dk-glass,.pp-tog .dk-bot .dk-glass,.dk-st-ic .dk-bot .dk-glass{fill:#5b3a22;stroke:#f1d7b8}
+.pp-cell.off .dk-bot .dk-glass{fill:none;stroke:rgba(255,255,255,.35);stroke-dasharray:3 2.4}.pp-cell.off .dk-bot .dk-cap,.pp-cell.off .dk-bot .dk-lab{fill:rgba(255,255,255,.12)}.pp-cell.off .dk-bot .dk-ink{stroke:rgba(255,255,255,.3)}.pp-cell.off .dk-bot circle.dk-ink{fill:rgba(255,255,255,.3)}
+.dk-hero{background:linear-gradient(160deg,#1d1810,#101217 72%);border-color:rgba(232,184,74,.42)}
+.dk-hero .pp-k{color:#F2CF7A}.dk-hero-ic{display:flex;gap:2px;align-items:flex-end;flex:none}.dk-hero-ic .dk-bot{width:24px;height:44px}
+.dk-ic{position:relative;height:50px;display:flex;align-items:center;justify-content:center;margin-bottom:6px}.dk-ic .dk-bot{width:30px;height:48px}
+.dk-x{position:absolute;bottom:-2px;right:-16px;font-size:11px;font-weight:900;padding:1px 6px;border-radius:99px;background:#E8B84A;color:#16181F}
+.dk-cell{min-height:128px}.dk-cell .pp-nm{font-size:12px}
+.dk-pz .pp-pz-art svg.dk-bot{width:22px;height:34px;margin:0 auto}
+.dk-pz.lock .pp-pz-art{filter:grayscale(1);opacity:.4}
+/* unlock celebration */
+.pp-cele{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:24px;animation:ppFade .25s}
+.pp-cele-c{width:100%;max-width:340px;text-align:center;padding:26px 22px 22px;border-radius:24px;background:linear-gradient(165deg,#2a1608,#111318 70%);border:1.5px solid #FF4D00;box-shadow:0 20px 60px rgba(255,77,0,.35);animation:ppPop .5s cubic-bezier(.2,1.5,.4,1)}
+.pp-cele-art{display:flex;justify-content:center}.pp-cele-art img,.pp-cele-art .pp-svg,.pp-cele-art .pp-card-ic{width:84px;height:84px;color:#FF4D00}.pp-cele-art .dk-bot{width:48px;height:76px}
+.pp-cele-k{margin-top:10px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:900;color:#E8B84A}
+.pp-cele-c h2{margin:6px 0 8px;font-size:22px;line-height:1.2}.pp-cele-c p{margin:0 0 16px;font-size:14px;opacity:.82;line-height:1.45}.pp-cele-c .btn{width:100%}
+@keyframes ppPop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}@keyframes ppFade{from{opacity:0}to{opacity:1}}
+/* staff iPad: bottles */
+.dk-st-h{margin-top:10px;padding-top:10px;border-top:1px solid rgba(127,127,127,.3)}.dk-st-ic{width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex:none}.dk-st-ic .dk-bot{width:22px;height:34px}
+.dk-pk{cursor:default}.dk-pk-ic .dk-bot{width:18px;height:28px}
+.dk-step{display:flex;align-items:center;gap:6px;flex:none}.dk-step b{min-width:18px;text-align:center;font-size:17px}
+.dk-step button{width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(127,127,127,.5);background:transparent;color:inherit;font:inherit;font-size:20px;font-weight:900;cursor:pointer;line-height:1}
+.dk-pk.sel .dk-plus{background:#FF4D00;border-color:#FF4D00;color:#fff}
+.dk-pick{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+/* owner */
+.dk-cat{font-size:11px;padding:1px 7px;border-radius:99px;background:var(--line,rgba(127,127,127,.2));margin-left:4px}
+.pp-orow b small{display:block;font-weight:600;color:var(--muted,rgba(255,255,255,.6));font-size:12px}
+.dk-elist{display:flex;flex-direction:column;gap:6px}
+.dk-erow{display:grid;grid-template-columns:minmax(0,1.6fr) 120px 90px 90px;gap:8px;align-items:end;padding:8px 10px;border-radius:12px;border:1px solid var(--line,rgba(127,127,127,.3));opacity:.65}
+.dk-erow.on{opacity:1;border-color:#F64501;background:rgba(246,69,1,.07)}
+@media(max-width:600px){.dk-erow{grid-template-columns:1fr 1fr 1fr}.dk-erow .dk-chk{grid-column:1/-1}}
+.dk-chk{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;min-height:44px}.dk-chk input{width:22px;height:22px;accent-color:#F64501;flex:none}
+@media(min-width:600px){.pp-badges{grid-template-columns:1fr 1fr}}
+/* f36: reward cards: status pill under the text so names don't squeeze to one word a line (food + drinks match) */
+.pp-pz{grid-template-columns:42px 36px 1fr;row-gap:6px}.pp-pz .pp-pz-s{grid-column:3;justify-self:start}

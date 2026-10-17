@@ -4,7 +4,7 @@ window.RORU = (function () {
     url: "https://gpudggbdwghzsanyvvgt.supabase.co",
     key: "sb_publishable_WbZvV4s9WkKYvdGGlIUBbw_-e6W7Yfk",
     passHash: "156a203791b9b43e682aa45904eee434cc46fab681b2ae1cbb8ee76415df1c68",   // sha256 of the preview passcode (dark phase only)
-    build: "f35-preview-2026-10-17"
+    build: "f36-preview-2026-10-17"
   };
   // PROGRAMME NAME — the one place to rename the loyalty programme (EN / 繁中). Every string below uses {prog};
   // page titles, headers, the passcode gate, share text and the month-end PDF/CSV read it from here.
