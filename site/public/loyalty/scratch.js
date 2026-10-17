@@ -367,7 +367,7 @@
           srcHtml() +
           '<h2 style="margin-top:18px">Roru Days</h2><p class="pp-osub">One a month, Mon to Wed. Each uses one prize set.</p>' + (dayRows || '<p class="pp-osub">None yet.</p>') + "</div></div>" +
       '<details class="pp-ocard pp-oall"><summary>Prize sets and odds</summary><div class="sc-sets">' + d.sets.map(setCard).join("") + "</div></details>" +
-      '<p class="pp-osub" style="margin-top:10px">Costs are ingredient cost from the October cost sheet. +100 points and the extra visit stamp cost nothing on the night and go onto the guest\'s card by themselves. Guests never see the odds.</p>';
+      '<p class="pp-osub" style="margin-top:10px">Costs are ingredient cost from the October cost sheet. +88 points and the extra visit stamp cost nothing on the night and go onto the guest\'s card by themselves. Guests never see the odds.</p>';
     $("#scEdit").onclick = ownerEdit;
   }
   function srcHtml() {

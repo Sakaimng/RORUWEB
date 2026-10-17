@@ -8,14 +8,14 @@
 <title data-tt="{prog} — Owner">High Rollers — Owner</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f33">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f33">
-<link rel="stylesheet" href="/loyalty/scratch.css?v=f33">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f34">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f34">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f34">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f33"></script>
-<script src="/loyalty/passport.js?v=f33"></script>
-<script src="/loyalty/scratch.js?v=f33"></script>
-<script src="/loyalty/monthend.js?v=f33"></script>
+<script src="/loyalty/loyalty.js?v=f34"></script>
+<script src="/loyalty/passport.js?v=f34"></script>
+<script src="/loyalty/scratch.js?v=f34"></script>
+<script src="/loyalty/monthend.js?v=f34"></script>
 <style>
 /* v36 owner dashboard */
 .dash{margin:16px 0 18px}
@@ -479,8 +479,8 @@ body.thB{--muted:rgba(22,24,31,.64)}
     const tk = { p_token: st.sess.token }, soft = (p) => p.catch(() => null);
     try {
       const r = await Promise.all([R.rpc("owner_stats", tk), soft(R.rpc("owner_dashboard", tk)), soft(R.rpc("staff_today", tk)), soft(R.rpc("staff_queue", tk)), soft(R.rpc("staff_bonus_queue", tk)), soft(R.rpc("staff_pos_queue", tk)),
-        soft(R.rpc("owner_perks", tk)), soft(R.rpc("owner_upgrade_log", tk)), soft(R.rpc("owner_extras", tk)), soft(R.rpc("owner_features", tk)), soft(R.rpc("owner_access_log", { p_token: st.sess.token, p_limit: 30 }))]);
-      [st.data, st.dash, st.today, st.queue, st.bq, st.pos, st.perks, st.ulog, st.extras, st.features, st.alog] = r;
+        soft(R.rpc("owner_perks", tk)), soft(R.rpc("owner_upgrade_log", tk)), soft(R.rpc("owner_extras", tk)), soft(R.rpc("owner_features", tk)), soft(R.rpc("owner_access_log", { p_token: st.sess.token, p_limit: 30 })), soft(R.rpc("staff_splits", { p_token: st.sess.token, p_days: 30 }))]);
+      [st.data, st.dash, st.today, st.queue, st.bq, st.pos, st.perks, st.ulog, st.extras, st.features, st.alog, st.splits] = r;
     } catch (e) { if (e.code === "staff_not_signed_in" || e.code === "owner_only") { logout(); return; } R.toast(R.errText(e)); return; }
     $$("details[id]").forEach(x => st.open[x.id] = x.open);
     $(".views").appendChild($("#dashHome"));
@@ -509,6 +509,18 @@ body.thB{--muted:rgba(22,24,31,.64)}
     return p > 0 ? '<span class="up">▲ ' + p + "% vs " + what + "</span>" : p < 0 ? '<span class="down">▼ ' + Math.abs(p) + "% vs " + what + "</span>" : '<span class="flat">— same as ' + what + "</span>";
   }
   const hkTime = (x) => x ? new Date(x).toLocaleString("en-GB", { timeZone: "Asia/Hong_Kong", day: "numeric", month: "short", hour: "numeric", minute: "2-digit", hour12: true }).replace(/ (am|pm)$/i, (m) => m.toLowerCase()) : "";
+  // f34: split receipts (a guest scanned, a member friend confirmed, points went 50/50)
+  function splitRows(list) {
+    const stx = (o) => o.status === "accepted" ? '<span class="sp-ok">✓ Split</span>' : o.status === "pending" ? '<span class="sp-wait">⏳ Waiting for friend</span>' : o.status === "declined" ? '<span class="sp-no">Friend said no</span>' : o.status === "expired" ? '<span class="sp-no">No answer · points stayed with scanner</span>' : '<span class="sp-no">Cancelled by guest</span>';
+    return rt([{ h: "Bill" }, { h: "Scanned by" }, { h: "Split with" }, { h: "Points each" }, { h: "Status" }, { h: "When" }],
+      list.map(o => ({ cells: [((/^Table /.test(o.receipt_no || "") ? "" : "#") + esc(o.receipt_no || "")) + " · " + hkd(o.bill) + (o.is_test ? ' <small class="muted">test</small>' : ""), esc(o.scanner), esc(o.friend),
+        o.status === "accepted" ? fmt(o.points_scanner) + " + " + fmt(o.points_friend) + (o.hkd_friend != null ? '<br><small class="muted">' + hkd(o.hkd_scanner) + " + " + hkd(o.hkd_friend) + " spend</small>" : "") : "—", stx(o), hkTime(o.decided_at || o.at)] })));
+  }
+  function splitBox(limit, withCounts) {
+    const sp = st.splits || {}, of = sp.offers || [], c = sp.counts || {};
+    return (withCounts ? '<div class="stats">' + [["Split receipts ✓", c.accepted], ["Waiting for a friend", c.pending], ["Friend said no", c.declined], ["No answer (points stayed)", c.expired], ["Points moved to friends", c.points_moved]].map(y => '<div class="stat"><b>' + fmt(y[1] || 0) + "</b><span>" + y[0] + "</span></div>").join("") + "</div>" : "") +
+      (of.length ? splitRows(of.slice(0, limit)) : '<p class="empty">No split receipts yet.</p>');
+  }
   function renderToday() {
     const t = st.today || {}, d = st.data, q = st.queue || [], bq = st.bq || [], pos = ((st.pos && st.pos.items) || []).slice().sort((a, b) => String(b.redeemed_at).localeCompare(String(a.redeemed_at)));
     const waiting = q.length + bq.length; badge(waiting);
@@ -539,9 +551,10 @@ body.thB{--muted:rgba(22,24,31,.64)}
           '<div class="t3">' + (p.upgraded ? '<span class="opill warn">⬆️ swapped up from ' + esc(p.from_en || "") + "</span>" : "") + (p.logged_at ? '<span class="opill">Rung up on the POS</span>' : '<span class="opill no">Not rung up on the POS yet</span>') + (p.pos_item ? '<span class="muted">POS button: ' + esc(p.pos_item) + "</span>" : "") + "</div>" +
           '<div class="acts"><button class="btn ghost sm" data-undo="' + esc(p.code) + '" data-nm="' + esc(p.give_en || "") + '">↩︎ Undo</button></div></div></div>').join("") : '<p class="empty">No free items claimed yet.</p>') + "</div>" +
       "</div></div>" +
+      sec("Split receipts 🍣🍣", '<button class="lnk" data-go2="reports">All splits ›</button>') + '<p class="hint">Guests who shared one bill 50/50 with a member friend. One scan per bill; the friend confirmed in their own app.</p>' + splitBox(5, false) +
       sec("Best guests", '<button class="lnk" data-go2="guests">All guests ›</button>') + '<p class="hint">Who spent the most with you in the last 12 months.</p><div class="lilist">' + (top.length ? top.map((m, i) => guestLi(m, i)).join("") : '<p class="empty">No members yet.</p>') + "</div>" +
       '<details class="grp" id="todayLog" style="margin-top:16px"><summary>Everything that happened today (' + ((t.log || []).length) + ')</summary><div class="in">' + ((t.log || []).length ? rt([{ h: "What happened" }, { h: "Guest" }, { h: "Time" }, { h: "Done by" }],
-        t.log.map(l => ({ cells: [l.type === "redeem" ? "🎁 Claimed: " + esc(l.reward || "") : l.type === "visit" ? "🍣 Visit stamped" : "🧾 " + hkd(l.amount) + " bill → " + fmt(l.points) + " points" + (l.source === "ocr" ? " (scanned)" : l.source === "staff" ? " (by staff)" : ""), esc(l.who || "—"), hkTime(l.at), esc(l.by || "Guest, on their phone")] }))) : '<p class="empty">Nothing yet today.</p>') + "</div></details>";
+        t.log.map(l => ({ cells: [l.type === "redeem" ? "🎁 Claimed: " + esc(l.reward || "") : l.type === "visit" ? "🍣 Visit stamped" : "🧾 " + hkd(l.amount) + " bill → " + fmt(l.points) + " points" + (l.source === "ocr" ? " (scanned)" : l.source === "staff" ? " (by staff)" : "") + (l.split_role ? ' · <b class="sp-tag">½ split with ' + esc(l.split_with || "") + "</b>" : ""), esc(l.who || "—"), hkTime(l.at), esc(l.by || "Guest, on their phone")] }))) : '<p class="empty">Nothing yet today.</p>') + "</div></details>";
     const T = $("#v-today");
     T.querySelector('[data-q="find"]').onclick = () => { go("guests"); setTimeout(() => $("#gq") && $("#gq").focus(), 50); };
     T.querySelector('[data-q="approve"]').onclick = () => { const a = $("#apList"); a.scrollIntoView({ behavior: "smooth", block: "start" }); };
@@ -716,6 +729,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
     if (!st.monthEl) { st.monthEl = document.createElement("div"); st.monthEl.className = "card"; st.monthEl.id = "monthBox"; window.RORU_MONTHEND.mount(st.monthEl, () => st.sess.token); }
     const v = $("#v-reports");
     v.innerHTML = vh("Reports", "Month-end report, downloads and numbers") + '<p class="purpose">Your month-end report for Florencia, spreadsheets to download, and how the extras are doing.</p>' + '<div id="monthSlot"></div>' +
+      sec("Split receipts · last 30 days") + '<p class="hint">Each bill is scanned once. When a guest splits it with a member friend and the friend says yes, both get half the points (the scanner keeps an odd point). No answer within ' + esc((st.data.settings || {}).split_offer_hours || 12) + ' hours = the points stay with the scanner.</p>' + splitBox(60, true) +
       sec("Download spreadsheets") + '<p class="hint">Opens in Excel, Numbers or Google Sheets. They include phone numbers, so keep them inside the business (HK privacy law).</p>' +
       '<div class="qa" id="csvBtns">' + [["members", "👥", "All members"], ["receipts", "🧾", "All bills"], ["visits", "🍣", "All visits"], ["rewards", "🎁", "Free items claimed"], ["consents", "✍️", "Sign-up agreements"], ["marketing_optins", "📣", "Who said yes to messages"]].map(c => '<button data-x="' + c[0] + '"><i>' + c[1] + "</i>" + c[2] + "<small>Spreadsheet</small></button>").join("") + "</div>" +
       (x ? sec("How the extras are doing") + '<p class="hint">Totals since the programme started.</p><div class="stats">' + [["Gold receipts won ✨⁠", x.gold_receipts], ["Friends who joined 👯", x.referrals_joined], ["Friend bonuses paid", x.referrals_rewarded], ["Points given for friends", x.referral_points], ["Birthdays saved 🎂", x.birthdays_on_file], ["Birthday rolls given", x.birthday_rolls]].map(y => '<div class="stat"><b>' + fmt(y[1]) + "</b><span>" + y[0] + "</span></div>").join("") + "</div>" +
@@ -746,7 +760,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
     gold_roll_chance: ["Chance of a gold visit stamp (looks only, no prize)", "0 to 1 · e.g. 0.05 = 1 in 20"],
     gold_receipt_odds: ["Chance a bill becomes a gold receipt", "0 to 1 · e.g. 0.05 = 1 in 20 bills"],
     gold_receipt_mult: ["Gold receipt points bonus", "e.g. 2 = double points on that bill"],
-    referral_bonus_points: ["Bring-a-friend points (each person gets)", "e.g. 100"],
+    referral_bonus_points: ["Bring-a-friend points (each person gets)", "e.g. 188"],
     referral_cap_per_year: ["Most friend bonuses one member can get a year", "e.g. 10"],
     birthday_window_days: ["Birthday treat works this many days either side", "e.g. 3 → from 3 days before to 3 days after"],
     birthday_min_days: ["Days a birthday must be saved before the treat works", "e.g. 30 · stops people changing it to get a free roll"],
@@ -757,7 +771,12 @@ body.thB{--muted:rgba(22,24,31,.64)}
     hook_tue_bonus_mult: ["Tuesday: friend bonus multiplied by", "e.g. 2 = double friend points"],
     hook_wed_on: ["Wednesday gold rush: 1 = on, 0 = off", "Easier with the switch under Weekly specials"],
     hook_wed_gold_odds: ["Wednesday: chance of a gold receipt", "0 to 1 · e.g. 0.2 = 1 in 5"],
-    referral_min_spend: ["Friend bonus only if the friend's first bill is at least (HK$)", "e.g. 200"],
+    referral_min_spend: ["Friend bonus only if the friend's first bill is at least (HK$)", "e.g. 388 · the one place to change the bring-a-friend minimum"],
+    referral_visit2_points: ["Come-back bonus: points for a new friend who visits again", "e.g. 88 · 0 = off"],
+    referral_visit2_days: ["Come-back bonus: within this many days of their first visit", "e.g. 30"],
+    roru_day_max_point_rewards: ["Roru Day: points rewards a guest can use per bill (free first drink always stacks)", "e.g. 1 · 0 = no limit"],
+    split_offer_hours: ["Split receipt: hours a friend has to say yes", "e.g. 12 · after that the points stay with the guest who scanned"],
+    split_offers_per_day: ["Split receipt: requests a guest can send per day", "e.g. 5"],
     rejoin_cooloff_days: ["Days before a deleted account can rejoin", "15 or 30"],
     kama_dinner_passes: ["Kama Dinner passes per member per year", "e.g. 2"]
   };

@@ -4,7 +4,7 @@ window.RORU = (function () {
     url: "https://gpudggbdwghzsanyvvgt.supabase.co",
     key: "sb_publishable_WbZvV4s9WkKYvdGGlIUBbw_-e6W7Yfk",
     passHash: "156a203791b9b43e682aa45904eee434cc46fab681b2ae1cbb8ee76415df1c68",   // sha256 of the preview passcode (dark phase only)
-    build: "v1d-preview-2026-10-14"
+    build: "f34-preview-2026-10-17"
   };
   // PROGRAMME NAME — the one place to rename the loyalty programme (EN / 繁中). Every string below uses {prog};
   // page titles, headers, the passcode gate, share text and the month-end PDF/CSV read it from here.
@@ -37,7 +37,14 @@ window.RORU = (function () {
       hook_mon_double: "Monday: double stamps 🍣🍣", hook_mon_double_sub: "Every visit today = {n} stamps on your plate", hook_tue_friends: "Tuesday: friends night 👯", hook_tue_friends_sub: "Bring-a-friend bonus is {x} today",
       hook_wed_gold: "Wednesday: gold rush ✨\u2060", hook_wed_gold_sub: "About 1 in {o} receipts turns gold today", hook_upgrade_line: "✨ Surprise upgrades more likely Mon–Wed", split_q: "Split a receipt with {who}?", split_new: "New", split_each: "{n} people, about {s} each",
       yes: "Yes, split it", no: "No", split_done: "Split ✓ — shared by {n}", split_declined: "Declined", split_mine: "Shared receipts", split_waiting: "Waiting for the first scanner to confirm the split",
-      split_not_confirmed: "Not confirmed — this receipt stays with the first scanner", deleted_rejoin: "Deleted. You can rejoin from {d}.", err_rejoin: "Welcome back! You can rejoin {prog} from {d}.",
+pre_title: "One receipt, one scan", pre_flair: "Like the last hand roll: it only goes once.", pre_once: "Each receipt can be scanned once only. After that nobody can scan it again, not even you.", pre_friend: "Eating with a friend who's also a member? Split the receipt and you both earn equal points.", pre_scan: "Scan receipt", pre_type: "Type it in", pre_split: "Split with a friend", pre_later: "Not now",
+      visit2_got: "+{n} come-back bonus", friend_v2: "Your friend gets +{v} more if they come back within {d} days.", visit2_until: "Come back by {d} for +{v} bonus points.", err_roru_day_one_points_reward: "Roru Day: one points reward per bill. The free first drink still counts on top.",
+      split_banner: "Splitting with a friend: scan first, then pick your friend.", split_title: "Split with a friend", split_how: "50/50: your friend gets half the points (rounded down), you keep the rest. They confirm in their own app.", split_friend_lbl: "Friend's phone number or member code", split_send: "Send to my friend", split_you_friend: "You {a} pts · Friend {b} pts",
+      split_sent: "Sent to {who}. They have {h} hours to say yes.", split_wait_card: "Waiting for {who} · until {t}", split_cancel: "Cancel", split_in_q: "{who} wants to split a receipt with you", split_in_sub: "{no} · HK${bill} → you get {p} points", split_ok_friend: "Split ✓ +{n} points",
+      split_out_accepted: "Split ✓ with {who}: you {a} · them {b}", split_out_declined: "{who} said no. The points stay with you", split_out_expired: "No answer in time. The points stay with you", split_out_cancelled: "Cancelled", split_hist_with: "split with {who}", split_link: "Split", split_pending_note: "You can split this once staff approve it.", split_title_mine: "Receipts you're splitting",
+      err_receipt_scanned_by_friend: "Already scanned. Ask your friend to split it with you.", err_split_wait_approval: "Staff need to approve this receipt first, then you can split it.", err_split_already: "This receipt is already split.", err_split_already_offered: "You've already asked someone to split this one.", err_split_too_late: "This receipt is too old to split.",
+      err_split_too_small: "Not enough points on this receipt to split.", err_split_daily_limit: "That's enough split requests for today. Try again tomorrow.", err_split_friend_not_found: "No member with that number or code. Ask your friend to join first.", err_split_not_yourself: "That's you! Enter your friend's number.", err_split_not_available: "This receipt can't be split any more.", err_split_points_spent: "The points on this receipt were already spent, so it can't be split now.",
+            split_not_confirmed: "Not confirmed — this receipt stays with the first scanner", deleted_rejoin: "Deleted. You can rejoin from {d}.", err_rejoin: "Welcome back! You can rejoin {prog} from {d}.",
       err_split_full: "This receipt is already shared by 6 people", err_split_expired: "That split request has expired", err_split_not_found: "That split request is gone", err_referral_same_device: "Friend links need your friend's own phone", err_already_reviewed: "Already answered",
       terms_agree_a: "I agree to the", terms_link: "Terms & Conditions", and: "and", privacy_link: "Privacy Policy", optional_title: "Optional — tick only if you want them:",
       mkt_wa: "Send me rewards and member drops on WhatsApp (optional — stop any time)", mkt_push: "Push notifications on this phone (optional — coming later)",
@@ -85,7 +92,14 @@ window.RORU = (function () {
       hook_mon_double: "星期一：雙倍印章 🍣🍣", hook_mon_double_sub: "今日每次到訪 = {n} 個印", hook_tue_friends: "星期二：朋友之夜 👯", hook_tue_friends_sub: "今日帶朋友獎賞 {x}",
       hook_wed_gold: "星期三：金色狂熱 ✨\u2060", hook_wed_gold_sub: "今日大約每 {o} 張收據有一張變金色", hook_upgrade_line: "✨ 星期一至三，驚喜升級機會更高", split_q: "與 {who} 平分一張收據？", split_new: "新", split_each: "{n} 人，每人約 {s}",
       yes: "好，平分", no: "不了", split_done: "已平分 ✓ — 共 {n} 人", split_declined: "已拒絕", split_mine: "共享收據", split_waiting: "等待首位掃描者確認平分",
-      split_not_confirmed: "未獲確認 — 此收據仍屬首位掃描者", deleted_rejoin: "已刪除。你可於 {d} 起重新加入。", err_rejoin: "歡迎回來！你可於 {d} 起重新加入{prog}。",
+pre_title: "一張收據，掃一次", pre_flair: "就好似最後一條手卷，冇得食兩次。", pre_once: "每張收據只可以掃描一次。掃咗之後，任何人都唔可以再掃，包括你自己。", pre_friend: "同都係會員嘅朋友一齊食？分單，你哋攞一樣嘅積分。", pre_scan: "掃描收據", pre_type: "手動輸入", pre_split: "同朋友分單", pre_later: "遲啲先",
+      visit2_got: "+{n} 回訪獎賞", friend_v2: "朋友 {d} 日內再嚟，再多 +{v} 分。", visit2_until: "{d} 前再嚟，送你 +{v} 分。", err_roru_day_one_points_reward: "Roru Day：每張單只可以用一個積分獎賞，免費第一杯照送。",
+      split_banner: "同朋友分單：先掃收據，再揀朋友。", split_title: "同朋友分單", split_how: "一人一半：朋友攞一半積分（去尾），餘數歸你。朋友要喺自己嘅 app 確認。", split_friend_lbl: "朋友嘅電話號碼或會員編號", split_send: "傳俾朋友", split_you_friend: "你 {a} 分 · 朋友 {b} 分",
+      split_sent: "已傳俾 {who}。佢有 {h} 個鐘確認。", split_wait_card: "等緊 {who} 確認 · 直到 {t}", split_cancel: "取消", split_in_q: "{who} 想同你分一張收據", split_in_sub: "{no} · HK${bill} → 你會攞到 {p} 分", split_ok_friend: "分單完成 ✓ +{n} 分",
+      split_out_accepted: "已同 {who} 分單 ✓：你 {a} · 佢 {b}", split_out_declined: "{who} 拒絕咗，積分留返俾你", split_out_expired: "冇喺時限內確認，積分留返俾你", split_out_cancelled: "已取消", split_hist_with: "同 {who} 分單", split_link: "分單", split_pending_note: "店員批核之後就可以分單。", split_title_mine: "你嘅分單",
+      err_receipt_scanned_by_friend: "呢張收據已經有人掃咗。請叫你朋友同你分單。", err_split_wait_approval: "要等店員批核咗呢張收據先可以分單。", err_split_already: "呢張收據已經分咗單。", err_split_already_offered: "你已經邀請咗人分呢張單。", err_split_too_late: "呢張收據太舊，唔可以再分單。",
+      err_split_too_small: "呢張收據嘅積分太少，分唔到。", err_split_daily_limit: "今日分單邀請夠晒喇，聽日再試。", err_split_friend_not_found: "搵唔到用呢個號碼或編號嘅會員，請朋友先加入。", err_split_not_yourself: "呢個係你自己！請輸入朋友嘅號碼。", err_split_not_available: "呢張收據已經唔可以分單。", err_split_points_spent: "呢張收據嘅積分已經用咗，所以分唔到單。",
+            split_not_confirmed: "未獲確認 — 此收據仍屬首位掃描者", deleted_rejoin: "已刪除。你可於 {d} 起重新加入。", err_rejoin: "歡迎回來！你可於 {d} 起重新加入{prog}。",
       err_split_full: "此收據已由 6 人共享", err_split_expired: "平分請求已過期", err_split_not_found: "平分請求已不存在", err_referral_same_device: "朋友連結須用朋友自己的手機", err_already_reviewed: "已經回覆",
       terms_agree_a: "我同意", terms_link: "條款及細則", and: "及", privacy_link: "私隱政策", optional_title: "可選 — 如想收取才剔選：",
       mkt_wa: "透過 WhatsApp 向我發送獎賞及會員優惠（可選 — 可隨時停止）", mkt_push: "在此手機接收推送通知（可選 — 稍後推出）",

@@ -8,13 +8,13 @@
 <title data-tt="{prog} — RORUBARU">High Rollers — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f33">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f33">
-<link rel="stylesheet" href="/loyalty/scratch.css?v=f33">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f34">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f34">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f34">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f33"></script>
-<script src="/loyalty/passport.js?v=f33"></script>
-<script src="/loyalty/scratch.js?v=f33"></script>
+<script src="/loyalty/loyalty.js?v=f34"></script>
+<script src="/loyalty/passport.js?v=f34"></script>
+<script src="/loyalty/scratch.js?v=f34"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -98,10 +98,11 @@
 
     <!-- v46: scan sits right under the points on the Card tab -->
     <div data-tab="card" class="card" id="scanCard">
+      <div class="notice split-banner hide" id="splitBanner"></div>
       <div id="scanIdle">
         <h2 style="margin-top:0" data-t="scan"></h2>
         <p class="muted small" data-t="scan_sub"></p>
-        <label class="btn" for="photo" style="margin-top:8px">📷 <span data-t="scan"></span></label>
+        <button class="btn" type="button" id="scanOpen" style="margin-top:8px">📷 <span data-t="scan"></span></button>
         <input id="photo" type="file" accept="image/*" capture="environment" class="hide">
         <p class="center small" style="margin-top:10px"><a href="#" id="typeInstead" data-t="type_instead"></a></p>
       </div>
@@ -226,12 +227,12 @@
     // f32: one step per guest feature, in order: card/points, stamps, tiers, gold receipt, passport, Roru Day scratch card, bring a friend
     const shown = (el) => el && el.getClientRects().length && !el.closest(".hide") ? el : null;
     R.tour("guest_f32", [
-      { before: () => setTab("card"), el: () => shown($("#scanCard")) || $("#perkHero"), en: "Your card 🍣. After you pay, scan your receipt here: every HK$1 earns points. Spend them in Rewards.", zh: "你嘅會員卡 🍣。埋單後喺度掃描收據：每 HK$1 都有積分，可以喺「獎賞」換嘢。" },
+      { before: () => setTab("card"), el: () => shown($("#scanCard")) || $("#perkHero"), en: "Your card 🍣. After you pay, scan your receipt here: every HK$1 earns points. Each receipt scans once only; eating with a member friend? Split it and you both get equal points.", zh: "你嘅會員卡 🍣。埋單後喺度掃描收據：每 HK$1 都有積分。每張收據只可以掃一次；同會員朋友一齊食？分單，大家攞一樣嘅積分。" },
       { before: () => setTab("card"), el: () => shown($("#plateCard")) || $("#scanCard"), en: "Stamps: each visit adds one. Fill the plate and the next hand roll is on us.", zh: "印花：每次到訪加一個。集滿一碟，下一條手卷我哋請。" },
       { before: () => setTab("status"), el: () => shown($("#statusCard")) || $('#tabBar [data-tab="status"]'), en: "Tiers: Nori, Gohan, Tobiko. The more you spend in a year, the higher you go, with more points per HK$1 and more perks. Kama is by invitation.", zh: "等級：紫菜、壽司飯、飛魚籽。一年內消費越多升得越高，每 HK$1 積分更多，著數更多。魚鮫只限邀請。" },
       { before: () => setTab("card"), el: () => shown($("#goldLine")) || $("#scanCard"), en: "Gold receipt ✨\u2060: about 1 in 20 scans turns gold. That's 2× points and a free highball 🥃.", zh: "金色收據 ✨\u2060：大約每 20 次掃描有 1 次變金色，雙倍積分再送 Highball 一杯 🥃。" },
       { before: () => setTab("passport"), el: '#tabBar [data-tab="passport"]', en: "Passport: one stamp for every dish you try. Collect them for free food.", zh: "護照：每試一款菜就有一個印花，集夠有免費嘢食。" },
-      { before: () => setTab("card"), el: () => shown($("#scWrap")) || $("#scanCard"), en: "Roru Day: members' first drink is free (any drink except draft sake). Scan a receipt of HK$388+ and a scratch card pops up. Scratch it, then show staff to use your prize.", zh: "Roru Day：會員第一杯飲品免費（生清酒除外）。掃描 HK$388 或以上嘅收據，就會彈出刮刮卡。刮開之後俾店員睇，就可以用獎品。" },
+      { before: () => setTab("card"), el: () => shown($("#scWrap")) || $("#scanCard"), en: "Roru Day: members' first drink is free (any drink except draft sake), and you can still use one points reward on the same bill. Scan a receipt of HK$388+ and a scratch card pops up. Scratch it, then show staff to use your prize.", zh: "Roru Day：會員第一杯飲品免費（生清酒除外），同一張單仲可以用一個積分獎賞。掃描 HK$388 或以上嘅收據，就會彈出刮刮卡。刮開之後俾店員睇，就可以用獎品。" },
       { before: () => setTab("me"), el: () => shown($("#meInvite")) || $('#tabBar [data-tab="me"]'), en: "Bring a friend: share your link and you both get bonus points. Replay this guide from Me any time.", zh: "帶朋友來：分享你嘅連結，你哋都有額外積分。隨時可以喺「我」再睇呢個教學。" }
     ], { force: !!force, lang: zh ? "zh" : "en", onEnd: () => setTab("card") });
   }
@@ -374,9 +375,9 @@
     const ref = me.referral || {}, bd = me.birthday || {};
     $("#friendCard").classList.toggle("hide", !ref.on);
     if (ref.on) {
-      $("#friendSub").textContent = t("friend_sub", { n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 200) });
+      const v2 = me.visit2 || {}; $("#friendSub").textContent = t("friend_sub", { n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 388) }) + (v2.points > 0 ? " " + t("friend_v2", { v: v2.points, d: v2.days }) : "");
       $("#friendLink").textContent = inviteUrl(ref.code);
-      $("#invitedBy").classList.toggle("hide", !ref.invited_by); if (ref.invited_by) $("#invitedBy").textContent = (ref.my_bonus_pending ? t("invited_pending", { who: ref.invited_by, n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 200) }) : t("invited_done", { who: ref.invited_by }));
+      $("#invitedBy").classList.toggle("hide", !ref.invited_by); if (ref.invited_by) $("#invitedBy").textContent = (ref.my_bonus_pending ? t("invited_pending", { who: ref.invited_by, n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 388) }) : t("invited_done", { who: ref.invited_by })); if (ref.invited_by && v2.until) $("#invitedBy").textContent += " " + t("visit2_until", { v: v2.points, d: R.fmtDay(v2.until) });
       $("#friendStats").textContent = t("friend_stats", { j: ref.joined, q: ref.pending || 0, r: ref.rewarded, p: ref.points_earned, c: ref.cap });
     }
     $("#bdayCard").classList.toggle("hide", !bd.on);
@@ -448,7 +449,18 @@
     $("#splitInbox").querySelectorAll("[data-split-yes],[data-split-no]").forEach(b => b.onclick = async () => { const yes = !!b.dataset.splitYes; b.disabled = true; try { const r = await R.rpc("family_answer_split", { p_token: state.token, p_request_id: +(b.dataset.splitYes || b.dataset.splitNo), p_yes: yes }); state.me = r.member; state.lastPoints = r.member.points; render(); R.toast(yes ? t("split_done", { n: r.people }) : t("split_declined"), 3000); } catch (e) { R.toast(R.errText(e)); b.disabled = false; } });
     const out = me.split_outbox || [];
     $("#splitOutbox").innerHTML = out.length ? '<div class="card"><h2 style="margin-top:0">🧾 ' + t("split_mine") + "</h2>" + out.map(q => '<div class="hist"><span>' + (/^Table /.test(q.receipt_no) ? "" : "#") + q.receipt_no + "</span><span>" + (q.status === "pending" ? "⏳ " + t("split_waiting") : q.status === "accepted" ? "✓ +" + (q.points || 0) + " " + t("points") : t("split_not_confirmed")) + "</span></div>").join("") + "</div>" : "";
-    const badge = inbox.length; $("#tierPill").textContent = tierName(me.tier) + (badge ? " · 🔔" + badge : "");
+    // f34: split offers — a friend asked ME (confirm here), and the ones I sent (wait / cancel / result)
+    const sp = me.split || {}, offIn = sp.in || [], offOut = sp.out || [];
+    const recNo = (n) => (/^Table /.test(n || "") ? "" : "#") + escR(n || "");
+    $("#splitInbox").insertAdjacentHTML("beforeend", offIn.map(q => '<div class="card splitq split-in"><div class="row" style="justify-content:space-between;align-items:flex-start"><b>' + "🍣🍣 " + escR(t("split_in_q", { who: q.from })) + '</b><span class="pill on">' + t("split_new") + '</span></div><p class="small muted">' + escR(t("split_in_sub", { no: (/^Table /.test(q.receipt_no || "") ? "" : "#") + (q.receipt_no || ""), bill: Math.round(q.bill), p: q.points_you })) + " · ⏳ " + escR(R.fmtTime(q.expires_at)) + '</p><div class="row" style="gap:8px"><button class="btn sm" data-off-yes="' + q.id + '">' + t("yes") + '</button><button class="btn ghost sm" data-off-no="' + q.id + '">' + t("no") + "</button></div></div>").join(""));
+    $("#splitInbox").querySelectorAll("[data-off-yes],[data-off-no]").forEach(b => b.onclick = async () => { const yes = !!b.dataset.offYes; b.disabled = true;
+      try { const r = await R.rpc("family_split_answer", { p_token: state.token, p_offer_id: +(b.dataset.offYes || b.dataset.offNo), p_yes: yes }); state.me = r.member; state.lastPoints = r.member.points; render();
+        if (yes) { R.burst(); R.toast(t("split_ok_friend", { n: r.points }) + (r.visit && r.visit.added ? " · " + t("stamp_added") : "") + (r.visit && r.visit.referral_bonus ? " · 👯 +" + r.visit.referral_bonus : "") + (r.visit && r.visit.visit2_bonus ? " · 🎉 " + t("visit2_got", { n: r.visit.visit2_bonus }) : ""), 4000); } else R.toast(t("split_declined"), 2500); }
+      catch (e) { R.toast(R.errText(e), 4000); b.disabled = false; load(true); } });
+    const outTxt = (q) => q.status === "pending" ? "⏳ " + escR(t("split_wait_card", { who: q.to, t: R.fmtTime(q.expires_at) })) : q.status === "accepted" ? escR(t("split_out_accepted", { who: q.to, a: q.points_you, b: q.points_friend })) : q.status === "declined" ? escR(t("split_out_declined", { who: q.to })) : q.status === "expired" ? escR(t("split_out_expired")) : escR(t("split_out_cancelled"));
+    if (offOut.length) $("#splitOutbox").insertAdjacentHTML("afterbegin", '<div class="card split-out"><h2 style="margin-top:0">' + "🍣🍣 " + escR(t("split_title_mine")) + "</h2>" + offOut.map(q => '<div class="hist split-row' + (q.status === "pending" ? " is-wait" : "") + '"><span>' + recNo(q.receipt_no) + "</span><span>" + outTxt(q) + (q.status === "pending" ? ' <button class="linkbtn" data-off-cancel="' + q.id + '">' + escR(t("split_cancel")) + "</button>" : "") + "</span></div>").join("") + "</div>");
+    $("#splitOutbox").querySelectorAll("[data-off-cancel]").forEach(b => b.onclick = async () => { b.disabled = true; try { const r = await R.rpc("family_split_cancel", { p_token: state.token, p_offer_id: +b.dataset.offCancel }); state.me = r.member; render(); } catch (e) { R.toast(R.errText(e)); load(true); } });
+    const badge = inbox.length + offIn.length; $("#tierPill").textContent = tierName(me.tier) + (badge ? " · 🔔" + badge : "");
   }
   function render() {
     R.applyI18n();
@@ -508,7 +520,11 @@
       }
     });
     // receipts
-    $("#history").innerHTML = me.receipts.map(r => '<div class="hist"><span>' + R.fmtDay(r.at) + " · " + (zh ? (r.shop_zh || "") : (r.shop || "")) + " · " + (/^STAFF-/.test(r.receipt_no) ? "(staff)" : (/^Table /.test(r.receipt_no) ? "" : "#") + r.receipt_no) + "</span><span>HK$" + (+r.total_hkd).toFixed(0) + " → " + (r.status === "approved" ? "+" + r.points + (r.multiplier && +r.multiplier !== 1 ? " (" + multTxt(r.multiplier) + ")" : "") + (r.stamped ? " · 🍣" : "") + (r.gold ? " ✨⁠" : "") : r.status === "pending" ? "⏳" : "✕") + "</span></div>").join("") || '<p class="muted small">—</p>';
+    const shared = (me.split && me.split.shared) || {}, canSplit = (me.split && me.split.can) || [];
+    // f34: shared receipts say who with; a receipt that can still be split gets a Split button
+    const histSplit = (r) => { const s = shared[r.id]; if (s) return '<div class="hist-split">½ · ' + escR(t("split_hist_with", { who: s.with || "" })) + "</div>"; return canSplit.includes(r.id) ? '<div class="hist-split"><button class="linkbtn" data-split-rid="' + r.id + '" data-split-pts="' + r.points + '">' + "🍣🍣 " + escR(t("split_link")) + "</button></div>" : ""; };
+    $("#history").innerHTML = me.receipts.map(r => '<div class="hist"><span>' + R.fmtDay(r.at) + " · " + (zh ? (r.shop_zh || "") : (r.shop || "")) + " · " + (/^STAFF-/.test(r.receipt_no) ? "(staff)" : (/^Table /.test(r.receipt_no) ? "" : "#") + r.receipt_no) + "</span><span>HK$" + (+r.total_hkd).toFixed(0) + " → " + (r.status === "approved" ? "+" + r.points + (r.multiplier && +r.multiplier !== 1 ? " (" + multTxt(r.multiplier) + ")" : "") + (r.stamped ? " · 🍣" : "") + (r.gold ? " ✨⁠" : "") : r.status === "pending" ? "⏳" : "✕") + "</span></div>" + histSplit(r)).join("") || '<p class="muted small">—</p>';
+    $("#history").querySelectorAll("[data-split-rid]").forEach(b => b.onclick = () => splitSheet(+b.dataset.splitRid, +b.dataset.splitPts));
     $("#memberQr").innerHTML = R.qrSvg("RF:" + me.member_code, 180); $("#memberCode").textContent = me.member_code; $("#memberPhone").textContent = me.phone_masked;
     $("#since").textContent = R.fmtDay(me.member_since);
     renderShopPick();
@@ -519,8 +535,67 @@
   let ocr = { conf: null, text: null, fromOcr: false, shop: localStorage.getItem("roru_shop_guess") || "wanchai" };
   function renderShopPick() { $("#rShops").innerHTML = shops().map(s => '<button type="button" data-id="' + s.id + '" class="' + (s.id === ocr.shop ? "on" : "") + '">' + (R.lang() === "zh" ? s.name_zh : s.name_en) + "</button>").join(""); $("#rShops").querySelectorAll("button").forEach(b => b.onclick = () => { ocr.shop = b.dataset.id; localStorage.setItem("roru_shop_guess", ocr.shop); renderShopPick(); }); }
   const showScan = (which) => ["scanIdle", "scanBusy", "scanForm", "scanDone"].forEach(id => $("#" + id).classList.toggle("hide", id !== which));
-  $("#typeInstead").onclick = (e) => { e.preventDefault(); ocr = { ...ocr, conf: null, text: null, fromOcr: false, p: null }; $("#rNo").value = ""; $("#rNoWrap").classList.add("hide"); $("#rTable").value = ""; $("#rTotal").value = ""; $("#rAt").value = localNow(); $("#readMsg").textContent = ""; showScan("scanForm"); $("#rTotal").focus(); };
-  $("#rCancel").onclick = (e) => { e.preventDefault(); showScan("scanIdle"); $("#photo").value = ""; };
+  const openTyped = () => { ocr = { ...ocr, conf: null, text: null, fromOcr: false, p: null }; $("#rNo").value = ""; $("#rNoWrap").classList.add("hide"); $("#rTable").value = ""; $("#rTotal").value = ""; $("#rAt").value = localNow(); $("#readMsg").textContent = ""; showScan("scanForm"); $("#rTotal").focus(); };
+  $("#typeInstead").onclick = (e) => { e.preventDefault(); preScan("type"); };
+  $("#scanOpen").onclick = () => preScan("camera");
+
+  // ----- f34 (Dominic Oct 17 15:02): pre-scan pop-up, EVERY time before the camera or the typed form opens (no "don't show again") -----
+  const WARN_SVG = '<svg class="ps-warn" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5.5c1.6 0 3 .8 3.8 2.2l16 27.8c1.7 3-.4 6.5-3.8 6.5H8c-3.4 0-5.5-3.5-3.8-6.5l16-27.8c.8-1.4 2.2-2.2 3.8-2.2z" fill="#F64501"/><path d="M24 5.5c1.6 0 3 .8 3.8 2.2l16 27.8c1.7 3-.4 6.5-3.8 6.5H8c-3.4 0-5.5-3.5-3.8-6.5l16-27.8c.8-1.4 2.2-2.2 3.8-2.2z" fill="none" stroke="#0b0d12" stroke-opacity=".25" stroke-width="1.5"/><rect x="21.6" y="15" width="4.8" height="15" rx="2.4" fill="#F6F3E7"/><circle cx="24" cy="35" r="2.8" fill="#F6F3E7"/></svg>';
+  const ONCE_SVG = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 3h16v26l-2.7-2-2.6 2-2.7-2-2.7 2-2.6-2L8 29z" fill="#F6F3E7" stroke="#c9c4b3" stroke-width="1"/><path d="M11 8h10M11 12h10M11 16h6" stroke="#9a9585" stroke-width="1.6" stroke-linecap="round"/><circle cx="23" cy="22" r="7" fill="#F64501"/><text x="23" y="25.8" text-anchor="middle" font-size="10" font-weight="900" fill="#fff" font-family="Geist,system-ui,sans-serif">1</text></svg>';
+  let splitIntent = false;
+  const setSplitIntent = (on) => { splitIntent = !!on; const b = $("#splitBanner"); b.textContent = t("split_banner"); b.classList.toggle("hide", !splitIntent); };
+  function preScan(mode) {
+    const old = document.getElementById("preScan"); if (old) old.remove();
+    const o = document.createElement("div"); o.className = "ask-sheet prescan"; o.id = "preScan"; o.setAttribute("role", "dialog"); o.setAttribute("aria-modal", "true"); o.setAttribute("aria-labelledby", "psT");
+    const cam = mode === "camera";
+    // camera mode: both buttons are <label for="photo"> so iPhone opens the camera straight from the tap
+    const b1 = cam ? '<label class="btn" for="photo" data-a="scan">📷 ' + escR(t("pre_scan")) + "</label>" : '<button class="btn" type="button" data-a="scan">' + escR(t("pre_type")) + "</button>";
+    const b2 = cam ? '<label class="btn ghost ps-split" for="photo" data-a="split">' + "🍣🍣 " + escR(t("pre_split")) + "</label>" : '<button class="btn ghost ps-split" type="button" data-a="split">' + "🍣🍣 " + escR(t("pre_split")) + "</button>";
+    o.innerHTML = '<div class="card ps-card"><div class="ps-head">' + WARN_SVG + '<div><h2 id="psT">' + escR(t("pre_title")) + '</h2><p class="ps-flair">' + escR(t("pre_flair")) + "</p></div></div>" +
+      '<ul class="ps-list"><li><span class="ps-ic">' + ONCE_SVG + "</span><span>" + escR(t("pre_once")) + '</span></li><li><span class="ps-ic ps-rolls">' + "🍣🍣" + "</span><span>" + escR(t("pre_friend")) + "</span></li></ul>" +
+      '<div class="ps-btns">' + b1 + b2 + '</div><p class="center small" style="margin:12px 0 0"><a href="#" data-a="later">' + escR(t("pre_later")) + "</a></p></div>";
+    const close = () => setTimeout(() => o.remove(), 0);   // after the label has handed the tap to the camera input
+    o.addEventListener("click", e => {
+      const a = e.target.closest("[data-a]");
+      if (!a) { if (e.target === o) close(); return; }
+      if (a.dataset.a === "later") { e.preventDefault(); close(); return; }
+      setSplitIntent(a.dataset.a === "split");
+      if (!cam) { e.preventDefault(); openTyped(); }
+      close();
+    });
+    document.addEventListener("keydown", function esc(e) { if (e.key === "Escape") { o.remove(); document.removeEventListener("keydown", esc); } });
+    document.body.appendChild(o);
+    const f = o.querySelector('[data-a="scan"]'); if (f && f.focus) f.focus();
+    return o;
+  }
+  // the split step: ask a member friend (phone or member code); they confirm in their own app
+  const splitPts = (p) => ({ friend: Math.floor((+p || 0) / 2), you: (+p || 0) - Math.floor((+p || 0) / 2) });
+  function splitForm(rid, pts) {
+    const s = splitPts(pts);
+    return '<div class="split-form" data-rid="' + rid + '"><h3 style="margin:0 0 4px">' + "🍣🍣 " + escR(t("split_title")) + '</h3><p class="small muted" style="margin:0 0 8px">' + escR(t("split_how")) + "</p>" +
+      '<label class="field" style="margin:8px 0"><span>' + escR(t("split_friend_lbl")) + '</span><input class="sp-friend" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" placeholder="9123 4567"></label>' +
+      '<p class="small sp-even"><b>' + escR(t("split_you_friend", { a: s.you, b: s.friend })) + '</b></p><div class="err hide sp-err"></div><button class="btn sp-send" type="button">' + escR(t("split_send")) + "</button></div>";
+  }
+  function wireSplitForm(box, done) {
+    box.querySelectorAll(".split-form").forEach(fm => {
+      const send = fm.querySelector(".sp-send"), inp = fm.querySelector(".sp-friend"), err = fm.querySelector(".sp-err");
+      inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); send.click(); } });
+      send.onclick = async () => {
+        err.classList.add("hide"); if (!inp.value.trim()) { inp.focus(); return; }
+        send.disabled = true;
+        try { const r = await R.rpc("family_split_offer", { p_token: state.token, p_receipt_id: +fm.dataset.rid, p_friend: inp.value.trim() }); state.me = r.member; setSplitIntent(false);
+          R.toast(t("split_sent", { who: r.to, h: (state.me.split && state.me.split.hours) || 12 }), 4500); if (done) done(r); render(); }
+        catch (e) { err.textContent = R.errText(e); err.classList.remove("hide"); send.disabled = false; }
+      };
+    });
+  }
+  function splitSheet(rid, pts) {
+    const o = document.createElement("div"); o.className = "ask-sheet"; o.id = "splitSheet"; o.setAttribute("role", "dialog"); o.setAttribute("aria-modal", "true");
+    o.innerHTML = '<div class="card ps-card">' + splitForm(rid, pts) + '<p class="center small" style="margin:12px 0 0"><a href="#" data-x>' + escR(t("pre_later")) + "</a></p></div>";
+    o.addEventListener("click", e => { if (e.target === o || e.target.closest("[data-x]")) { e.preventDefault(); o.remove(); } });
+    document.body.appendChild(o); wireSplitForm(o, () => o.remove()); setTimeout(() => { const i = o.querySelector(".sp-friend"); if (i) i.focus(); }, 60);
+  }
+  $("#rCancel").onclick = (e) => { e.preventDefault(); showScan("scanIdle"); $("#photo").value = ""; setSplitIntent(false); };
   const localNow = () => { const d = new Date(Date.now() + 8 * 3600e3); return d.toISOString().slice(0, 16); };
   // ----- confirm sheet + undo a reward (Oct 14: Dominic redeemed by mistake; no undo before) -----
 
@@ -576,7 +651,7 @@
     $("#meProgLine").textContent = line; $("#meProgFill").style.width = pct + "%"; $("#meProgFill").className = "t-" + tier;
     $("#meProgSub").textContent = tierName(tier) + " · " + t("year_spend", { n: fmtHK(ys) });
     const ref = me.referral || {};
-    $("#meInviteSub").textContent = ref.on ? t("friend_sub", { n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 200) }) : t("invite_sub");
+    $("#meInviteSub").textContent = ref.on ? t("friend_sub", { n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 388) }) : t("invite_sub");
   }
   $("#meInviteBtn").onclick = () => shareInvite();
   $("#meNameSave").onclick = async () => { const v = $("#meName").value.trim(); if (!goodName(v) || v.length > 30) return R.toast(t("err_bad_name"));
@@ -730,14 +805,20 @@
         const head = r.status === "approved" ? (g ? "✨⁠ " + t("gold_hit") + " " : "") + t("added_points", { n: Number(r.points || 0).toLocaleString("en-US") }) + (r.visit && r.visit.added ? " · " + t("stamp_added") : "") : "⏳ " + t("r_pending");
         const meta = [rd.table ? t("table").replace(/\s*[（(].*$/, "") + " " + escR(rd.table) : "", rd.at ? escR(rd.at.slice(8, 10) + "/" + rd.at.slice(5, 7) + " " + rd.at.slice(11)) : "", rd.total ? "HK$" + Number(rd.total).toLocaleString("en-US", { minimumFractionDigits: 2 }) : "", rd.server ? t("r_server") + " " + escR(rd.server) : "", rd.seats ? t(+rd.seats === 1 ? "seat_1" : "seats_n", { n: rd.seats }) : ""].filter(Boolean).join(" · ");
         const items = (r.items || []).map(x => '<span class="pill">' + (x.qty > 1 ? x.qty + "× " : "") + escR(zh && x.zh ? x.zh : String(x.en).replace(/\s*\((per person|(19|20)\d\d)\)$/i, "")) + "</span>").join(" ");
-        $("#scanDone").innerHTML = '<h2 style="margin-top:0">' + head + '</h2><p class="small muted" style="margin:4px 0 10px">' + t("r_read") + ": " + meta + "</p>" + (items ? '<p class="small" style="margin:0 0 6px"><b>' + t("r_items") + '</b></p><div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:12px">' + items + "</div>" : "") + (r.status === "approved" ? "" : '<p class="small muted">' + t("queued") + "</p>") + '<button class="btn" id="rDone">' + t("r_done") + "</button>";
+        $("#scanDone").innerHTML = '<h2 style="margin-top:0">' + head + '</h2><p class="small muted" style="margin:4px 0 10px">' + t("r_read") + ": " + meta + "</p>" + (items ? '<p class="small" style="margin:0 0 6px"><b>' + t("r_items") + '</b></p><div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:12px">' + items + "</div>" : "") + (r.status === "approved" ? "" : '<p class="small muted">' + t("queued") + "</p>") +
+          (r.status === "approved" && +r.points >= 2 ? (splitIntent ? '<div class="card split-inline">' + splitForm(r.id, r.points) + "</div>" : '<p class="center small" style="margin:0 0 10px"><a href="#" id="rSplitLink">' + escR(t("pre_split")) + "</a></p>") : (splitIntent ? '<p class="notice">' + escR(t("split_pending_note")) + "</p>" : "")) +
+          '<button class="btn' + (r.status === "approved" && splitIntent ? " ghost" : "") + '" id="rDone">' + t("r_done") + "</button>";
         const gr = g && r.visit ? r.visit.gold_reward : null; // v48: gold receipt = 2x points + a free highball
         if (gr && r.status === "approved") $("#scanDone").insertAdjacentHTML("afterbegin", '<div class="notice" style="background:linear-gradient(135deg,#f3d27a,#b9862a);color:#0b0d12;font-weight:800">✨⁠🥃 ' + escR(t("gold_won")) + "</div>");
-        showScan("scanDone"); $("#rDone").onclick = () => showScan("scanIdle");
+        showScan("scanDone"); $("#rDone").onclick = () => { showScan("scanIdle"); setSplitIntent(false); };
+        const sdone = $("#scanDone"), afterSend = () => { showScan("scanIdle"); setSplitIntent(false); };
+        wireSplitForm(sdone, afterSend);
+        if ($("#rSplitLink")) $("#rSplitLink").onclick = (e) => { e.preventDefault(); const wrap = document.createElement("div"); wrap.className = "card split-inline"; wrap.innerHTML = splitForm(r.id, r.points); e.target.closest("p").replaceWith(wrap); wireSplitForm(sdone, afterSend); wrap.querySelector(".sp-friend").focus(); };
+        if (splitIntent && r.status === "approved") { $("#splitBanner").classList.add("hide"); setTimeout(() => { const i = sdone.querySelector(".sp-friend"); if (i) { i.scrollIntoView({ block: "center", behavior: "smooth" }); } }, 300); }
         if (gr && r.status === "approved") setTimeout(() => goldSheet(gr), 400);
         // f31: the server checked this receipt for a Roru Day scratch card; if it earned one, say so right here
         if (r.status === "approved" && window.RORU_SC && RORU_SC.afterReceipt) RORU_SC.afterReceipt(r.id).then(c => { if (c && c.state === "new" && !$("#scanDone").classList.contains("hide")) RORU_SC.scanWin($("#scanDone"), c); });
-        if (r.status === "approved") { R.burst(g ? ["#E8B84A", "#F3D27A", "#F6F3E7"] : undefined); R.toast((g ? "✨⁠ " + t("gold_hit") + " " : "") + t("added_points", { n: r.points }) + (r.visit && r.visit.referral_bonus ? " · 👯 +" + r.visit.referral_bonus : ""), 3500); state.lastPoints = r.member.points; state.lastStamps = r.member.visits_total; }
+        if (r.status === "approved") { R.burst(g ? ["#E8B84A", "#F3D27A", "#F6F3E7"] : undefined); R.toast((g ? "✨⁠ " + t("gold_hit") + " " : "") + t("added_points", { n: r.points }) + (r.visit && r.visit.referral_bonus ? " · 👯 +" + r.visit.referral_bonus : "") + (r.visit && r.visit.visit2_bonus ? " · 🎉 " + t("visit2_got", { n: r.visit.visit2_bonus }) : ""), 3500); state.lastPoints = r.member.points; state.lastStamps = r.member.visits_total; }
       }
       render();
     } catch (e) { $("#rErr").textContent = R.errText(e); $("#rErr").classList.remove("hide"); }

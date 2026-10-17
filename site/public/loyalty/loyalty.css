@@ -372,3 +372,34 @@ td input,td select{font-size:16px}
 /* f33 all-logo: empty logo slots get a solid backing so the plate's dashed ring doesn't show through the ghost */
 .plate .slot{z-index:1}
 .plate .slot:not(.on) .stamp.s-logo{background:radial-gradient(circle,#24272f 0 66%,transparent 70%);border-radius:50%}
+
+/* f34 — pre-scan pop-up (every scan) + split the receipt with a friend */
+.prescan,#splitSheet{position:fixed;inset:0;z-index:92;background:rgba(0,0,0,.66);display:flex;align-items:flex-end;justify-content:center;padding:16px;animation:psFade .18s ease-out}
+.ps-card{width:100%;max-width:420px;margin:0 0 env(safe-area-inset-bottom);padding:20px 18px 16px;box-shadow:0 18px 50px rgba(0,0,0,.5);animation:psUp .22s cubic-bezier(.2,.8,.2,1)}
+@keyframes psFade{from{opacity:0}to{opacity:1}}
+@keyframes psUp{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.prescan,#splitSheet,.ps-card{animation:none}}
+.ps-head{display:flex;gap:12px;align-items:center;margin-bottom:6px}
+.ps-head h2{margin:0;font-size:22px;line-height:1.15}
+.ps-warn{width:44px;height:44px;flex:none;filter:drop-shadow(0 3px 8px rgba(246,69,1,.35))}
+.ps-flair{margin:2px 0 0;font-size:14px;color:var(--muted);font-style:italic}
+.ps-list{list-style:none;margin:14px 0 16px;padding:0;display:flex;flex-direction:column;gap:12px}
+.ps-list li{display:flex;gap:12px;align-items:flex-start;font-size:16px;line-height:1.4}
+.ps-ic{flex:none;width:40px;height:40px;border-radius:12px;background:var(--ink);border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+.ps-ic>svg{width:28px;height:28px}
+.ps-rolls{font-size:17px;letter-spacing:-4px}
+.ps-btns{display:flex;flex-direction:column;gap:10px}
+.ps-btns .btn{display:flex;align-items:center;justify-content:center;gap:6px;text-align:center;cursor:pointer;font-size:17px}
+.split-banner{font-weight:700}
+.split-inline{margin:4px 0 12px;border-color:rgba(246,69,1,.45)}
+.split-form h3{font-size:18px;font-weight:900}
+.split-form .sp-even{font-size:15px;margin:2px 0 10px}
+.linkbtn{background:none;border:0;padding:4px 0;color:var(--orange);font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.hist-split{font-size:13px;color:var(--gold);text-align:right;margin:-2px 0 4px}
+.split-row.is-wait span:last-child{color:var(--cream)}
+.split-out .hist span:last-child{text-align:right;max-width:70%}
+.ps-rolls .hr-emoji{margin:0 -.18em}
+.sp-ok{color:var(--green);font-weight:700}.sp-wait{color:var(--gold);font-weight:700}.sp-no{color:var(--muted)}
+.sp-tag,.split-tag{color:var(--gold);font-weight:700}
+body.thB .sp-tag,body.thB .sp-wait{color:#9a6a12}body.thB .sp-ok{color:#1f8a57}
+.ps-split .hr-emoji,.split-form h3 .hr-emoji,.split-in .hr-emoji,.split-out h2 .hr-emoji,.linkbtn .hr-emoji,.split-staff h2 .hr-emoji{margin:0 -.14em}
