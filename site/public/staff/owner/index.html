@@ -8,14 +8,14 @@
 <title data-tt="{prog} — Owner">High Rollers — Owner</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f36">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f36">
-<link rel="stylesheet" href="/loyalty/scratch.css?v=f36">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f37">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f37">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f37">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f36"></script>
-<script src="/loyalty/passport.js?v=f36"></script>
-<script src="/loyalty/scratch.js?v=f36"></script>
-<script src="/loyalty/monthend.js?v=f36"></script>
+<script src="/loyalty/loyalty.js?v=f37"></script>
+<script src="/loyalty/passport.js?v=f37"></script>
+<script src="/loyalty/scratch.js?v=f37"></script>
+<script src="/loyalty/monthend.js?v=f37"></script>
 <style>
 /* v36 owner dashboard */
 .dash{margin:16px 0 18px}
@@ -375,7 +375,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
   </div>
   <div class="menu" id="menu"><div class="mp">
     <h3>Menu</h3>
-    <button class="mi" data-go="passport"><i><img src="/loyalty/img/stampcard_64.png" alt="" style="width:1.3em;height:1.3em;vertical-align:-.3em"></i><span>Menu Passport<small>Who's playing, most and least tried dishes, season &amp; prizes</small></span></button>
+    <button class="mi" data-go="passport"><i><img src="/loyalty/img/stampcard_64.png" alt="" style="width:1.3em;height:1.3em;vertical-align:-.3em"></i><span>Menu Passport<small>Who's playing, most and least tried dishes, quarter &amp; prizes</small></span></button>
     <button class="mi" data-go="scratch"><i><svg viewBox="0 0 32 32" aria-hidden="true" style="width:1.3em;height:1.3em;vertical-align:-.3em"><path d="M4 9.5a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2V13a3 3 0 0 0 0 6v3.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V19a3 3 0 0 0 0-6z" fill="#F64501" stroke="currentColor" stroke-width="1.6"/><path d="M11 10v12" stroke="#fff" stroke-width="1.8" stroke-dasharray="2 2.2"/><path d="M18.6 10.6l1.3 3.6 3.6 1.3-3.6 1.3-1.3 3.6-1.3-3.6-3.6-1.3 3.6-1.3z" fill="#fff"/></svg></i><span>Roru Day scratch card<small>Cards given, prizes won, cost, minimum bill &amp; odds</small></span></button>
     <button class="mi" data-go="staff"><i>🔑</i><span>Staff &amp; PINs<small>Who can sign in, PINs, who looked at what</small></span></button>
     <button class="mi" data-go="reports"><i>📄</i><span>Reports<small>Month-end report, downloads, charts</small></span></button>
@@ -694,7 +694,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
   const ROLES = [["staff", "Staff"], ["manager", "Manager"], ["owner", "Owner"]], RN = { staff: "Staff", manager: "Manager", owner: "Owner" };
   const roleSel = (cur) => '<select class="fin" name="role">' + ROLES.map(r => '<option value="' + r[0] + '"' + (cur === r[0] ? " selected" : "") + ">" + r[1] + "</option>").join("") + "</select>";
   const shopSel = (cur) => '<select class="fin" name="shop"><option value="wanchai"' + (cur === "wanchai" ? " selected" : "") + '>Wan Chai</option><option value="central"' + (cur === "central" ? " selected" : "") + ">Central</option></select>";
-  const ACT = { lookup: "Looked up a phone number", scan: "Scanned a guest's QR code", view: "Opened a guest's card", reverse_redeem: "↩︎ Undid a claimed reward", perk_use: "✅ Marked a benefit as used", perk_undo: "↩︎ Undid a used benefit", passport_stamp: "🎫 Stamped a guest's passport", passport_undo: "↩︎ Undid a passport stamp", passport_prize: "✅ Marked a passport prize as used", passport_prize_undo: "↩︎ Undid a passport prize", passport_settings: "⚙️ Changed the passport season or prizes", scratch_give: "🎟 Gave a Roru Day scratch card", scratch_fallback: "🔑 Gave a scratch card by hand (scan failed, manager OK)", scratch_undo: "↩︎ Cancelled a scratch card", scratch_reveal: "🎟 Revealed a scratch card on the iPad", scratch_use: "✅ Marked a scratch card prize as used", scratch_use_undo: "↩︎ Undid a used scratch card prize", scratch_settings: "⚙️ Changed the scratch card rules or odds", scratch_prize: "⚙️ Changed a scratch card prize" };
+  const ACT = { lookup: "Looked up a phone number", scan: "Scanned a guest's QR code", view: "Opened a guest's card", reverse_redeem: "↩︎ Undid a claimed reward", perk_use: "✅ Marked a benefit as used", perk_undo: "↩︎ Undid a used benefit", passport_stamp: "🎫 Stamped a guest's passport", passport_undo: "↩︎ Undid a passport stamp", passport_prize: "✅ Marked a passport prize as used", passport_prize_undo: "↩︎ Undid a passport prize", passport_settings: "⚙️ Changed the passport quarter or prizes", scratch_give: "🎟 Gave a Roru Day scratch card", scratch_fallback: "🔑 Gave a scratch card by hand (scan failed, manager OK)", scratch_undo: "↩︎ Cancelled a scratch card", scratch_reveal: "🎟 Revealed a scratch card on the iPad", scratch_use: "✅ Marked a scratch card prize as used", scratch_use_undo: "↩︎ Undid a used scratch card prize", scratch_settings: "⚙️ Changed the scratch card rules or odds", scratch_prize: "⚙️ Changed a scratch card prize" };
   function renderStaff() {
     const d = st.data, al = st.alog;
     $("#v-staff").innerHTML = vh("Staff & PINs", d.staff.filter(s => s.active).length + " people can sign in", '<button class="btn sm" id="stAdd">+ Add a person</button>') + '<p class="purpose">Who can sign in to the staff iPad and with which PIN, plus a record of every time staff look at a guest\'s details.</p>' +
@@ -800,6 +800,9 @@ body.thB{--muted:rgba(22,24,31,.64)}
     $("#v-settings").innerHTML = vh("Settings", "Tap a section to open it") + '<p class="purpose">The rules of the programme: points per dollar, when guests move up a level, special nights and extras.</p>' +
       grp("timeout", "🔒 Staff iPad: auto-close guest details", help("After staff open a guest, their card (phone, birthday, spend) closes by itself when nobody taps the iPad for this long. Staff see a countdown in the last 10 seconds; any tap restarts it. \"Done ✓ Next guest\" closes it at once. Staff stay signed in.<br>客人資料喺無人操作一段時間後會自動關閉，最後 10 秒會倒數；按一下就重新計時。店員唔會被登出。") +
         '<div class="setrow">' + fld("Close a guest's details after · 自動關閉", '<select class="fin" id="tmSel">' + [30, 60, 90, 120].map(v => '<option value="' + v + '"' + (v === tmCur ? " selected" : "") + ">" + v + " s / 秒" + (v === 60 ? " (default 預設)" : "") + "</option>").join("") + "</select>") + '<button class="btn sm" id="tmSave">Save</button></div>') +
+      grp("expiry", "⏳ Points expiry", (() => { const rule = S0.points_expiry, y = new Date(Date.now() + 8 * 3600e3).getUTCFullYear();
+        return '<div class="setrow"><div class="lb" style="font-size:16px"><b>' + (rule === "annual_dec31" ? "Points expire on 31 Dec each year" : "No expiry rule set") + '</b><small class="muted" style="display:block;font-size:13px">' + (rule === "annual_dec31" ? "積分每年 12 月 31 日到期 · 积分每年 12 月 31 日到期 · next expiry 31 Dec " + y : "") + "</small></div></div>" +
+          help("Guests see it under their points (\"1,234 points · expire 31 Dec " + y + "\"), in Rewards and in the terms. Stored rule: points_expiry = " + esc(rule || "none") + ". Nothing has expired yet: no balance is touched until the year-end expiry job is built (00:00 HKT on 31 Dec), with a WhatsApp reminder on 1 Dec to members who still have points."); })()) +
       grp("upgrade", "🎁 Surprise upgrades", '<p class="hint">Now and then, a guest who swaps points gets the next reward up for free. Guests just see the better reward, marked ⬆️.</p>' + help("The draw happens the moment they tap Use and is saved, so reloading the page can't change it. Guests are never told the chances.") +
         tog("Surprise upgrades", "Turns all of them on or off", 'data-uk="upgrade_on"', on("upgrade_on")) +
         UPR.map(u => '<div class="card" style="margin:10px 0;padding:12px 14px">' + (u[2] ? tog("<b>" + u[0] + "</b>", u[1], 'data-uk="' + u[2] + '"', on(u[2])) : '<div class="lb" style="font-size:16px"><b>' + u[0] + '</b><small class="muted" style="display:block;font-size:13px">' + u[1] + "</small></div>") +

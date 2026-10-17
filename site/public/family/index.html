@@ -8,19 +8,19 @@
 <title data-tt="{prog} — RORUBARU">High Rollers — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f36">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f36">
-<link rel="stylesheet" href="/loyalty/scratch.css?v=f36">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f37">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f37">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f37">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f36"></script>
-<script src="/loyalty/passport.js?v=f36"></script>
-<script src="/loyalty/scratch.js?v=f36"></script>
+<script src="/loyalty/loyalty.js?v=f37"></script>
+<script src="/loyalty/passport.js?v=f37"></script>
+<script src="/loyalty/scratch.js?v=f37"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
   <div class="top">
     <div class="brand"><img src="/logo.png" alt="RORUBARU"><span class="fam" data-t="family"></span></div>
-    <div class="langs"><button data-lang="en">EN</button><button data-lang="zh">繁中</button></div>
+    <div class="langs"><button data-lang="en">EN</button><button data-lang="zh">繁中</button><button data-lang="zhs">简中</button></div>
   </div>
 
   <!-- sign in -->
@@ -90,6 +90,7 @@
     <div data-tab="card" class="card center" style="padding:22px 16px">
       <div class="tiny" style="letter-spacing:.1em;text-transform:uppercase" data-t="your_points"></div>
       <div style="font-size:64px;font-weight:900;line-height:1;margin:6px 0" id="pts">0</div>
+      <div class="small hide" id="ptsExp" style="margin:-2px 0 6px;opacity:.85;font-weight:600"></div>
       <div class="muted small" id="nextReward"></div>
       <div style="height:8px;border-radius:99px;background:var(--ink);margin:12px 0 4px;overflow:hidden"><div id="bar" style="height:100%;width:0;background:var(--orange);transition:width .6s"></div></div>
       <div class="notice hide" id="pendingNote"></div>
@@ -227,7 +228,7 @@
     // f32: one step per guest feature, in order: card/points, stamps, tiers, gold receipt, passport, Roru Day scratch card, bring a friend
     const shown = (el) => el && el.getClientRects().length && !el.closest(".hide") ? el : null;
     R.tour("guest_f32", [
-      { before: () => setTab("card"), el: () => shown($("#scanCard")) || $("#perkHero"), en: "Your card 🍣. After you pay, scan your receipt here: every HK$1 earns points. Each receipt scans once only; eating with a member friend? Split it and you both get equal points.", zh: "你嘅會員卡 🍣。埋單後喺度掃描收據：每 HK$1 都有積分。每張收據只可以掃一次；同會員朋友一齊食？分單，大家攞一樣嘅積分。" },
+      { before: () => setTab("card"), el: () => shown($("#scanCard")) || $("#perkHero"), en: "Your card 🍣. After you pay, scan your receipt here: every HK$1 earns points. Points expire on 31 Dec each year. Each receipt scans once only; eating with a member friend? Split it and you both get equal points.", zh: "你嘅會員卡 🍣。埋單後喺度掃描收據：每 HK$1 都有積分。積分每年 12 月 31 日到期。每張收據只可以掃一次；同會員朋友一齊食？分單，大家攞一樣嘅積分。" },
       { before: () => setTab("card"), el: () => shown($("#plateCard")) || $("#scanCard"), en: "Stamps: each visit adds one. Fill the plate and the next hand roll is on us.", zh: "印花：每次到訪加一個。集滿一碟，下一條手卷我哋請。" },
       { before: () => setTab("status"), el: () => shown($("#statusCard")) || $('#tabBar [data-tab="status"]'), en: "Tiers: Nori, Gohan, Tobiko. The more you spend in a year, the higher you go, with more points per HK$1 and more perks. Kama is by invitation.", zh: "等級：紫菜、壽司飯、飛魚籽。一年內消費越多升得越高，每 HK$1 積分更多，著數更多。魚鮫只限邀請。" },
       { before: () => setTab("card"), el: () => shown($("#goldLine")) || $("#scanCard"), en: "Gold receipt ✨\u2060: about 1 in 20 scans turns gold. That's 2× points and a free highball 🥃.", zh: "金色收據 ✨\u2060：大約每 20 次掃描有 1 次變金色，雙倍積分再送 Highball 一杯 🥃。" },
@@ -235,6 +236,17 @@
       { before: () => setTab("card"), el: () => shown($("#scWrap")) || $("#scanCard"), en: "Roru Day: members' first drink is free (any drink except draft sake), and you can still use one points reward on the same bill. Scan a receipt of HK$388+ and a scratch card pops up. Scratch it, then show staff to use your prize.", zh: "Roru Day：會員第一杯飲品免費（生清酒除外），同一張單仲可以用一個積分獎賞。掃描 HK$388 或以上嘅收據，就會彈出刮刮卡。刮開之後俾店員睇，就可以用獎品。" },
       { before: () => setTab("me"), el: () => shown($("#meInvite")) || $('#tabBar [data-tab="me"]'), en: "Bring a friend: share your link and you both get bonus points. Replay this guide from Me any time.", zh: "帶朋友來：分享你嘅連結，你哋都有額外積分。隨時可以喺「我」再睇呢個教學。" }
     ], { force: !!force, lang: zh ? "zh" : "en", onEnd: () => setTab("card") });
+  }
+  // f37: points expiry rule (setting points_expiry = annual_dec31; shown only, nothing expires yet)
+  let RULES = null, lastPts = null;
+  const RULES_P = R.rpc("family_rules", {}).then(r => { RULES = r; if (lastPts !== null) renderExpiry(lastPts); return r; }).catch(() => null);
+  function renderExpiry(points) {
+    lastPts = points; const el = $("#ptsExp"); if (!el) return; const d = RULES && RULES.points_expire_on;
+    if (!d) { el.classList.add("hide"); return; }
+    const [y, m, dd] = String(d).split("-").map(Number), n = Number(points || 0);
+    el.textContent = R.lang() === "zh" ? (R.hans && R.hans() ? n.toLocaleString("en-HK") + " 积分 · " + y + "年" + m + "月" + dd + "日到期" : n.toLocaleString("en-HK") + " 分 · " + y + "年" + m + "月" + dd + "日到期")
+      : n.toLocaleString("en-HK") + (n === 1 ? " point" : " points") + " · expire " + dd + " " + ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][m - 1] + " " + y;
+    el.classList.remove("hide");
   }
   $("#howBtn").onclick = () => guestTour(true);
   const TABS = ["card", "passport", "rewards", "status", "me"];
@@ -512,7 +524,7 @@
     try { renderSuggest(me, zh); } catch (e) { console.warn(e); }
     // points + next reward
     const gained = state.lastPoints !== null && me.points > state.lastPoints;
-    $("#pts").textContent = me.points;
+    $("#pts").textContent = me.points; renderExpiry(me.points);
     const next = me.ladder.find(l => l.points_cost > me.points) || me.ladder[me.ladder.length - 1];
     if (next) { $("#nextReward").textContent = (me.points >= next.points_cost ? "✓ " : t("need_more", { n: next.points_cost - me.points }) + " → ") + (zh ? next.name_zh : next.name_en); $("#bar").style.width = Math.min(100, 100 * me.points / next.points_cost) + "%"; }
     $("#pendingNote").classList.toggle("hide", !me.pending_receipts); $("#pendingNote").textContent = "⏳ " + t("pending_hint", { n: me.pending_receipts });

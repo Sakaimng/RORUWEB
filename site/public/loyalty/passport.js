@@ -16,7 +16,9 @@
   const icon = (g) => g === "roll" ? ROLL : g === "dessert" ? SWEET : BOWL;
   const CARD = '<img class="pp-card-ic" src="' + IMG + 'stampcard_64.png" srcset="' + IMG + 'stampcard_64.png 1x, ' + IMG + 'stampcard_128.png 2x" alt="">';
   const GRP = { roll: ["Hand rolls", "手卷"], app: ["Appetisers", "前菜"], dessert: ["Desserts", "甜品"] };
-  const W = (en, z) => zh() ? z : en;
+  const hans = () => !!(R.hans && R.hans());
+  // W(en, 繁中, 简中): 简中 is optional; without it the 繁中 text is shown converted to Simplified characters.
+  const W = (en, z, s) => zh() ? (s != null && hans() ? s : z) : en;
   const tierFor = (p) => (p.tiers || []).find(t => p.count < t.n) || null;
 
   // ---------- progress track (shared) ----------
@@ -25,11 +27,16 @@
     return '<div class="pp-track"><div class="pp-fill" style="width:' + pct(p.count) + '%"></div>' +
       (p.tiers || []).map(t => '<i class="pp-mk' + (p.count >= t.n ? " on" : "") + '" style="left:' + pct(t.n) + '%"><span>' + t.n + "</span></i>").join("") + "</div>";
   }
+  // f37: calendar quarters (Q1 Jan–Mar · Q2 Apr–Jun · Q3 Jul–Sep · Q4 Oct–Dec); stamps reset when the quarter ends
+  const qOf = (s) => { const e = ymd(s && s.ends_on); return e ? Math.floor((e[1] - 1) / 3) + 1 : ""; };
+  const daysLeft = (s) => { const e = ymd(s && s.ends_on); if (!e) return 0; const t = hkDate(new Date().toISOString()); return Math.max(0, Math.round((Date.UTC(e[0], e[1] - 1, e[2]) - Date.UTC(t[0], t[1] - 1, t[2])) / 864e5)); };
+  const QRULE = () => W("Each passport runs for one quarter (Q1–Q4). Stamps reset when the quarter ends.", "每本護照為期一季（Q1–Q4）。季度完結，印花就會重新計算。", "每本护照为期一个季度（Q1–Q4）。季度结束后，印花清零重新开始。");
   function seasonLine(p, z) {
-    const s = p.season || {}, end = fmtD(ymd(s.ends_on), z), start = fmtD(ymd(s.starts_on), z), nm = z ? (s.name_zh || s.name_en) : s.name_en;
-    if (s.status === "upcoming") return nm + (z ? " · " + start + "開始" : " · starts " + start);
-    if (s.status === "ended") return nm + (z ? " · 已於" + end + "完結" : " · ended " + end);
-    return nm + (z ? " · 截至" + end : " · ends " + end);
+    const s = p.season || {}, end = fmtD(ymd(s.ends_on), z), start = fmtD(ymd(s.starts_on), z), nm = z ? (s.name_zh || s.name_en) : s.name_en, q = qOf(s);
+    if (s.status === "upcoming") return nm + W(" · starts " + start, " · " + start + "開始", " · " + start + "开始");
+    if (s.status === "ended") return nm + W(" · ended " + end, " · 已於" + end + "完結", " · 已于" + end + "结束");
+    const rng = fmtD(ymd(s.starts_on), z, true) + W(" – ", "至", "至") + fmtD(ymd(s.ends_on), z, true), left = daysLeft(s);
+    return nm + " · " + rng + " · " + W(left + (left === 1 ? " day" : " days") + " left in Q" + q, "Q" + q + " 仲有 " + left + " 日", "Q" + q + " 还剩 " + left + " 天");
   }
   function nextLine(p, z) {
     const nx = tierFor(p);
@@ -47,18 +54,19 @@
   const LOCK = '<svg class="pp-lock" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="currentColor"/><path d="M8.2 10.5V8a3.8 3.8 0 0 1 7.6 0v2.5" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>';
   const HIGHBALL = '<img class="pp-roll" src="' + IMG + 'highball_64.png" srcset="' + IMG + 'highball_64.png 1x, ' + IMG + 'highball_128.png 2x" alt="">';
   const SAKE_IMG = '<img class="pp-roll" src="' + IMG + 'sake_64.png" srcset="' + IMG + 'sake_64.png 1x, ' + IMG + 'sake_128.png 2x" alt="">';
-  const DCAT = { sake: ["Sake", "清酒"], shochu: ["Shochu", "燒酎"], white: ["White wine", "白酒"], red: ["Red wine", "紅酒"], rose: ["Rosé", "玫瑰紅酒"], sparkling: ["Sparkling", "氣泡酒"], whisky: ["Whisky", "威士忌"], other: ["More bottles", "其他酒"] };
-  const DBADGE = { sake: ["Sake sensei", "清酒達人"], shochu: ["Shochu shogun", "燒酎將軍"], white: ["White wine whisperer", "白酒知音"], red: ["Red all over", "紅酒迷"], rose: ["Pink drink pro", "玫瑰紅酒迷"], sparkling: ["Bubble boss", "氣泡王"], whisky: ["Whisky wise", "威士忌通"], other: ["Bottle hunter", "尋酒高手"] };
+  const DCAT = { sake: ["Sake", "清酒", "清酒"], shochu: ["Shochu", "燒酎", "烧酎"], white: ["White wine", "白酒", "白葡萄酒"], red: ["Red wine", "紅酒", "红葡萄酒"], rose: ["Rosé", "玫瑰紅酒", "桃红葡萄酒"], sparkling: ["Sparkling", "氣泡酒", "起泡酒"], whisky: ["Whisky", "威士忌", "威士忌"], other: ["More bottles", "其他酒", "其他酒款"] };
+  const DBADGE = { sake: ["Sake sensei", "清酒達人", "清酒达人"], shochu: ["Shochu shogun", "燒酎將軍", "烧酎将军"], white: ["White wine whisperer", "白酒知音", "白葡萄酒知音"], red: ["Red all over", "紅酒迷", "红葡萄酒迷"], rose: ["Pink drink pro", "玫瑰紅酒迷", "桃红葡萄酒迷"], sparkling: ["Bubble boss", "氣泡王", "起泡酒王"], whisky: ["Whisky wise", "威士忌通", "威士忌通"], other: ["Bottle hunter", "尋酒高手", "寻酒高手"] };
+  const CL = (lb) => W(lb[0], lb[1], lb[2]);   // a category / badge label in the current language
   const FBADGE = { roll: ["Roll royalty", "手卷之王"], app: ["Starter pack", "前菜全制霸"], dessert: ["Sweet tooth", "甜品控"] };
   // a badge: earned = every item of the group tried; otherwise how far along
   const badge = (title, sub, got, of, art) => '<div class="pp-badge' + (got >= of && of ? " on" : "") + '"><span class="pp-badge-ic">' + art + (got >= of && of ? '<i>✓</i>' : "") + '</span><span class="pp-badge-t"><b>' + esc(title) + "</b><small>" + esc(sub) + "</small></span>" +
     (got >= of && of ? "" : '<em>' + got + "/" + of + "</em>") + "</div>";
   // "X to go" chip: the next milestone, in plain words
-  function togo(count, tiers, z, unitEn, unitsEn, unitZh) {
+  function togo(count, tiers, z, unitEn, unitsEn, unitZh, unitZhs) {
     const nx = (tiers || []).find(t => count < t.n);
     if (!nx) return '<div class="pp-togo done"><b>✓</b><span>' + (z ? "全部獎賞解鎖！" : "Every reward unlocked!") + "</span></div>";
     const left = nx.n - count;
-    return '<div class="pp-togo"><b>' + left + "</b><span>" + (z ? unitZh + "就解鎖" : (left === 1 ? unitEn : unitsEn) + " to go") + "<small>" + esc(z ? (nx.zh || nx.en) : nx.en) + "</small></span></div>";
+    return '<div class="pp-togo"><b>' + left + "</b><span>" + (z ? (hans() ? (unitZhs || unitZh) + "即可解锁" : unitZh + "就解鎖") : (left === 1 ? unitEn : unitsEn) + " to go") + "<small>" + esc(z ? ((hans() && nx.zhs) || nx.zh || nx.en) : nx.en) + "</small></span></div>";
   }
   // celebrate a reward the guest just reached (once per reward per phone)
   function celebrate(kind, seasonId, tiers, z) {
@@ -72,8 +80,8 @@
       const t = fresh[fresh.length - 1];
       if (R.burst) R.burst(["#F64501", "#E8B84A", "#F6F3E7"]);
       const ov = document.createElement("div"); ov.className = "pp-cele"; ov.setAttribute("role", "dialog");
-      ov.innerHTML = '<div class="pp-cele-c"><div class="pp-cele-art">' + (kind === "drinks" ? (t.n >= 10 ? BOT_WINE : t.n >= 6 ? SAKE_IMG : HIGHBALL) : (t.n >= 20 ? CARD : t.n >= 10 ? ROLL : SWEET)) + '</div><div class="pp-cele-k">' + (z ? "解鎖咗！" : "Unlocked!") + "</div><h2>" + esc(z ? (t.zh || t.en) : t.en) + "</h2><p>" +
-        (kind === "drinks" ? (z ? t.n + " 支酒達成。埋單前俾店員睇就換到。" : t.n + " bottles down. Show staff before you pay to claim it.") : (z ? t.n + " 個印花達成。俾店員睇就換到。" : t.n + " stamps collected. Show staff to claim it.")) +
+      ov.innerHTML = '<div class="pp-cele-c"><div class="pp-cele-art">' + (kind === "drinks" ? (t.n >= 10 ? BOT_WINE : t.n >= 6 ? SAKE_IMG : HIGHBALL) : (t.n >= 20 ? CARD : t.n >= 10 ? ROLL : SWEET)) + '</div><div class="pp-cele-k">' + (z ? (hans() ? "已解锁！" : "解鎖咗！") : "Unlocked!") + "</div><h2>" + esc(z ? ((hans() && t.zhs) || t.zh || t.en) : t.en) + "</h2><p>" +
+        (kind === "drinks" ? (z ? (hans() ? t.n + " 瓶已达成。结账前出示给店员即可兑换。" : t.n + " 支酒達成。埋單前俾店員睇就換到。") : t.n + " bottles down. Show staff before you pay to claim it.") : (z ? (hans() ? t.n + " 个印花已集齐。出示给店员即可兑换。" : t.n + " 個印花達成。俾店員睇就換到。") : t.n + " stamps collected. Show staff to claim it.")) +
         '</p><button class="btn" type="button" data-x>' + (z ? "正！" : "Nice one") + "</button></div>";
       ov.addEventListener("click", (e) => { if (e.target === ov || e.target.closest("[data-x]")) ov.remove(); });
       document.body.appendChild(ov);
@@ -83,7 +91,10 @@
   // ---------- GUEST ----------
   const G = { data: null, drinks: null, at: 0, busy: false, seen: null, mode: (function () { try { return localStorage.getItem("roru_pp_mode") === "drinks" ? "drinks" : "food"; } catch (e) { return "food"; } })() };
   function guestToken() { try { return localStorage.getItem("roru_member_token"); } catch (e) { return null; } }
+  // f37: makes sure the current calendar quarter exists (the next one starts by itself on its first day)
+  const TICK = R.rpc("passport_quarter_tick", {}).catch(() => null);
   async function guestLoad(force) {
+    await TICK;
     const tk = guestToken(); if (!tk || G.busy) return; if (!force && Date.now() - G.at < 12000) return;
     G.busy = true;
     try { const [p, dk] = await Promise.all([R.rpc("family_passport", { p_token: tk }), R.rpc("family_drinks", { p_token: tk }).catch(() => null)]); G.at = Date.now(); const prev = G.data; G.data = p; G.drinks = dk; guestRender(prev); } catch (e) {} finally { G.busy = false; }
@@ -125,11 +136,11 @@
             (onx ? '<div class="pp-stamp"><span>✓</span><em>' + fmtD(hkDate(x.at), z, true) + "</em></div>" : "") + "</div>";
         }).join("") + "</div>";
     }).join("");
-    const how = z ? ["掃描收據：每款付咗錢嘅食物蓋一個印花（每張單每款一次）。", "每張單最多 " + p.max_per_bill + " 個新印花。", "只有埋單嗰位有印花，同枱朋友冇。", "免費嘢食、獎賞同飲品都唔計。套餐會蓋入面嘅手卷。", "收據讀唔到？埋單時叫店員幫你蓋。", "一季三個月，季尾重新開始。"]
-      : ["Scan your receipt: every food item you paid for gets a stamp (once per item per bill).", "Up to " + p.max_per_bill + " new stamps a bill.", "Only the person who paid gets stamps, not the rest of the table.", "Free items, rewards and drinks don't count. A roll set stamps the rolls in it.", "Receipt won't read? Ask staff to stamp it when you pay.", "A season runs 3 months, then the passport starts fresh."];
+    const how = z ? ["掃描收據：每款付咗錢嘅食物蓋一個印花（每張單每款一次）。", "每張單最多 " + p.max_per_bill + " 個新印花。", "只有埋單嗰位有印花，同枱朋友冇。", "免費嘢食、獎賞同飲品都唔計。套餐會蓋入面嘅手卷。", "收據讀唔到？埋單時叫店員幫你蓋。", QRULE()]
+      : ["Scan your receipt: every food item you paid for gets a stamp (once per item per bill).", "Up to " + p.max_per_bill + " new stamps a bill.", "Only the person who paid gets stamps, not the rest of the table.", "Free items, rewards and drinks don't count. A roll set stamps the rolls in it.", "Receipt won't read? Ask staff to stamp it when you pay.", QRULE()];
     const foodHtml = '<div class="pp-hero"><div class="pp-top">' + CARD + '<div><div class="pp-k">' + W("Menu Passport", "菜單護照") + " · " + W("菜單護照", "Menu Passport") + '</div><div class="pp-season">' + esc(seasonLine(p, z)) + "</div></div></div>" +
-      '<div class="pp-count"><b>' + p.count + "</b><span>/" + p.total + '</span></div><div class="pp-sub">' + W("dishes tried this season", "今季試過嘅菜式") + "</div>" + track(p) +
-      togo(p.count, p.tiers, z, "dish", "dishes", "款") + (p.season && p.season.status !== "live" ? '<div class="pp-off">' + W("Stamps are paused outside the season dates.", "季度以外暫停蓋印花。") + "</div>" : "") +
+      '<div class="pp-count"><b>' + p.count + "</b><span>/" + p.total + '</span></div><div class="pp-sub">' + W("dishes tried this quarter", "今季試過嘅菜式", "本季已尝菜式") + "</div>" + track(p) +
+      togo(p.count, p.tiers, z, "dish", "dishes", "款") + (p.season && p.season.status !== "live" ? '<div class="pp-off">' + W("Stamps are paused outside the quarter's dates.", "季度以外暫停蓋印花。", "季度以外暂停盖印花。") + "</div>" : "") +
       '<div class="pp-badges">' + ["roll", "app", "dessert"].map(g => { const its = p.items.filter(x => x.grp === g); if (!its.length) return ""; const got = its.filter(x => x.sid).length;
         return badge(W(FBADGE[g][0], FBADGE[g][1]), got >= its.length ? W("Tried every " + GRP[g][0].toLowerCase().replace(/s$/, ""), "全部" + GRP[g][1] + "試齊") : W("Try every " + GRP[g][0].toLowerCase().replace(/s$/, ""), "試齊所有" + GRP[g][1]), got, its.length, icon(g)); }).join("") + "</div></div>" +
       '<div class="card pp-prizes"><h2>' + W("Prizes", "獎品") + "</h2>" + prizes + "</div>" + groups +
@@ -143,6 +154,8 @@
     if (guestToken()) { celebrate("food", p.season && p.season.id, p.tiers, z); if (dk) celebrate("drinks", dk.season && dk.season.id, dk.rewards, z); }
   }
   // the bottle passport: one stamp per different bottle, milestones count every bottle
+  // f37: vintage / brewery line + the menu bottle price under each bottle name
+  const dkMeta = (b) => (b.note || b.price) ? '<div class="dk-meta">' + [b.note ? esc(b.note) : "", b.price ? "HK$" + Math.round(+b.price) : ""].filter(Boolean).join(" · ") + "</div>" : "";
   function drinksHtml(d, z) {
     const tiers = d.rewards || [], top = tiers.length ? Math.max(...tiers.map(t => t.n)) : 10;
     const tr = { count: d.count, total: Math.max(top, d.count), tiers: tiers };
@@ -150,30 +163,35 @@
     const prizes = tiers.map(t => {
       const st = t.used_at ? "used" : t.reached ? "ready" : "lock", left = t.n - d.count;
       const right = st === "used" ? '<span class="pp-pz-s used">' + W("Enjoyed ✓ ", "已享用 ✓ ") + fmtD(hkDate(t.used_at), z, true) + "</span>"
-        : st === "ready" ? '<span class="pp-pz-s ready">' + W("Unlocked! Show staff", "解鎖咗！俾店員睇") + "</span>"
-        : '<span class="pp-pz-s">' + LOCK + " " + W(left + " to go", "仲差 " + left + " 支") + "</span>";
+        : st === "ready" ? '<span class="pp-pz-s ready">' + W("Unlocked! Show staff", "解鎖咗！俾店員睇", "已解锁！出示给店员") + "</span>"
+        : '<span class="pp-pz-s">' + LOCK + " " + W(left + " to go", "仲差 " + left + " 支", "还差 " + left + " 瓶") + "</span>";
       const art = t.n >= 10 ? BOT_WINE : t.n >= 6 ? SAKE_IMG : HIGHBALL;
-      return '<div class="pp-pz dk-pz ' + st + '"><div class="pp-pz-n"><b>' + t.n + "</b><small>" + W("bottles", "支") + '</small></div><div class="pp-pz-art">' + art + '</div><div class="pp-pz-t"><b>' + esc(z ? t.zh : t.en) + "</b><small>" + esc(z ? (t.line_zh || "") : (t.line_en || "")) + "</small></div>" + right + "</div>";
+      return '<div class="pp-pz dk-pz ' + st + '"><div class="pp-pz-n"><b>' + t.n + "</b><small>" + W("bottles", "支", "瓶") + '</small></div><div class="pp-pz-art">' + art + '</div><div class="pp-pz-t"><b>' + esc(z ? ((hans() && t.zhs) || t.zh) : t.en) + "</b><small>" + esc(z ? ((hans() && t.line_zhs) || t.line_zh || "") : (t.line_en || "")) + "</small></div>" + right + "</div>";
     }).join("");
     const groups = cats.map(c => {
       const its = d.bottles.filter(b => b.cat === c), got = its.filter(b => b.n > 0).length, lb = DCAT[c] || DCAT.other;
-      return '<div class="pp-gh"><h2>' + W(lb[0], lb[1]) + " <span>" + W(lb[1], lb[0]) + "</span></h2><b>" + got + "/" + its.length + "</b></div>" +
+      return '<div class="pp-gh"><h2>' + CL(lb) + " <span>" + W(lb[1], lb[0]) + "</span></h2><b>" + got + "/" + its.length + "</b></div>" +
         '<div class="pp-grid dk-grid">' + its.map(b => '<div class="pp-cell dk-cell ' + (b.n ? "on" : "off") + '" data-cat="' + esc(c) + '"><div class="dk-ic">' + botIcon(c) + (b.n > 1 ? '<span class="dk-x">×' + b.n + "</span>" : "") + "</div>" +
-          '<div class="pp-nm">' + esc(z ? b.zh : b.en) + "</div>" + (b.n ? '<div class="pp-stamp"><span>✓</span><em>' + fmtD(hkDate(b.at), z, true) + "</em></div>" : '<div class="pp-zh">' + W("not yet", "未試") + "</div>") + "</div>").join("") + "</div>";
+          '<div class="pp-nm">' + esc(z ? b.zh : b.en) + "</div>" + dkMeta(b) + (b.n ? '<div class="pp-stamp"><span>✓</span><em>' + fmtD(hkDate(b.at), z, true) + "</em></div>" : '<div class="pp-zh">' + W("not yet", "未試", "未尝") + "</div>") + "</div>").join("") + "</div>";
     }).join("");
     const allDiff = d.total && d.different >= d.total;
     const badges = cats.map(c => { const its = d.bottles.filter(b => b.cat === c), got = its.filter(b => b.n > 0).length, bd = DBADGE[c] || DBADGE.other, lb = DCAT[c] || DCAT.other;
-        return badge(W(bd[0], bd[1]), got >= its.length ? W("Tried every " + lb[0].toLowerCase(), "全部" + lb[1] + "試齊") : W("Try every " + lb[0].toLowerCase(), "試齊所有" + lb[1]), got, its.length, botIcon(c)); }).join("") +
-      badge(W("Full cellar", "酒窖全開"), allDiff ? W("Every bottle on the list", "酒牌上每支都試齊") : W("Every bottle on the list", "試齊酒牌上每一支"), d.different, d.total, BOT_WINE);
-    const how = z ? ["每支付咗錢嘅酒（整支）都計：掃描收據就自動蓋印。杯裝唔計。", "每款唔同嘅酒一個印花；同一款再叫都計入獎賞進度。", "獎賞：3 支、6 支、10 支，每季每樣換一次，埋單前俾店員睇。", "只有埋單嗰位計，同枱朋友冇。每張單最多 " + d.max_per_bill + " 支。", "收據讀唔到？叫店員幫你喺 iPad 蓋。", "同食物護照同一季：截至 " + fmtD(ymd(d.season && d.season.ends_on), true) + "。"]
-      : ["Every bottle you pay for counts. Scan your receipt and it stamps itself. Glasses don't count.", "One stamp for each different bottle; ordering a favourite again still counts toward the rewards.", "Rewards at 3, 6 and 10 bottles, once each a season. Show staff before you pay.", "Only the person who paid gets the bottles, not the rest of the table. Up to " + d.max_per_bill + " a bill.", "Receipt won't read? Staff can stamp it on the iPad.", "Same season as the food passport: ends " + fmtD(ymd(d.season && d.season.ends_on), false) + "."];
+        return badge(CL(bd), got >= its.length ? W("Tried every " + lb[0].toLowerCase(), "全部" + lb[1] + "試齊", lb[2] + "全部尝遍") : W("Try every " + lb[0].toLowerCase(), "試齊所有" + lb[1], "尝遍所有" + lb[2]), got, its.length, botIcon(c)); }).join("") +
+      badge(W("Full cellar", "酒窖全開", "酒窖全开"), allDiff ? W("Every bottle on the list", "酒牌上每支都試齊", "酒单上每瓶都尝过") : W("Every bottle on the list", "試齊酒牌上每一支", "尝遍酒单上每一瓶"), d.different, d.total, BOT_WINE);
+    // f37 (Dominic): the sharing rule, word for word in all three languages; the logic is unchanged (the scanner gets the bottles, split shares never stamp)
+    const shareRule = W("Sharing a bill? Bottle stamps go to whoever scans the receipt. Splitting the bill shares the points, not the bottle stamps. Max " + d.max_per_bill + " bottle stamps per bill.",
+      "同枱夾單？酒樽印花歸掃描收據嗰位。分單只會分積分，唔會分酒樽印花。每張單最多" + d.max_per_bill + "個酒樽印花。",
+      "同桌分单？酒瓶印花归扫描收据的人。分单只分积分，不分酒瓶印花。每张单最多" + d.max_per_bill + "个酒瓶印花。");
+    const how = !z ? ["Every bottle you pay for counts. Scan your receipt and it stamps itself. Glasses don't count.", "One stamp for each different bottle; ordering a favourite again still counts toward the rewards.", "Rewards at 3, 6 and 10 bottles, once each a quarter. Show staff before you pay.", shareRule, "Receipt won't read? Staff can stamp it on the iPad.", QRULE()]
+      : hans() ? ["每瓶付费的酒（整瓶）都算：扫描收据就会自动盖印。杯装不算。", "每款不同的酒一个印花；同一款再点也会计入奖赏进度。", "奖赏：3 瓶、6 瓶、10 瓶，每季每项兑换一次，结账前出示给店员。", shareRule, "收据读不到？请店员帮你在 iPad 上盖印。", QRULE()]
+      : ["每支付咗錢嘅酒（整支）都計：掃描收據就自動蓋印。杯裝唔計。", "每款唔同嘅酒一個印花；同一款再叫都計入獎賞進度。", "獎賞：3 支、6 支、10 支，每季每樣換一次，埋單前俾店員睇。", shareRule, "收據讀唔到？叫店員幫你喺 iPad 蓋。", QRULE()];
     return '<div class="pp-hero dk-hero"><div class="pp-top"><span class="dk-hero-ic">' + BOT_SAKE + BOT_WINE + '</span><div><div class="pp-k">' + W("Bottle Passport", "酒瓶護照") + " · " + W("酒瓶護照", "Bottle Passport") + '</div><div class="pp-season">' + esc(seasonLine(d, z)) + "</div></div></div>" +
-      '<div class="pp-count"><b>' + d.count + '</b><span>' + W(d.count === 1 ? " bottle" : " bottles", " 支") + '</span></div><div class="pp-sub">' + W(d.different + " of " + d.total + " different bottles tried", "試咗 " + d.total + " 款之中 " + d.different + " 款") + "</div>" + track(tr) +
-      togo(d.count, tiers, z, "bottle", "bottles", "支") +
-      (d.season && d.season.status !== "live" ? '<div class="pp-off">' + W("Stamps are paused outside the season dates.", "季度以外暫停蓋印花。") + "</div>" : "") +
+      '<div class="pp-count"><b>' + d.count + '</b><span>' + W(d.count === 1 ? " bottle" : " bottles", " 支", " 瓶") + '</span></div><div class="pp-sub">' + W(d.different + " of " + d.total + " different bottles tried", "試咗 " + d.total + " 款之中 " + d.different + " 款", d.total + " 款中已尝 " + d.different + " 款") + "</div>" + track(tr) +
+      togo(d.count, tiers, z, "bottle", "bottles", "支", "瓶") +
+      (d.season && d.season.status !== "live" ? '<div class="pp-off">' + W("Stamps are paused outside the quarter's dates.", "季度以外暫停蓋印花。", "季度以外暂停盖印花。") + "</div>" : "") +
       '<div class="pp-badges">' + badges + "</div></div>" +
       '<div class="card pp-prizes"><h2>' + W("Rewards", "獎賞") + "</h2>" + prizes + "</div>" + groups +
-      '<div class="card pp-how"><h2>' + W("How the bottle passport works", "酒瓶護照點玩") + "</h2><ul>" + how.map(h => "<li>" + esc(h) + "</li>").join("") + "</ul></div>";
+      '<div class="card pp-how"><h2>' + W("How the bottle passport works", "酒瓶護照點玩", "酒瓶护照怎么玩") + "</h2><ul>" + how.map(h => "<li>" + esc(h) + "</li>").join("") + "</ul></div>";
   }
   function guestInit() {
     if (!$("#ppSec")) return;
@@ -190,9 +208,9 @@
   const ERR = {
     passport_bill_cap: "This bill already has the most new stamps it can get. Next visit!",
     passport_not_payer: "That bill number belongs to another member. Only the person who paid gets stamps.",
-    passport_no_season: "No passport season is running today.", passport_off: "The passport is switched off.",
+    passport_no_season: "No passport quarter is running today.", passport_off: "The passport is switched off.",
     passport_nothing_picked: "Pick at least one item.", passport_not_reached: "Not enough stamps for that prize yet.",
-    perk_used_up: "Already used this season.", manager_only: "After 15 minutes only a manager or the owner can undo this.",
+    perk_used_up: "Already used this quarter.", manager_only: "After 15 minutes only a manager or the owner can undo this.",
     reason_required: "Please type a short reason.", already_undone: "Already undone.", owner_only: "Owner only."
   };
   const ERRZ = { passport_bill_cap: "呢張單已經蓋滿新印花，下次再嚟！", passport_not_payer: "呢個單號屬於另一位會員，只有埋單嗰位有印花。", passport_no_season: "今日冇護照季度。", passport_off: "護照已關閉。",
@@ -200,6 +218,7 @@
   const errTxt = (e) => (zh() && ERRZ[e && (e.code || e.message)]) || ERR[e && (e.code || e.message)] || (R.errText ? R.errText(e) : String(e && e.message || e));
   const sess = () => window.__ppSess && window.__ppSess.token;
   async function staffLoad(force) {
+    await TICK;
     const c = window.__ppCard; if (!c || !c.member_code || !sess()) return;
     if (!force && S.code === c.member_code && Date.now() - S.at < 20000) { staffPaint(); return; }
     if (S.busy) return; S.busy = true;
@@ -226,10 +245,10 @@
   function staffDrinksHtml(d) {
     if (!d || !d.on) return "";
     const live = d.season && d.season.status === "live", nx = (d.rewards || []).find(t => d.count < t.n);
-    const rows = (d.rewards || []).filter(t => t.reached).map(t => '<div class="pp-st-pz' + (t.used_at ? " used" : "") + '"><span><b>' + t.n + W(" bottles:", " 支：") + "</b> " + esc(zh() ? t.zh : t.en) + (t.used_at ? ' <em>· ' + W("used ", "已用 ") + fmtD(hkDate(t.used_at), zh(), true) + "</em>" : "") + "</span>" +
+    const rows = (d.rewards || []).filter(t => t.reached).map(t => '<div class="pp-st-pz' + (t.used_at ? " used" : "") + '"><span><b>' + t.n + W(" bottles:", " 支：", " 瓶：") + "</b> " + esc(zh() ? ((hans() && t.zhs) || t.zh) : t.en) + (t.used_at ? ' <em>· ' + W("used ", "已用 ") + fmtD(hkDate(t.used_at), zh(), true) + "</em>" : "") + "</span>" +
       (t.used_at ? '<button class="btn ghost sm" data-dkundo="' + t.claim_id + '">↩︎ ' + W("Undo", "復原") + "</button>" : '<button class="btn sm" data-dkuse="' + t.n + '">' + W("Mark used", "標記已用") + "</button>") + "</div>").join("");
-    return '<div class="pp-st-h dk-st-h"><span class="dk-st-ic">' + BOT_SAKE + '</span><div class="pp-st-t"><b>' + W("Bottles ", "酒瓶 ") + d.count + " · " + W(d.different + "/" + d.total + " different", "唔同款 " + d.different + "/" + d.total) + "</b><small>" +
-      (nx ? W((nx.n - d.count) + " more to: " + nx.en, "再 " + (nx.n - d.count) + " 支就換：" + nx.zh) : W("Every reward unlocked", "全部獎賞解鎖")) + "</small></div>" +
+    return '<div class="pp-st-h dk-st-h"><span class="dk-st-ic">' + BOT_SAKE + '</span><div class="pp-st-t"><b>' + W("Bottles ", "酒瓶 ") + d.count + " · " + W(d.different + "/" + d.total + " different", "唔同款 " + d.different + "/" + d.total, "不同款 " + d.different + "/" + d.total) + "</b><small>" +
+      (nx ? W((nx.n - d.count) + " more to: " + nx.en, "再 " + (nx.n - d.count) + " 支就換：" + nx.zh, "再 " + (nx.n - d.count) + " 瓶即可兑换：" + (nx.zhs || nx.zh)) : W("Every reward unlocked", "全部獎賞解鎖")) + "</small></div>" +
       (live ? '<button class="btn sm" data-dkstamp>' + W("Stamp bottles", "蓋酒瓶印花") + "</button>" : "") + "</div>" + rows;
   }
   function drinksSheet() {
@@ -237,18 +256,20 @@
     const pick = {}, max = d.max_per_bill || 6, tot = () => Object.values(pick).reduce((a, b) => a + b, 0);
     const nm = /\p{L}/u.test(c.name || "") ? c.name : W("this guest", "呢位客人");
     const cats = [...new Set(d.bottles.map(b => b.cat))];
-    const ov = sheet('<div class="pp-sh-h"><button class="pp-x" data-x aria-label="Close">‹</button><div><h2>' + W("Stamp bottles", "蓋酒瓶印花") + '</h2><small>' + esc(nm) + " · " + W(d.count + " bottles so far", "暫時 " + d.count + " 支") + "</small></div></div>" +
-      '<p class="pp-rule">' + W("Tap + for each <b>bottle</b> on this guest's bill (not glasses). Only the person who paid. Max <b>" + max + "</b> bottles a bill.", "喺呢位客人張單上面每支<b>整支酒</b>撳一下 +（杯裝唔計）。只限埋單嗰位。每張單最多 <b>" + max + "</b> 支。") + "</p>" +
-      '<label class="pp-bill"><span>' + W("Bill no. (optional)", "單號（可以留空）") + '</span><input id="dkBill" autocomplete="off" autocapitalize="characters" placeholder="e.g. A-001238"></label>' +
-      cats.map(ct => '<h3>' + W((DCAT[ct] || DCAT.other)[0] + " · " + (DCAT[ct] || DCAT.other)[1], (DCAT[ct] || DCAT.other)[1] + " · " + (DCAT[ct] || DCAT.other)[0]) + '</h3><div class="pp-pick dk-pick">' + d.bottles.filter(b => b.cat === ct).map(b =>
-        '<div class="pp-pk dk-pk" data-id="' + b.id + '"><span class="pp-pk-ic dk-pk-ic">' + botIcon(ct) + '</span><span class="pp-pk-t"><b>' + esc(zh() ? b.zh : b.en) + "</b><small>" + (b.n ? W("had " + b.n + " this season", "今季飲過 " + b.n + " 支") : W("new for this guest", "第一次")) + '</small></span><span class="dk-step"><button type="button" class="dk-minus" aria-label="−">−</button><b>0</b><button type="button" class="dk-plus" aria-label="+">+</button></span></div>').join("") + "</div>").join("") +
-      '<div class="pp-sh-f"><span id="dkPicked">' + W("0 bottles", "0 支") + '</span><button class="btn" id="dkGo" disabled>' + W("Stamp", "蓋印") + '</button></div><div id="dkErr" class="pp-err hide"></div>');
-    const upd = () => { const n = tot(); $("#dkPicked", ov).textContent = W(n + " of " + max + " bottles", n + "/" + max + " 支"); const b = $("#dkGo", ov); b.disabled = !n; b.textContent = n ? W("Stamp " + n + " bottle" + (n === 1 ? "" : "s"), "蓋 " + n + " 支") : W("Stamp", "蓋印"); };
+    const ov = sheet('<div class="pp-sh-h"><button class="pp-x" data-x aria-label="Close">‹</button><div><h2>' + W("Stamp bottles", "蓋酒瓶印花") + '</h2><small>' + esc(nm) + " · " + W(d.count + " bottles so far", "暫時 " + d.count + " 支", "目前 " + d.count + " 瓶") + "</small></div></div>" +
+      '<p class="pp-rule">' + W("Tap + for each <b>bottle</b> on this guest's bill (not glasses). Sharing a bill? Bottle stamps go to whoever scans the receipt. Splitting the bill shares the points, not the bottle stamps. Max <b>" + max + "</b> bottle stamps per bill.",
+        "喺呢位客人張單上面每支<b>整支酒</b>撳一下 +（杯裝唔計）。同枱夾單？酒樽印花歸掃描收據嗰位。分單只會分積分，唔會分酒樽印花。每張單最多<b>" + max + "</b>個酒樽印花。",
+        "在这位客人的账单上，每瓶<b>整瓶酒</b>按一下 +（杯装不算）。同桌分单？酒瓶印花归扫描收据的人。分单只分积分，不分酒瓶印花。每张单最多<b>" + max + "</b>个酒瓶印花。") + "</p>" +
+      '<label class="pp-bill"><span>' + W("Bill no. (optional)", "單號（可以留空）", "单号（可留空）") + '</span><input id="dkBill" autocomplete="off" autocapitalize="characters" placeholder="e.g. A-001238"></label>' +
+      cats.map(ct => '<h3>' + W((DCAT[ct] || DCAT.other)[0] + " · " + (DCAT[ct] || DCAT.other)[1], (DCAT[ct] || DCAT.other)[1] + " · " + (DCAT[ct] || DCAT.other)[0], (DCAT[ct] || DCAT.other)[2] + " · " + (DCAT[ct] || DCAT.other)[0]) + '</h3><div class="pp-pick dk-pick">' + d.bottles.filter(b => b.cat === ct).map(b =>
+        '<div class="pp-pk dk-pk" data-id="' + b.id + '"><span class="pp-pk-ic dk-pk-ic">' + botIcon(ct) + '</span><span class="pp-pk-t"><b>' + esc(zh() ? b.zh : b.en) + "</b><small>" + (b.price ? "HK$" + Math.round(+b.price) + (b.note ? " · " + esc(b.note) : "") + " · " : "") + (b.n ? W("had " + b.n + " this quarter", "今季飲過 " + b.n + " 支", "本季已点 " + b.n + " 瓶") : W("new for this guest", "第一次")) + '</small></span><span class="dk-step"><button type="button" class="dk-minus" aria-label="−">−</button><b>0</b><button type="button" class="dk-plus" aria-label="+">+</button></span></div>').join("") + "</div>").join("") +
+      '<div class="pp-sh-f"><span id="dkPicked">' + W("0 bottles", "0 支", "0 瓶") + '</span><button class="btn" id="dkGo" disabled>' + W("Stamp", "蓋印") + '</button></div><div id="dkErr" class="pp-err hide"></div>');
+    const upd = () => { const n = tot(); $("#dkPicked", ov).textContent = W(n + " of " + max + " bottles", n + "/" + max + " 支", n + "/" + max + " 瓶"); const b = $("#dkGo", ov); b.disabled = !n; b.textContent = n ? W("Stamp " + n + " bottle" + (n === 1 ? "" : "s"), "蓋 " + n + " 支", "盖 " + n + " 瓶") : W("Stamp", "蓋印"); };
     ov.addEventListener("click", async (e) => {
       if (e.target.closest("[data-x]") || e.target === ov) { ov.remove(); return; }
       const st = e.target.closest(".dk-plus, .dk-minus");
       if (st) { const row = st.closest(".dk-pk"), id = +row.dataset.id, cur = pick[id] || 0;
-        if (st.classList.contains("dk-plus")) { if (tot() >= max) { R.toast(W("Max " + max + " bottles a bill", "每張單最多 " + max + " 支")); return; } pick[id] = cur + 1; } else pick[id] = Math.max(0, cur - 1);
+        if (st.classList.contains("dk-plus")) { if (tot() >= max) { R.toast(W("Max " + max + " bottle stamps per bill", "每張單最多" + max + "個酒樽印花", "每张单最多" + max + "个酒瓶印花")); return; } pick[id] = cur + 1; } else pick[id] = Math.max(0, cur - 1);
         row.querySelector(".dk-step b").textContent = pick[id]; row.classList.toggle("sel", pick[id] > 0); upd(); return; }
       if (e.target.closest("#dkGo")) {
         const b = $("#dkGo", ov); b.disabled = true; $("#dkErr", ov).classList.add("hide");
@@ -264,7 +285,7 @@
     const d = S.drinks, byId = {}; d.bottles.forEach(b => byId[b.id] = b);
     const ids = r.stamp_ids || [];
     const reached = (d.rewards || []).filter(t => t.reached && !t.used_at);
-    const ov = sheet('<div class="pp-sh-h"><button class="pp-x" data-x aria-label="Close">‹</button><div><h2>' + W(r.added + " bottle" + (r.added === 1 ? "" : "s") + " stamped ✓", "蓋咗 " + r.added + " 支 ✓") + "</h2><small>" + W("Bottles now ", "而家 ") + d.count + W("", " 支") + "</small></div></div>" +
+    const ov = sheet('<div class="pp-sh-h"><button class="pp-x" data-x aria-label="Close">‹</button><div><h2>' + W(r.added + " bottle" + (r.added === 1 ? "" : "s") + " stamped ✓", "蓋咗 " + r.added + " 支 ✓", "已盖 " + r.added + " 瓶 ✓") + "</h2><small>" + W("Bottles now ", "而家 ", "现在 ") + d.count + W("", " 支", " 瓶") + "</small></div></div>" +
       '<div class="pp-done">' + items.map((id, i) => '<div class="pp-done-r"><span>' + esc(zh() ? (byId[id] || {}).zh : (byId[id] || {}).en) + '</span><button class="btn ghost sm" data-dkunstamp="' + ids[i] + '">↩︎ ' + W("Undo", "復原") + "</button></div>").join("") + "</div>" +
       (reached.length ? '<p class="pp-rule"><b>' + W("Reward ready: ", "可以換獎賞：") + "</b>" + esc(reached.map(t => zh() ? t.zh : t.en).join(" · ")) + W(". Hand it over, then tap Mark used.", "。送出後撳「標記已用」。") + "</p>" : "") +
       '<p class="pp-rule">' + W("Logged under your PIN. Undo works for " + (d.undo_minutes || 15) + " minutes; after that a manager can undo it with a reason.", "已用你嘅 PIN 記錄。" + (d.undo_minutes || 15) + " 分鐘內可以復原；之後要經理寫低原因。") + '</p><div class="pp-sh-f"><span></span><button class="btn" data-x>' + W("Done", "完成") + "</button></div>");
@@ -286,7 +307,7 @@
     const nm = /\p{L}/u.test(c.name || "") ? c.name : W("this guest", "呢位客人");
     const ov = sheet('<div class="pp-sh-h"><button class="pp-x" data-x aria-label="Close">‹</button><div><h2>' + W("Stamp passport", "蓋護照印花") + '</h2><small>' + esc(nm) + " · " + W(p.count + "/" + p.total + " stamped", "已蓋 " + p.count + "/" + p.total) + "</small></div></div>" +
       '<p class="pp-rule">' + W('Tick the food on <b>this guest\'s bill</b>. Only the person who paid. Max <b>' + max + '</b> new stamps a bill. Free items, rewards and drinks don\'t count.', '剔返<b>呢位客人張單</b>上面嘅食物。只限埋單嗰位。每張單最多 <b>' + max + '</b> 個新印花。免費嘢食、獎賞同飲品唔計。') + '</p>' +
-      '<label class="pp-bill"><span>' + W("Bill no. (optional)", "單號（可以留空）") + '</span><input id="ppBill" autocomplete="off" autocapitalize="characters" placeholder="e.g. A-001238"></label>' +
+      '<label class="pp-bill"><span>' + W("Bill no. (optional)", "單號（可以留空）", "单号（可留空）") + '</span><input id="ppBill" autocomplete="off" autocapitalize="characters" placeholder="e.g. A-001238"></label>' +
       ["roll", "app", "dessert"].map(g => '<h3>' + W(GRP[g][0] + " · " + GRP[g][1], GRP[g][1] + " · " + GRP[g][0]) + '</h3><div class="pp-pick">' + p.items.filter(x => x.grp === g).map(x =>
         '<button type="button" class="pp-pk' + (x.sid ? " done" : "") + '" data-id="' + x.id + '"' + (x.sid ? " disabled" : "") + '><span class="pp-pk-ic">' + icon(g) + '</span><span class="pp-pk-t"><b>' + esc(zh() ? x.zh : x.en) + "</b><small>" + esc(zh() ? x.en : x.zh) + "</small></span><i>" + (x.sid ? "✓" : "") + "</i></button>").join("") + "</div>").join("") +
       '<div class="pp-sh-f"><span id="ppPicked">' + W("0 of " + max + " picked", "已揀 0/" + max) + '</span><button class="btn" id="ppGo" disabled>' + W("Stamp", "蓋印") + '</button></div><div id="ppErr" class="pp-err hide"></div>');
@@ -341,6 +362,7 @@
   const O = { data: null };
   const otok = () => window.__ppOwner && window.__ppOwner.token;
   async function ownerLoad() {
+    await TICK;
     const v = $("#v-passport"); if (!v || !otok()) return;
     if (!O.data) v.innerHTML = '<p class="sub" style="padding:20px 0">Loading…</p>';
     try { const [pp, dk] = await Promise.all([R.rpc("owner_passport", { p_token: otok() }), R.rpc("owner_drinks", { p_token: otok() }).catch(() => null)]); O.data = pp; O.drinks = dk; ownerRender(); } catch (e) { v.innerHTML = '<p class="sub">' + esc(errTxt(e)) + "</p>"; }
@@ -359,16 +381,16 @@
     const max = Math.max(1, ...d.items.map(i => i.n));
     const bar = (i) => '<div class="pp-ob"><span class="pp-ob-n">' + esc(i.en) + ' <small>' + esc(i.zh || "") + '</small></span><span class="pp-ob-b"><i style="width:' + Math.max(2, i.n / max * 100) + '%"></i></span><b>' + i.n + "</b></div>";
     const most = d.items.slice(0, 5), least = d.items.slice(-5).reverse();
-    const statusTxt = s.status === "live" ? "Running · " + s.days_left + " days left" : s.status === "upcoming" ? "Starts " + odate(s.starts_on) : "Ended " + odate(s.ends_on);
-    v.innerHTML = '<div class="vh"><div><h1>Menu Passport</h1><p class="sub">Guests collect one stamp for each dish they try. Use it to see who\'s playing and which dishes get ordered least.</p></div><button class="obtn" id="ppEdit">Change season &amp; prizes</button></div>' +
+    const statusTxt = s.status === "live" ? "Running · " + s.days_left + " days left in Q" + qOf(s) : s.status === "upcoming" ? "Starts " + odate(s.starts_on) : "Ended " + odate(s.ends_on);
+    v.innerHTML = '<div class="vh"><div><h1>Menu Passport</h1><p class="sub">Guests collect one stamp for each dish they try. Use it to see who\'s playing and which dishes get ordered least.</p></div><button class="obtn" id="ppEdit">Change quarter &amp; prizes</button></div>' +
       '<div class="pp-okpis" id="ppOwnerKpis">' + kp + "</div>" +
-      '<div class="pp-ocols"><div class="pp-ocard"><h2>Season</h2><p class="pp-osub">The dates stamps count, and what guests win.</p>' +
+      '<div class="pp-ocols"><div class="pp-ocard"><h2>Quarter</h2><p class="pp-osub">The dates stamps count, and what guests win. Each passport runs for one quarter (Q1–Q4). Stamps reset when the quarter ends; the next quarter starts by itself with the same dishes, prizes, bottles and rewards.</p>' +
         '<div class="pp-orow"><span>' + esc(s.name_en) + " · " + esc(s.name_zh || "") + "</span><b>" + statusTxt + "</b></div>" +
         '<div class="pp-orow"><span>Dates</span><b>' + odate(s.starts_on) + " → " + odate(s.ends_on) + "</b></div>" +
         '<div class="pp-orow"><span>New stamps a bill (max)</span><b>' + s.max_per_bill + "</b></div>" +
         tiers.map(t => '<div class="pp-orow"><span>Prize at ' + t.n + " stamps</span><b>" + esc(t.en) + "</b></div>").join("") +
         '<div class="pp-orow"><span>Stamps so far</span><b>' + d.stamps + " (" + (d.by_source.receipt || 0) + " from receipts, " + (d.by_source.staff || 0) + " by staff)</b></div>" +
-      '</div><div class="pp-ocard"><h2>Most stamped</h2><p class="pp-osub">Dishes members try the most this season.</p>' + most.map(bar).join("") +
+      '</div><div class="pp-ocard"><h2>Most stamped</h2><p class="pp-osub">Dishes members try the most this quarter.</p>' + most.map(bar).join("") +
         '<h2 style="margin-top:18px">Least stamped</h2><p class="pp-osub">Dishes members skip. Worth a staff recommendation, a better photo, or a rethink.</p>' + least.map(bar).join("") +
       '</div></div><details class="pp-ocard pp-oall"><summary>All ' + d.total + " dishes, most to least stamped</summary>" + d.items.map(bar).join("") + "</details>" +
       '<p class="pp-osub" style="margin-top:10px">How stamps get ticked: the guest\'s receipt scan reads the food lines (sets stamp their rolls); staff can tick items from the bill on the iPad with "Stamp passport". Only the person who paid, one stamp per dish per bill, max ' + s.max_per_bill + " new stamps a bill, free items never stamp. Prizes are marked used by staff like other benefits, and every stamp, prize and undo is in Staff &amp; PINs → activity.</p>";
@@ -386,12 +408,14 @@
     el.innerHTML = '<div class="vh" style="margin-top:26px"><div><h1>Bottle Passport</h1><p class="sub">The Drinks side of the guest Passport tab. One stamp for each different bottle; the rewards count every bottle ordered' + (d.repeats_count ? ", repeats included" : " (different bottles only)") + '. Glasses never count.</p></div><button class="obtn" id="dkEdit">Change bottles &amp; rewards</button></div>' +
       '<div class="pp-okpis">' + tile("k-or", "Members playing", d.playing, "have 1 or more bottles stamped") + tile("k-gr", "Bottles stamped", d.bottles, (d.by_source.receipt || 0) + " from receipts, " + (d.by_source.staff || 0) + " by staff") + tile("k-bl", "Bottles this week", d.week, "last 7 days") +
         (d.rewards || []).map(r => tile("k-gold", "Reward at " + r.n, r.claimed, "claimed · " + esc(r.en))).join("") + "</div>" +
-      '<div class="pp-ocols"><div class="pp-ocard"><h2>Bottles on the passport</h2><p class="pp-osub">From the October price sheet. Price and cost per bottle.</p>' +
-        inl.map(x => '<div class="pp-orow"><span>' + esc(x.short_en || x.name) + ' <small class="dk-cat">' + esc((DCAT[x.cat] || DCAT.other)[0]) + "</small></span><b>" + money(x.price) + ' <small>cost ' + money(x.cost) + " · " + x.stamped + " stamped</small></b></div>").join("") +
+      '<div class="pp-ocols"><div class="pp-ocard"><h2>Bottles on the passport</h2><p class="pp-osub">Names and bottle prices from the rorubaru.com drinks menu. Costs from the October price sheet; "cost unknown" where the sheet has no row.</p>' +
+        inl.map(x => '<div class="pp-orow"><span>' + esc(x.short_en || x.name) + ' <small class="dk-cat">' + esc((DCAT[x.cat] || DCAT.other)[0]) + "</small>" + (x.note || x.glass_too ? "<br><small>" + esc([x.note, x.glass_too ? "also by the glass (glasses never stamp)" : ""].filter(Boolean).join(" · ")) + "</small>" : "") + "</span><b>" + money(x.price) + ' <small>' + (x.cost == null ? '<span class="dk-unk">cost unknown</span>' : "cost " + money(x.cost)) + " · " + x.stamped + " stamped</small></b></div>").join("") +
       '</div><div class="pp-ocard"><h2>Rewards &amp; what they cost</h2><p class="pp-osub">Cost as a share of the least a guest can spend to get there (cheapest bottle, ' + money(cheapest) + ') and of a typical spend (average bottle, ' + money(Math.round(avg)) + ').</p>' +
+        (() => { const rs = d.rewards || [], top = rs.length ? Math.max(...rs.map(r => r.n)) : 0, tot = rs.reduce((a, r) => a + (r.cost == null ? 0 : +r.cost), 0);
+          return top && avg ? '<div class="dk-tot"><b>' + (tot / (top * avg) * 100).toFixed(1) + '%</b><span>All ' + rs.length + " rewards together (" + money(tot) + ") for a guest who reaches " + top + " bottles, against " + top + " average bottles (" + money(Math.round(top * avg)) + ", before service charge)</span></div>" : ""; })() +
         (d.rewards || []).map(r => '<div class="pp-orow"><span><b>' + r.n + " bottles:</b> " + esc(r.en) + "<br><small>" + esc(r.cost_note || "") + "</small></span><b>" + money(r.cost) + ' <small>' + pct(r.cost, r.n, cheapest) + " min · " + pct(r.cost, r.n, avg) + " typical</small></b></div>").join("") +
       "</div></div>" +
-      '<p class="pp-osub" style="margin-top:10px">How bottles get stamped: the receipt scan reads bottle lines and checks the price, so a HK$88 glass of Pessegueiro never counts but the bottle does; a line like "2 Sari Black" stamps 2. Staff can tap bottles on the iPad with "Stamp bottles". Only the person who paid, max ' + d.max_per_bill + " bottles a bill, split shares never stamp. Rewards are marked used by staff; every stamp, reward and undo is in Staff &amp; PINs → activity.</p>";
+      '<p class="pp-osub" style="margin-top:10px">How bottles get stamped: the receipt scan reads bottle lines and checks the price, so a HK$88 glass of Pessegueiro or an HK$80 glass of Heavensake never counts but the bottle does; a line like "2 Sari Black" stamps 2. Staff can tap bottles on the iPad with "Stamp bottles". Sharing a bill? Bottle stamps go to whoever scans the receipt. Splitting the bill shares the points, not the bottle stamps. Max ' + d.max_per_bill + " bottle stamps per bill. Rewards are marked used by staff; every stamp, reward and undo is in Staff &amp; PINs → activity.</p>";
     v.appendChild(el);
     $("#dkEdit").onclick = ownerDrinksEdit;
   }
@@ -404,7 +428,7 @@
       '<input type="hidden" name="line_en" value="' + esc(r.line_en || "") + '"><input type="hidden" name="line_zh" value="' + esc(r.line_zh || "") + '"><input type="hidden" name="cost_note" value="' + esc(r.cost_note || "") + '"></div>';
     const ov = sheet('<div class="pp-sh-h"><button class="pp-x" data-x aria-label="Back">‹</button><div><h2>Bottles &amp; rewards</h2><small>The Drinks side of the guest Passport</small></div></div>' +
       '<h3>Bottles</h3><p class="pp-rule">Tick the bottles that count. Every drink on the menu is listed; only tick bottles (wine, sake, shochu), never glasses or cocktails.</p><div class="dk-elist">' + (d.drinks || []).map(brow).join("") + "</div>" +
-      '<h3>Rewards</h3><p class="pp-rule">Once each a season, when a guest reaches that many bottles.</p><div id="dkR">' + (d.rewards || []).map(rrow).join("") + '</div><button class="obtn ghost" id="dkAdd" type="button">+ Add a reward</button>' +
+      '<h3>Rewards</h3><p class="pp-rule">Once each a quarter, when a guest reaches that many bottles.</p><div id="dkR">' + (d.rewards || []).map(rrow).join("") + '</div><button class="obtn ghost" id="dkAdd" type="button">+ Add a reward</button>' +
       '<div class="pp-ofields"><label class="dk-chk"><input type="checkbox" id="dkRep"' + (d.repeats_count ? " checked" : "") + '><span>Count repeat bottles toward rewards (the same bottle twice = 2)</span></label>' +
       '<label class="fl"><span>Max bottles a bill</span><input class="fin" type="number" min="1" max="24" id="dkMax" value="' + d.max_per_bill + '"></label></div>' +
       '<div id="dkEErr" class="pp-err hide"></div><div class="pp-sh-f"><button class="obtn ghost" data-x type="button">Cancel</button><button class="obtn" id="dkSave" type="button">Save</button></div>');
@@ -428,13 +452,13 @@
   function ownerEdit() {
     const s = O.data.season, total = O.data.total;
     const trow = (t) => '<div class="pp-trow"><label class="fl"><span>Stamps</span><input class="fin" name="n" type="number" min="1" max="' + total + '" value="' + (t.n || "") + '"></label><label class="fl"><span>Prize (English)</span><input class="fin" name="en" value="' + esc(t.en || "") + '"></label><label class="fl"><span>Prize (繁中)</span><input class="fin" name="zh" value="' + esc(t.zh || "") + '"></label><button class="pp-trm" type="button" aria-label="Remove">✕</button></div>';
-    const ov = sheet('<div class="pp-sh-h"><button class="pp-x" data-x aria-label="Back">‹</button><div><h2>Season &amp; prizes</h2><small>What guests see on their passport</small></div></div>' +
-      '<div class="pp-ofields"><label class="fl"><span>Season name (English)</span><input class="fin" id="pnEn" value="' + esc(s.name_en) + '"><em>e.g. Season 1</em></label>' +
-      '<label class="fl"><span>Season name (繁中)</span><input class="fin" id="pnZh" value="' + esc(s.name_zh || "") + '"><em>e.g. 第一季</em></label>' +
+    const ov = sheet('<div class="pp-sh-h"><button class="pp-x" data-x aria-label="Back">‹</button><div><h2>Quarter &amp; prizes</h2><small>What guests see on their passport</small></div></div>' +
+      '<div class="pp-ofields"><label class="fl"><span>Quarter name (English)</span><input class="fin" id="pnEn" value="' + esc(s.name_en) + '"><em>e.g. Q4 2026</em></label>' +
+      '<label class="fl"><span>Quarter name (繁中)</span><input class="fin" id="pnZh" value="' + esc(s.name_zh || "") + '"><em>e.g. 2026年第四季</em></label>' +
       '<label class="fl"><span>First day</span><input class="fin" type="date" id="pS" value="' + s.starts_on + '"></label>' +
-      '<label class="fl"><span>Last day</span><input class="fin" type="date" id="pE" value="' + s.ends_on + '"><em>About 3 months after the first day</em></label>' +
+      '<label class="fl"><span>Last day</span><input class="fin" type="date" id="pE" value="' + s.ends_on + '"><em>Calendar quarters: Q1 Jan–Mar · Q2 Apr–Jun · Q3 Jul–Sep · Q4 Oct–Dec</em></label>' +
       '<label class="fl"><span>Max new stamps a bill</span><input class="fin" type="number" min="1" max="' + total + '" id="pM" value="' + s.max_per_bill + '"><em>' + s.max_per_bill + ' means finishing takes at least ' + Math.ceil(total / s.max_per_bill) + ' visits</em></label></div>' +
-      "<h3>Prizes</h3><p class=\"pp-rule\">A guest gets each prize once a season when they reach that many stamps (out of " + total + ').</p><div id="pTiers">' + (s.tiers || []).map(trow).join("") + '</div><button class="obtn ghost" id="pAdd" type="button">+ Add a prize</button>' +
+      "<h3>Prizes</h3><p class=\"pp-rule\">A guest gets each prize once a quarter when they reach that many stamps (out of " + total + ').</p><div id="pTiers">' + (s.tiers || []).map(trow).join("") + '</div><button class="obtn ghost" id="pAdd" type="button">+ Add a prize</button>' +
       '<div id="pErr" class="pp-err hide"></div><div class="pp-sh-f"><button class="obtn ghost" data-x type="button">Cancel</button><button class="obtn" id="pSave" type="button">Save</button></div>');
     ov.addEventListener("click", async (e) => {
       if (e.target.closest("[data-x]") || e.target === ov) { ov.remove(); return; }

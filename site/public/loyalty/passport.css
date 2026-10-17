@@ -135,3 +135,8 @@
 @media(min-width:600px){.pp-badges{grid-template-columns:1fr 1fr}}
 /* f36: reward cards: status pill under the text so names don't squeeze to one word a line (food + drinks match) */
 .pp-pz{grid-template-columns:42px 36px 1fr;row-gap:6px}.pp-pz .pp-pz-s{grid-column:3;justify-self:start}
+/* f37: bottle meta line (vintage / brewery + menu price), cost unknown, all-rewards cost line */
+.dk-meta{font-size:10.5px;opacity:.62;margin-top:3px;line-height:1.2;font-weight:600}
+.dk-unk{color:#E04000;font-weight:800}
+.dk-tot{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--line,rgba(127,127,127,.16));margin:0 0 12px}.dk-tot b{font-size:22px;color:#E04000;white-space:nowrap}.dk-tot span{font-size:12.5px;line-height:1.4;opacity:.85}
+.dk-pk .pp-pk-t small{white-space:normal}
