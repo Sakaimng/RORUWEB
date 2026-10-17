@@ -4,7 +4,7 @@ window.RORU = (function () {
     url: "https://gpudggbdwghzsanyvvgt.supabase.co",
     key: "sb_publishable_WbZvV4s9WkKYvdGGlIUBbw_-e6W7Yfk",
     passHash: "156a203791b9b43e682aa45904eee434cc46fab681b2ae1cbb8ee76415df1c68",   // sha256 of the preview passcode (dark phase only)
-    build: "f36-preview-2026-10-17"
+    build: "f38-preview-2026-10-17"
   };
   // PROGRAMME NAME — the one place to rename the loyalty programme (EN / 繁中). Every string below uses {prog};
   // page titles, headers, the passcode gate, share text and the month-end PDF/CSV read it from here.
@@ -261,7 +261,7 @@ pre_title: "一張收據，掃一次", pre_flair: "就好似最後一條手卷�
     opts = opts || {}; const LS = "roru_tour_" + key;
     try { if (!opts.force && localStorage.getItem(LS)) return false; } catch (e) {}
     const old = document.querySelector(".tour"); if (old) old.remove();
-    const zh = (opts.lang || lang) === "zh", W = { next: zh ? "下一步" : "Next", back: zh ? "返回" : "Back", skip: zh ? "略過" : "Skip", done: zh ? "明白" : "Got it" };
+    const zh = (opts.lang || lang) === "zh", hs = zh && hans, W = { next: zh ? "下一步" : "Next", back: zh ? "返回" : "Back", skip: zh ? (hs ? "跳过" : "略過") : "Skip", done: zh ? "明白" : "Got it" };
     const ov = document.createElement("div"); ov.className = "tour"; ov.innerHTML = '<div class="tour-ring"></div><div class="tour-tip" role="dialog" aria-live="polite"><div class="tour-n"></div><div class="tour-t"></div><div class="tour-b"><button type="button" class="tour-skip"></button><div class="tour-nav"><button type="button" class="tour-back"></button><button type="button" class="tour-next"></button></div></div></div>';
     document.body.appendChild(ov);
     const ring = ov.querySelector(".tour-ring"), tip = ov.querySelector(".tour-tip");
@@ -296,7 +296,7 @@ pre_title: "一張收據，掃一次", pre_flair: "就好似最後一條手卷�
     function paint(s) {
       s._el.scrollIntoView({ block: "center", behavior: "auto" });
       ov.querySelector(".tour-n").textContent = (i + 1) + " / " + list.length;
-      ov.querySelector(".tour-t").textContent = zh ? (s.zh || s.en) : s.en;
+      ov.querySelector(".tour-t").textContent = zh ? ((hs && s.zhs) || s.zh || s.en) : s.en; // f38: hand-written 简中 when a step has one
       ov.querySelector(".tour-skip").textContent = W.skip; ov.querySelector(".tour-skip").style.visibility = i === list.length - 1 ? "hidden" : "visible";
       ov.querySelector(".tour-next").textContent = i === list.length - 1 ? W.done : W.next;
       const bk = ov.querySelector(".tour-back"); bk.textContent = W.back; bk.style.visibility = i === 0 ? "hidden" : "visible"; bk.disabled = i === 0; // f33: Back (Dominic Oct 16), hidden on step 1
@@ -340,5 +340,32 @@ pre_title: "一張收據，掃一次", pre_flair: "就好似最後一條手卷�
     new MutationObserver((ms) => { for (const m of ms) { if (m.type === "characterData") hrScan(m.target); else m.addedNodes.forEach(hrScan); } }).observe(document.body, { childList: true, subtree: true, characterData: true });
   }
   if (typeof document !== "undefined") { if (document.body) hrStart(); else document.addEventListener("DOMContentLoaded", hrStart); }
-  return { HR, HRI, CFG, PROG, prog, t, lang: () => lang, hans: () => hans, toS, setLang, applyI18n, rpc, errText, gate, qrSvg, rollSvg, stamp, stampStyle, tierIcon, TIERS, tierName: (k, l) => (TIERS[k] || TIERS.nori)[(l || lang) === "zh" ? "zh" : "en"], toast, burst, fmtDay, fmtTime, tour };
+
+  // f38 (Dominic Oct 17 19:15 "across all the apps there should be dark and light"): one theme switch for the guest and staff apps.
+  // "A" = dark (the original look), "B" = light. Follows the phone's light/dark setting until someone taps the switch, then remembers it.
+  // body.lt carries the light palette (loyalty.css); the owner page keeps its own A/B switch (thA/thB) and is not touched by this.
+  const theme = (function () {
+    let key = "roru_theme", cur = "A";
+    const sysLight = () => { try { return window.matchMedia("(prefers-color-scheme: light)").matches; } catch (e) { return false; } };
+    function set(th, save) {
+      cur = th === "B" ? "B" : "A";
+      document.documentElement.classList.toggle("lt", cur === "B"); if (document.body) document.body.classList.toggle("lt", cur === "B");
+      document.documentElement.style.colorScheme = cur === "B" ? "light" : "dark";
+      const mc = document.querySelector('meta[name="theme-color"]'); if (mc) mc.setAttribute("content", cur === "B" ? "#F4F0E4" : "#0b0d12");
+      if (save) { try { localStorage.setItem(key, cur); } catch (e) {} }
+      document.querySelectorAll("[data-theme-btn]").forEach(b => { const i = b.querySelector("i"); if (i) i.textContent = cur === "B" ? "🌙" : "☀️"; const lb = cur === "B" ? (lang === "zh" ? "轉深色" : "Dark mode") : (lang === "zh" ? "轉淺色" : "Light mode"); b.setAttribute("aria-label", lb); b.title = lb; });
+      try { document.dispatchEvent(new CustomEvent("roru:theme", { detail: cur })); } catch (e) {}
+    }
+    function init(k) {
+      key = k || key; let q = null; try { q = new URLSearchParams(location.search).get("theme"); } catch (e) {}
+      let saved = null; try { saved = localStorage.getItem(key); } catch (e) {}
+      const pick = q ? (/^(b|light)$/i.test(q) ? "B" : "A") : saved ? saved : (sysLight() ? "B" : "A");
+      set(pick, false);
+      if (!document.body) document.addEventListener("DOMContentLoaded", () => set(cur, false));
+      try { window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", () => { let s = null; try { s = localStorage.getItem(key); } catch (e) {} if (!s) set(sysLight() ? "B" : "A", false); }); } catch (e) {}
+      document.addEventListener("click", (e) => { const b = e.target.closest("[data-theme-btn]"); if (b) set(cur === "B" ? "A" : "B", true); });
+    }
+    return { init, set, get: () => cur };
+  })();
+  return { theme, HR, HRI, CFG, PROG, prog, t, lang: () => lang, hans: () => hans, toS, setLang, applyI18n, rpc, errText, gate, qrSvg, rollSvg, stamp, stampStyle, tierIcon, TIERS, tierName: (k, l) => (TIERS[k] || TIERS.nori)[(l || lang) === "zh" ? "zh" : "en"], toast, burst, fmtDay, fmtTime, tour };
 })();

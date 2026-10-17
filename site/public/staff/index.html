@@ -13,14 +13,14 @@
 <link rel="manifest" href="/loyalty/staff.webmanifest">
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f37">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f37">
-<link rel="stylesheet" href="/loyalty/scratch.css?v=f37">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f38">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f38">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f38">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f37"></script>
-<script src="/loyalty/passport.js?v=f37"></script>
-<script src="/loyalty/scratch.js?v=f37"></script>
-<script src="/loyalty/monthend.js?v=f37"></script>
+<script src="/loyalty/loyalty.js?v=f38"></script>
+<script src="/loyalty/passport.js?v=f38"></script>
+<script src="/loyalty/scratch.js?v=f38"></script>
+<script src="/loyalty/monthend.js?v=f38"></script>
 <style>body{overscroll-behavior:none}
 .gcard{border:1px solid var(--line);background:var(--ink2);border-radius:18px;padding:14px 16px;margin:0 0 12px}
 .gcard .gh{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
@@ -45,8 +45,7 @@
 .oktoast span.os{color:var(--muted)}
 @keyframes okin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 .closein{display:inline-block;margin:0 0 10px;padding:6px 12px;border-radius:99px;background:rgba(246,243,231,.08);color:var(--muted);font-size:14px;font-weight:700}
-#doneBtn{margin-top:12px;min-height:66px;background:var(--green);color:var(--ink);font-size:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
-#doneBtn small{font-size:13px;font-weight:700;opacity:.8}
+/* f38: #doneBtn is now the small "‹ New guest" button (loyalty.css) */
 @media (max-width:520px){.gcard .gs{grid-template-columns:repeat(2,1fr)}.gcard .gn{font-size:20px}}
 </style>
 </head>
@@ -57,6 +56,7 @@
     <div class="row">
       <span class="pill" id="who"></span>
       <div class="langs"><button data-lang="en">EN</button><button data-lang="zh">繁中</button><button data-lang="zhs">简中</button></div>
+      <button class="btn ghost sm thbtn" type="button" data-theme-btn aria-label="Light mode"><i>☀️</i></button>
       <button class="btn ghost sm hide" id="helpBtn" type="button" title="How it works" aria-label="How it works">?</button>
       <button class="btn ghost sm hide" id="logout" aria-label="Sign out" title="Sign out"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" style="vertical-align:-3px"><path d="M12 3v9"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg></button>
     </div>
@@ -73,50 +73,66 @@
   </section>
 
   <!-- main -->
+  <!-- f38 (Dominic Oct 17 19:14 "staff will probably use their phone to scan more than the iPad"): phone-first, same layout on iPad, just wider.
+       Home = find the guest (pad + Scan QR, counts on the top bar, POS / Today / Splits as tabs). Guest = serve this guest with a fixed
+       bottom action bar in thumb reach: Add bill · Visit · Redeem · Stamp. Redeem asks to confirm and logs it on POS. -->
   <section id="main" class="hide">
+    <div class="sbar" id="sbar">
+      <button type="button" class="schip" id="queueBtn">⏳ <span data-t="s_queue"></span> <b id="queueN"></b></button>
+      <button type="button" class="schip" id="posChip">🧾 POS <b id="posChipN"></b></button>
+    </div>
     <div class="cols">
-      <div>
+      <div id="padCol">
         <div class="display" id="disp"><span class="ph" data-t="s_type"></span></div>
         <div class="pad" id="pad"></div>
-        <div class="row" style="margin-top:12px;gap:8px">
-          <button class="btn ghost sm" id="scanBtn">📷 <span data-t="s_scan"></span></button>
-          <button class="btn ghost sm" id="queueBtn" style="margin-left:auto">⏳ <span data-t="s_queue"></span> <b id="queueN"></b></button>
-        </div>
+        <button class="btn scanbig" id="scanBtn">📷 <span data-t="s_scan"></span></button>
         <div class="cam" id="cam"><video id="video" playsinline muted autoplay></video><div class="frame"></div></div>
       </div>
-      <div>
-        <div id="closeIn" class="closein hide" aria-live="polite"></div>
+      <div id="rightCol">
+        <div id="queue" class="card hide"><div class="row"><h2 style="margin:0" class="grow" data-t="s_queue"></h2><button type="button" class="btn ghost sm" id="queueClose" style="width:auto">✕</button></div><div id="queueList" class="members"></div></div>
         <div id="members" class="members"></div>
         <div id="actions" class="hide">
+          <div class="g-top"><button type="button" class="btn ghost sm" id="doneBtn"><span class="g-x">‹</span> <span data-f="s_newguest"></span><small id="doneSub" class="hide"></small></button><div id="closeIn" class="closein hide" aria-live="polite"></div></div>
           <div id="okToast" class="oktoast hide" role="status"></div>
           <div id="gcard" class="gcard hide"></div>
-          <div class="big">
+          <label class="check small hide" id="demoRow" style="margin-top:10px"><input type="checkbox" id="demo"><span data-t="s_demo"></span></label>
+          <!-- kept for the old flows; the new ones open as sheets -->
+          <div class="big" hidden>
             <button class="btn" id="addRoll">🧾 <span data-t="s_add"></span><small id="addSub"></small></button>
             <button class="btn ghost" id="visitBtn">🍣 <span data-t="s_visit"></span><small id="visitSub"></small></button>
-            <button class="btn gold" id="redeemBtn" style="grid-column:1 / -1;min-height:80px">🎁 <span data-t="s_redeem"></span><small id="redeemSub"></small></button>
+            <button class="btn gold" id="redeemBtn">🎁 <span data-t="s_redeem"></span><small id="redeemSub"></small></button>
           </div>
-          <button class="btn" id="doneBtn"><span data-t="s_done"></span><small id="doneSub" class="hide"></small></button>
-          <label class="check small hide" id="demoRow" style="margin-top:10px"><input type="checkbox" id="demo"><span data-t="s_demo"></span></label>
-          <div id="award" class="card hide">
+          <div id="award" class="s-sheet hide"><div class="card s-sheet-c">
+            <div class="fs-h"><h2 data-t="s_add"></h2><button type="button" class="fs-x" id="aX" aria-label="Close">✕</button></div>
+            <p class="small muted" id="aWho"></p>
             <label class="field"><span data-t="s_total"></span><input id="aTotal" type="text" inputmode="decimal" autocomplete="off" style="font-size:28px;font-weight:900"></label>
             <label class="field"><span data-t="s_rno"></span><input id="aNo" type="text" autocapitalize="characters" autocomplete="off"></label>
             <div class="err hide" id="aErr"></div>
-            <div class="row"><button class="btn" id="aGo" data-t="s_award"></button><button class="btn ghost sm" id="aBack" data-t="s_back"></button></div>
+            <div class="row"><button class="btn" id="aGo" data-t="s_award"></button><button class="btn ghost sm" id="aBack" data-t="s_back" style="width:auto"></button></div>
+          </div></div>
+          <div id="pending" class="members" hidden></div>
+        </div>
+        <div id="lists">
+          <div class="ltabs" id="listTabs" role="tablist"><button type="button" data-list="pos" class="on">🧾 POS <b class="badge hide" id="posN"></b></button><button type="button" data-list="today"><span data-t="s_today"></span></button><button type="button" data-list="splits">🍣🍣 <span data-f="s_splits"></span></button></div>
+          <div class="card pos lpanel" data-panel="pos" id="posCard"><div class="row" style="align-items:center"><h2 style="margin:0" class="grow">🧾 <span data-t="s_pos"></span></h2><span class="muted small" data-t="s_pos_sub"></span></div><div id="posList"></div></div>
+          <div class="log card lpanel hide" data-panel="today" id="logCard">
+            <div class="row"><h2 style="margin:0" class="grow"><span data-t="s_today"></span> · <span id="shopName"></span></h2><span class="muted small" id="todayNums"></span></div>
+            <div id="log"></div>
           </div>
-          <div id="pending" class="members"></div>
+          <div class="card split-staff lpanel hide" data-panel="splits" id="splitCard"><div class="row"><h2 style="margin:0" class="grow">🍣🍣 <span data-t="s_split_title"></span></h2><span class="muted small" data-t="s_split_sub"></span></div><div id="splitList"></div></div>
+          <div class="card hide" id="monthCard"></div>
         </div>
-        <div id="queue" class="card hide"><h2 style="margin-top:0" data-t="s_queue"></h2><div id="queueList" class="members"></div></div>
-        <div class="card pos" id="posCard"><div class="row" style="align-items:center"><h2 style="margin:0" class="grow">🧾 <span data-t="s_pos"></span> <span class="badge hide" id="posN"></span></h2><span class="muted small" data-t="s_pos_sub"></span></div><div id="posList"></div></div>
-        <div class="card hide" id="monthCard"></div>
-        <div class="log card" id="logCard">
-          <div class="row"><h2 style="margin:0" class="grow"><span data-t="s_today"></span> · <span id="shopName"></span></h2><span class="muted small" id="todayNums"></span></div>
-          <div id="log"></div>
-        </div>
-        <div class="card split-staff" id="splitCard"><div class="row"><h2 style="margin:0" class="grow">🍣🍣 <span data-t="s_split_title"></span></h2><span class="muted small" data-t="s_split_sub"></span></div><div id="splitList"></div></div>
       </div>
     </div>
     <p class="tiny" data-t="preview_note"></p>
   </section>
+  <!-- the fixed action bar (only while a guest is open) -->
+  <nav class="actbar hide" id="actBar" aria-label="Actions">
+    <button type="button" data-act="bill"><i>🧾</i><span data-f="a_bill"></span></button>
+    <button type="button" data-act="visit"><i>🍣</i><span data-f="a_visit"></span></button>
+    <button type="button" data-act="redeem"><i>🎁</i><span data-f="a_redeem"></span><b class="ab-n hide" id="abRedeemN"></b></button>
+    <button type="button" data-act="stamp"><i>🍽️</i><span data-f="a_stamp"></span></button>
+  </nav>
 </div>
 
 <div class="result" id="result"><div class="box"><div class="big-ico" id="rIco"></div><h1 id="rTitle"></h1><p id="rSub" style="font-size:18px"></p><button class="btn" id="rOk" style="margin-top:18px;max-width:320px;margin-left:auto;margin-right:auto">OK</button></div></div>
@@ -134,6 +150,7 @@
       r_added: "+1 手卷", r_gold: "金色手卷！", r_gold_sub: "請送上金色小禮 🎉", r_bonus: "+1 額外手卷（連續到訪）", r_full: "集齊一碟 — 獎賞解鎖", r_full_sub: "客人在手機刮開紫菜", r_redeemed: "已兌換 ✓", r_already: "今日已經加過", r_already_sub: "每位客人每日一個手卷", r_err: "未能完成", r_already_redeemed: "已兌換", r_already_redeemed_sub: "此獎賞已經用咗，只有經理可以退回。", r_receipt_used: "此收據已經加過", s_log_redeem: "已兌換", s_log_rejected: "已拒絕", s_split_title: "分單收據", s_split_sub: "今日 · 一張單 2 至 6 位會員平分", s_split_with: "同 {who} 分單", s_split_waiting: "等緊 {who} 確認", s_split_declined: "{who} 拒絕咗", s_split_expired: "冇回覆，積分留返俾掃描嘅客人", s_split_cancelled: "客人取消咗", s_split_none: "今日未有分單收據。", s_split_n_with: "同 {who} {n} 人分單", s_split_ways: "{n} 人分單", s_split_open: "等緊回覆", s_split_done_n: "{n} 人之中 {a} 人分", s_split_scanned: "掃描者", s_split_noyes: "冇人確認，全部留返俾掃描者", s_split_st_pending: "等緊", s_split_st_declined: "拒絕咗，份額留返俾掃描者", s_split_st_expired: "冇回覆，份額留返俾掃描者", s_split_st_cancelled: "已取消", s_log_staff: "（店員）", s_not_scratched: "未刮開", sg_next: "下一份獎賞", sg_first: "第一份獎賞",
       wrong_pin: "PIN 錯誤", locked_try_later: "嘗試太多次 — 請等 15 分鐘", pending_none: "沒有可兌換的獎賞", rolls_lbl: "手卷", cam_err: "無法使用相機 — 請輸入號碼", logout: "登出", s_pos: "POS 記錄", s_pos_sub: "先在 POS 入單，再按一下", s_pos_give: "送出", s_pos_ring: "POS 入單", s_pos_log: "已入 POS ✓", s_pos_done: "已記錄", s_pos_not: "未記錄", s_pos_none: "暫時沒有", s_upgraded: "已升級", s_from: "客人原本換", s_pos_more: "再顯示 {n} 項", s_done: "完成 ✓ 下一位", s_closing: "{n} 秒後關閉", s_closing_long: "{n} 秒無操作會自動關閉" } };
   const t = (k, v) => { let s = (S[R.lang()] && S[R.lang()][k]) || S.en[k]; if (!s) return t0(k, v); if (v) for (const x in v) s = s.replace("{" + x + "}", v[x]); return s.split("{prog}").join(R.prog()); };
+  if (R.theme) R.theme.init("roru_theme"); // f38: dark + light, the same switch as the guest app
   await R.gate(); $("#app").style.visibility = "visible";
   document.querySelectorAll(".langs button").forEach(b => b.onclick = () => { R.setLang(b.dataset.lang); render(); });
   const st = { sess: JSON.parse(localStorage.getItem("roru_staff") || "null"), cfg: null, shop: localStorage.getItem("roru_shop") || "wanchai", pin: "", num: "", members: [], sel: null, me: null, today: null, stream: null };
@@ -210,7 +227,7 @@
     st.sel = m; bump(); renderMembers(); $("#actions").classList.remove("hide"); $("#award").classList.add("hide"); $("#queue").classList.add("hide");
     $("#addSub").textContent = t("s_add_sub2") + " · " + tierName(m.tier) + " " + mult(m.multiplier); $("#visitSub").textContent = m.visited_today ? t("r_stamp_already") : t("s_visit_sub") + " · 🍣 " + m.stamps + "/" + m.per_plate; $("#visitBtn").disabled = false; $("#redeemSub").textContent = m.pending_rewards ? m.pending_rewards + " 🎁" : t("pending_none");
     $("#redeemBtn").disabled = !m.pending_rewards; $("#pending").innerHTML = ""; $("#addRoll").disabled = false;
-    loadCard(m);
+    guestMode(true); loadCard(m);
   }
   // Guest card (v38, Dominic's call Oct 14): full phone, birthday, spending background. Server logs every view (owner → Staff & roles → Access log).
   const money = (n) => "HK$" + Math.round(+n || 0).toLocaleString("en-US");
@@ -226,13 +243,18 @@
     const p = me.profile, box = $("#gcard"); const ago = p.days_since_visit == null ? "" : p.days_since_visit === 0 ? t("g_today") : p.days_since_visit === 1 ? t("g_yday") : t("g_ago", { n: p.days_since_visit });
     const bd = p.birthday_tag ? '<span class="bd">' + t("g_bd_" + p.birthday_tag) + "</span>" : "";
     box.innerHTML = '<div class="gh"><span class="gn">' + esc(/\p{L}/u.test(me.name || "") ? me.name : "—") + '</span><span class="tag-tier t-' + me.tier + '" style="margin:0">' + tierName(me.tier) + " " + mult(me.multiplier) + "</span>" + bd + "</div>" +
-      perkBox(me) +
-      '<div class="gl"><span><span class="k">📞</span><b id="gPhone">' + esc(p.phone) + '</b></span><span><span class="k">🎂 ' + t("g_bday") + "</span><b>" + esc(fmtMd(p.birthday_md)) + "</b></span></div>" +
+      rewardChips(me) + perkBox(me) +
+      '<details class="gmore"><summary>▸ ' + t("g_more") + '</summary><div class="gl"><span><span class="k">📞</span><b id="gPhone">' + esc(p.phone) + '</b></span><span><span class="k">🎂 ' + t("g_bday") + "</span><b>" + esc(fmtMd(p.birthday_md)) + "</b></span></div>" +
       '<div class="gs"><div><small>' + t("g_life") + "</small><b>" + money(p.spend_lifetime) + "</b></div><div><small>" + t("g_12m") + "</small><b>" + money(p.spend_12m) + "</b></div><div><small>" + t("g_visits") + "</small><b>" + (p.visits || 0) + "</b></div><div><small>" + t("g_avg") + "</small><b>" + (p.avg_per_visit ? money(p.avg_per_visit) : "—") + "</b></div></div>" +
       '<div class="gx"><span class="k">' + t("g_last") + ":</span> " + (p.last_visit ? esc(fmtD(p.last_visit)) + " (" + ago + ")" : t("g_never")) +
       (p.favourites && p.favourites.length ? '<br><span class="k">' + t("g_fav") + ":</span> " + p.favourites.map(f => esc(favName(f))).join(", ") : "") + "</div>" +
-      "<details><summary>▸ " + t("g_more") + "</summary><div>" + t("g_since") + ": " + esc(fmtD(p.member_since)) + " · " + t("g_receipts") + ": " + (p.receipts || 0) + " · " + t("g_code") + ": " + esc(me.member_code) + '</div><div class="lg">' + t("g_logged") + "</div></details>";
+      "<div>" + t("g_since") + ": " + esc(fmtD(p.member_since)) + " · " + t("g_receipts") + ": " + (p.receipts || 0) + " · " + t("g_code") + ": " + esc(me.member_code) + '</div><div class="lg">' + t("g_logged") + "</div></details>";
+    paintBar();
   }
+  // f38: rewards the guest can use now = tap chips (tap → confirm → done); phone, spend and visits fold under "More"
+  function rewardChips(me) { const zh = R.lang() === "zh", list = (me.rewards || []).filter(r => r.status === "earned" || r.status === "revealed"); if (!list.length) return "";
+    return '<div class="rchips"><span class="rchips-k">🎁 ' + esc(tf("chips_k")) + "</span>" + list.map(r => '<button type="button" class="rchip" data-rchip="' + esc(r.code) + '">' + esc(zh ? r.name_zh : r.name_en) + "<small>" + esc(r.code) + "</small></button>").join("") + "</div>"; }
+  document.addEventListener("click", e => { const c = e.target.closest("[data-rchip]"); if (c && st.sel) { bump(); confirmRedeem(c.dataset.rchip); } });
   $("#addRoll").onclick = () => { if (!st.sel) return; $("#award").classList.remove("hide"); $("#aTotal").value = ""; $("#aNo").value = ""; $("#aErr").classList.add("hide"); setTimeout(() => $("#aTotal").focus(), 50); };
   $("#aBack").onclick = () => $("#award").classList.add("hide");
   $("#visitBtn").onclick = async () => {
@@ -252,7 +274,7 @@
     $("#aGo").disabled = false;
   };
   // approval queue
-  $("#queueBtn").onclick = async () => { const q = $("#queue"); if (!q.classList.contains("hide")) { q.classList.add("hide"); return; } await loadQueue(); q.classList.remove("hide"); $("#actions").classList.add("hide"); };
+  $("#queueBtn").onclick = async () => { const q = $("#queue"); if (!q.classList.contains("hide")) { q.classList.add("hide"); return; } if (st.sel) closeGuest(); await loadQueue(); q.classList.remove("hide"); q.scrollIntoView({ behavior: "smooth", block: "start" }); };
   async function loadQueue() {
     let list = [], bon = []; try { list = await R.rpc("staff_queue", { p_token: st.sess.token }); bon = await R.rpc("staff_bonus_queue", { p_token: st.sess.token }); } catch (e) { return; }
     $("#queueN").textContent = list.length ? list.length : "";
@@ -270,9 +292,78 @@
       $("#pending").querySelectorAll("button").forEach(b => b.onclick = () => redeem(b.dataset.code)); } catch (e) { show("⚠️", t("r_err"), R.errText(e), ""); }
   };
   async function redeem(code) {
+    if (st.sess) { confirmRedeem(code); return; } // f38: a scanned reward QR also asks to confirm (and logs POS)
     try { const r = await R.rpc("staff_redeem", { p_token: st.sess.token, p_reward_code: code }); const zh = R.lang() === "zh"; R.burst(["#E8B84A", "#F6F3E7"]); if (r.member && r.member.member_code) await stayOn(r.member); ok(r.pos && r.pos.upgraded ? "⬆️" : "🎁", t("r_redeemed") + " · " + (r.pos && r.pos.upgraded ? t("s_upgraded") + " → " + (zh ? r.pos.give_zh : r.pos.give_en) : (zh ? r.reward.name_zh : r.reward.name_en)), t("s_pos_ring") + ": " + (r.pos ? r.pos.pos_item : ""), 9000); loadToday(); }
     catch (e) { if (e.code === "already_redeemed") show("⚠️", t("r_already_redeemed"), t("r_already_redeemed_sub"), ""); else show("⚠️", t("r_err"), R.errText(e), ""); }
   }
+
+  // ===================== f38: phone-first staff app: fixed action bar, sheets, redeem confirm (+ POS log), lists as tabs =====================
+  const SF = {
+    en: { s_newguest: "New guest", s_splits: "Splits", a_bill: "Add bill", a_visit: "Visit", a_redeem: "Redeem", a_stamp: "Stamp",
+      rc_title: "Use this reward?", rc_ring: "Ring on POS", rc_then: "Ring it on POS first, then tap Confirm. Confirm also logs it on POS.", rc_go: "Rung on POS · Confirm", rc_cancel: "Cancel",
+      rc_up: "Surprise upgrade from", rc_done: "Redeemed · logged on POS ✓", rc_none: "No rewards ready for this guest", rc_pick: "Which reward?", rc_used: "Already used", rc_pts: "{n} pts were taken when the guest tapped Use",
+      see_all: "See all ({n})", see_less: "Show less", st_pick: "Stamp", st_food: "Food", st_drinks: "Drinks", chips_k: "Ready to use", aw_for: "for {who}" },
+    zh: { s_newguest: "下一位客人", s_splits: "分單", a_bill: "加單", a_visit: "到訪", a_redeem: "兌換", a_stamp: "蓋印",
+      rc_title: "用呢個獎賞？", rc_ring: "POS 要打", rc_then: "先喺 POS 打咗，再撳確認。確認同時會記錄已打 POS。", rc_go: "已打 POS · 確認", rc_cancel: "取消",
+      rc_up: "驚喜升級，原本係", rc_done: "已兌換 · 已記錄 POS ✓", rc_none: "呢位客人未有可用獎賞", rc_pick: "邊個獎賞？", rc_used: "已經用咗", rc_pts: "客人撳「使用」嗰陣已扣 {n} 分",
+      see_all: "睇晒全部（{n}）", see_less: "收起", st_pick: "蓋印", st_food: "食物", st_drinks: "飲品", chips_k: "可以用", aw_for: "客人：{who}" },
+    zhs: { s_newguest: "下一位客人", s_splits: "分单", a_bill: "加单", a_visit: "到访", a_redeem: "兑换", a_stamp: "盖印",
+      rc_title: "使用这个奖赏？", rc_ring: "POS 要打", rc_then: "先在 POS 打好，再点确认。确认同时会记录已打 POS。", rc_go: "已打 POS · 确认", rc_cancel: "取消",
+      rc_up: "惊喜升级，原本是", rc_done: "已兑换 · 已记录 POS ✓", rc_none: "这位客人还没有可用奖赏", rc_pick: "哪个奖赏？", rc_used: "已经用过", rc_pts: "客人点“使用”时已扣 {n} 分",
+      see_all: "查看全部（{n}）", see_less: "收起", st_pick: "盖印", st_food: "食物", st_drinks: "饮品", chips_k: "可以用", aw_for: "客人：{who}" }
+  };
+  const tf = (k, v) => { const L0 = R.lang() === "zh" ? (R.hans && R.hans() ? SF.zhs : SF.zh) : SF.en; let s = (L0[k] != null ? L0[k] : SF.en[k]) || k; if (v) for (const x in v) s = s.split("{" + x + "}").join(v[x]); return s; };
+  const applySF = () => document.querySelectorAll("[data-f]").forEach(e => { const s = tf(e.dataset.f); if (e.textContent !== s) e.textContent = s; });
+  function sSheet(html) { const o = document.createElement("div"); o.className = "s-sheet f38s"; o.innerHTML = '<div class="card s-sheet-c">' + html + "</div>"; document.body.appendChild(o);
+    o.addEventListener("click", e => { if (e.target === o || e.target.closest("[data-sx]")) o.remove(); }); return o; }
+  const guestName = () => { const c = st.card || st.sel || {}; return /\p{L}/u.test(c.name || "") ? c.name : (c.phone_masked || c.member_code || ""); };
+  // the bar
+  const openBill = () => { if (!st.sel) return; $("#award").classList.remove("hide"); $("#aWho").textContent = tf("aw_for", { who: guestName() }); $("#aTotal").value = ""; $("#aNo").value = ""; $("#aErr").classList.add("hide"); setTimeout(() => $("#aTotal").focus(), 60); };
+  $("#aX").onclick = () => $("#award").classList.add("hide");
+  $("#award").addEventListener("click", e => { if (e.target === $("#award")) $("#award").classList.add("hide"); });
+  const readyRewards = () => ((st.card && st.card.rewards) || []).filter(r => r.status === "earned" || r.status === "revealed");
+  function redeemFlow() { if (!st.sel) return; const list = readyRewards();
+    if (!list.length) { ok("🎁", tf("rc_none"), "", 3500); return; }
+    if (list.length === 1) { confirmRedeem(list[0].code); return; }
+    const zh = R.lang() === "zh";
+    const o = sSheet('<div class="fs-h"><h2>🎁 ' + esc(tf("rc_pick")) + '</h2><button type="button" class="fs-x" data-sx aria-label="Close">✕</button></div><p class="small muted">' + esc(guestName()) + "</p>" +
+      list.map(r => '<button type="button" class="member rw-pick" data-rc="' + esc(r.code) + '"><div><b>' + esc(zh ? r.name_zh : r.name_en) + '</b><span class="meta">' + esc(r.code) + (r.status === "earned" ? " · " + t("s_not_scratched") : "") + '</span></div><span class="rolls">›</span></button>').join(""));
+    o.querySelectorAll("[data-rc]").forEach(b => b.onclick = () => { o.remove(); confirmRedeem(b.dataset.rc); }); }
+  // Redeem: ONE confirm that names what to ring on POS; Confirm = rung on POS -> redeemed + logged (staff_redeem_confirm)
+  async function confirmRedeem(code) {
+    let pv = null; try { pv = await R.rpc("staff_redeem_preview", { p_token: st.sess.token, p_reward_code: code }); } catch (e) { if (e.code === "reward_not_found") { show("⚠️", t("r_err"), R.errText(e), ""); return; } pv = null; }
+    const zh = R.lang() === "zh";
+    if (pv && pv.status === "redeemed") { show("⚠️", t("r_already_redeemed"), t("r_already_redeemed_sub"), ""); return; }
+    const pos = (pv && pv.pos) || {}, nm = pv ? (zh ? pv.name_zh : pv.name_en) : code;
+    const o = sSheet('<div class="fs-h"><h2>🎁 ' + esc(tf("rc_title")) + '</h2><button type="button" class="fs-x" data-sx aria-label="Close">✕</button></div>' +
+      '<div class="rc-box"><div class="rc-name">' + esc(pos.give_en ? (zh ? pos.give_zh : pos.give_en) : nm) + (pos.upgraded ? ' <span class="uptag">⬆️ ' + t("s_upgraded") + "</span>" : "") + "</div>" +
+      (pos.upgraded ? '<div class="small muted">' + esc(tf("rc_up")) + " " + esc(zh ? pos.from_zh : pos.from_en) + "</div>" : "") +
+      '<div class="small muted">' + esc(code) + (pv && pv.phone_masked ? " · " + esc(guestName() || pv.phone_masked) : "") + "</div>" +
+      (pos.pos_item ? '<div class="rc-ring"><small>' + esc(tf("rc_ring")) + "</small><b>" + esc(pos.pos_item) + "</b><small>100% loyalty</small></div>" : "") +
+      (pv && pv.points_spent ? '<div class="small muted">' + esc(tf("rc_pts", { n: Number(pv.points_spent).toLocaleString("en-US") })) + "</div>" : "") + "</div>" +
+      '<p class="small" style="line-height:1.45">' + esc(tf("rc_then")) + "</p>" +
+      '<div class="row" style="gap:10px"><button type="button" class="btn ghost" data-sx style="flex:1">' + esc(tf("rc_cancel")) + '</button><button type="button" class="btn gold" id="rcGo" style="flex:2">✓ ' + esc(tf("rc_go")) + "</button></div>");
+    o.querySelector("#rcGo").onclick = async (e) => { const b = e.currentTarget; b.disabled = true;
+      try { const r = await R.rpc("staff_redeem_confirm", { p_token: st.sess.token, p_reward_code: code }); o.remove(); R.burst(["#E8B84A", "#F6F3E7"]);
+        if (r.member && r.member.member_code) await stayOn(r.member);
+        ok(r.pos && r.pos.upgraded ? "⬆️" : "🎁", tf("rc_done"), (zh ? (r.pos && r.pos.give_zh) || r.reward.name_zh : (r.pos && r.pos.give_en) || r.reward.name_en) + " · " + t("s_pos_ring") + ": " + ((r.pos && r.pos.pos_item) || ""), 9000); loadToday(); }
+      catch (er) { o.remove(); if (er.code === "already_redeemed") show("⚠️", t("r_already_redeemed"), t("r_already_redeemed_sub"), ""); else show("⚠️", t("r_err"), R.errText(er), ""); } };
+  }
+  // Stamp: one sheet with Food | Drinks (passport.js draws both; this picks the last one used)
+  function stampFlow() { if (!st.sel || !window.__ppStaff) return; let m = "food"; try { m = localStorage.getItem("roru_stamp_mode") || "food"; } catch (e) {} window.__ppStaff.open(m); }
+  document.querySelectorAll("#actBar [data-act]").forEach(b => b.onclick = () => { bump(); const a = b.dataset.act; if (a === "bill") openBill(); else if (a === "visit") $("#visitBtn").click(); else if (a === "redeem") redeemFlow(); else if (a === "stamp") stampFlow(); });
+  // guest open / closed: the pad and the lists step aside on a phone; the bar shows
+  function guestMode(on) { document.body.classList.toggle("g-open", !!on); $("#actBar").classList.toggle("hide", !on); if (!on) $("#award").classList.add("hide"); }
+  function paintBar() { const n = readyRewards().length; $("#abRedeemN").textContent = n || ""; $("#abRedeemN").classList.toggle("hide", !n); }
+  // lists as tabs: POS | Today | Splits (one at a time)
+  st.list = (() => { try { return sessionStorage.getItem("roru_staff_list") || "pos"; } catch (e) { return "pos"; } })();
+  function setList(k) { st.list = k; try { sessionStorage.setItem("roru_staff_list", k); } catch (e) {} document.querySelectorAll("#listTabs [data-list]").forEach(b => { b.classList.toggle("on", b.dataset.list === k); b.setAttribute("aria-selected", b.dataset.list === k); }); document.querySelectorAll("#lists .lpanel").forEach(p => p.classList.toggle("hide", p.dataset.panel !== k)); }
+  document.querySelectorAll("#listTabs [data-list]").forEach(b => b.onclick = () => setList(b.dataset.list));
+  setList(st.list);
+  $("#posChip").onclick = () => { if (st.sel) closeGuest(); setList("pos"); setTimeout(() => $("#listTabs").scrollIntoView({ behavior: "smooth", block: "start" }), 60); };
+  $("#queueClose").onclick = () => $("#queue").classList.add("hide");
+  const seeAll = (n, on, key) => n > 5 ? '<button type="button" class="btn ghost sm see-all" data-seeall="' + key + '">' + esc(on ? tf("see_less") : tf("see_all", { n })) + "</button>" : "";
+  document.addEventListener("click", e => { const b = e.target.closest("[data-seeall]"); if (!b) return; const k = b.dataset.seeall; st[k] = !st[k]; renderToday(); });
   // ---- POS logging: every redemption gets one tap "Logged on POS ✓" (who + when stored) ----
   const KIND_ICO = { ladder: "🎁", plate: "🍣", birthday: "🎂", gold: "✨⁠" };
   async function loadPos() {
@@ -283,7 +374,7 @@
     const q = st.posQ; if (!q || !st.sess) return;
     const typing = $("#posList").querySelector(".rev-reason"); if (!force && typing) return; // never wipe a reason a manager is typing (30 s refresh)
     try { const zh = R.lang() === "zh";
-      $("#posN").textContent = q.not_logged ? q.not_logged + " " + t("s_pos_not") : ""; $("#posN").classList.toggle("hide", !q.not_logged);
+      $("#posN").textContent = q.not_logged ? q.not_logged : ""; $("#posN").classList.toggle("hide", !q.not_logged); $("#posChipN").textContent = q.not_logged || ""; $("#posChip").classList.toggle("hot", !!q.not_logged);
       const shown = st.posAll ? q.items : q.items.slice(0, 6);
       $("#posList").innerHTML = shown.length ? shown.map(x => '<div class="positem' + (x.logged_at ? " done" : "") + (x.upgraded ? " up" : "") + '" data-code="' + x.code + '">' +
           '<div class="pi-main"><div class="pi-give">' + (KIND_ICO[x.kind] || "🎁") + " " + t("s_pos_give") + ": <b>" + esc(zh ? x.give_zh : x.give_en) + "</b>" + (x.upgraded ? ' <span class="uptag">⬆️ ' + t("s_upgraded") + "</span>" : "") + "</div>" +
@@ -371,19 +462,19 @@
     if (left <= 10) { ci.textContent = "⏱ " + t("s_closing", { n: left }); ci.classList.remove("hide"); ds.textContent = t("s_closing", { n: left }); ds.classList.remove("hide"); }
     else { ci.classList.add("hide"); ds.textContent = t("s_closing_long", { n: idleSecs() }); ds.classList.remove("hide"); }
   }, 250);
-  function reset() { st.num = ""; st.sel = null; st.members = []; renderDisp(); $("#members").innerHTML = ""; $("#actions").classList.add("hide"); $("#award").classList.add("hide"); $("#pending").innerHTML = ""; $("#gcard").classList.add("hide"); $("#gcard").innerHTML = ""; st.card = null; }
+  function reset() { guestMode(false); st.num = ""; st.sel = null; st.members = []; renderDisp(); $("#members").innerHTML = ""; $("#actions").classList.add("hide"); $("#award").classList.add("hide"); $("#pending").innerHTML = ""; $("#gcard").classList.add("hide"); $("#gcard").innerHTML = ""; st.card = null; }
   function show(ico, title, sub, cls) { $("#rIco").textContent = ico; $("#rTitle").textContent = title; $("#rSub").textContent = sub; const el = $("#result"); el.className = "result show " + cls; clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 4000); }
   $("#rOk").onclick = () => $("#result").classList.remove("show"); $("#result").onclick = (e) => { if (e.target === $("#result")) $("#result").classList.remove("show"); };
 
   // ---- today log ----
   async function loadToday() { if (!st.sess) return; loadPos(); loadUi(); try { st.today = await R.rpc("staff_today", { p_token: st.sess.token }); } catch (e) { return; } try { st.splits = await R.rpc("staff_splits", { p_token: st.sess.token, p_days: 1 }); } catch (e) { st.splits = null; } renderToday(); }
-  function renderToday() { if (!st.today) return; $("#shopName").textContent = shopName(st.shop); $("#todayNums").textContent = st.today.receipts + " 🧾 · " + (st.today.visits || 0) + " 🍣 · " + st.today.points + " " + t("s_pts") + " · " + st.today.redeemed + " 🎁"; $("#queueN").textContent = (st.today.pending + (st.today.pending_bonuses || 0)) || ""; $("#log").innerHTML = st.today.log.slice(0, 30).map(l => '<div class="hist"><span>' + R.fmtTime(l.at) + " · " + l.who + (l.reward ? " · " + (R.lang() === "zh" && l.reward_zh ? l.reward_zh : l.reward) : "") + (l.amount ? " · HK$" + (+l.amount).toFixed(0) : "") + "</span><span>" + (l.type === "points" ? "+" + l.points + " " + t("s_pts") + (l.stamped ? " + 🍣" : "") + (l.source === "staff" ? " " + t("s_log_staff") : "") + (l.split_role ? ' <b class="split-tag">' + (+l.split_n > 2 ? t("s_split_n_with", { n: l.split_n, who: esc(l.split_with || "") }) : "½ " + t("s_split_with", { who: esc(l.split_with || "") })) + "</b>" : "") : l.type === "visit" ? "🍣 " + t("s_visit_log") : l.type === "redeem" ? "🎁 " + t("s_log_redeem") : l.type === "rejected" ? "✕ " + t("s_log_rejected") : l.type) + "</span></div>").join("") || '<p class="muted small">—</p>';  renderSplits(); }
+  function renderToday() { if (!st.today) return; $("#shopName").textContent = shopName(st.shop); $("#todayNums").textContent = st.today.receipts + " 🧾 · " + (st.today.visits || 0) + " 🍣 · " + st.today.points + " " + t("s_pts") + " · " + st.today.redeemed + " 🎁"; $("#queueN").textContent = (st.today.pending + (st.today.pending_bonuses || 0)) || ""; $("#log").innerHTML = st.today.log.slice(0, st.todayAll ? 60 : 5).map(l => '<div class="hist"><span>' + R.fmtTime(l.at) + " · " + l.who + (l.reward ? " · " + (R.lang() === "zh" && l.reward_zh ? l.reward_zh : l.reward) : "") + (l.amount ? " · HK$" + (+l.amount).toFixed(0) : "") + "</span><span>" + (l.type === "points" ? "+" + l.points + " " + t("s_pts") + (l.stamped ? " + 🍣" : "") + (l.source === "staff" ? " " + t("s_log_staff") : "") + (l.split_role ? ' <b class="split-tag">' + (+l.split_n > 2 ? t("s_split_n_with", { n: l.split_n, who: esc(l.split_with || "") }) : "½ " + t("s_split_with", { who: esc(l.split_with || "") })) + "</b>" : "") : l.type === "visit" ? "🍣 " + t("s_visit_log") : l.type === "redeem" ? "🎁 " + t("s_log_redeem") : l.type === "rejected" ? "✕ " + t("s_log_rejected") : l.type) + "</span></div>").join("") + seeAll(Math.min(st.today.log.length, 60), st.todayAll, "todayAll") || '<p class="muted small">—</p>';  renderSplits(); }
   // f35: split receipts on the iPad (today): one row per bill, "split N ways", then every person's share and answer
   function renderSplits() { const el = $("#splitList"); if (!el) return; const sp = st.splits, gs = (sp && sp.groups) || [];
     const pSt = (i) => i.status === "accepted" ? "✓" : i.status === "pending" ? "⏳" : i.status === "declined" ? "✕" : i.status === "expired" ? "⌛" : "–";
-    el.innerHTML = gs.slice(0, 20).map(g => '<div class="sg' + (g.open ? " is-open" : "") + '"><div class="hist"><span>' + R.fmtTime(g.created_at) + " · " + ((/^Table /.test(g.receipt_no || "") ? "" : "#") + esc(g.receipt_no || "")) + " · HK$" + Math.round(g.bill) + (g.is_test ? " · test" : "") + '</span><span><b class="split-tag">' + t("s_split_ways", { n: g.people }) + "</b> · " + t(g.open ? "s_split_open" : (+g.accepted || 0) ? "s_split_done_n" : "s_split_noyes", { a: (+g.accepted || 0) + 1, n: g.people }) + "</span></div>" +
+    el.innerHTML = gs.slice(0, st.splitsAll ? 20 : 5).map(g => '<div class="sg' + (g.open ? " is-open" : "") + '"><div class="hist"><span>' + R.fmtTime(g.created_at) + " · " + ((/^Table /.test(g.receipt_no || "") ? "" : "#") + esc(g.receipt_no || "")) + " · HK$" + Math.round(g.bill) + (g.is_test ? " · test" : "") + '</span><span><b class="split-tag">' + t("s_split_ways", { n: g.people }) + "</b> · " + t(g.open ? "s_split_open" : (+g.accepted || 0) ? "s_split_done_n" : "s_split_noyes", { a: (+g.accepted || 0) + 1, n: g.people }) + "</span></div>" +
       '<div class="sg-people"><span class="sg-p sg-you">' + esc(g.scanner) + " <b>" + g.scanner_points + "</b> " + t("s_pts") + ' <small>HK$' + (+g.scanner_hkd).toFixed(2).replace(/\.00$/, "") + " · " + t("s_split_scanned") + "</small></span>" +
-      (g.invites || []).map(i => '<span class="sg-p sg-' + i.status + '">' + pSt(i) + " " + esc(i.who) + (i.status === "accepted" ? " <b>" + i.points + "</b> " + t("s_pts") + ' <small>HK$' + (+i.hkd).toFixed(2).replace(/\.00$/, "") + "</small>" : ' <small>' + t("s_split_st_" + i.status) + "</small>") + "</span>").join("") + "</div></div>").join("") || '<p class="muted small">' + t("s_split_none") + "</p>"; }
+      (g.invites || []).map(i => '<span class="sg-p sg-' + i.status + '">' + pSt(i) + " " + esc(i.who) + (i.status === "accepted" ? " <b>" + i.points + "</b> " + t("s_pts") + ' <small>HK$' + (+i.hkd).toFixed(2).replace(/\.00$/, "") + "</small>" : ' <small>' + t("s_split_st_" + i.status) + "</small>") + "</span>").join("") + "</div></div>").join("") + seeAll(Math.min(gs.length, 20), st.splitsAll, "splitsAll") || '<p class="muted small">' + t("s_split_none") + "</p>"; }
 
   // ---- QR scan (camera; BarcodeDetector first, jsQR fallback) ----
   let scanning = false, raf = null;
@@ -401,7 +492,7 @@
   function stopScan() { scanning = false; clearTimeout(raf); if (st.stream) st.stream.getTracks().forEach(tr => tr.stop()); st.stream = null; $("#cam").classList.remove("show"); }
   function onCode(text) { stopScan(); const m = /^RF:([A-Z0-9]{8})$/.exec(text.trim()); const r = /^RR:(R[A-Z0-9]{7})$/.exec(text.trim()); if (m) { st.num = m[1]; renderDisp(); lookup(); } else if (r) { redeem(r[1]); } else R.toast("?"); }
 
-  function render() { R.applyI18n(); document.querySelectorAll("[data-t]").forEach(el => { if (S.en[el.dataset.t]) el.textContent = t(el.dataset.t); }); renderShops();
+  function render() { R.applyI18n(); applySF(); document.querySelectorAll("[data-t]").forEach(el => { if (S.en[el.dataset.t]) el.textContent = t(el.dataset.t); }); renderShops();
     const on = !!st.sess; $("#login").classList.toggle("hide", on); $("#main").classList.toggle("hide", !on); $("#logout").classList.toggle("hide", !on); $("#helpBtn").classList.toggle("hide", !on); if (on && !window.__stour) { window.__stour = 1; setTimeout(() => staffTour(false), 1200); }
     $("#who").textContent = on ? st.sess.staff.name + (st.sess.staff.role && st.sess.staff.role !== "staff" ? " (" + (st.sess.staff.role === "owner" ? "Owner" : "Manager") + ")" : "") + " · " + shopName(st.shop) : ""; $("#monthCard").classList.toggle("hide", !(on && ["manager", "owner"].includes(st.sess.staff.role))); if (on && ["manager", "owner"].includes(st.sess.staff.role) && !st.meMounted) { st.meMounted = true; window.RORU_MONTHEND.mount($("#monthCard"), () => st.sess.token); } if (!on) st.meMounted = false; renderDisp(); renderToday(); renderPos(true); if (on && st.card && st.sel) { renderCard(st.card); renderMembers(); } }
   document.addEventListener("roru:lang", () => { render(); });
@@ -432,25 +523,50 @@
         '<div class="gx muted small">' + (zh ? "呢張係示範卡，教學完就會消失。" : "This is a sample card for the walkthrough. It disappears at the end.") + "</div>";
       $("#addSub").textContent = zh ? "輸入總數同單號" : "type the total + bill no."; $("#visitSub").textContent = zh ? "每日一個" : "one a day"; $("#redeemSub").textContent = zh ? "客人嘅獎賞" : "the guest's rewards";
       ["#addRoll", "#visitBtn", "#redeemBtn"].forEach(s => $(s).disabled = true);
-      $("#actions").classList.remove("hide");
+      g.insertAdjacentHTML("afterbegin", ""); const gp = g.querySelector(".gperks"); if (gp) gp.insertAdjacentHTML("afterend", '<div class="rchips"><span class="rchips-k">🎁 ' + (zh ? "可以用" : "Ready to use") + '</span><button type="button" class="rchip" tabindex="-1">' + (zh ? "免費手卷（任揀，包括和牛）" : "Free hand roll (any, Wagyu included)") + "<small>RSAMPLE1</small></button></div>");
+      $("#actions").classList.remove("hide"); sample.gopen = document.body.classList.contains("g-open"); document.body.classList.add("g-open"); $("#actBar").classList.remove("hide");
     };
     const clearSample = () => {
       if (!sample) return;
       const g = $("#gcard"); g.innerHTML = ""; delete g.dataset.sample; $("#actions").classList.add("hide");
       ["#addSub", "#visitSub", "#redeemSub"].forEach((s, k) => $(s).textContent = sample.subs[k]); ["#addRoll", "#visitBtn", "#redeemBtn"].forEach((s, k) => $(s).disabled = sample.dis[k]);
+      if (!sample.gopen) { document.body.classList.remove("g-open"); $("#actBar").classList.add("hide"); }
       window.__ppCard = sample.pp; sample = null;
     };
     const vis = (...sels) => () => { for (const s of sels) { const x = typeof s === "function" ? s() : $(s); if (x && x.offsetParent) return x; } return null; };
-    R.tour("staff_f31", [
-      { before: clearSample, el: () => $("#disp"), en: "Find a guest by typing their phone number here, or tap Scan QR to read the card on their phone.", zh: "喺度輸入客人電話號碼搵佢，或者撳「掃描 QR」讀佢手機上嘅會員卡。" },
-      { before: showSample, el: "#addRoll", en: "Tap ADD BILL to type in the bill total and receipt number when a guest's receipt can't be scanned.", zh: "客人收據掃唔到嘅時候，撳「加單」輸入總數同單號。" },
-      { before: showSample, el: "#visitBtn", en: "The bill gives the guest their points, and VISIT ONLY gives one visit stamp a day when there is no bill.", zh: "張單會俾客人積分，冇單嘅時候撳「只蓋到訪印」，每日一個到訪印花。" },
-      { before: showSample, el: vis(".gperks", "#redeemBtn"), en: "When a guest shows their flash card, tap Mark used on that perk, or REDEEM for a points reward.", zh: "客人出示閃卡嗰陣，喺嗰個著數撳「標記已用」，積分獎賞就撳「兌換」。" },
-      { before: showSample, el: "#logCard", en: "Tapped the wrong thing? Undo it from today's list here, and after the undo window a manager can undo it with a reason.", zh: "撳錯咗？喺今日紀錄度復原；過咗時限就要經理寫低原因先復原到。" },
-      { before: showSample, el: vis(".pp-st", "#gcard"), en: "If a receipt didn't stamp the guest's Menu Passport, tap Stamp passport and tick the food from their bill.", zh: "如果收據冇幫客人嘅菜單護照蓋到印花，撳「蓋護照印花」再剔返張單上面嘅食物。" },
-      { before: showSample, el: vis(".sc-st", "#gcard"), en: "On Roru Day the scratch card comes by itself: when the guest who paid scans a receipt of HK$388 or more, it lands on their phone. You just tap Mark used when they use the prize. If the scan doesn't work, a manager can give one by hand with their PIN and a reason.", zh: "Roru Day 當晚刮刮卡會自動派：埋單嗰位客人掃描滿 HK$388 嘅收據，張卡就會出現喺佢手機。佢用獎品嗰陣你撳「標記已用」就得。掃唔到收據嘅話，經理可以用佢嘅 PIN 同寫低原因人手派。" },
-      { before: clearSample, el: "#queueBtn", en: "Big or unclear bills wait in To approve, so only approve one that matches the paper bill and leave the rest for the manager or owner.", zh: "大額或者睇唔清嘅單會喺「待批核」等，同張紙單對得上先好批准，其他留俾經理或者老闆。" },
-      { before: clearSample, el: "#helpBtn", en: "Tap ? up here any time to see this walkthrough again.", zh: "隨時撳上面嘅 ? 就可以再睇呢個教學。" }
+    R.tour("staff_f38", [
+      { before: clearSample, el: () => $("#padCol") && $("#padCol").offsetParent ? $("#disp") : $("#disp"),
+        en: "Find a guest: type their phone number, or tap Scan QR and scan the QR on their phone (Show at counter on their Card, or the Me tab).",
+        zh: "搵客人：輸入佢電話號碼，或者撳「掃描 QR」掃佢手機上嘅 QR（會員卡嘅「櫃檯出示」或者「我」頁）。",
+        zhs: "找客人：输入他的电话号码，或者点“扫描 QR”扫他手机上的二维码（会员卡的“柜台出示”或“我”页面）。" },
+      { before: showSample, el: "#actBar",
+        en: "The guest opens with the action bar at the bottom: Add bill, Visit, Redeem, Stamp. It stays under your thumb, no scrolling.",
+        zh: "客人打開之後，底部有動作列：加單、到訪、兌換、蓋印。一直喺手指位，唔使碌。",
+        zhs: "客人打开后，底部有操作栏：加单、到访、兑换、盖印。一直在拇指位置，不用滚动。" },
+      { before: showSample, el: '#actBar [data-act="bill"]',
+        en: "Add bill: type the total and bill number when a receipt can't be scanned. Visit gives one stamp a day with no bill. Points expire on 31 Dec each year.",
+        zh: "加單：收據掃唔到就輸入總數同單號。到訪：冇單嘅時候每日一個印花。積分每年 12 月 31 日到期。",
+        zhs: "加单：收据扫不到就输入总额和单号。到访：没有账单时每天一个印花。积分每年 12 月 31 日到期。" },
+      { before: showSample, el: () => $(".rchips") || $('#actBar [data-act="redeem"]'),
+        en: "Redeem: tap the guest's reward, ring it on POS, then Confirm. Confirm also logs it on POS. Guest showing a reward QR? Scan it, then Confirm.",
+        zh: "兌換：撳客人嘅獎賞，喺 POS 打咗，再撳確認。確認同時記錄已打 POS。客人出示獎賞 QR？掃完再確認。",
+        zhs: "兑换：点客人的奖赏，在 POS 打好，再点确认。确认同时记录已打 POS。客人出示奖赏二维码？扫完再确认。" },
+      { before: showSample, el: '#actBar [data-act="stamp"]',
+        en: "Stamp: one sheet with Food | Drinks. Tick the dishes or bottles on their bill. Bottles go to whoever paid, max 6 a bill. Q4 ends 31 Dec, then stamps start again.",
+        zh: "蓋印：一張表，食物 | 飲品。剔返張單上面嘅菜式或者酒。酒樽印花歸埋單嗰位，每張單最多 6 個。第四季 12 月 31 日完，之後重新開始。",
+        zhs: "盖印：一张表，食物 | 饮品。勾选账单上的菜式或酒。酒瓶印花归结账的人，每张单最多 6 个。第四季 12 月 31 日结束，之后重新开始。" },
+      { before: showSample, el: () => $(".gperks"),
+        en: "Perks: when a guest uses a perk from their card, tap Mark used. Splits are done by the guests in their app (2 to 6 people), nothing to do here.",
+        zh: "著數：客人用咗卡上面嘅著數，撳「標記已用」。分單由客人喺 app 自己做（2 至 6 人），你唔使做嘢。",
+        zhs: "优惠：客人用了卡上的优惠，点“标记已用”。分单由客人在 app 里自己操作（2 到 6 人），你不用做什么。" },
+      { before: clearSample, el: "#listTabs",
+        en: "POS, Today and Splits are tabs. Tapped the wrong thing? Undo it in Today. Splits shows who shared which bill.",
+        zh: "POS、今日同分單係分頁。撳錯咗？喺「今日」度復原。「分單」睇到邊個同邊個分咗邊張單。",
+        zhs: "POS、今日和分单是分页。点错了？在“今日”里撤销。“分单”可以看到谁和谁分了哪张单。" },
+      { before: clearSample, el: () => $("#queueBtn") && $("#queueBtn").offsetParent ? $("#queueBtn") : $("#helpBtn"),
+        en: "Bills to approve wait up here: approve only what matches the paper bill. Tap ? any time to see this again; ☀️ switches light and dark.",
+        zh: "待批核嘅單喺上面等：同張紙單對得上先批。隨時撳 ? 再睇呢個教學；☀️ 轉淺色或者深色。",
+        zhs: "待批准的单在上面等：和纸质账单对得上才批。随时点 ? 再看这个教学；☀️ 切换浅色或深色。" }
     ], { force: !!force, lang: zh ? "zh" : "en", onEnd: clearSample });
   }
   document.querySelector("#helpBtn").onclick = () => staffTour(true);

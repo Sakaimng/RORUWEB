@@ -88,6 +88,7 @@
     } catch (e) {}
   }
 
+  const INFO_BTN = () => '<button type="button" class="pp-info" data-ppinfo aria-label="' + W("How it works", "點樣玩", "怎么玩") + '">i</button>';
   // ---------- GUEST ----------
   const G = { data: null, drinks: null, at: 0, busy: false, seen: null, mode: (function () { try { return localStorage.getItem("roru_pp_mode") === "drinks" ? "drinks" : "food"; } catch (e) { return "food"; } })() };
   function guestToken() { try { return localStorage.getItem("roru_member_token"); } catch (e) { return null; } }
@@ -138,7 +139,7 @@
     }).join("");
     const how = z ? ["掃描收據：每款付咗錢嘅食物蓋一個印花（每張單每款一次）。", "每張單最多 " + p.max_per_bill + " 個新印花。", "只有埋單嗰位有印花，同枱朋友冇。", "免費嘢食、獎賞同飲品都唔計。套餐會蓋入面嘅手卷。", "收據讀唔到？埋單時叫店員幫你蓋。", QRULE()]
       : ["Scan your receipt: every food item you paid for gets a stamp (once per item per bill).", "Up to " + p.max_per_bill + " new stamps a bill.", "Only the person who paid gets stamps, not the rest of the table.", "Free items, rewards and drinks don't count. A roll set stamps the rolls in it.", "Receipt won't read? Ask staff to stamp it when you pay.", QRULE()];
-    const foodHtml = '<div class="pp-hero"><div class="pp-top">' + CARD + '<div><div class="pp-k">' + W("Menu Passport", "菜單護照") + " · " + W("菜單護照", "Menu Passport") + '</div><div class="pp-season">' + esc(seasonLine(p, z)) + "</div></div></div>" +
+    const foodHtml = '<div class="pp-hero"><div class="pp-top">' + CARD + INFO_BTN() + '<div><div class="pp-k">' + W("Menu Passport", "菜單護照") + " · " + W("菜單護照", "Menu Passport") + '</div><div class="pp-season">' + esc(seasonLine(p, z)) + "</div></div></div>" +
       '<div class="pp-count"><b>' + p.count + "</b><span>/" + p.total + '</span></div><div class="pp-sub">' + W("dishes tried this quarter", "今季試過嘅菜式", "本季已尝菜式") + "</div>" + track(p) +
       togo(p.count, p.tiers, z, "dish", "dishes", "款") + (p.season && p.season.status !== "live" ? '<div class="pp-off">' + W("Stamps are paused outside the quarter's dates.", "季度以外暫停蓋印花。", "季度以外暂停盖印花。") + "</div>" : "") +
       '<div class="pp-badges">' + ["roll", "app", "dessert"].map(g => { const its = p.items.filter(x => x.grp === g); if (!its.length) return ""; const got = its.filter(x => x.sid).length;
@@ -150,6 +151,10 @@
     const tog = dk ? '<div class="pp-tog" role="tablist" aria-label="' + W("Passport", "護照") + '"><button type="button" role="tab" data-ppmode="food" aria-selected="' + (G.mode === "food") + '" class="' + (G.mode === "food" ? "on" : "") + '">' + ROLL + "<span>" + W("Food", "食物") + "</span><em>" + p.count + "/" + p.total + "</em></button>" +
       '<button type="button" role="tab" data-ppmode="drinks" aria-selected="' + (G.mode === "drinks") + '" class="' + (G.mode === "drinks" ? "on" : "") + '">' + BOT_SAKE + "<span>" + W("Drinks", "飲品") + "</span><em>" + dk.count + "</em></button></div>" : "";
     sec.innerHTML = tog + (G.mode === "drinks" && dk ? drinksHtml(dk, z) : foodHtml);
+    // f38: the rules sit behind the ⓘ on the passport card (same text, opens as a sheet)
+    $$("[data-ppinfo]", sec).forEach(b => b.onclick = () => { const hw = $(".pp-how", sec); if (!hw) return; const ov = document.createElement("div"); ov.className = "ask-sheet f38-sheet"; ov.setAttribute("role", "dialog");
+      ov.innerHTML = '<div class="card fs-card pp-how-sheet"><div class="fs-h"><h2>' + hw.querySelector("h2").innerHTML + '</h2><button type="button" class="fs-x" aria-label="Close">✕</button></div><div class="fs-b"><ul>' + hw.querySelector("ul").innerHTML + "</ul></div></div>";
+      ov.addEventListener("click", e => { if (e.target === ov || e.target.closest(".fs-x")) ov.remove(); }); document.body.appendChild(ov); });
     $$("[data-ppmode]", sec).forEach(b => b.onclick = () => { G.mode = b.dataset.ppmode; try { localStorage.setItem("roru_pp_mode", G.mode); } catch (e) {} guestRender(null); window.scrollTo({ top: Math.max(0, sec.getBoundingClientRect().top + window.scrollY - 70), behavior: "smooth" }); });
     if (guestToken()) { celebrate("food", p.season && p.season.id, p.tiers, z); if (dk) celebrate("drinks", dk.season && dk.season.id, dk.rewards, z); }
   }
@@ -185,7 +190,7 @@
     const how = !z ? ["Every bottle you pay for counts. Scan your receipt and it stamps itself. Glasses don't count.", "One stamp for each different bottle; ordering a favourite again still counts toward the rewards.", "Rewards at 3, 6 and 10 bottles, once each a quarter. Show staff before you pay.", shareRule, "Receipt won't read? Staff can stamp it on the iPad.", QRULE()]
       : hans() ? ["每瓶付费的酒（整瓶）都算：扫描收据就会自动盖印。杯装不算。", "每款不同的酒一个印花；同一款再点也会计入奖赏进度。", "奖赏：3 瓶、6 瓶、10 瓶，每季每项兑换一次，结账前出示给店员。", shareRule, "收据读不到？请店员帮你在 iPad 上盖印。", QRULE()]
       : ["每支付咗錢嘅酒（整支）都計：掃描收據就自動蓋印。杯裝唔計。", "每款唔同嘅酒一個印花；同一款再叫都計入獎賞進度。", "獎賞：3 支、6 支、10 支，每季每樣換一次，埋單前俾店員睇。", shareRule, "收據讀唔到？叫店員幫你喺 iPad 蓋。", QRULE()];
-    return '<div class="pp-hero dk-hero"><div class="pp-top"><span class="dk-hero-ic">' + BOT_SAKE + BOT_WINE + '</span><div><div class="pp-k">' + W("Bottle Passport", "酒瓶護照") + " · " + W("酒瓶護照", "Bottle Passport") + '</div><div class="pp-season">' + esc(seasonLine(d, z)) + "</div></div></div>" +
+    return '<div class="pp-hero dk-hero"><div class="pp-top"><span class="dk-hero-ic">' + BOT_SAKE + BOT_WINE + '</span>' + INFO_BTN() + '<div><div class="pp-k">' + W("Bottle Passport", "酒瓶護照") + " · " + W("酒瓶護照", "Bottle Passport") + '</div><div class="pp-season">' + esc(seasonLine(d, z)) + "</div></div></div>" +
       '<div class="pp-count"><b>' + d.count + '</b><span>' + W(d.count === 1 ? " bottle" : " bottles", " 支", " 瓶") + '</span></div><div class="pp-sub">' + W(d.different + " of " + d.total + " different bottles tried", "試咗 " + d.total + " 款之中 " + d.different + " 款", d.total + " 款中已尝 " + d.different + " 款") + "</div>" + track(tr) +
       togo(d.count, tiers, z, "bottle", "bottles", "支", "瓶") +
       (d.season && d.season.status !== "live" ? '<div class="pp-off">' + W("Stamps are paused outside the quarter's dates.", "季度以外暫停蓋印花。", "季度以外暂停盖印花。") + "</div>" : "") +
@@ -342,6 +347,21 @@
       S.data = Object.assign(r.passport, { undo_minutes: S.data.undo_minutes, role: S.data.role }); S.at = Date.now(); staffPaint(); R.toast(W("Undone ✓", "已復原 ✓")); return true;
     } catch (e) { R.toast(errTxt(e), 3500); btn.disabled = false; return false; }
   }
+  // f38: ONE stamp sheet for the staff action bar: Food | Drinks toggle on top of the passport / bottle sheet (same sheets as before)
+  window.__ppStaff = { open: async (mode) => {
+    await staffLoad(true);
+    const foodOk = !!(S.data && S.data.on && S.data.season && S.data.season.status === "live"), drinkOk = !!(S.drinks && S.drinks.on && S.drinks.season && S.drinks.season.status === "live");
+    if (!foodOk && !drinkOk) { R.toast(W("No passport quarter is running today.", "今日冇護照季度。", "今天没有护照季度。"), 3000); return; }
+    if (mode === "drinks" && !drinkOk) mode = "food"; if (mode === "food" && !foodOk) mode = "drinks";
+    try { localStorage.setItem("roru_stamp_mode", mode); } catch (e) {}
+    $$(".pp-ov").forEach(x => x.remove());
+    if (mode === "drinks") drinksSheet(); else stampSheet();
+    const ov = [...document.querySelectorAll(".pp-ov")].pop(); if (!ov) return; const sh = $(".pp-sh", ov);
+    const sw = document.createElement("div"); sw.className = "pp-tog pp-sw"; sw.setAttribute("role", "tablist");
+    sw.innerHTML = '<button type="button" data-sw="food" class="' + (mode === "food" ? "on" : "") + '"' + (foodOk ? "" : " disabled") + ">" + ROLL + "<span>" + W("Food", "食物") + '</span></button><button type="button" data-sw="drinks" class="' + (mode === "drinks" ? "on" : "") + '"' + (drinkOk ? "" : " disabled") + ">" + BOT_SAKE + "<span>" + W("Drinks", "飲品") + "</span></button>";
+    const hd = $(".pp-sh-h", sh); if (hd) hd.after(sw); else sh.prepend(sw);
+    $$("[data-sw]", sw).forEach(b => b.onclick = () => { if (b.dataset.sw !== mode) window.__ppStaff.open(b.dataset.sw); });
+  } };
   function staffInit() {
     const box = $("#gcard"); if (!box) return;
     new MutationObserver(() => { if (window.__ppCard && box.firstChild && !$(".pp-st", box)) { staffPaint(); staffLoad(false); } }).observe(box, { childList: true });
@@ -396,6 +416,16 @@
       '<p class="pp-osub" style="margin-top:10px">How stamps get ticked: the guest\'s receipt scan reads the food lines (sets stamp their rolls); staff can tick items from the bill on the iPad with "Stamp passport". Only the person who paid, one stamp per dish per bill, max ' + s.max_per_bill + " new stamps a bill, free items never stamp. Prizes are marked used by staff like other benefits, and every stamp, prize and undo is in Staff &amp; PINs → activity.</p>";
     $("#ppEdit").onclick = ownerEdit;
     ownerDrinks(v);
+    // f38: Food | Drinks toggle, the same as the guest Passport tab (the owner page stacked both, 4,054px)
+    if (v.querySelector(".dk-own")) {
+      let m = "food"; try { m = localStorage.getItem("roru_owner_pp_mode") || "food"; } catch (e) {}
+      const tg = document.createElement("div"); tg.className = "pp-tog pp-otog"; tg.setAttribute("role", "tablist");
+      tg.innerHTML = '<button type="button" data-opm="food">' + ROLL + "<span>Food</span><em>" + (d.total || "") + '</em></button><button type="button" data-opm="drinks">' + BOT_SAKE + "<span>Drinks</span><em>" + ((O.drinks && (O.drinks.drinks || []).filter(x => x.in).length) || "") + "</em></button>";
+      v.prepend(tg);
+      const setM = (k) => { v.dataset.ppmode = k; $$("[data-opm]", tg).forEach(b => { b.classList.toggle("on", b.dataset.opm === k); b.setAttribute("aria-selected", b.dataset.opm === k); }); try { localStorage.setItem("roru_owner_pp_mode", k); } catch (e) {} };
+      $$("[data-opm]", tg).forEach(b => b.onclick = () => { setM(b.dataset.opm); window.scrollTo(0, 0); });
+      setM(m);
+    } else delete v.dataset.ppmode;
   }
   // f36: the bottle passport for the owner: how it's going, the list, the rewards and what they cost
   function ownerDrinks(v) {

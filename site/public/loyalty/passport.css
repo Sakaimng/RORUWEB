@@ -1,5 +1,5 @@
 /* f29 Menu Passport */
-.tabbar.pp5{grid-template-columns:repeat(5,1fr)!important}
+.tabbar.pp5{grid-template-columns:repeat(4,1fr)!important} /* f38: 4 tabs (Status merged into Rewards) */
 #member[data-tab-on="passport"]>[data-tab]:not([data-tab="passport"]){display:none!important}
 .pp-hero{background:linear-gradient(160deg,#21150e,#101217 72%);border:1px solid rgba(255,77,0,.38);border-radius:22px;padding:18px 18px 16px;margin:0 0 14px}
 .pp-top{display:flex;gap:12px;align-items:center}.pp-card-ic{width:46px;height:46px;flex:none}
@@ -140,3 +140,52 @@
 .dk-unk{color:#E04000;font-weight:800}
 .dk-tot{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--line,rgba(127,127,127,.16));margin:0 0 12px}.dk-tot b{font-size:22px;color:#E04000;white-space:nowrap}.dk-tot span{font-size:12.5px;line-height:1.4;opacity:.85}
 .dk-pk .pp-pk-t small{white-space:normal}
+
+/* f38: light theme for the passport (guest + staff, body.lt) */
+body.lt .pp-hero{background:linear-gradient(160deg,#FFEBDD,#FFFFFF 72%);color:#16181F;box-shadow:0 10px 26px -16px rgba(22,24,31,.3)}
+body.lt .dk-hero{background:linear-gradient(160deg,#FFF3D6,#FFFFFF 72%)}
+body.lt .pp-k{color:#D23A00}
+body.lt .dk-hero .pp-k{color:#93650C}
+body.lt .pp-track,body.lt .pp-tz-bar{background:rgba(22,24,31,.1)}
+body.lt .pp-mk{background:#fff;border-color:rgba(22,24,31,.25)}
+body.lt .pp-mk.on{background:#FF4D00;border-color:#fff}
+body.lt .pp-pz{border-top-color:rgba(22,24,31,.08)}
+body.lt .pp-pz-s{background:rgba(22,24,31,.06)}
+body.lt .pp-pz-s.ready{background:#FF4D00;color:#fff}
+body.lt .pp-cell{background:#fff}
+body.lt .pp-cell.off{border-color:rgba(22,24,31,.2);background:rgba(255,255,255,.55)}
+body.lt .pp-tog{background:#fff;border-color:rgba(22,24,31,.1)}
+body.lt .pp-tog button em{background:rgba(22,24,31,.08)}
+body.lt .pp-tog button.on em{background:rgba(255,255,255,.25)}
+body.lt .pp-togo{background:rgba(255,77,0,.08)}
+body.lt .pp-badge{background:rgba(22,24,31,.025);border-color:rgba(22,24,31,.18)}
+body.lt .pp-badge-ic{background:rgba(22,24,31,.05)}
+body.lt .pp-badge.on b{color:#93650C}
+body.lt .pp-cell.off .dk-bot .dk-glass{stroke:rgba(22,24,31,.35)}
+body.lt .pp-cell.off .dk-bot .dk-cap,body.lt .pp-cell.off .dk-bot .dk-lab{fill:rgba(22,24,31,.1)}
+body.lt .pp-cell.off .dk-bot .dk-ink{stroke:rgba(22,24,31,.3)}
+body.lt .pp-cell.off .dk-bot circle.dk-ink{fill:rgba(22,24,31,.3)}
+body.lt .pp-sh,body.lt .pp-sh-f{background:#F4F0E4;color:#16181F}
+body.lt .pp-cele-c{background:linear-gradient(165deg,#FFE9DC,#FFFFFF 70%);color:#16181F}
+body.lt .pp-err{color:#B3261E}
+/* f38: Passport top tightened; rules behind an ⓘ */
+.pp-hero{padding:14px 16px 12px}
+.pp-top{position:relative;padding-right:34px}
+.pp-info{position:absolute;right:0;top:0;width:28px;height:28px;border-radius:50%;border:1.5px solid currentColor;background:none;color:inherit;opacity:.7;font:inherit;font-size:15px;font-weight:900;font-style:italic;cursor:pointer;display:grid;place-items:center;padding:0}
+.pp-count{margin-top:8px}
+.pp-count b{font-size:46px}
+.pp-track{margin:14px 9px 24px}
+.pp-badges{margin-top:10px;gap:5px}
+.pp-badge{padding:6px 8px}
+#ppSec>.pp-how{display:none}
+.pp-tog{margin-bottom:10px}
+.pp-tog button{min-height:44px}
+
+/* f38: owner Passport = Food | Drinks toggle */
+#v-passport[data-ppmode="drinks"]>:not(.dk-own):not(.pp-otog){display:none!important}
+#v-passport[data-ppmode="food"]>.dk-own{display:none!important}
+#v-passport[data-ppmode="drinks"] .dk-own>.vh{margin-top:0!important}
+.pp-otog{max-width:520px;margin:0 0 14px}
+.thB .pp-otog{background:#fff;border-color:rgba(22,24,31,.1)}
+.thB .pp-otog button em{background:rgba(22,24,31,.08)}
+.thB .pp-otog button.on em{background:rgba(255,255,255,.25)}

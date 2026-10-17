@@ -92,7 +92,9 @@
   }
   function guestRender() {
     const box = $("#scWrap"), d = G.data; if (!box) return;
-    if (!d || !d.on) { box.innerHTML = ""; return; }
+    const dayBox = $("#scDay");
+    const tell = (v) => { window.__scGuest = v; try { document.dispatchEvent(new CustomEvent("roru:scratch")); } catch (e) {} };
+    if (!d || !d.on) { box.innerHTML = ""; if (dayBox) dayBox.innerHTML = ""; tell(null); return; }
     const z = zh(), nw = d.cards.filter(c => c.state === "new"), open = d.cards.filter(c => c.state === "unused"), done = d.cards.filter(c => c.state === "used" || c.state === "expired");
     let h = "";
     if (d.today && d.today.roru_day) {
@@ -107,7 +109,17 @@
         open.map(c => '<div class="sc-pr">' + prizeIcon(c.prize) + '<div class="sc-pr-t"><b>' + esc(z ? c.prize.zh : c.prize.en) + "</b><small>" + (c.usable_today ? W("Ready to use. Show this to staff.", "可以用。俾店員睇呢度。") : W("Use it Mon–Wed", "星期一至三可用")) + " · " + W("until " + fmtD(c.expires_on, false), "有效至 " + fmtD(c.expires_on, true)) + '</small></div><span class="sc-chip on">' + W("Unused", "未用") + "</span></div>").join("") +
         done.slice(0, 3).map(c => '<div class="sc-pr dim">' + prizeIcon(c.prize) + '<div class="sc-pr-t"><b>' + esc(z ? c.prize.zh : c.prize.en) + "</b><small>" + (c.state === "expired" ? W("Expired " + fmtD(c.expires_on, false), fmtD(c.expires_on, true) + "已過期") : (c.prize.kind === "item" ? W("Used " + fmtD(c.used_at, false), fmtD(c.used_at, true) + "用咗") : W("Added to your card", "已加到你張卡"))) + '</small></div><span class="sc-chip">' + (c.state === "expired" ? W("Expired", "過期") : W("Used ✓", "已用 ✓")) + "</span></div>").join("") + "</div>";
     }
+    if (dayBox) {
+      // f38: the Roru Day block moves to Rewards › Ways to earn; "next Roru Day" always shows there (it was hidden on Card when prizes were waiting)
+      let dh = "";
+      if (d.today && d.today.roru_day) dh = h.slice(0, h.indexOf('<div class="sc-day"') >= 0 ? h.indexOf("</p></div>") + 10 : 0);
+      else if (d.next_day) dh = '<div class="sc-next">' + TICKET + "<span>" + W("Next Roru Day: <b>" + fmtD(d.next_day, false, true) + "</b>. First drink on us, and scan a receipt of " + money(d.min_bill) + " or more for a scratch card.", "下一個 Roru Day：<b>" + fmtD(d.next_day, true, true) + "</b>。第一杯飲品我們請，掃描滿 " + money(d.min_bill) + " 嘅收據仲有刮刮卡。") + "</span></div>";
+      if (dh && h.startsWith(dh)) h = h.slice(dh.length); else h = h.replace(/^<div class="sc-next">[\s\S]*?<\/span><\/div>/, "");
+      dayBox.innerHTML = dh;
+    }
     box.innerHTML = h;
+    tell({ fresh: nw.map(c => ({ id: c.id })), today: open.filter(c => c.usable_today).map(c => ({ id: c.id, en: c.prize.en, zh: c.prize.zh })), unused: open.length,
+      roru_day: !!(d.today && d.today.roru_day), next_day: d.next_day || null, min_bill: d.min_bill });
   }
 
   // ---- the scratch card itself ----
@@ -211,7 +223,12 @@
   }
   function guestInit() {
     const hero = $("#perkHero"); if (!hero || !$("#member")) return;
-    const box = document.createElement("div"); box.id = "scWrap"; box.dataset.tab = "card"; const hb = $("#hookBar"); (hb || hero).insertAdjacentElement("afterend", box);
+    // f38: the scratch cards + prizes live in Rewards › Ready to use (#scHost); Roru Day info in Rewards › Ways to earn (#scDayHost).
+    // The Card tab only shows ONE banner when something needs the guest (the family page reads window.__scGuest, sent on "roru:scratch").
+    const box = document.createElement("div"); box.id = "scWrap"; const host = $("#scHost");
+    if (host) host.appendChild(box); else { box.dataset.tab = "card"; const hb = $("#hookBar"); (hb || hero).insertAdjacentElement("afterend", box); }
+    if ($("#scDayHost") && !$("#scDay")) { const dy = document.createElement("div"); dy.id = "scDay"; $("#scDayHost").appendChild(dy); }
+    window.__scOpen = (id) => scratchOpen(+id);
     box.addEventListener("click", (e) => { const b = e.target.closest("[data-scopen]"); if (b) scratchOpen(+b.dataset.scopen); });
     setInterval(() => { if (document.visibilityState === "visible" && !$("#member").classList.contains("hide")) guestLoad(false); }, 3000);
     document.addEventListener("roru:lang", guestRender);

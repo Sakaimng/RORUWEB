@@ -8,14 +8,14 @@
 <title data-tt="{prog} — Owner">High Rollers — Owner</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f37">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f37">
-<link rel="stylesheet" href="/loyalty/scratch.css?v=f37">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f38">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f38">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f38">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f37"></script>
-<script src="/loyalty/passport.js?v=f37"></script>
-<script src="/loyalty/scratch.js?v=f37"></script>
-<script src="/loyalty/monthend.js?v=f37"></script>
+<script src="/loyalty/loyalty.js?v=f38"></script>
+<script src="/loyalty/passport.js?v=f38"></script>
+<script src="/loyalty/scratch.js?v=f38"></script>
+<script src="/loyalty/monthend.js?v=f38"></script>
 <style>
 /* v36 owner dashboard */
 .dash{margin:16px 0 18px}
@@ -353,6 +353,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
       <button data-go="settings"><i>⚙️</i>Settings</button>
       <hr>
       <button data-help><i>❓</i>How it works</button>
+      <div class="tlang" aria-label="Guide language"><button type="button" data-tl="en">EN</button><button type="button" data-tl="zh">繁中</button><button type="button" data-tl="zhs">简中</button></div>
       <button data-theme class="thside"><i>☀️</i><span>Light mode</span></button>
     </nav>
     <main class="views">
@@ -527,6 +528,28 @@ body.thB{--muted:rgba(22,24,31,.64)}
     return (withCounts ? '<div class="stats">' + [["Bills split", sp.bills], ["Friends who said yes", c.accepted], ["Waiting for a friend", c.pending], ["Friend said no", c.declined], ["No answer (share stayed)", c.expired], ["Points moved to friends", c.points_moved]].map(y => '<div class="stat"><b>' + fmt(y[1] || 0) + "</b><span>" + y[0] + "</span></div>").join("") + "</div>" : "") +
       (gs.length ? splitRows(gs.slice(0, limit)) : '<p class="empty">No split receipts yet.</p>');
   }
+  function splitLine() {
+    const sp = st.splits || {}, gs = sp.groups || [], today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Hong_Kong" });
+    const td = gs.filter(g => new Date(g.created_at).toLocaleDateString("en-CA", { timeZone: "Asia/Hong_Kong" }) === today), open = gs.filter(g => g.open).length;
+    return '<button type="button" class="split-line" data-go2="reports"><span class="sl-ic">🍣🍣</span><span class="sl-t"><b>Split receipts: ' + td.length + " today" + (open ? " · " + open + " waiting for friends" : "") + "</b><small>" + fmt(gs.length) + " in the last 30 days · see them all in Reports</small></span><span class=\'sl-go\'>›</span></button>";
+  }
+  // f38: long lists show 5 rows + "See all (n)" (Today, Staff & PINs, Reports). Remembers what was opened until the page reloads.
+  const clampOpen = new Set();
+  function clampLists() {
+    ["today", "staff", "reports"].forEach(v => { const root = $("#v-" + v); if (!root || !root.firstChild) return;
+      const lists = [...root.querySelectorAll("table.rt")].map(tb => ({ el: tb, rows: [...tb.querySelectorAll("tr")].filter(r => !r.classList.contains("rh") && !r.querySelector("th")) }))
+        .concat([...root.querySelectorAll("div")].filter(d => d.children.length > 6 && !d.querySelector(":scope > .more") && !d.closest(".dash,.kpis,svg,table") && !d.matches(".dash,.kpis,.stats,.qa,#quick") && (() => { const k = [...d.children].map(c => String(c.className).split(" ")[0]).filter(Boolean); const top = k.sort((a, b) => k.filter(x => x === b).length - k.filter(x => x === a).length)[0]; return top && k.filter(x => x === top).length >= d.children.length * .8; })()).map(d => ({ el: d, rows: [...d.children].filter(c => !c.classList.contains("see-all")) })));
+      lists.forEach((L, i) => { const key = v + ":" + i, n = L.rows.length, nx = L.el.nextElementSibling, has = nx && nx.classList.contains("see-all-o");
+        if (L.el.querySelector(":scope > .more, :scope > tbody > .more")) return; // this list already has its own "show more"
+        if (n <= 6) { if (has) nx.remove(); return; }
+        const open = clampOpen.has(key); L.rows.forEach((r, j) => r.classList.toggle("clamp-x", !open && j >= 5));
+        const label = open ? "Show less" : "See all (" + n + ")";
+        if (has) { if (nx.textContent !== label) nx.textContent = label; nx.dataset.key = key; return; }
+        const b = document.createElement("button"); b.type = "button"; b.className = "btn ghost sm see-all-o"; b.dataset.key = key; b.textContent = label; L.el.after(b); }); });
+  }
+  document.addEventListener("click", e => { const b = e.target.closest(".see-all-o"); if (!b) return; const k = b.dataset.key; if (clampOpen.has(k)) clampOpen.delete(k); else clampOpen.add(k); clampLists(); });
+  { let tm = null; const vs = document.querySelector("main.views"); if (vs) new MutationObserver(() => { clearTimeout(tm); tm = setTimeout(clampLists, 60); }).observe(vs, { childList: true, subtree: true }); }
+  $$("[data-tl]").forEach(b => b.onclick = () => { R.setLang(b.dataset.tl); closeMenu(); tour(true); });
   function renderToday() {
     const t = st.today || {}, d = st.data, q = st.queue || [], bq = st.bq || [], pos = ((st.pos && st.pos.items) || []).slice().sort((a, b) => String(b.redeemed_at).localeCompare(String(a.redeemed_at)));
     const waiting = q.length + bq.length; badge(waiting);
@@ -557,7 +580,8 @@ body.thB{--muted:rgba(22,24,31,.64)}
           '<div class="t3">' + (p.upgraded ? '<span class="opill warn">⬆️ swapped up from ' + esc(p.from_en || "") + "</span>" : "") + (p.logged_at ? '<span class="opill">Rung up on the POS</span>' : '<span class="opill no">Not rung up on the POS yet</span>') + (p.pos_item ? '<span class="muted">POS button: ' + esc(p.pos_item) + "</span>" : "") + "</div>" +
           '<div class="acts"><button class="btn ghost sm" data-undo="' + esc(p.code) + '" data-nm="' + esc(p.give_en || "") + '">↩︎ Undo</button></div></div></div>').join("") : '<p class="empty">No free items claimed yet.</p>') + "</div>" +
       "</div></div>" +
-      sec("Split receipts 🍣🍣", '<button class="lnk" data-go2="reports">All splits ›</button>') + '<p class="hint">Guests who shared one bill with 1 to 5 member friends. One scan per bill; each friend confirmed in their own app. Points and spend split equally; the scanner keeps any leftover point.</p>' + splitBox(5, false) +
+      splitLine() + // f38: splits live in Reports only; Today shows the count and a link
+
       sec("Best guests", '<button class="lnk" data-go2="guests">All guests ›</button>') + '<p class="hint">Who spent the most with you in the last 12 months.</p><div class="lilist">' + (top.length ? top.map((m, i) => guestLi(m, i)).join("") : '<p class="empty">No members yet.</p>') + "</div>" +
       '<details class="grp" id="todayLog" style="margin-top:16px"><summary>Everything that happened today (' + ((t.log || []).length) + ')</summary><div class="in">' + ((t.log || []).length ? rt([{ h: "What happened" }, { h: "Guest" }, { h: "Time" }, { h: "Done by" }],
         t.log.map(l => ({ cells: [l.type === "redeem" ? "🎁 Claimed: " + esc(l.reward || "") : l.type === "visit" ? "🍣 Visit stamped" : "🧾 " + hkd(l.amount) + " bill → " + fmt(l.points) + " points" + (l.source === "ocr" ? " (scanned)" : l.source === "staff" ? " (by staff)" : "") + (l.split_role ? ' · <b class="sp-tag">' + (+l.split_n > 2 ? "split " + l.split_n + " ways with " : "½ split with ") + esc(l.split_with || "") + "</b>" : ""), esc(l.who || "—"), hkTime(l.at), esc(l.by || "Guest, on their phone")] }))) : '<p class="empty">Nothing yet today.</p>') + "</div></details>";
@@ -735,7 +759,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
     if (!st.monthEl) { st.monthEl = document.createElement("div"); st.monthEl.className = "card"; st.monthEl.id = "monthBox"; window.RORU_MONTHEND.mount(st.monthEl, () => st.sess.token); }
     const v = $("#v-reports");
     v.innerHTML = vh("Reports", "Month-end report, downloads and numbers") + '<p class="purpose">Your month-end report for Florencia, spreadsheets to download, and how the extras are doing.</p>' + '<div id="monthSlot"></div>' +
-      sec("Split receipts · last 30 days") + '<p class="hint">Each bill is scanned once. The guest who scanned picks how many people share it (2 to ' + esc((st.data.settings || {}).split_max_people || 6) + ', them included) and types each friend\'s number. Every friend\'s share is the points divided by the number of people, rounded down; the scanner keeps the leftover. Spend splits the same way to the cent, so the rows always add up to the bill. Each friend says yes on their own; a friend who says no or doesn\'t answer within ' + esc((st.data.settings || {}).split_offer_hours || 12) + ' hours leaves their share with the scanner. Yeses stay yeses.</p>' + splitBox(60, true) +
+      sec("Split receipts · last 30 days") + '<p class="hint">Each bill is scanned once. The guest who scanned picks how many people share it (2 to ' + esc((st.data.settings || {}).split_max_people || 6) + ', them included) and types each friend\'s number. Every friend\'s share is the points divided by the number of people, rounded down; the scanner keeps the leftover. Spend splits the same way to the cent, so the rows always add up to the bill. Each friend says yes on their own; a friend who says no or doesn\'t answer within ' + esc((st.data.settings || {}).split_offer_hours || 12) + ' hours leaves their share with the scanner. Yeses stay yeses.</p><div id="splitsAll">' + splitBox(60, true) + '</div>' +
       sec("Download spreadsheets") + '<p class="hint">Opens in Excel, Numbers or Google Sheets. They include phone numbers, so keep them inside the business (HK privacy law).</p>' +
       '<div class="qa" id="csvBtns">' + [["members", "👥", "All members"], ["receipts", "🧾", "All bills"], ["visits", "🍣", "All visits"], ["rewards", "🎁", "Free items claimed"], ["consents", "✍️", "Sign-up agreements"], ["marketing_optins", "📣", "Who said yes to messages"]].map(c => '<button data-x="' + c[0] + '"><i>' + c[1] + "</i>" + c[2] + "<small>Spreadsheet</small></button>").join("") + "</div>" +
       (x ? sec("How the extras are doing") + '<p class="hint">Totals since the programme started.</p><div class="stats">' + [["Gold receipts won ✨⁠", x.gold_receipts], ["Friends who joined 👯", x.referrals_joined], ["Friend bonuses paid", x.referrals_rewarded], ["Points given for friends", x.referral_points], ["Birthdays saved 🎂", x.birthdays_on_file], ["Birthday rolls given", x.birthday_rolls]].map(y => '<div class="stat"><b>' + fmt(y[1]) + "</b><span>" + y[0] + "</span></div>").join("") + "</div>" +
@@ -839,19 +863,45 @@ body.thB{--muted:rgba(22,24,31,.64)}
     if (st.view !== "today") go("today");
     const vis = (...sels) => () => { for (const s of sels) { const x = typeof s === "function" ? s() : $(s); if (x && x.offsetParent) return x; } return null; };
     const secBy = (re) => () => [...document.querySelectorAll("#v-today h2")].map(h => h.closest(".sec") || h).find(h => h.offsetParent && re.test(h.textContent));
-    R.tour("owner_f31", [
-      { before: () => go("today"), el: "#todayKpis", en: "These are today's numbers, and the grey line under each one tells you what it means." },
-      { before: () => go("guests"), el: vis("#gq", "#v-guests .vh"), en: "To find a guest, type their name or the last 4 digits of their phone here." },
-      { before: () => go("rewards"), el: vis(() => [...document.querySelectorAll("#v-rewards [data-rw]")].find(x => x.offsetParent), "#v-rewards .vh"), en: "Tap any reward to change its name or points, or switch it off, and guests see it straight away." },
-      { before: () => go("today"), el: vis('#quick [data-q="approve"]', secBy(/Bills waiting/i), "#quick"), en: "Big or unclear bills wait for your OK, so tap here to approve the real ones and turn down the rest." },
-      { before: () => go("staff"), el: vis(() => [...document.querySelectorAll("#v-staff [data-st]")].find(x => x.offsetParent), "#v-staff .vh"), en: "Staff & PINs is where you add staff, change a PIN, and see who looked up which guest." },
-      { before: () => go("reports"), el: vis("#monthSlot", "#v-reports .vh"), en: "Reports has the charts and the month-end PDF to send Florencia, one tap to download." },
-      { before: () => go("settings"), el: vis("#g-nums", "#v-settings .vh"), en: "Settings holds the rules, like points per HK$1 and level thresholds, each with an example." },
-      { before: () => go("today"), el: vis("#themeBtn", "#side [data-theme]"), en: "Tap the sun or moon to switch between light and dark, and this device remembers your choice." },
-      { before: () => go("passport"), el: vis("#ppOwnerKpis", "#v-passport .vh"), en: "Menu Passport shows who's collecting dish stamps, who reached each prize, and which dishes get tried least." },
-      { before: () => go("scratch"), el: vis("#scOwnerKpis", "#v-scratch .vh"), en: "Scratch card shows the Roru Day cards guests got automatically by scanning a receipt of HK$388+, any a manager gave by hand, what they won and what it cost, and Change prizes & rules sets the minimum bill and the odds." },
-      { before: () => go("today"), el: vis("#menuBtn", "#side [data-help]"), en: "To replay this walkthrough, open the menu and tap How it works." }
-    ], { force: !!force, lang: "en", onEnd: () => go("today") });
+    R.tour("owner_f38", [
+      { before: () => go("today"), el: "#todayKpis",
+        en: "Today's numbers. The grey line under each one says what it means.",
+        zh: "今日嘅數字。每個數字下面灰色嗰行講咗佢代表乜。", zhs: "今天的数字。每个数字下面的灰色小字说明它代表什么。" },
+      { before: () => go("today"), el: vis('#quick [data-q="approve"]', secBy(/Bills waiting/i), "#quick"),
+        en: "Big or unclear bills wait for your OK. Approve the real ones, turn down the rest. Long lists show 5 rows; tap See all for the rest.",
+        zh: "大額或者睇唔清嘅單會等你批。真嘅就批，其他就拒絕。長嘅清單只顯示 5 行，撳「睇晒全部」睇其餘。",
+        zhs: "大额或看不清的单会等你批准。真的就批，其他就拒绝。长清单只显示 5 行，点“查看全部”看其余的。" },
+      { before: () => go("guests"), el: vis("#gq", "#v-guests .vh"),
+        en: "Find a guest: type their name or the last 4 digits of their phone.",
+        zh: "搵客人：輸入名或者電話最後 4 個數字。", zhs: "找客人：输入名字或电话最后 4 位数字。" },
+      { before: () => go("rewards"), el: vis(() => [...document.querySelectorAll("#v-rewards [data-rw]")].find(x => x.offsetParent), "#v-rewards .vh"),
+        en: "Tap a reward to change its name or points, or switch it off. Guests see it straight away.",
+        zh: "撳一個獎賞就可以改名、改積分或者關咗佢，客人即刻見到。", zhs: "点一个奖赏就可以改名、改积分或关闭，客人马上看到。" },
+      { before: () => go("passport"), el: vis("#v-passport .pp-otog", "#ppOwnerKpis", "#v-passport .vh"),
+        en: "Passport: switch Food | Drinks, like the guest app. Each quarter runs on its own (Q4 ends 31 Dec), stamps don't carry over. Bottle stamps go to whoever scans the receipt, max 6 a bill.",
+        zh: "護照：同客人 app 一樣可以轉食物 | 飲品。每季獨立計（第四季 12 月 31 日完），印花唔會帶過去。酒樽印花歸掃描收據嗰位，每張單最多 6 個。",
+        zhs: "护照：和客人 app 一样可以切换食物 | 饮品。每季独立计算（第四季 12 月 31 日结束），印花不会结转。酒瓶印花归扫描收据的人，每张单最多 6 个。" },
+      { before: () => go("scratch"), el: vis("#scOwnerKpis", "#v-scratch .vh"),
+        en: "Scratch card: Roru Day cards guests got by scanning a receipt of HK$388+, cards a manager gave by hand, what they won and what it cost.",
+        zh: "刮刮卡：客人喺 Roru Day 掃描滿 HK$388 收據攞到嘅卡、經理人手派嘅卡、贏咗乜同成本。",
+        zhs: "刮刮卡：客人在 Roru Day 扫描满 HK$388 收据得到的卡、经理手动发的卡、赢了什么和成本。" },
+      { before: () => go("staff"), el: vis(() => [...document.querySelectorAll("#v-staff [data-st]")].find(x => x.offsetParent), "#v-staff .vh"),
+        en: "Staff & PINs: add staff, change a PIN, and see who looked up which guest (5 rows, then See all).",
+        zh: "員工同 PIN：加員工、改 PIN、睇邊個查過邊位客人（先顯示 5 行，再撳「睇晒全部」）。",
+        zhs: "员工和 PIN：添加员工、改 PIN、查看谁查过哪位客人（先显示 5 行，再点“查看全部”）。" },
+      { before: () => go("reports"), el: vis(() => [...document.querySelectorAll("#v-reports h2")].find(h => h.offsetParent && /Split|分/.test(h.textContent)), "#monthSlot", "#v-reports .vh"),
+        en: "Reports: charts, the month-end PDF for Florencia, and every split receipt (2 to 6 people) in one place. Today only shows the count.",
+        zh: "報告：圖表、俾 Florencia 嘅月結 PDF，同埋所有分單（2 至 6 人）都喺呢度。「今日」只顯示數量。",
+        zhs: "报告：图表、给 Florencia 的月结 PDF，以及所有分单（2 到 6 人）都在这里。“今日”只显示数量。" },
+      { before: () => go("settings"), el: vis("#g-nums", "#v-settings .vh"),
+        en: "Settings: the rules, each with an example: points per HK$1, levels, most people on one split, and points expire on 31 Dec each year.",
+        zh: "設定：所有規則，每條都有例子：每 HK$1 幾多分、等級、一張單最多幾多人分，同埋積分每年 12 月 31 日到期。",
+        zhs: "设置：所有规则，每条都有例子：每 HK$1 多少分、等级、一张单最多几人分，以及积分每年 12 月 31 日到期。" },
+      { before: () => go("today"), el: vis("#themeBtn", "#side [data-theme]", "#menuBtn"),
+        en: "☀️ / 🌙 switches light and dark (the staff and guest apps have it too). To see this again: menu → How it works.",
+        zh: "☀️ / 🌙 轉淺色同深色（員工同客人 app 都有）。想再睇：選單 → 點樣用。",
+        zhs: "☀️ / 🌙 切换浅色和深色（员工和客人 app 也有）。想再看：菜单 → 怎么用。" }
+    ], { force: !!force, lang: R.lang() === "zh" ? "zh" : "en", onEnd: () => go("today") }); // f38: EN / 繁中 / 简中 (the device's language; pick it under How it works)
   }
   function chg(cur, prev) {
     cur = +cur || 0; prev = +prev || 0;

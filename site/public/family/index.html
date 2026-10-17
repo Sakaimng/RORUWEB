@@ -8,13 +8,13 @@
 <title data-tt="{prog} — RORUBARU">High Rollers — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f37">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f37">
-<link rel="stylesheet" href="/loyalty/scratch.css?v=f37">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f38">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f38">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f38">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f37"></script>
-<script src="/loyalty/passport.js?v=f37"></script>
-<script src="/loyalty/scratch.js?v=f37"></script>
+<script src="/loyalty/loyalty.js?v=f38"></script>
+<script src="/loyalty/passport.js?v=f38"></script>
+<script src="/loyalty/scratch.js?v=f38"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -54,58 +54,35 @@
   </section>
 
   <!-- member -->
+  <!-- f38 (Dominic Oct 17 19:22 "go"): 4 tabs, one job each. Card = what I have + what to do now (fits one iPhone screen);
+       Passport = collect; Rewards = spend + my level + ways to earn; Me = my QR, history, friends, settings, help. Nothing removed, only moved. -->
   <section id="member" class="hide">
-    <div class="row" style="justify-content:space-between;align-items:flex-start">
+    <div class="row hide" id="helloRow" style="justify-content:space-between;align-items:flex-start">
       <div><h1 id="hello" style="margin-bottom:2px"></h1><p class="muted small" id="tierLine"></p></div>
       <span class="pill on" id="tierPill"></span>
     </div>
 
-    <!-- v48: the card staff see when the guest sits down: tier colour + "Today:" + limited perks -->
+    <!-- ===== CARD ===== -->
+    <div data-tab="card" id="actBanner" class="act-banner hide" role="status"></div>
     <div data-tab="card" class="perkhero t-nori" id="perkHero"></div>
-    <div data-tab="card" class="hookbar hide" id="hookBar"></div>
-    <div data-tab="card" id="splitInbox"></div>
-    <div data-tab="rewards" id="suggestCard"></div>
-    <!-- status (spend in the last 12 months) -->
-    <div data-tab="status" class="card status" id="statusCard">
-      <div class="row" style="align-items:center;gap:12px">
-        <div class="tierbadge" id="tierBadge"></div>
-        <div class="grow">
-          <div class="tiny" style="letter-spacing:.1em;text-transform:uppercase;margin:0" data-t="your_status"></div>
-          <div style="font-size:26px;font-weight:900;line-height:1.1" id="tierName"></div>
-          <div class="small muted" id="multLine"></div>
-        </div>
-      </div>
-      <div class="tierbar"><div id="tierFill"></div></div>
-      <div class="row small" style="justify-content:space-between"><span id="yearSpend"></span><span id="tierNext" style="text-align:right"></span></div>
-      <div class="ladder" id="tierSteps"></div>
+    <div data-tab="card" class="card c-pts" id="ptsCard">
+      <div class="c-pts-l"><div class="c-k" data-t="your_points"></div><div class="c-num" id="pts">0</div></div>
+      <div class="c-pts-r"><div class="c-exp hide" id="ptsExp"></div><div class="notice hide" id="pendingNote"></div></div>
     </div>
-
-    <!-- perks per tier (owner-toggleable, loyalty_perks) -->
-    <div data-tab="status" class="card hide" id="perksCard">
-      <h2 style="margin-top:0" data-t="perks_title"></h2>
-      <div id="perksBody"></div>
-    </div>
-
-    <!-- points (spend) -->
-    <div data-tab="card" class="card center" style="padding:22px 16px">
-      <div class="tiny" style="letter-spacing:.1em;text-transform:uppercase" data-t="your_points"></div>
-      <div style="font-size:64px;font-weight:900;line-height:1;margin:6px 0" id="pts">0</div>
-      <div class="small hide" id="ptsExp" style="margin:-2px 0 6px;opacity:.85;font-weight:600"></div>
-      <div class="muted small" id="nextReward"></div>
-      <div style="height:8px;border-radius:99px;background:var(--ink);margin:12px 0 4px;overflow:hidden"><div id="bar" style="height:100%;width:0;background:var(--orange);transition:width .6s"></div></div>
-      <div class="notice hide" id="pendingNote"></div>
-      <div class="tiny hide" id="goldLine" style="margin-top:8px;color:var(--gold)"></div>
-    </div>
-
-    <!-- v46: scan sits right under the points on the Card tab -->
-    <div data-tab="card" class="card" id="scanCard">
+    <button data-tab="card" type="button" class="card c-visits" id="visitRow" aria-haspopup="dialog">
+      <span class="c-vtop"><span class="c-vrow" id="visitStamps"></span><b id="visitLine"></b><span class="c-go" aria-hidden="true">›</span></span>
+      <small class="c-vsub" id="visitSub"></small>
+    </button>
+    <button data-tab="card" type="button" class="card c-next" id="nextCard">
+      <span class="c-next-t"><span class="c-nx"><span class="c-k" data-f="next_k"></span><span id="nextReward"></span></span><span class="c-go" aria-hidden="true">›</span></span>
+      <span class="c-bar"><i id="bar"></i></span>
+    </button>
+    <div data-tab="card" class="card c-scan" id="scanCard">
       <div class="notice split-banner hide" id="splitBanner"></div>
       <div id="scanIdle">
-        <h2 style="margin-top:0" data-t="scan"></h2>
-        <p class="muted small" data-t="scan_sub"></p>
-        <button class="btn" type="button" id="scanOpen" style="margin-top:8px">📷 <span data-t="scan"></span></button>
+        <button class="btn" type="button" id="scanOpen">📷 <span data-t="scan"></span></button>
         <input id="photo" type="file" accept="image/*" capture="environment" class="hide">
-        <p class="center small" style="margin-top:10px"><a href="#" id="typeInstead" data-t="type_instead"></a></p>
+        <p class="center small c-type"><a href="#" id="typeInstead" data-t="type_instead"></a></p>
       </div>
       <div id="scanBusy" class="hide center" style="padding:10px 0">
         <img id="thumb" style="max-height:140px;border-radius:12px;display:none;margin:0 auto 10px">
@@ -125,70 +102,122 @@
       </div>
       <div id="scanDone" class="hide"></div>
     </div>
-
     <div data-tab="card" id="ppTeaser" class="hide"></div>
-    <div data-tab="card" id="splitOutbox"></div>
 
-    <!-- visits (stamp plate) -->
-    <div data-tab="card" class="card center" id="plateCard">
-      <div class="tiny" style="letter-spacing:.1em;text-transform:uppercase" data-t="your_plate"></div>
-      <div class="plate-wrap"><div class="plate small-plate" id="plate"></div></div>
-      <div style="font-weight:900;font-size:18px;margin-top:6px" id="plateLine"></div>
-      <div class="small" id="plateDetail" style="color:var(--gold,#E8B84A);margin-top:2px"></div>
-      <div class="small muted" id="plateSub"></div>
+    <!-- things that open in a sheet from the Card tab (moved, not removed) -->
+    <div id="sheetStore" hidden>
+      <div class="hookbar hide" id="hookBar"></div>
+      <div id="splitInbox"></div>
+      <!-- visits (stamp plate): opens from the visit row -->
+      <div class="card center" id="plateCard">
+        <div class="tiny" style="letter-spacing:.1em;text-transform:uppercase" data-t="your_plate"></div>
+        <div class="plate-wrap"><div class="plate small-plate" id="plate"></div></div>
+        <div style="font-weight:900;font-size:18px;margin-top:6px" id="plateLine"></div>
+        <div class="small" id="plateDetail" style="color:var(--gold,#E8B84A);margin-top:2px"></div>
+        <div class="small muted" id="plateSub"></div>
+      </div>
+      <div class="card hide" id="meProgress">
+        <div id="meProgLine"></div><div class="tierbar"><div id="meProgFill"></div></div><div class="small muted" id="meProgSub"></div>
+      </div>
     </div>
 
-    <section data-tab="rewards" id="ladderSec">
-      <h2 data-t="ladder"></h2>
-      <p class="small muted lad-sub" data-t="ladder_sub"></p>
+    <!-- ===== PASSPORT ===== -->
+    <section data-tab="passport" id="ppSec"></section>
+
+    <!-- ===== REWARDS ===== -->
+    <section data-tab="rewards" id="readySec" class="rw-sec">
+      <h2 class="rw-h" data-f="ready_h"></h2>
+      <div id="rewards"></div>
+      <div id="scHost"></div>
+      <p class="muted small rw-empty hide" id="readyEmpty" data-f="ready_empty"></p>
+    </section>
+    <div data-tab="rewards" id="suggestCard"></div>
+    <section data-tab="rewards" id="ladderSec" class="rw-sec">
+      <h2 class="rw-h"><span data-f="ladder_h"></span><button type="button" class="info-i" data-info="ladder" aria-label="ⓘ">i</button></h2>
+      <p class="small muted lad-sub hide" data-t="ladder_sub"></p>
       <div id="ladder"></div>
     </section>
-    <div data-tab="rewards" id="rewards"></div>
+    <section data-tab="rewards" id="levelSec" class="rw-sec">
+      <h2 class="rw-h" data-f="level_h"></h2>
+      <div class="card status" id="statusCard">
+        <div class="row" style="align-items:center;gap:12px">
+          <div class="tierbadge" id="tierBadge"></div>
+          <div class="grow">
+            <div class="tiny" style="letter-spacing:.1em;text-transform:uppercase;margin:0" data-t="your_status"></div>
+            <div style="font-size:26px;font-weight:900;line-height:1.1" id="tierName"></div>
+            <div class="small muted" id="multLine"></div>
+          </div>
+        </div>
+        <div class="lvl-to" id="lvlTo"></div>
+        <div class="tierbar"><div id="tierFill"></div></div>
+        <div class="row small" style="justify-content:space-between"><span id="yearSpend"></span><span id="tierNext" style="text-align:right"></span></div>
+        <div class="ladder" id="tierSteps"></div>
+      </div>
+      <div class="card hide perks-few" id="perksCard">
+        <h2 style="margin-top:0" data-t="perks_title"></h2>
+        <div id="perksBody"></div>
+        <button type="button" class="linkbtn perks-more" id="perksMore"></button>
+      </div>
+    </section>
+    <section data-tab="rewards" id="earnSec" class="rw-sec">
+      <h2 class="rw-h" data-f="earn_h"></h2>
+      <div class="card earn" id="earnList"></div>
+      <div id="scDayHost"></div>
+      <div class="card hide" id="bdayCard">
+        <h2 style="margin-top:0">🎂 <span data-t="bday_title"></span></h2>
+        <div id="bdayBody"></div>
+      </div>
+      <div id="soonWrap" class="hide">
+        <h2><span data-t="coming_soon"></span> <span class="pill" style="font-size:10px;vertical-align:middle">🔒</span></h2>
+        <div class="soon" id="soon"></div>
+      </div>
+      <div class="tiny hide" id="goldLine"></div>
+    </section>
 
-    <div data-tab="rewards" id="extras">
+    <!-- ===== ME ===== -->
+    <div data-tab="me" class="card meqr" id="meQr">
+      <div class="meqr-h"><h2 data-f="qr_h"></h2><span class="small muted" data-f="qr_sub"></span></div>
+      <div class="meqr-b">
+        <button type="button" class="qr" id="memberQr" aria-label="QR"></button>
+        <div class="meqr-t">
+          <p class="code" id="memberCode"></p>
+          <p class="small muted" id="memberPhone"></p>
+          <p class="tiny"><span data-t="member_since"></span> <span id="since"></span></p>
+          <button type="button" class="btn sm" id="meQrBig" data-f="counter_btn"></button>
+        </div>
+      </div>
+    </div>
+    <div data-tab="me" class="card" id="histCard">
+      <h2 style="margin-top:0" data-f="hist_h"></h2>
+      <div id="splitOutbox"></div>
+      <div id="history"></div>
+      <button type="button" class="btn ghost sm hide" id="histAll"></button>
+    </div>
+    <div data-tab="me" id="friendWrap">
       <div class="card hide" id="friendCard">
         <h2 style="margin-top:0">👯 <span data-t="friend_title"></span></h2>
         <p class="small muted" id="friendSub"></p>
+        <p class="small fr-v2 hide" id="friendV2"></p>
         <div class="notice hide" id="invitedBy"></div>
         <div class="linkbox" id="friendLink"></div>
         <div class="row" style="gap:8px;margin-top:8px"><button class="btn sm" id="friendShare" data-t="share"></button><button class="btn ghost sm" id="friendCopy" data-t="copy"></button></div>
         <p class="tiny" id="friendStats"></p>
       </div>
-      <div class="card hide" id="bdayCard">
-        <h2 style="margin-top:0">🎂 <span data-t="bday_title"></span></h2>
-        <div id="bdayBody"></div>
+      <div class="card" id="meInvite">
+        <h2 style="margin-top:0">👯 <span data-t="invite_title"></span></h2>
+        <p class="small muted" id="meInviteSub"></p>
+        <button class="btn sm" id="meInviteBtn" type="button" data-t="invite_btn" style="width:auto"></button>
       </div>
     </div>
-
-    <!-- v48: Me tab: details, progress, invite -->
     <div data-tab="me" class="card" id="meProfile">
       <h2 style="margin-top:0" data-t="me_profile"></h2>
       <label class="field"><span data-t="me_name"></span><div class="row" style="gap:8px"><input id="meName" type="text" maxlength="30" autocomplete="given-name" data-tp="me_name_ph" style="flex:1;min-width:0"><button class="btn sm" id="meNameSave" type="button" data-t="save" style="width:auto"></button></div></label>
       <div class="field"><span data-t="me_bday"></span><div id="meBday"></div></div>
     </div>
-    <div data-tab="me" class="card" id="meProgress">
-      <h2 style="margin-top:0" data-t="me_progress"></h2>
-      <div id="meProgLine" style="font-size:19px;font-weight:800;line-height:1.25"></div>
-      <div class="tierbar"><div id="meProgFill"></div></div>
-      <div class="small muted" id="meProgSub"></div>
-    </div>
-    <div data-tab="me" class="card" id="meInvite">
-      <h2 style="margin-top:0">👯 <span data-t="invite_title"></span></h2>
-      <p class="small muted" id="meInviteSub"></p>
-      <button class="btn sm" id="meInviteBtn" type="button" data-t="invite_btn" style="width:auto"></button>
-    </div>
-    <div data-tab="me" class="card">
-      <h2 style="margin-top:0" data-t="receipts"></h2>
-      <div id="history"></div>
-    </div>
-
-    <div data-tab="card" class="card center">
-      <h2 style="margin-top:0" data-t="your_code"></h2>
-      <div class="qr" id="memberQr"></div>
-      <p class="code" id="memberCode"></p>
-      <p class="small muted" id="memberPhone"></p>
-      <p class="small muted" data-t="show_staff"></p>
-      <p class="tiny"><span data-t="member_since"></span> <span id="since"></span></p>
+    <div data-tab="me" class="card" id="setCard">
+      <h2 style="margin-top:0" data-f="set_h"></h2>
+      <div class="set-row"><span data-f="set_lang"></span><div class="langs"><button data-lang="en">EN</button><button data-lang="zh">繁中</button><button data-lang="zhs">简中</button></div></div>
+      <div class="set-row"><span data-f="set_theme"></span><div class="langs thseg" id="themeSeg"><button type="button" data-th="A">🌙 <span data-f="th_dark"></span></button><button type="button" data-th="B">☀️ <span data-f="th_light"></span></button></div></div>
     </div>
     <div data-tab="me" class="card" id="privacyCard">
       <h2 style="margin-top:0">🔒 <span data-t="priv_title"></span></h2>
@@ -196,18 +225,19 @@
       <label class="check"><input type="checkbox" id="pWa"><span data-t="mkt_wa"></span></label>
       <label class="check"><input type="checkbox" id="pPush"><span data-t="mkt_push"></span></label>
       <p class="tiny" id="consentMeta"></p>
-      <div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn ghost sm" id="unsubAll" data-t="unsub_all"></button><a class="btn ghost sm" href="/family/privacy/" data-t="privacy_link"></a><a class="btn ghost sm" href="/family/terms/" data-t="terms_link"></a></div>
+      <button class="btn ghost sm" id="unsubAll" data-t="unsub_all" style="width:auto"></button>
     </div>
-    <div data-tab="rewards" id="soonWrap" class="hide">
-      <h2><span data-t="coming_soon"></span> <span class="pill" style="font-size:10px;vertical-align:middle">🔒</span></h2>
-      <div class="soon" id="soon"></div>
+    <div data-tab="me" class="card" id="meHow">
+      <h2 style="margin-top:0" data-f="help_h"></h2>
+      <button class="btn ghost sm" id="howBtn" type="button">❓ <span id="howTxt">How it works</span></button>
+      <button class="btn ghost sm" id="rulesBtn" type="button" style="margin-top:8px">📜 <span data-f="rules_btn"></span></button>
+      <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:8px"><a class="btn ghost sm" href="/family/privacy/" data-t="privacy_link"></a><a class="btn ghost sm" href="/family/terms/" data-t="terms_link"></a></div>
     </div>
     <p data-tab="me" class="tiny" data-t="privacy"></p>
     <p data-tab="me" class="tiny" data-t="preview_note"></p>
-    <div data-tab="me" class="card" id="meHow"><button class="btn ghost sm" id="howBtn" type="button" style="width:auto">❓ <span id="howTxt">How it works</span></button></div>
     <div data-tab="me" class="row" style="margin-top:14px"><button class="btn ghost sm" id="signout" data-t="signout"></button><button class="btn ghost sm" id="delete" data-t="delete" style="margin-left:auto;color:#ff8a6a"></button></div>
-    <section data-tab="passport" id="ppSec"></section>
-    <nav class="tabbar" id="tabBar" role="tablist"><button type="button" role="tab" data-tab="card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18M7 15h4"/></svg><span data-t="tab_card"></span></button><button type="button" role="tab" data-tab="passport" class="hide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2.8" width="14" height="18.4" rx="2.2"/><circle cx="12" cy="10.2" r="3.3"/><path d="M9 16.6h6"/></svg><span class="pp-tablbl">Passport</span></button><button type="button" role="tab" data-tab="rewards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="9" width="17" height="11" rx="1.5"/><path d="M2.5 9h19v-3h-19zM12 6v14M12 6c-2-3.5-6-3-5 0M12 6c2-3.5 6-3 5 0"/></svg><span data-t="tab_rewards"></span></button><button type="button" role="tab" data-tab="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V14M10 20V10M15 20V7M20 20V4"/></svg><span data-t="tab_status"></span></button><button type="button" role="tab" data-tab="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.2-4 4.2-6 7.5-6s6.3 2 7.5 6"/></svg><span data-t="tab_me"></span></button></nav>
+    <nav class="tabbar" id="tabBar" role="tablist"><button type="button" role="tab" data-tab="card"><i class="tb-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18M7 15h4"/></svg><span data-t="tab_card"></span></i></button><button type="button" role="tab" data-tab="passport" class="hide"><i class="tb-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2.8" width="14" height="18.4" rx="2.2"/><circle cx="12" cy="10.2" r="3.3"/><path d="M9 16.6h6"/></svg><span class="pp-tablbl">Passport</span></i></button><button type="button" role="tab" data-tab="rewards"><i class="tb-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="9" width="17" height="11" rx="1.5"/><path d="M2.5 9h19v-3h-19zM12 6v14M12 6c-2-3.5-6-3-5 0M12 6c2-3.5 6-3 5 0"/></svg><span data-t="tab_rewards"></span><b class="tb-dot hide" id="rwDot"></b></i></button><button type="button" role="tab" data-tab="me"><i class="tb-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.2-4 4.2-6 7.5-6s6.3 2 7.5 6"/></svg><span data-t="tab_me"></span></i></button></nav>
+
   </section>
 </div>
 
@@ -216,6 +246,7 @@
   const R = window.RORU, t = R.t, $ = (s) => document.querySelector(s);
   try { if (new URLSearchParams(location.search).get("unsubscribe")) localStorage.setItem("roru_unsub", "1"); } catch (e) {}
   try { const rf = new URLSearchParams(location.search).get("ref"); if (rf && /^[A-Za-z0-9]{6,12}$/.test(rf)) localStorage.setItem("roru_ref", rf.toUpperCase()); } catch (e) {}
+  if (R.theme) R.theme.init("roru_theme"); // f38: dark + light
   await R.gate();
   $("#app").style.visibility = "visible";
   document.querySelectorAll(".langs button").forEach(b => b.onclick = () => { R.setLang(b.dataset.lang); render(); });
@@ -225,16 +256,37 @@
   function guestTour(force) {
     if (!R.tour || $("#member").classList.contains("hide")) return;
     const zh = R.lang() === "zh";
-    // f32: one step per guest feature, in order: card/points, stamps, tiers, gold receipt, passport, Roru Day scratch card, bring a friend
+    // f38: 7 steps, one per place in the new layout (Card, points, visits, scan + split, Passport, Rewards, Me). EN / 繁中 / 简中.
     const shown = (el) => el && el.getClientRects().length && !el.closest(".hide") ? el : null;
-    R.tour("guest_f32", [
-      { before: () => setTab("card"), el: () => shown($("#scanCard")) || $("#perkHero"), en: "Your card 🍣. After you pay, scan your receipt here: every HK$1 earns points. Points expire on 31 Dec each year. Each receipt scans once only; eating with a member friend? Split it and you both get equal points.", zh: "你嘅會員卡 🍣。埋單後喺度掃描收據：每 HK$1 都有積分。積分每年 12 月 31 日到期。每張收據只可以掃一次；同會員朋友一齊食？分單，大家攞一樣嘅積分。" },
-      { before: () => setTab("card"), el: () => shown($("#plateCard")) || $("#scanCard"), en: "Stamps: each visit adds one. Fill the plate and the next hand roll is on us.", zh: "印花：每次到訪加一個。集滿一碟，下一條手卷我哋請。" },
-      { before: () => setTab("status"), el: () => shown($("#statusCard")) || $('#tabBar [data-tab="status"]'), en: "Tiers: Nori, Gohan, Tobiko. The more you spend in a year, the higher you go, with more points per HK$1 and more perks. Kama is by invitation.", zh: "等級：紫菜、壽司飯、飛魚籽。一年內消費越多升得越高，每 HK$1 積分更多，著數更多。魚鮫只限邀請。" },
-      { before: () => setTab("card"), el: () => shown($("#goldLine")) || $("#scanCard"), en: "Gold receipt ✨\u2060: about 1 in 20 scans turns gold. That's 2× points and a free highball 🥃.", zh: "金色收據 ✨\u2060：大約每 20 次掃描有 1 次變金色，雙倍積分再送 Highball 一杯 🥃。" },
-      { before: () => setTab("passport"), el: '#tabBar [data-tab="passport"]', en: "Passport: one stamp for every dish you try. Collect them for free food.", zh: "護照：每試一款菜就有一個印花，集夠有免費嘢食。" },
-      { before: () => setTab("card"), el: () => shown($("#scWrap")) || $("#scanCard"), en: "Roru Day: members' first drink is free (any drink except draft sake), and you can still use one points reward on the same bill. Scan a receipt of HK$388+ and a scratch card pops up. Scratch it, then show staff to use your prize.", zh: "Roru Day：會員第一杯飲品免費（生清酒除外），同一張單仲可以用一個積分獎賞。掃描 HK$388 或以上嘅收據，就會彈出刮刮卡。刮開之後俾店員睇，就可以用獎品。" },
-      { before: () => setTab("me"), el: () => shown($("#meInvite")) || $('#tabBar [data-tab="me"]'), en: "Bring a friend: share your link and you both get bonus points. Replay this guide from Me any time.", zh: "帶朋友來：分享你嘅連結，你哋都有額外積分。隨時可以喺「我」再睇呢個教學。" }
+    R.tour("guest_f38", [
+      { before: () => setTab("card"), el: () => shown($("#perkHero")),
+        en: "This is your card: your level and today's perks. Tap “Show at counter” and staff scan your QR.",
+        zh: "呢張係你嘅會員卡：等級同今日著數。撳「櫃檯出示」，店員就掃你個 QR。",
+        zhs: "这是你的会员卡：等级和今天的优惠。点“柜台出示”，店员就会扫你的二维码。" },
+      { before: () => setTab("card"), el: () => shown($("#ptsCard")),
+        en: "Your points. Every HK$1 you spend earns points. Points expire on 31 Dec each year.",
+        zh: "你嘅積分。每消費 HK$1 都有積分。積分每年 12 月 31 日到期。",
+        zhs: "你的积分。每消费 HK$1 都有积分。积分每年 12 月 31 日到期。" },
+      { before: () => setTab("card"), el: () => shown($("#visitRow")),
+        en: "Visits: one stamp per visit. 5 stamps = a free hand roll, any roll, Wagyu included. Tap the row to see your plate.",
+        zh: "到訪：每次嚟一個印花。集 5 個 = 免費手卷一條，任揀，和牛都得。撳一下睇你隻碟。",
+        zhs: "到访：每次来一个印花。集 5 个 = 免费手卷一条，任选，和牛也可以。点一下看你的碟子。" },
+      { before: () => setTab("card"), el: () => shown($("#scanCard")),
+        en: "After you pay, scan your receipt here. Each receipt scans once. Eating with members? Split it with 2 to 6 people and everyone gets equal points.",
+        zh: "埋單後喺度掃描收據，每張只可以掃一次。同會員朋友一齊食？可以 2 至 6 人分單，人人攞一樣嘅積分。",
+        zhs: "结账后在这里扫描收据，每张只能扫一次。和会员朋友一起吃？可以 2 到 6 人分单，每人得到一样的积分。" },
+      { before: () => setTab("passport"), el: () => shown(document.querySelector("#ppSec .pp-tog")) || shown(document.querySelector("#ppSec .pp-hero")) || $('#tabBar [data-tab="passport"]'),
+        en: "Passport: switch between Food and Drinks. A stamp for every new dish and bottle unlocks free food and drinks. Q4 ends 31 Dec, then stamps start again.",
+        zh: "護照：可以轉食物或者飲品。每款新菜式同新酒都有印花，集夠換免費嘢食同飲品。第四季 12 月 31 日完，之後印花重新開始。",
+        zhs: "护照：可以切换食物或饮品。每款新菜和新酒都有印花，集够换免费食物和饮品。第四季 12 月 31 日结束，之后印花重新开始。" },
+      { before: () => setTab("rewards"), el: () => shown($("#readySec")) || $('#tabBar [data-tab="rewards"]'),
+        en: "Rewards: anything ready to use is at the top. Below: use your points, your level, and ways to earn more.",
+        zh: "獎賞：可以用嘅嘢喺最頂。下面係用積分換、你嘅等級，同埋賺多啲嘅方法。",
+        zhs: "奖赏：可以用的放在最上面。下面是用积分兑换、你的等级，以及赚更多的方法。" },
+      { before: () => setTab("me"), el: () => shown($("#meQr")) || $('#tabBar [data-tab="me"]'),
+        en: "Me: your QR, your history (splits too), bring a friend, settings, and this guide any time.",
+        zh: "我：你嘅 QR、紀錄（包括分單）、帶朋友嚟、設定，隨時可以再睇呢個教學。",
+        zhs: "我：你的二维码、记录（包括分单）、带朋友来、设置，随时可以再看这个教学。" }
     ], { force: !!force, lang: zh ? "zh" : "en", onEnd: () => setTab("card") });
   }
   // f37: points expiry rule (setting points_expiry = annual_dec31; shown only, nothing expires yet)
@@ -244,13 +296,16 @@
     lastPts = points; const el = $("#ptsExp"); if (!el) return; const d = RULES && RULES.points_expire_on;
     if (!d) { el.classList.add("hide"); return; }
     const [y, m, dd] = String(d).split("-").map(Number), n = Number(points || 0);
-    el.textContent = R.lang() === "zh" ? (R.hans && R.hans() ? n.toLocaleString("en-HK") + " 积分 · " + y + "年" + m + "月" + dd + "日到期" : n.toLocaleString("en-HK") + " 分 · " + y + "年" + m + "月" + dd + "日到期")
-      : n.toLocaleString("en-HK") + (n === 1 ? " point" : " points") + " · expire " + dd + " " + ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][m - 1] + " " + y;
+    // f38: the number sits right beside it on the Card, so the line only says when they expire
+    el.innerHTML = R.lang() === "zh" ? "⏳ " + y + "年" + m + "月" + dd + "日<br>到期"
+      : "⏳ Expire<br>" + dd + " " + ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][m - 1] + " " + y;
     el.classList.remove("hide");
   }
   $("#howBtn").onclick = () => guestTour(true);
-  const TABS = ["card", "passport", "rewards", "status", "me"];
-  function setTab(tb, keepScroll) { if (!TABS.includes(tb)) tb = "card"; $("#member").dataset.tabOn = tb; try { sessionStorage.setItem("roru_tab", tb); } catch (e) {}
+  const TABS = ["card", "passport", "rewards", "me"];
+  function setTab(tb, keepScroll) { if (tb === "status") tb = "rewards"; if (!TABS.includes(tb)) tb = "card"; $("#member").dataset.tabOn = tb; try { sessionStorage.setItem("roru_tab", tb); } catch (e) {}
+    // f38: some WebKit builds keep a stale zero-height layout for blocks that were display:none; nudge the newly shown tab once
+    document.querySelectorAll('#member > [data-tab="' + tb + '"]').forEach(el => { el.style.display = "none"; void el.offsetHeight; el.style.display = ""; });
     document.querySelectorAll("#tabBar button").forEach(b => { const on = b.dataset.tab === tb; b.classList.toggle("on", on); b.setAttribute("aria-selected", on ? "true" : "false"); });
     if (!keepScroll) window.scrollTo(0, 0); }
   document.querySelectorAll("#tabBar button").forEach(b => b.onclick = () => setTab(b.dataset.tab));
@@ -358,7 +413,7 @@
       const list = perks.filter(p => p.tier === tr); if (!list.length) return;
       const open = ti <= mine;
       const TN = { nori: tierName("nori"), gohan: tierName("gohan"), tobiko: tierName("tobiko"), kama: tierName("kama") };
-      h += '<div class="perkgrp' + (open ? "" : " locked") + '"><div class="perkhead"><b>' + TN[tr] + "</b>" + (ti === mine ? '<span class="perktag you">' + t("perks_you") + "</span>" : !open ? '<span class="perktag">🔒 ' + t("perks_from", { t: TN[tr] }) + "</span>" : "") + "</div>";
+      h += '<div class="perkgrp' + (open ? "" : " locked") + (ti === mine ? " mine" : "") + '"><div class="perkhead"><b>' + TN[tr] + "</b>" + (ti === mine ? '<span class="perktag you">' + t("perks_you") + "</span>" : !open ? '<span class="perktag">🔒 ' + t("perks_from", { t: TN[tr] }) + "</span>" : "") + "</div>";
       if (ti > 0) h += '<div class="perkplus">' + t("perks_plus", { t: TN[TIERS[ti - 1]] }) + "</div>";
       list.forEach(p => {
         const x = (me.mults && me.mults[tr]) || "", name = (zh ? p.name_zh : p.name_en).replace("{x}", x).replace("{p}", kd.passes != null ? kd.passes : 2);
@@ -387,7 +442,7 @@
     const ref = me.referral || {}, bd = me.birthday || {};
     $("#friendCard").classList.toggle("hide", !ref.on);
     if (ref.on) {
-      const v2 = me.visit2 || {}; $("#friendSub").textContent = t("friend_sub", { n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 388) }) + (v2.points > 0 ? " " + t("friend_v2", { v: v2.points, d: v2.days }) : "");
+      const v2 = me.visit2 || {}; $("#friendSub").textContent = t("friend_sub", { n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 388) }) ; // f38: the +88 come-back line has its own highlighted line (#friendV2)
       $("#friendLink").textContent = inviteUrl(ref.code);
       $("#invitedBy").classList.toggle("hide", !ref.invited_by); if (ref.invited_by) $("#invitedBy").textContent = (ref.my_bonus_pending ? t("invited_pending", { who: ref.invited_by, n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 388) }) : t("invited_done", { who: ref.invited_by })); if (ref.invited_by && v2.until) $("#invitedBy").textContent += " " + t("visit2_until", { v: v2.points, d: R.fmtDay(v2.until) });
       $("#friendStats").textContent = t("friend_stats", { j: ref.joined, q: ref.pending || 0, r: ref.rewarded, p: ref.points_earned, c: ref.cap });
@@ -522,9 +577,12 @@
     renderConsents(me);
     renderHookAndSplits(me, zh);
     try { renderSuggest(me, zh); } catch (e) { console.warn(e); }
+    applyF(); renderCardTab(me, zh); renderEarn(me, zh); paintThemeSeg();
+    $("#lvlTo").textContent = $("#meProgLine").textContent;
+    $("#perksMore").textContent = $("#perksCard").classList.contains("perks-few") ? tt("perks_more") : tt("perks_less");
     // points + next reward
     const gained = state.lastPoints !== null && me.points > state.lastPoints;
-    $("#pts").textContent = me.points; renderExpiry(me.points);
+    $("#pts").textContent = Number(me.points || 0).toLocaleString("en-HK"); renderExpiry(me.points);
     const next = me.ladder.find(l => l.points_cost > me.points) || me.ladder[me.ladder.length - 1];
     if (next) { $("#nextReward").textContent = (me.points >= next.points_cost ? "✓ " : t("need_more", { n: next.points_cost - me.points }) + " → ") + (zh ? next.name_zh : next.name_en); $("#bar").style.width = Math.min(100, 100 * me.points / next.points_cost) + "%"; }
     $("#pendingNote").classList.toggle("hide", !me.pending_receipts); $("#pendingNote").textContent = "⏳ " + t("pending_hint", { n: me.pending_receipts });
@@ -559,15 +617,17 @@
         box.appendChild(d);
       }
     });
+    // f38: "Ready to use" shows only what can still be used; used ones fold into "Used (n)" underneath
+    { const used = [...box.querySelectorAll(".reward.redeemed")]; if (used.length) { const dt = document.createElement("details"); dt.className = "rw-used"; dt.innerHTML = "<summary>" + escR(t("redeemed")) + " (" + used.length + ")</summary>"; used.forEach(u => dt.appendChild(u)); box.appendChild(dt); } }
     // receipts
     const shared = (me.split && me.split.shared) || {}, canSplit = (me.split && me.split.can) || [];
     // f34: shared receipts say who with; a receipt that can still be split gets a Split button
     const histSplit = (r) => { const s = shared[r.id]; if (s) return '<div class="hist-split">' + (+s.n > 2 ? escR(t("split_hist_n", { n: s.n, who: s.with || "" })) : "½ · " + escR(t("split_hist_with", { who: s.with || "" }))) + "</div>"; return canSplit.includes(r.id) ? '<div class="hist-split"><button class="linkbtn" data-split-rid="' + r.id + '" data-split-pts="' + r.points + '" data-split-bill="' + (+r.total_hkd || 0) + '">' + "🍣🍣 " + escR(t("split_link")) + "</button></div>" : ""; };
-    $("#history").innerHTML = me.receipts.map(r => '<div class="hist"><span>' + R.fmtDay(r.at) + " · " + (zh ? (r.shop_zh || "") : (r.shop || "")) + " · " + (/^STAFF-/.test(r.receipt_no) ? "(staff)" : (/^Table /.test(r.receipt_no) ? "" : "#") + r.receipt_no) + "</span><span>HK$" + (+r.total_hkd).toFixed(0) + " → " + (r.status === "approved" ? "+" + r.points + (r.multiplier && +r.multiplier !== 1 ? " (" + multTxt(r.multiplier) + ")" : "") + (r.stamped ? " · 🍣" : "") + (r.gold ? " ✨⁠" : "") : r.status === "pending" ? "⏳" : "✕") + "</span></div>" + histSplit(r)).join("") || '<p class="muted small">—</p>';
-    $("#history").querySelectorAll("[data-split-rid]").forEach(b => b.onclick = () => splitSheet(+b.dataset.splitRid, +b.dataset.splitPts, +b.dataset.splitBill));
+    renderHistory(me, zh); // f38: Me › History (5 rows + See all, tap a row for split details)
     $("#memberQr").innerHTML = R.qrSvg("RF:" + me.member_code, 180); $("#memberCode").textContent = me.member_code; $("#memberPhone").textContent = me.phone_masked;
     $("#since").textContent = R.fmtDay(me.member_since);
     renderShopPick();
+    renderReadyEmpty();
     const fs = (state.features || []).filter(x => x.status === "soon"); $("#soonWrap").classList.toggle("hide", !fs.length);
     $("#soon").innerHTML = fs.map(x => '<div class="soon-card"><div class="soon-ico">' + (x.emoji || "🔒") + '</div><div class="grow"><b>' + (zh ? x.name_zh : x.name_en) + '</b><div class="small muted">' + (zh ? x.detail_zh : x.detail_en) + '</div></div><span class="pill">' + t("soon_tag") + "</span></div>").join("");
   }
@@ -712,27 +772,32 @@
   }
   const limOn = (x) => x.state === "available" || x.state === "claimed";
   function renderHero(me, zh) {
+    // f38: the card = level once, name, today's perks on one line, and ONE button: "Show at counter" (QR + level + today's perks for staff)
     const ps = me.perk_status || {}, tier = ps.tier || me.tier || "nori", el = $("#perkHero");
-    el.className = "perkhero t-" + tier;
+    el.className = "perkhero ph-compact t-" + tier;
     const today = ps.today || [];
-    const items = today.length ? today.map(x => '<span class="ph-it">' + (x.emoji ? x.emoji + " " : "") + esc(zh ? x.zh : x.en) + "</span>").join('<span class="ph-dot"> · </span>') : esc(t("today_none"));
-    const lim = (ps.limited || []).map(x => '<span class="ph-chip' + (limOn(x) ? " on" : "") + '">' + (x.emoji ? x.emoji + " " : "") + esc(zh ? x.name_zh : x.name_en) + " · " + esc(limText(x)) + "</span>").join("");
-    el.innerHTML = '<div class="ph-top"><span class="ph-tier">' + esc(R.tierName(tier, "en")) + '</span><span class="ph-zh">' + esc(R.tierName(tier, "zh")) + "</span></div>" +
-      (goodName(me.name) ? '<div class="ph-name">' + esc(goodName(me.name)) + "</div>" : "") +
+    const items = today.length ? today.map(x => (x.emoji ? x.emoji + " " : "") + esc(zh ? x.zh : x.en)).join(" · ") : esc(t("today_none"));
+    el.innerHTML = '<div class="ph-top"><span class="ph-tier">' + esc(R.tierName(tier, "en")) + '</span><span class="ph-zh">' + esc(R.tierName(tier, "zh")) + "</span>" +
+      (goodName(me.name) ? '<span class="ph-name">' + esc(goodName(me.name)) + "</span>" : "") + "</div>" +
       '<div class="ph-today"><span class="ph-k">' + t("today_k") + ":</span> " + items + "</div>" +
-      (lim ? '<div class="ph-lim">' + lim + "</div>" : "") + '<button type="button" class="ph-show" id="phShow">👀 ' + esc(t("show_staff_btn")) + '</button><div class="ph-hint">' + t("today_show") + "</div>";
+      '<button type="button" class="ph-show" id="phShow"><span class="ph-qr" aria-hidden="true">' + QR_ICO + "</span>" + esc(tt("counter_btn")) + "</button>";
     $("#phShow").onclick = () => showStaffFull(me);
   }
-  // v48: "Show staff": the whole screen in the tier colour, readable from across the counter. Tap anywhere to close.
+  const QR_ICO = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><path d="M14 14h3v3M21 14v.01M14 21h3M21 18v3"/></svg>';
+  // f38: "Show at counter" = ONE sheet for staff: level in the tier colour, the member QR (staff scan it), today's perks. Tap outside / Close to close.
   async function showStaffFull(me) {
+    me = me || state.me; if (!me) return;
     const ps = me.perk_status || {}, tier = ps.tier || me.tier || "nori", zh = R.lang() === "zh", today = ps.today || [];
-    const o = document.createElement("div"); o.id = "staffFull"; o.className = "staff-full t-" + tier; o.setAttribute("role", "dialog");
-    o.innerHTML = '<div class="sf-tier">' + esc(R.tierName(tier, "en")) + '</div><div class="sf-zh">' + esc(R.tierName(tier, "zh")) + "</div>" +
-      (goodName(me.name) ? '<div class="sf-name">' + esc(goodName(me.name)) + "</div>" : "") +
+    const lim = (ps.limited || []).map(x => '<span class="ph-chip' + (limOn(x) ? " on" : "") + '">' + (x.emoji ? x.emoji + " " : "") + esc(zh ? x.name_zh : x.name_en) + " · " + esc(limText(x)) + "</span>").join("");
+    const o = document.createElement("div"); o.id = "staffFull"; o.className = "staff-full counter t-" + tier; o.setAttribute("role", "dialog");
+    o.innerHTML = '<div class="sf-head"><div class="sf-tier">' + esc(R.tierName(tier, "en")) + '</div><div class="sf-zh">' + esc(R.tierName(tier, "zh")) + "</div>" +
+      (goodName(me.name) ? '<div class="sf-name">' + esc(goodName(me.name)) + "</div>" : "") + "</div>" +
+      '<div class="sf-qr">' + R.qrSvg("RF:" + me.member_code, 200) + '<div class="sf-code">' + esc(me.member_code) + "</div></div>" +
       '<div class="sf-k">' + t("today_k") + "</div>" + (today.length ? today.map(x => '<div class="sf-it">' + (x.emoji ? x.emoji + " " : "") + esc(zh ? x.zh : x.en) + (zh ? "" : '<span class="sf-zhl">' + esc(x.zh) + "</span>") + "</div>").join("") : '<div class="sf-it">' + esc(t("today_none")) + "</div>") +
-      '<div class="sf-close">' + esc(t("tap_close")) + "</div>";
+      (lim ? '<div class="sf-lim">' + lim + "</div>" : "") +
+      '<button type="button" class="sf-close">' + esc(t("tap_close")) + "</button>";
     let lock = null; try { if (navigator.wakeLock) lock = await navigator.wakeLock.request("screen"); } catch (e) {}
-    o.addEventListener("click", () => { o.remove(); try { lock && lock.release(); } catch (e) {} });
+    o.addEventListener("click", (e) => { if (e.target.closest(".sf-qr") && !e.target.closest(".sf-close")) return; o.remove(); try { lock && lock.release(); } catch (e) {} });
     document.body.appendChild(o);
   }
   function renderMe(me, zh) {
@@ -795,6 +860,179 @@
       try { const r = await R.rpc("family_undo_redeem", { p_token: state.token, p_redemption_id: rw.id }); state.me = r.member; state.lastPoints = r.member.points; render(); R.toast("↩︎ " + t("undone", { n: Number(r.refunded).toLocaleString("en-US") }), 3500); } catch (er) { R.toast(R.errText(er), 4000); } };
   }
   const escR = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  // ===================== f38: new layout helpers (strings, Card banner, visit row, history, sheets, theme) =====================
+  const F = {
+    en: { ready_h: "Ready to use", ready_empty: "Nothing ready yet. Codes you unlock and scratch-card prizes show up here.", ladder_h: "Use your points", level_h: "Your level", earn_h: "Ways to earn more",
+      qr_h: "My QR", qr_sub: "Show it at the counter", counter_btn: "Show at counter", hist_h: "History", hist_all: "See all ({n})", hist_less: "Show less",
+      set_h: "Settings", set_lang: "Language", set_theme: "Theme", th_dark: "Dark", th_light: "Light", help_h: "Help", rules_btn: "Rules & FAQ", close: "Close",
+      perks_more: "See every level's perks", perks_less: "Only my level", v_k: "Visits", v_more: "{n} more → {r}", v_soon: "1 more → {r}", v_ready: "{r} unlocked! It's in Rewards",
+      next_k: "Next reward", b_gin1: "{who} wants to split a bill with you", b_ginn: "{n} split requests are waiting for you", b_gin_sub: "Your share {p} pts · tap to answer",
+      b_out: "Your split is waiting on {n} friend(s)", b_out_sub: "Tap to see who has said yes", b_sc: "You've got a scratch card!", b_sc_sub: "Tap to scratch it. Every card wins.",
+      b_pz: "Use today: {p}", b_pz_sub: "Your scratch-card prize · show staff", b_rw: "You unlocked {r}!", b_rw_sub: "Tap to scratch and see your code",
+      b_roru: "Tonight is Roru Day", b_roru_sub: "Members' first drink is on us (any drink except draft sake)",
+      e_gold: "Gold receipt", e_visits: "Visits", e_visits_t: "Every visit adds a stamp. 5 stamps = {r}.", e_pp: "Passport", e_pp_t: "A stamp for every new dish and bottle this quarter. Collect them for free food and drinks.",
+      e_days: "Mon–Wed specials", e_friend: "Bring a friend", e_friend_t: "You both get +{n} when their first receipt of {m}+ is approved. Come back within {d} days for +{v} more.",
+      e_friend_t0: "You both get +{n} when their first receipt of {m}+ is approved.", e_go_me: "Your link", e_go_pp: "Open", v2_line: "🎉 Come back within {d} days: +{v} more points.",
+      info_ladder: "How points work", split_req_h: "Split requests", hist_split: "Split {n} ways", hist_you: "You", hist_tap: "Details", hist_none: "No receipts yet. Scan one on the Card tab.", rules_h: "Rules & FAQ" },
+    zh: { ready_h: "可以用", ready_empty: "暫時未有。解鎖咗嘅換領碼同刮刮卡獎品會喺度出現。", ladder_h: "用積分換", level_h: "你嘅等級", earn_h: "賺多啲",
+      qr_h: "我嘅 QR", qr_sub: "喺櫃檯俾店員掃", counter_btn: "櫃檯出示", hist_h: "紀錄", hist_all: "睇晒全部（{n}）", hist_less: "收起",
+      set_h: "設定", set_lang: "語言", set_theme: "外觀", th_dark: "深色", th_light: "淺色", help_h: "幫助", rules_btn: "規則同常見問題", close: "關閉",
+      perks_more: "睇晒每個等級嘅著數", perks_less: "只睇我嘅等級", v_k: "到訪", v_more: "再 {n} 次 → {r}", v_soon: "再 1 次 → {r}", v_ready: "{r} 已解鎖！喺「獎賞」度",
+      next_k: "下一個獎賞", b_gin1: "{who} 想同你分單", b_ginn: "有 {n} 個分單邀請等緊你", b_gin_sub: "你份 {p} 分 · 撳嚟回覆",
+      b_out: "你嘅分單仲等緊 {n} 位朋友", b_out_sub: "撳嚟睇邊個已經答應", b_sc: "你有一張刮刮卡！", b_sc_sub: "撳嚟刮開，每張都有獎。",
+      b_pz: "今日可以用：{p}", b_pz_sub: "你嘅刮刮卡獎品 · 俾店員睇", b_rw: "你解鎖咗 {r}！", b_rw_sub: "撳嚟刮開睇換領碼",
+      b_roru: "今晚係 Roru Day", b_roru_sub: "會員第一杯飲品我哋請（生清酒除外）",
+      e_gold: "金色收據", e_visits: "到訪", e_visits_t: "每次到訪加一個印花。集 5 個 = {r}。", e_pp: "護照", e_pp_t: "今季每款新菜式同新酒都有一個印花，集夠換免費嘢食同飲品。",
+      e_days: "星期一至三特別優惠", e_friend: "帶朋友嚟", e_friend_t: "朋友第一張 {m} 或以上嘅收據批核後，你哋各自 +{n}。佢 {d} 日內再嚟，再多 +{v}。",
+      e_friend_t0: "朋友第一張 {m} 或以上嘅收據批核後，你哋各自 +{n}。", e_go_me: "你嘅連結", e_go_pp: "打開", v2_line: "🎉 {d} 日內再嚟：再多 +{v} 分。",
+      info_ladder: "積分點運作", split_req_h: "分單邀請", hist_split: "{n} 人分單", hist_you: "你", hist_tap: "詳情", hist_none: "未有收據。喺「會員卡」掃描一張啦。", rules_h: "規則同常見問題" },
+    zhs: { ready_h: "可以使用", ready_empty: "暂时还没有。解锁的兑换码和刮刮卡奖品会显示在这里。", ladder_h: "用积分兑换", level_h: "你的等级", earn_h: "赚更多",
+      qr_h: "我的二维码", qr_sub: "在柜台给店员扫", counter_btn: "柜台出示", hist_h: "记录", hist_all: "查看全部（{n}）", hist_less: "收起",
+      set_h: "设置", set_lang: "语言", set_theme: "外观", th_dark: "深色", th_light: "浅色", help_h: "帮助", rules_btn: "规则和常见问题", close: "关闭",
+      perks_more: "查看每个等级的优惠", perks_less: "只看我的等级", v_k: "到访", v_more: "再 {n} 次 → {r}", v_soon: "再 1 次 → {r}", v_ready: "{r} 已解锁！在“奖赏”里",
+      next_k: "下一个奖赏", b_gin1: "{who} 想和你分单", b_ginn: "有 {n} 个分单邀请在等你", b_gin_sub: "你的份额 {p} 分 · 点击回复",
+      b_out: "你的分单还在等 {n} 位朋友", b_out_sub: "点击查看谁已同意", b_sc: "你有一张刮刮卡！", b_sc_sub: "点击刮开，每张都有奖。",
+      b_pz: "今天可用：{p}", b_pz_sub: "你的刮刮卡奖品 · 出示给店员", b_rw: "你解锁了 {r}！", b_rw_sub: "点击刮开查看兑换码",
+      b_roru: "今晚是 Roru Day", b_roru_sub: "会员第一杯饮品我们请（生清酒除外）",
+      e_gold: "金色收据", e_visits: "到访", e_visits_t: "每次到访加一个印花。集 5 个 = {r}。", e_pp: "护照", e_pp_t: "本季每款新菜和新酒都有一个印花，集够换免费食物和饮品。",
+      e_days: "周一至周三特别优惠", e_friend: "带朋友来", e_friend_t: "朋友第一张 {m} 或以上的收据批准后，你们各得 +{n}。对方 {d} 天内再来，再多 +{v}。",
+      e_friend_t0: "朋友第一张 {m} 或以上的收据批准后，你们各得 +{n}。", e_go_me: "你的链接", e_go_pp: "打开", v2_line: "🎉 {d} 天内再来：再多 +{v} 分。",
+      info_ladder: "积分怎么用", split_req_h: "分单邀请", hist_split: "{n} 人分单", hist_you: "你", hist_tap: "详情", hist_none: "还没有收据。在“会员卡”扫描一张吧。", rules_h: "规则和常见问题" }
+  };
+  const isHans = () => !!(R.hans && R.hans());
+  function tt(k, v) { const L0 = R.lang() === "zh" ? (isHans() ? F.zhs : F.zh) : F.en; let s = (L0 && L0[k] != null) ? L0[k] : (F.en[k] || k);
+    if (v) Object.keys(v).forEach(x => { s = s.split("{" + x + "}").join(v[x]); }); return s; }
+  function applyF() { document.querySelectorAll("[data-f]").forEach(e => { const s = tt(e.dataset.f); if (e.textContent !== s) e.textContent = s; }); }
+
+  // ---- a simple bottom sheet (used for the visit plate, split requests, rules, ⓘ) ----
+  function openSheet(title, bodyNode, opts) {
+    opts = opts || {};
+    const o = document.createElement("div"); o.className = "ask-sheet f38-sheet"; o.setAttribute("role", "dialog");
+    o.innerHTML = '<div class="card fs-card"><div class="fs-h"><h2>' + escR(title) + '</h2><button type="button" class="fs-x" aria-label="' + escR(tt("close")) + '">✕</button></div><div class="fs-b"></div></div>';
+    const b = o.querySelector(".fs-b"); if (typeof bodyNode === "string") b.innerHTML = bodyNode; else if (bodyNode) b.appendChild(bodyNode);
+    const close = () => { if (opts.onClose) opts.onClose(b); o.remove(); };
+    o.addEventListener("click", e => { if (e.target === o || e.target.closest(".fs-x")) close(); });
+    document.body.appendChild(o); return { el: o, body: b, close };
+  }
+  const store = () => $("#sheetStore");
+  function openPlate() { const pc = $("#plateCard"); openSheet(t("your_plate"), pc, { onClose: () => store().appendChild(pc) }); }
+  function openInbox() { const ib = $("#splitInbox"); const s = openSheet("🍣🍣 " + tt("split_req_h"), ib, { onClose: () => store().appendChild(ib) });
+    // closes itself once every request is answered
+    const mo = new MutationObserver(() => { if (!ib.children.length || !ib.querySelector("[data-g-yes],[data-off-yes],[data-split-yes]")) { mo.disconnect(); setTimeout(() => { if (s.el.isConnected) s.close(); }, 400); } }); mo.observe(ib, { childList: true }); }
+  function goRewards(sel) { setTab("rewards"); setTimeout(() => { const x = sel && $(sel); if (x) x.scrollIntoView({ behavior: "smooth", block: "start" }); }, 80); }
+
+  // ---- Card tab: visit row (5 logo stamps) + next reward + ONE action banner ----
+  function renderCardTab(me, zh) {
+    const per = me.per_plate || 5, n = Math.min(me.stamps || 0, per), plate = me.plate || [], vr = me.visit_reward, rn = vr ? (zh ? vr.name_zh : vr.name_en) : "";
+    let st = ""; for (let i = 0; i < per; i++) { const on = i < n; st += '<span class="vs' + (on ? " on" : "") + '">' + R.stamp(i, per, on, on && plate[i] && plate[i].gold) + "</span>"; }
+    $("#visitStamps").innerHTML = st;
+    $("#visitLine").textContent = tt("v_k") + " " + n + "/" + per;
+    $("#visitSub").textContent = n >= per ? tt("v_ready", { r: rn }) : tt(per - n === 1 ? "v_soon" : "v_more", { n: per - n, r: rn });
+    $("#visitRow").setAttribute("aria-label", n + "/" + per + " " + t("visits"));
+    $("#nextCard").onclick = () => goRewards("#ladderSec");
+    renderBanner(me, zh);
+  }
+  function renderBanner(me, zh) {
+    const el = $("#actBanner"), sp = me.split || {}, gin = sp.gin || [], oin = sp.in || [], ib = me.split_inbox || [], sc = window.__scGuest || null;
+    const waiting = []; (sp.gout || []).forEach(g => { if (g.open) { const k = (g.invites || []).filter(i => i.status === "pending").length; if (k) waiting.push(k); } }); (sp.out || []).forEach(q => { if (q.status === "pending") waiting.push(1); });
+    const earned = (me.rewards || []).filter(r => r.status === "earned");
+    let b = null; const nIn = gin.length + oin.length + ib.length;
+    if (nIn) { const q = gin[0] || oin[0] || {}; b = { k: "split", ic: "🔔", t: nIn > 1 ? tt("b_ginn", { n: nIn }) : tt("b_gin1", { who: (q.from || (ib[0] && ib[0].who) || "").replace(/\s*\(test\)/, "") }), s: tt("b_gin_sub", { p: q.points_you != null ? q.points_you : "" }).replace(/ · $/, ""), go: openInbox, hot: 1 }; }
+    else if (sc && sc.fresh && sc.fresh.length) b = { k: "scratch", ic: "🎟", t: tt("b_sc"), s: tt("b_sc_sub"), go: () => { if (window.__scOpen) window.__scOpen(sc.fresh[0].id); } , hot: 1 };
+    else if (earned.length) { const r0 = earned[0]; b = { k: "reward", ic: "🎁", t: tt("b_rw", { r: zh ? r0.name_zh : r0.name_en }), s: tt("b_rw_sub"), go: () => goRewards("#readySec") }; }
+    else if (sc && sc.today && sc.today.length) b = { k: "prize", ic: "🎁", t: tt("b_pz", { p: zh ? sc.today[0].zh : sc.today[0].en }), s: tt("b_pz_sub"), go: () => goRewards("#readySec") };
+    else if (waiting.length) b = { k: "out", ic: "⏳", t: tt("b_out", { n: waiting.reduce((a, x) => a + x, 0) }), s: tt("b_out_sub"), go: () => { setTab("me"); setTimeout(() => { const x = $("#histCard"); if (x) x.scrollIntoView({ behavior: "smooth", block: "start" }); }, 80); } };
+    else if (sc && sc.roru_day) b = { k: "roru", ic: "🍣", t: tt("b_roru"), s: tt("b_roru_sub"), go: () => goRewards("#scDayHost") };
+    else if (me.hook_today) { const cfg = state.cfg || {}, hk = me.hook_today; b = { k: "hook", ic: "📅", t: t("hook_" + hk), s: t("hook_" + hk + "_sub", { n: cfg.hook_mon_stamps || 2, x: (cfg.hook_tue_bonus_mult || 2) + "×", o: Math.round(1 / Math.max(0.01, cfg.hook_wed_gold_odds || 0.2)) }), go: () => goRewards("#earnSec") }; }
+    el.classList.toggle("hide", !b); $("#member").classList.toggle("has-banner", !!b); if (!b) { el.innerHTML = ""; el.onclick = null; return; }
+    el.className = "act-banner ab-" + b.k + (b.hot ? " hot" : "");
+    el.innerHTML = '<span class="ab-ic" aria-hidden="true">' + b.ic + '</span><span class="ab-t"><b>' + escR(b.t) + "</b><small>" + escR(b.s) + '</small></span><span class="ab-go" aria-hidden="true">›</span>';
+    el.onclick = b.go; el.setAttribute("role", "button"); el.tabIndex = 0;
+  }
+  document.addEventListener("roru:scratch", () => { if (state.me) { renderBanner(state.me, R.lang() === "zh"); renderReadyEmpty(); } });
+  function renderReadyEmpty() { const any = !!$("#rewards").querySelector(".reward:not(.redeemed)") || !!($("#scWrap") && $("#scWrap").innerHTML.trim()); $("#readyEmpty").classList.toggle("hide", any); const sc = window.__scGuest; $("#rwDot").classList.toggle("hide", !(((state.me && state.me.rewards) || []).some(r => r.status === "earned") || (sc && sc.fresh && sc.fresh.length))); }
+
+  // ---- Rewards › Ways to earn more ----
+  function renderEarn(me, zh) {
+    const cfg = state.cfg || {}, ref = me.referral || {}, v2 = me.visit2 || {}, vr = me.visit_reward, rn = vr ? (zh ? vr.name_zh : vr.name_en) : "";
+    const row = (ic, h, tx, btn) => '<div class="earn-r"><span class="earn-ic">' + ic + '</span><div class="grow"><b>' + escR(h) + "</b><span>" + tx + "</span></div>" + (btn || "") + "</div>";
+    let h = "";
+    if (me.gold && me.gold.on) h += row("✨\u2060", tt("e_gold"), escR(t("gold_line2", { o: Math.round(1 / Math.max(0.0001, me.gold.odds)), x: multTxt(me.gold.mult) }).replace(/^✨\u2060\s*/, "")));
+    h += row("🍣", tt("e_visits"), escR(tt("e_visits_t", { r: rn })));
+    if (!$('#tabBar [data-tab="passport"]').classList.contains("hide")) h += row("🍽️", tt("e_pp"), escR(tt("e_pp_t")), '<button type="button" class="btn ghost sm earn-b" data-go-tab="passport">' + escR(tt("e_go_pp")) + "</button>");
+    const days = ["mon_double", "tue_friends", "wed_gold"].map(k => '<span class="earn-d' + (me.hook_today === k ? " on" : "") + '"><b>' + escR(t("hook_" + k)) + "</b> " + escR(t("hook_" + k + "_sub", { n: cfg.hook_mon_stamps || 2, x: (cfg.hook_tue_bonus_mult || 2) + "×", o: Math.round(1 / Math.max(0.01, cfg.hook_wed_gold_odds || 0.2)) })) + "</span>").join("");
+    h += row("📅", tt("e_days"), days + (cfg.upgrade_boost_today || true ? '<span class="earn-d">' + escR(t("hook_upgrade_line")) + "</span>" : ""));
+    if (ref.on) h += row("👯", tt("e_friend"), escR(v2.points > 0 ? tt("e_friend_t", { n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 388), d: v2.days, v: v2.points }) : tt("e_friend_t0", { n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 388) })), '<button type="button" class="btn ghost sm earn-b" data-go-tab="me" data-go-sel="#friendWrap">' + escR(tt("e_go_me")) + "</button>");
+    $("#earnList").innerHTML = h;
+    $("#earnList").querySelectorAll("[data-go-tab]").forEach(b => b.onclick = () => { setTab(b.dataset.goTab); const s = b.dataset.goSel; if (s) setTimeout(() => { const x = $(s); if (x) x.scrollIntoView({ behavior: "smooth", block: "start" }); }, 80); });
+    // Me › Bring a friend: the +88 come-back line, said before it happens
+    $("#friendV2").classList.toggle("hide", !(v2.points > 0)); if (v2.points > 0) $("#friendV2").textContent = tt("v2_line", { d: v2.days, v: v2.points });
+    $("#meInvite").classList.toggle("hide", !!ref.on);
+  }
+
+  // ---- Me › History: 5 rows + See all; tap a row for its details (split: who, each share, answers) ----
+  let histAll = false; const histOpen = new Set();
+  function renderHistory(me, zh) {
+    const sp = me.split || {}, shared = sp.shared || {}, canSplit = sp.can || [], gout = sp.gout || [], out = sp.out || [];
+    const rows = me.receipts || [], list = histAll ? rows : rows.slice(0, 5);
+    const pts = (n) => n + " " + t("sp_pts");
+    const det = (r) => {
+      const s = shared[r.id], g = gout.find(x => +x.receipt_id === +r.id), o1 = out.filter(x => +x.receipt_id === +r.id);
+      let h = '<div class="hx-l"><span>' + escR(R.fmtTime ? R.fmtTime(r.at) : R.fmtDay(r.at)) + "</span><span>" + escR(zh ? (r.shop_zh || "") : (r.shop || "")) + "</span></div>" +
+        '<div class="hx-l"><span>' + escR(/^STAFF-/.test(r.receipt_no) ? "(staff)" : r.receipt_no) + "</span><span>HK$" + (+r.total_hkd).toFixed(0) + "</span></div>";
+      if (r.status === "approved") h += '<div class="hx-l"><span>' + escR(t("points")) + "</span><span>+" + r.points + (r.multiplier && +r.multiplier !== 1 ? " (" + multTxt(r.multiplier) + ")" : "") + (r.stamped ? " · 🍣" : "") + (r.gold ? " · ✨\u2060" : "") + "</span></div>";
+      if (g) { h += '<div class="hx-sp"><b>🍣🍣 ' + escR(tt("hist_split", { n: g.people })) + " · HK$" + Math.round(g.bill) + "</b>" +
+          '<div class="gout-p you"><span>' + escR(tt("hist_you")) + "</span><span><b>" + pts(g.scanner_points) + "</b></span></div>" +
+          (g.invites || []).map(i => '<div class="gout-p"><span>' + escR(i.who) + " · " + pts(i.points) + " · HK$" + String(i.hkd).replace(/\.0+$/, "") + "</span><span>" + (i.status === "accepted" ? '<span class="sp-ok">✓ ' + escR(t("gout_yes")) + "</span>" : i.status === "pending" ? '<span class="sp-wait">⏳ ' + escR(t("gout_wait")) + "</span>" : i.status === "declined" ? '<span class="sp-no">✕ ' + escR(t("gout_no")) + "</span>" : i.status === "expired" ? '<span class="sp-no">⌛ ' + escR(t("gout_exp")) + "</span>" : '<span class="sp-no">' + escR(t("gout_cx")) + "</span>") + "</span></div>").join("") + "</div>"; }
+      else if (o1.length) { h += '<div class="hx-sp"><b>🍣🍣 ' + escR(tt("hist_split", { n: 2 })) + "</b>" + o1.map(q => '<div class="gout-p"><span>' + escR(q.to) + "</span><span>" + (q.status === "accepted" ? '<span class="sp-ok">✓ ' + escR(tt("hist_you")) + " " + pts(q.points_you) + " · " + pts(q.points_friend) + "</span>" : q.status === "pending" ? '<span class="sp-wait">⏳ ' + escR(t("gout_wait")) + "</span>" : '<span class="sp-no">' + escR(t(q.status === "declined" ? "gout_no" : q.status === "expired" ? "gout_exp" : "gout_cx")) + "</span>") + "</span></div>").join("") + "</div>"; }
+      else if (s) h += '<div class="hx-sp"><b>🍣🍣 ' + escR(+s.n > 2 ? t("split_hist_n", { n: s.n, who: s.with || "" }) : "½ · " + t("split_hist_with", { who: s.with || "" })) + "</b></div>";
+      if (canSplit.includes(r.id)) h += '<div class="hist-split"><button class="btn sm" data-split-rid="' + r.id + '" data-split-pts="' + r.points + '" data-split-bill="' + (+r.total_hkd || 0) + '">🍣🍣 ' + escR(t("split_link")) + "</button></div>";
+      return h;
+    };
+    $("#history").innerHTML = list.length ? list.map(r => { const s = shared[r.id], open = histOpen.has(r.id);
+      const tag = s ? '<span class="hr-tag">🍣🍣 ' + escR(tt("hist_split", { n: s.n })) + "</span>" : canSplit.includes(r.id) ? '<span class="hr-tag can">🍣🍣 ' + escR(t("split_link")) + "</span>" : "";
+      return '<div class="hrow' + (open ? " open" : "") + '" data-rid="' + r.id + '"><button type="button" class="hr-h" aria-expanded="' + open + '"><span class="hr-l"><b>' + escR(R.fmtDay(r.at)) + "</b> · HK$" + (+r.total_hkd).toFixed(0) + (tag ? "<br>" + tag : "") + '</span><span class="hr-r">' +
+        (r.status === "approved" ? "+" + r.points + (r.gold ? " ✨\u2060" : "") : r.status === "pending" ? "⏳" : "✕") + '<i class="hr-chev">›</i></span></button><div class="hr-x">' + (open ? det(r) : "") + "</div></div>"; }).join("") : '<p class="muted small">' + escR(tt("hist_none")) + "</p>";
+    $("#history").querySelectorAll(".hrow .hr-h").forEach(b => b.onclick = () => { const row = b.closest(".hrow"), id = +row.dataset.rid, r = rows.find(x => x.id === id); if (histOpen.has(id)) histOpen.delete(id); else histOpen.add(id); row.classList.toggle("open"); b.setAttribute("aria-expanded", row.classList.contains("open")); row.querySelector(".hr-x").innerHTML = row.classList.contains("open") ? det(r) : ""; wireSplitBtns(row); });
+    wireSplitBtns($("#history"));
+    const all = $("#histAll"); all.classList.toggle("hide", rows.length <= 5); all.textContent = histAll ? tt("hist_less") : tt("hist_all", { n: rows.length }); all.onclick = () => { histAll = !histAll; renderHistory(state.me, R.lang() === "zh"); };
+    // "Receipts you're splitting" (in History): only splits still waiting on someone; finished ones are in each row's details
+    const so = $("#splitOutbox"); so.querySelectorAll(".gout").forEach((d, i) => { const g = gout[i]; if (g && !g.open) d.remove(); });
+    so.querySelectorAll(".split-row:not(.is-wait), .gout-old:not(.is-wait)").forEach(d => d.remove());
+    so.querySelectorAll(".card").forEach(c => { if (!c.querySelector(".gout, .split-row, .gout-old")) c.remove(); });
+  }
+  function wireSplitBtns(root) { root.querySelectorAll("[data-split-rid]").forEach(b => b.onclick = () => splitSheet(+b.dataset.splitRid, +b.dataset.splitPts, +b.dataset.splitBill)); }
+
+  // ---- theme (dark / light), shared with the staff app: localStorage roru_theme, follows the phone until the guest picks ----
+  function paintThemeSeg() { const th = R.theme ? R.theme.get() : "A"; document.querySelectorAll("#themeSeg [data-th]").forEach(b => b.classList.toggle("on", b.dataset.th === th)); }
+  document.querySelectorAll("#themeSeg [data-th]").forEach(b => b.onclick = () => { if (R.theme) R.theme.set(b.dataset.th, true); paintThemeSeg(); });
+  document.addEventListener("roru:theme", paintThemeSeg);
+
+  // ---- Rules & FAQ (Me › Help) and the ⓘ on Rewards ----
+  function rulesHtml() {
+    const zh = R.lang() === "zh", hs = isHans(), me = state.me || {}, ppd = (state.cfg && state.cfg.points_per_hkd) || me.points_per_hkd || 1, vr = me.visit_reward, rn = vr ? (zh ? vr.name_zh : vr.name_en) : "";
+    const Q = zh ? (hs ? [
+      ["积分", "每消费 HK$1 得 " + ppd + " 分（等级越高越多）。积分每年 12 月 31 日到期。"], ["收据", "每张收据只可扫描一次。读不到？请店员帮你加。每天最多 3 张。"],
+      ["分单", "和会员朋友一起吃？2 到 6 人可以分一张单，每人得到一样的积分。朋友在 12 小时内回复。"], ["到访", "每次到访一个印花。集 5 个 = " + rn + "。"],
+      ["护照", "食物和饮品分开收集。季度结束（第四季：12 月 31 日）后印花重新开始，不会累积。酒瓶印花归扫描收据的人，每张单最多 6 个。"],
+      ["等级", "等级看过去 12 个月的消费，越高每 HK$1 积分越多，优惠越多。"], ["刮刮卡", "Roru Day 扫描 HK$388 或以上的收据，就有刮刮卡，每张都有奖。"]] : [
+      ["積分", "每消費 HK$1 有 " + ppd + " 分（等級越高越多）。積分每年 12 月 31 日到期。"], ["收據", "每張收據只可以掃一次。讀唔到？叫店員幫你加。每日最多 3 張。"],
+      ["分單", "同會員朋友一齊食？2 至 6 人可以分一張單，人人攞一樣嘅積分。朋友要喺 12 個鐘內回覆。"], ["到訪", "每次到訪一個印花。集 5 個 = " + rn + "。"],
+      ["護照", "食物同飲品分開集。季度完咗（第四季：12 月 31 日）印花重新開始，唔會累積。酒樽印花歸掃描收據嗰位，每張單最多 6 個。"],
+      ["等級", "等級睇過去 12 個月嘅消費，越高每 HK$1 積分越多，著數越多。"], ["刮刮卡", "Roru Day 掃描 HK$388 或以上嘅收據，就有刮刮卡，每張都有獎。"]]) : [
+      ["Points", "Every HK$1 earns " + ppd + " point(s), more at higher levels. Points expire on 31 Dec each year."], ["Receipts", "Each receipt scans once. Won't read? Ask staff to add it. Up to 3 a day."],
+      ["Splitting", "Eating with members? Split one bill between 2 and 6 people and everyone gets equal points. Friends answer within 12 hours."], ["Visits", "One stamp per visit. 5 stamps = " + rn + "."],
+      ["Passport", "Food and Drinks are collected separately. When the quarter ends (Q4: 31 Dec) stamps start again; they don't carry over. Bottle stamps go to whoever scans the receipt, max 6 a bill."],
+      ["Levels", "Your level follows what you spent in the last 12 months. Higher levels earn more points per HK$1 and get more perks."], ["Scratch cards", "On Roru Day, scan a receipt of HK$388 or more and you get a scratch card. Every card wins."]];
+    return '<div class="rules">' + Q.map(q => "<details><summary>" + escR(q[0]) + "</summary><p>" + escR(q[1]) + "</p></details>").join("") + "</div>";
+  }
+  $("#rulesBtn").onclick = () => openSheet(tt("rules_h"), rulesHtml());
+  document.querySelectorAll("[data-info]").forEach(b => b.onclick = () => openSheet(tt("info_ladder"), '<p class="small" style="line-height:1.5">' + escR(t("ladder_sub")) + "</p>" + rulesHtml()));
+  $("#visitRow").onclick = openPlate;
+  $("#meQrBig").onclick = () => showStaffFull(state.me);
+  $("#memberQr").onclick = () => showStaffFull(state.me);
+  $("#perksMore").onclick = () => { const c = $("#perksCard"); c.classList.toggle("perks-few"); $("#perksMore").textContent = c.classList.contains("perks-few") ? tt("perks_more") : tt("perks_less"); };
   // receipt photo -> OCR-ready canvas, all on the phone: find the paper, crop, scale to ~1100 px wide, local-mean threshold (shadows, blue tint, dark table edge)
   async function prepReceipt(file) {
     const bmp = await createImageBitmap(file);
