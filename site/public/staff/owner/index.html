@@ -8,14 +8,14 @@
 <title data-tt="{prog} — Owner">High Rollers — Owner</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f38">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f38">
-<link rel="stylesheet" href="/loyalty/scratch.css?v=f38">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f38b">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f38b">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f38b">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f38"></script>
-<script src="/loyalty/passport.js?v=f38"></script>
-<script src="/loyalty/scratch.js?v=f38"></script>
-<script src="/loyalty/monthend.js?v=f38"></script>
+<script src="/loyalty/loyalty.js?v=f38b"></script>
+<script src="/loyalty/passport.js?v=f38b"></script>
+<script src="/loyalty/scratch.js?v=f38b"></script>
+<script src="/loyalty/monthend.js?v=f38b"></script>
 <style>
 /* v36 owner dashboard */
 .dash{margin:16px 0 18px}
@@ -140,6 +140,10 @@ details.grp{background:var(--ink2);border:1px solid var(--line);border-radius:16
 details.grp>summary{list-style:none;cursor:pointer;padding:16px 0;font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:space-between;gap:10px}
 details.grp>summary::-webkit-details-marker{display:none}
 details.grp>summary:after{content:"›";font-size:22px;color:var(--muted);transition:transform .2s}
+/* f38b: the title sits in one span, so a swapped-in custom emoji (🍣 → hand-roll image) can't split it into separate flex items (Kama Dinner header looked centred, Dominic Oct 18) */
+details.grp>summary>.gt{flex:1;min-width:0;text-align:left}
+details.grp>summary:after{margin-left:auto;flex:none}
+details.grp>summary .hr-emoji{height:1.4em;width:1.25em;margin:-.2em .08em 0 0;vertical-align:middle;object-fit:contain}
 details.grp[open]>summary:after{transform:rotate(90deg)}
 details.grp>.in{padding:0 0 14px}
 /* fields: label above, full width, 16px+ */
@@ -662,6 +666,8 @@ body.thB{--muted:rgba(22,24,31,.64)}
 
   // ===== REWARDS =====
   const KIND = { plate: "🍣 Free after visits", ladder: "★ Swap for points", birthday: "🎂 Birthday treat", gold: "✨⁠ Gold receipt" };
+  // f38b: one span per label, so the swapped-in hand-roll image stays inline with its words in the phone table (cells are flex there)
+  Object.keys(KIND).forEach(k => { KIND[k] = '<span class="knd">' + KIND[k] + "</span>"; });
   function renderRewards() {
     const d = st.data, S0 = d.settings, pk = st.perks;
     $("#v-rewards").innerHTML = vh("Rewards", d.rewards.filter(r => r.active).length + " shown to guests · tap one to change it") + '<p class="purpose">What guests can get for their points and visits, and the extra benefits each level gets.</p>' +
@@ -815,7 +821,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
   function renderSettings() {
     const d = st.data, S0 = d.settings, ul = st.ulog, fs = st.features || [];
     const on = (k) => String(S0[k]) === "1", oneIn = (v) => { const p = +v || 0; return p > 0 ? Math.round(1 / p) : 0; }, odds = (v) => "1 in " + Math.round(1 / Math.max(0.0001, +v || 0));
-    const grp = (id, title, inner) => '<details class="grp" id="g-' + id + '"><summary>' + title + '</summary><div class="in">' + inner + "</div></details>";
+    const grp = (id, title, inner) => '<details class="grp" id="g-' + id + '"><summary><span class="gt">' + title + '</span></summary><div class="in">' + inner + "</div></details>";
     const setrow = (label, key, val, extra, hint) => '<div class="setrow" data-k="' + key + '">' + fld(label, '<input class="fin" name="v" inputmode="decimal" value="' + esc(val) + '" ' + (extra || "") + ">", hint) + '<button class="btn sm" data-setsave>Save</button></div>';
     const tmCur = [30, 60, 90, 120].includes(+S0.staff_card_timeout_s) ? +S0.staff_card_timeout_s : 60;
     const UPR = [["Every claim (normal)", "When no rule below applies", null, "upgrade_chance"], ["Slow nights · Mon–Wed", "Hong Kong time", "upgrade_slow_on", "upgrade_slow_chance"], ["Guest we haven't seen", "Previous visit " + esc(S0.upgrade_lapsed_days) + "+ days ago", "upgrade_lapsed_on", "upgrade_lapsed_chance"], ["Both at once", "Slow night and a guest we haven't seen", null, "upgrade_both_chance"]];

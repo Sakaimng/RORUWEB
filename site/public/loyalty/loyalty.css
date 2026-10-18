@@ -572,7 +572,7 @@ body.thB .sp-tag,body.thB .sp-wait{color:#9a6a12}body.thB .sp-ok{color:#1f8a57}
 .f38-sheet .fs-card{width:100%;max-width:440px;max-height:86vh;overflow:auto;margin:0 0 env(safe-area-inset-bottom);padding:16px}
 .fs-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
 .fs-h h2{margin:0}
-.fs-x{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--ink);color:var(--cream);font-size:15px;cursor:pointer;flex:none}
+.fs-x{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--ink);color:var(--cream);font-size:17px;cursor:pointer;flex:none} /* f38b: 34 → 40px, easier to hit */
 .fs-b #plateCard{margin:0;border:0;background:transparent;padding:4px 0}
 .fs-b #splitInbox .card{margin:8px 0}
 .rules details{border-top:1px solid var(--line);padding:10px 0}
@@ -594,6 +594,24 @@ body.thB .sp-tag,body.thB .sp-wait{color:#9a6a12}body.thB .sp-ok{color:#1f8a57}
 .staff-full .sf-lim .ph-chip{font-size:13px;font-weight:700;padding:4px 10px;border-radius:99px;background:rgba(0,0,0,.2)}
 .staff-full.counter .sf-close{position:static;margin:18px auto 0;background:rgba(0,0,0,.22);border:0;color:inherit;font:inherit;font-size:16px;font-weight:900;padding:12px 30px;border-radius:999px;opacity:1;cursor:pointer}
 .staff-full.t-gohan .sf-close,.staff-full.t-kama .sf-close{background:rgba(11,13,18,.12)}
+/* f38b: a visible way out of the counter screen (Dominic Oct 18). ✕ top right, a short line pinned to the bottom, and the content shrinks with the
+   screen height so it always fits one screen (no scrolling; on a short iPhone the old Close pill sat below the fold). */
+.staff-full .sf-x{position:fixed;top:calc(10px + env(safe-area-inset-top));right:12px;width:48px;height:48px;border-radius:50%;border:0;display:grid;place-items:center;font:inherit;font-size:22px;font-weight:900;line-height:1;color:inherit;background:rgba(0,0,0,.22);cursor:pointer;z-index:2;-webkit-tap-highlight-color:transparent}
+.staff-full.t-gohan .sf-x,.staff-full.t-kama .sf-x{background:rgba(11,13,18,.14);color:#0b0d12}
+.staff-full.counter{overflow:hidden;padding-bottom:calc(52px + env(safe-area-inset-bottom))}
+.staff-full.counter .sf-close.sf-hint{position:fixed;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom));margin:0 auto;width:max-content;max-width:calc(100% - 32px);background:none;padding:8px 14px;font-size:14px;font-weight:700;opacity:.8;letter-spacing:.01em}
+.staff-full.counter .sf-head{padding:0 52px}
+.staff-full.counter .sf-tier{font-size:clamp(36px,min(14vw,8.5vh),80px)}
+.staff-full.counter .sf-zh{font-size:clamp(24px,min(9vw,5.6vh),52px)}
+.staff-full.counter .sf-name{font-size:clamp(16px,2.6vh,22px);margin-top:min(10px,1.2vh)}
+.staff-full.counter .sf-qr{margin:min(16px,1.8vh) auto 4px}
+.staff-full.counter .sf-qr svg{width:min(200px,25vh);height:min(200px,25vh)}
+.staff-full.counter .sf-code{font-size:clamp(14px,2.1vh,18px)}
+.staff-full.counter .sf-k{margin-top:min(14px,1.6vh);font-size:clamp(12px,1.9vh,16px)}
+.staff-full.counter .sf-it{font-size:clamp(15px,2.6vh,22px);margin-top:min(8px,.9vh)}
+.staff-full.counter .sf-zhl{font-size:clamp(12px,1.9vh,18px)}
+.staff-full.counter .sf-lim{margin-top:min(10px,1.2vh)}
+.staff-full.counter .sf-lim .ph-chip{font-size:clamp(11px,1.6vh,13px);padding:3px 9px}
 
 /* ===================== light theme (guest + staff; body.lt). The owner page keeps its own thB. ===================== */
 .lt body,body.lt{--ink:#F4F0E4;--ink2:#FFFFFF;--cream:#16181F;--line:rgba(22,24,31,.11);--muted:rgba(22,24,31,.62);--glass:rgba(255,255,255,.85);--green:#1F9D64;--gold:#A87A10;background:#F4F0E4;color:#16181F}
@@ -687,7 +705,7 @@ details.gmore>summary{font-weight:800}
 .s-sheet-c{width:100%;max-width:520px;max-height:90vh;overflow:auto;margin:0 0 env(safe-area-inset-bottom);padding:16px}
 .s-sheet .fs-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
 .s-sheet .fs-h h2{margin:0}
-.s-sheet .fs-x{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--ink);color:var(--cream);font-size:15px;cursor:pointer;flex:none}
+.s-sheet .fs-x{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--ink);color:var(--cream);font-size:15px;cursor:pointer;flex:none}
 .rc-box{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:8px 0 10px}
 .rc-name{font-size:22px;font-weight:900;line-height:1.2}
 .rc-ring{margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(232,184,74,.14);border:1px solid rgba(232,184,74,.55);display:flex;flex-direction:column;gap:2px}

@@ -8,13 +8,13 @@
 <title data-tt="{prog} — RORUBARU">High Rollers — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f38">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f38">
-<link rel="stylesheet" href="/loyalty/scratch.css?v=f38">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f38b">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f38b">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f38b">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f38"></script>
-<script src="/loyalty/passport.js?v=f38"></script>
-<script src="/loyalty/scratch.js?v=f38"></script>
+<script src="/loyalty/loyalty.js?v=f38b"></script>
+<script src="/loyalty/passport.js?v=f38b"></script>
+<script src="/loyalty/scratch.js?v=f38b"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -795,9 +795,17 @@
       '<div class="sf-qr">' + R.qrSvg("RF:" + me.member_code, 200) + '<div class="sf-code">' + esc(me.member_code) + "</div></div>" +
       '<div class="sf-k">' + t("today_k") + "</div>" + (today.length ? today.map(x => '<div class="sf-it">' + (x.emoji ? x.emoji + " " : "") + esc(zh ? x.zh : x.en) + (zh ? "" : '<span class="sf-zhl">' + esc(x.zh) + "</span>") + "</div>").join("") : '<div class="sf-it">' + esc(t("today_none")) + "</div>") +
       (lim ? '<div class="sf-lim">' + lim + "</div>" : "") +
-      '<button type="button" class="sf-close">' + esc(t("tap_close")) + "</button>";
+      // f38b (Dominic Oct 18: "hard to know how to exit this full screen"): a ✕ top right + a fixed line at the bottom; tap anywhere but the QR, swipe down or Back closes it
+      '<button type="button" class="sf-x" aria-label="' + esc(t("close_x")) + '">✕</button>' +
+      '<button type="button" class="sf-close sf-hint">' + esc(t("tap_close")) + "</button>";
     let lock = null; try { if (navigator.wakeLock) lock = await navigator.wakeLock.request("screen"); } catch (e) {}
-    o.addEventListener("click", (e) => { if (e.target.closest(".sf-qr") && !e.target.closest(".sf-close")) return; o.remove(); try { lock && lock.release(); } catch (e) {} });
+    let done = false;
+    const close = (viaBack) => { if (done) return; done = true; o.remove(); window.removeEventListener("popstate", onPop); try { lock && lock.release(); } catch (e) {} if (!viaBack && history.state && history.state.sf) { try { history.back(); } catch (e) {} } };
+    const onPop = () => close(true);
+    try { history.pushState({ sf: 1 }, ""); window.addEventListener("popstate", onPop); } catch (e) {}
+    o.addEventListener("click", (e) => { if (e.target.closest(".sf-qr") && !e.target.closest(".sf-x,.sf-close")) return; close(false); });
+    let y0 = null; o.addEventListener("touchstart", (e) => { y0 = e.touches.length === 1 ? e.touches[0].clientY : null; }, { passive: true });
+    o.addEventListener("touchend", (e) => { if (y0 === null) return; const dy = (e.changedTouches[0] || {}).clientY - y0; y0 = null; if (dy > 90) close(false); }, { passive: true });
     document.body.appendChild(o);
   }
   function renderMe(me, zh) {
