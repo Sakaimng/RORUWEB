@@ -407,11 +407,18 @@ pre_title: "一張收據，掃一次", pre_flair: "就好似最後一條手卷�
       ws.onmessage = (e) => { try { const m = JSON.parse(e.data); if (m.event === "postgres_changes") { clearTimeout(ws._d); ws._d = setTimeout(fetchNow, 250); } } catch (er) {} };
       ws.onclose = () => { clearInterval(hb); if (!dead) setTimeout(connect, Math.min(30000, 2000 * Math.pow(2, retry++))); };
     }
-    fetchNow(); connect();
+    // f41: the weekly item switches by itself at Monday 00:00 Hong Kong time (computed from the stored week dates, no database
+    // write, so no realtime event): refetch right at the switch (and once more a few seconds later), then re-arm for next Monday.
+    let monT = null;
+    function armMonday() { clearTimeout(monT); monT = setTimeout(() => { fetchNow(); setTimeout(fetchNow, 5000); armMonday(); }, Math.min(msToMondayHK() + 1500, 2147000000)); }
+    fetchNow(); connect(); armMonday();
     setInterval(() => { if (!document.hidden) fetchNow(); }, 30000);
     document.addEventListener("visibilitychange", () => { if (!document.hidden) fetchNow(); });
     return { refresh: fetchNow, get: () => cur, stop: () => { dead = true; try { ws && ws.close(); } catch (e) {} } };
   }
+  // ms until the next Monday 00:00 in Hong Kong (UTC+8, no DST)
+  function msToMondayHK(now) { now = now || Date.now(); const hk = new Date(now + 8 * 3600e3), dow = hk.getUTCDay(), days = ((8 - dow) % 7) || 7;
+    return Date.UTC(hk.getUTCFullYear(), hk.getUTCMonth(), hk.getUTCDate() + days) - 8 * 3600e3 - now; }
   function rwName(d, l) { if (!d) return ""; const zh = (l || lang) === "zh"; const n = zh ? (d.name_zh || d.name_en) : d.name_en; return hans && zh ? toS(n) : n; }
-  return { theme, HR, HRI, CFG, PROG, prog, t, lang: () => lang, hans: () => hans, toS, setLang, applyI18n, rpc, errText, gate, qrSvg, rollSvg, stamp, stampStyle, tierIcon, TIERS, tierName: (k, l) => (TIERS[k] || TIERS.nori)[(l || lang) === "zh" ? "zh" : "en"], toast, burst, fmtDay, fmtTime, tour, TOKEN, coin, coinSpin, rollWeek, rwName };
+  return { theme, HR, HRI, CFG, PROG, prog, t, lang: () => lang, hans: () => hans, toS, setLang, applyI18n, rpc, errText, gate, qrSvg, rollSvg, stamp, stampStyle, tierIcon, TIERS, tierName: (k, l) => (TIERS[k] || TIERS.nori)[(l || lang) === "zh" ? "zh" : "en"], toast, burst, fmtDay, fmtTime, tour, TOKEN, coin, coinSpin, rollWeek, rwName, msToMondayHK };
 })();

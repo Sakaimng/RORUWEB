@@ -8,14 +8,14 @@
 <title data-tt="{prog} — Owner">High Rollers — Owner</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f40">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f40">
-<link rel="stylesheet" href="/loyalty/scratch.css?v=f40">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f41">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f41">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f41">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f40"></script>
-<script src="/loyalty/passport.js?v=f40"></script>
-<script src="/loyalty/scratch.js?v=f40"></script>
-<script src="/loyalty/monthend.js?v=f40"></script>
+<script src="/loyalty/loyalty.js?v=f41"></script>
+<script src="/loyalty/passport.js?v=f41"></script>
+<script src="/loyalty/scratch.js?v=f41"></script>
+<script src="/loyalty/monthend.js?v=f41"></script>
 <style>
 /* v36 owner dashboard */
 .dash{margin:16px 0 18px}
@@ -680,7 +680,8 @@ body.thB{--muted:rgba(22,24,31,.64)}
           pk.perks.map((p, i) => ({ attrs: 'data-pk="' + i + '"' + (p.status === "on" ? "" : ' style="opacity:.6"'), cells: [esc((p.emoji ? p.emoji + " " : "") + tok(p.name_en, p.tier)), esc(TN(p.tier)) + (p.confirmed ? "" : ' <span class="opill warn">Not confirmed yet</span>'), esc(tok(p.name_zh, p.tier)), p.status === "on" ? '<span class="opill">Yes</span>' : '<span class="opill no">No, hidden</span>', '<button class="btn ghost sm">Change</button>'] }))) + "</div>" : "");
     $$("tr[data-rw]", $("#v-rewards")).forEach(tr => tr.onclick = () => rewardSheet(d.rewards[+tr.dataset.rw]));
     if ($("#rwPick")) $("#rwPick").onclick = () => rwSheet();
-    if ($("#rwStop")) $("#rwStop").onclick = async (e) => { if (!confirm("Stop the $RORU of the week? Guests stop seeing it and nothing earns 2x until you pick again.")) return; e.currentTarget.disabled = true;
+    rwQueueWire();
+    if ($("#rwStop")) $("#rwStop").onclick = async (e) => { if (!confirm("Stop the $RORU of the week? Guests stop seeing it, the Up next list is cleared, and nothing earns 2x until you pick again.")) return; e.currentTarget.disabled = true;
       try { await R.rpc("owner_set_roll_week", { p_token: st.sess.token, p_item_id: null }); R.toast("Stopped ✓"); load(); } catch (er) { R.toast(R.errText(er)); e.currentTarget.disabled = false; } };
     $$("[data-pk]", $("#v-rewards")).forEach(tr => tr.onclick = () => perkSheet(pk.perks[+tr.dataset.pk]));
   }
@@ -694,22 +695,55 @@ body.thB{--muted:rgba(22,24,31,.64)}
     return '<div class="card rw-own on" id="rwOwn"><div class="rw-own-h">' + R.coin(false, "idle") + '<div class="rw-own-t"><small>$RORU of the week · since ' + esc(R.fmtDay(c.starts_on)) + '</small><b>' + esc(c.name_en) + ' <span class="rw-tag">' + mx(c.multiplier) + "</span></b>" +
       (c.name_zh ? '<small>' + esc(c.name_zh) + "</small>" : "") + '<small>HK$' + fmt(c.price_hkd) + " each · " + fmt(tw.qty || 0) + " ordered on " + fmt(tw.bills || 0) + (+tw.bills === 1 ? " bill" : " bills") + " · +" + fmt(tw.extra || 0) + " extra $RORU so far</small></div></div>" +
       '<div class="rw-own-b"><button class="btn" id="rwPick">Change item</button><button class="btn ghost" id="rwStop">Stop</button></div>' +
+      rwQueueHtml(w, c) +
       '<p class="hint" style="margin:10px 0 0">Guests see it on their Card tab within seconds. Scanned receipts get the 2x by themselves when the item is on the bill; on “Add bill” staff tick it.</p></div>';
   }
-  function rwSheet() {
-    const w = st.rw || {}, c = w.current || {}, menu = (w.menu || []).slice();
-    let sel = c.on ? c.item_id : null;
+  // ----- f41 "Up next": queued weeks. Each starts Monday 00:00 Hong Kong time; the database works out which week is on from the
+  // stored dates (no timer job), and a bill gets the item that was on when it was paid. Guests never see the queue. Max 8 weeks.
+  const hkDay = (iso) => { try { return new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Hong_Kong" }).format(new Date(iso)).replace(",", ""); } catch (e) { return R.fmtDay(iso); } };
+  function rwNextStart(w) { const q = w.queue || []; return q.length ? new Date(new Date(q[q.length - 1].starts_at).getTime() + 7 * 864e5).toISOString() : (w.next_monday || new Date(Date.now() + R.msToMondayHK()).toISOString()); }
+  function rwQueueHtml(w, c) {
+    const q = w.queue || [], max = w.queue_max || 8;
+    return '<div class="rw-q" id="rwQueue"><div class="rw-qh"><b>Up next</b><small>Switches by itself every Monday 00:00</small></div>' +
+      (q.length ? q.map((x, i) => '<div class="rw-qi" data-qi="' + i + '"><span class="rw-qd">' + esc(hkDay(x.starts_at)) + '</span><span class="rw-qn"><b>' + esc(x.name_en) + "</b>" + (x.name_zh ? "<small>" + esc(x.name_zh) + "</small>" : "") + "</span>" +
+          '<span class="rw-qa"><button type="button" class="rw-qb" data-qmv="-1" aria-label="Move up"' + (i ? "" : " disabled") + '>↑</button><button type="button" class="rw-qb" data-qmv="1" aria-label="Move down"' + (i < q.length - 1 ? "" : " disabled") + '>↓</button><button type="button" class="rw-qb x" data-qrm="1" aria-label="Remove">✕</button></span></div>').join("")
+        : '<p class="rw-qe">Nothing lined up. ' + esc(c.name_en) + " stays until you change it.</p>") +
+      (q.length && q.length <= 2 ? '<p class="rw-qw">' + q.length + (q.length === 1 ? " week" : " weeks") + " left in the queue. After that, " + esc(q[q.length - 1].name_en) + " stays.</p>" : "") +
+      (q.length < max ? '<button type="button" class="btn ghost rw-qadd" id="rwQAdd">+ Add ' + esc(hkDay(rwNextStart(w))) + "</button>" : '<p class="rw-qe">Queue is full (' + max + " weeks).</p>") + "</div>";
+  }
+  async function rwQueueSave(items, msg) {
+    $$("#rwQueue button").forEach(b => b.disabled = true);
+    try {
+      const r = await R.rpc("owner_set_roll_week_queue", { p_token: st.sess.token, p_items: items.map(x => ({ item_id: x.item_id, price_hkd: +x.price_hkd || null })) });
+      st.rw = Object.assign({}, st.rw, { queue: r.queue || [], current: r.current || (st.rw || {}).current }); renderRewards(); R.toast(msg);
+    } catch (er) { R.toast(er.code === "queue_full" ? "Up to 8 weeks" : R.errText(er)); renderRewards(); }
+  }
+  // at Monday 00:00 HK the queued week becomes current by itself: refresh the card right then
+  (function armRwMonday() { setTimeout(async () => { try { if (st.sess && st.data) { st.rw = await R.rpc("owner_roll_week", { p_token: st.sess.token }); renderRewards(); } } catch (e) {} armRwMonday(); }, Math.min(R.msToMondayHK() + 2000, 2147000000)); })();
+  function rwQueueWire() {
+    const q = (st.rw || {}).queue || [];
+    if ($("#rwQAdd")) $("#rwQAdd").onclick = () => rwSheet("queue");
+    $$("#rwQueue [data-qi]").forEach(row => {
+      const i = +row.dataset.qi;
+      row.querySelectorAll("[data-qmv]").forEach(b => b.onclick = () => { const j = i + +b.dataset.qmv; if (j < 0 || j >= q.length) return; const a = q.slice(); [a[i], a[j]] = [a[j], a[i]]; rwQueueSave(a, "Moved ✓"); });
+      const rm = row.querySelector("[data-qrm]"); if (rm) rm.onclick = () => rwQueueSave(q.filter((_, k) => k !== i), "Removed ✓");
+    });
+  }
+  function rwSheet(mode) {
+    const w = st.rw || {}, c = w.current || {}, menu = (w.menu || []).slice(), isQ = mode === "queue", qDay = isQ ? hkDay(rwNextStart(w)) : "";
+    let sel = !isQ && c.on ? c.item_id : null;
     const row = (it) => '<label class="rw-it' + (sel === it.id ? " on" : "") + '" data-kind="' + esc(it.kind) + '" data-q="' + esc((it.name_en + " " + (it.name_zh || "")).toLowerCase()) + '"><input type="radio" name="rwItem" value="' + it.id + '"' + (sel === it.id ? " checked" : "") + '><span class="rw-it-n"><b>' + esc(it.name_en) + "</b>" + (it.name_zh ? "<small>" + esc(it.name_zh) + "</small>" : "") + '</span><span class="rw-it-p">' + (it.price_hkd ? "HK$" + fmt(it.price_hkd) : '<em>no price</em>') + "</span></label>";
-    const body = '<p class="muted" style="font-size:15px;margin:0 0 12px">Pick one item. From now on, ordering it earns <b>2x $RORU</b> on its price, until you change or stop it. Use it to push slow movers or high-margin dishes.</p>' +
+    const body = (isQ ? '<p class="muted" style="font-size:15px;margin:0 0 12px">Pick the item for the week of <b>' + esc(qDay) + '</b>. From Monday 00:00 that week, ordering it earns <b>2x $RORU</b>. Guests only see it once its week starts.</p>'
+        : '<p class="muted" style="font-size:15px;margin:0 0 12px">Pick one item. From now on, ordering it earns <b>2x $RORU</b> on its price, until you change or stop it' + ((w.queue || []).length ? " or the next week in Up next starts (Up next stays as it is)" : "") + '. Use it to push slow movers or high-margin dishes.</p>') +
       '<input class="fin" id="rwQ" type="search" placeholder="Search the menu" autocomplete="off" style="margin-bottom:10px">' +
       '<div id="rwList">' + RW_KIND.map(([k, lbl]) => { const its = menu.filter(x => x.kind === k); return its.length ? '<div class="rw-grp" data-grp="' + k + '"><p class="rw-gh">' + lbl + "</p>" + its.map(row).join("") + "</div>" : ""; }).join("") + "</div>" +
       '<div id="rwSelBox" class="rw-sel hide"></div>';
-    openSheet("$RORU of the week", body, '<button class="btn ghost" id="rwNo">Cancel</button><button class="btn" id="rwSave" disabled>Make it $RORU of the week</button>', (b, f) => {
+    openSheet(isQ ? "Up next · " + qDay : "$RORU of the week", body, '<button class="btn ghost" id="rwNo">Cancel</button><button class="btn" id="rwSave" disabled>' + (isQ ? "Add to " + esc(qDay) : "Make it $RORU of the week") + "</button>", (b, f) => {
       const paint = () => {
         const it = menu.find(x => x.id === sel); $$(".rw-it", b).forEach(l => l.classList.toggle("on", +l.querySelector("input").value === sel));
         const box = $("#rwSelBox"); if (!it) { box.classList.add("hide"); f.querySelector("#rwSave").disabled = true; return; }
         box.classList.remove("hide");
-        box.innerHTML = '<div class="rw-own-h">' + R.coin(true) + '<div class="rw-own-t"><small>Guests will see</small><b>This week: ' + esc(it.name_en) + ' = double $RORU</b></div></div>' +
+        box.innerHTML = '<div class="rw-own-h">' + R.coin(true) + '<div class="rw-own-t"><small>' + (isQ ? "From " + esc(qDay) + ", guests will see" : "Guests will see") + '</small><b>This week: ' + esc(it.name_en) + ' = double $RORU</b></div></div>' +
           fld("Price used for the 2x (HK$)", '<input class="fin" id="rwPrice" type="number" min="1" inputmode="decimal" value="' + esc(it.price_hkd || "") + '">', "From the menu. A guest who orders 1 earns " + (it.price_hkd ? fmt(it.price_hkd) : "this many") + " extra $RORU (more at higher levels).");
         const pr = $("#rwPrice"); const okp = () => { f.querySelector("#rwSave").disabled = !(+pr.value > 0); }; pr.oninput = okp; okp();
       };
@@ -718,6 +752,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
       paint();
       f.querySelector("#rwNo").onclick = closeSheet;
       f.querySelector("#rwSave").onclick = async (e) => { const btn = e.currentTarget; btn.disabled = true;
+        if (isQ) { const it = menu.find(x => x.id === sel), pr = +$("#rwPrice").value || it.price_hkd; closeSheet(); rwQueueSave(((st.rw || {}).queue || []).concat([{ item_id: sel, price_hkd: pr, name_en: it.name_en }]), "Added for " + qDay + " ✓"); return; }
         try { await R.rpc("owner_set_roll_week", { p_token: st.sess.token, p_item_id: sel, p_price_hkd: +$("#rwPrice").value, p_multiplier: 2 }); closeSheet(); R.toast("Saved ✓ · guests see it now"); load(); }
         catch (er) { R.toast(er.code === "price_required" ? "Type the price first" : R.errText(er)); btn.disabled = false; } };
     });
@@ -910,7 +945,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
     if (st.view !== "today") go("today");
     const vis = (...sels) => () => { for (const s of sels) { const x = typeof s === "function" ? s() : $(s); if (x && x.offsetParent) return x; } return null; };
     const secBy = (re) => () => [...document.querySelectorAll("#v-today h2")].map(h => h.closest(".sec") || h).find(h => h.offsetParent && re.test(h.textContent));
-    R.tour("owner_f39", [
+    R.tour("owner_f41", [
       { before: () => go("today"), el: "#todayKpis",
         en: "Today's numbers. The grey line under each one says what it means.",
         zh: "今日嘅數字。每個數字下面灰色嗰行講咗佢代表乜。", zhs: "今天的数字。每个数字下面的灰色小字说明它代表什么。" },
@@ -922,8 +957,8 @@ body.thB{--muted:rgba(22,24,31,.64)}
         en: "Find a guest: type their name or the last 4 digits of their phone.",
         zh: "搵客人：輸入名或者電話最後 4 個數字。", zhs: "找客人：输入名字或电话最后 4 位数字。" },
       { before: () => go("rewards"), el: vis("#rwOwn", () => [...document.querySelectorAll("#v-rewards [data-rw]")].find(x => x.offsetParent), "#v-rewards .vh"),
-        en: "Rewards. On top: $RORU of the week. Pick one item and ordering it earns 2x $RORU; guests see it within seconds. Below: tap a reward to change its name or $RORU, or switch it off.",
-        zh: "獎賞。最頂係本週加倍：揀一樣嘢，客人叫佢就賺雙倍 RORU幣，幾秒內就見到。下面撳一個獎賞就可以改名、改 RORU幣或者關咗佢。", zhs: "奖赏。最上面是本周加倍：选一样东西，客人点它就赚双倍 RORU币，几秒内就能看到。下面点一个奖赏就可以改名、改 RORU币或关闭。" },
+        en: "Rewards. On top: $RORU of the week. Pick one item and ordering it earns 2x $RORU; guests see it within seconds. Up next: line up the coming weeks (up to 8) and it switches by itself every Monday 00:00. Below: tap a reward to change its name or $RORU, or switch it off.",
+        zh: "獎賞。最頂係本週加倍：揀一樣嘢，客人叫佢就賺雙倍 RORU幣，幾秒內就見到。「下週起」（Up next）可以預先排好之後幾個禮拜（最多 8 個），每個禮拜一 00:00 自動轉。再下面撳一個獎賞就可以改名、改 RORU幣或者關咗佢。", zhs: "奖赏。最上面是本周加倍：选一样东西，客人点它就赚双倍 RORU币，几秒内就能看到。「下周起」（Up next）可以预先排好接下来几周（最多 8 周），每周一 00:00 自动切换。再下面点一个奖赏就可以改名、改 RORU币或关闭。" },
       { before: () => go("passport"), el: vis("#v-passport .pp-otog", "#ppOwnerKpis", "#v-passport .vh"),
         en: "Passport: switch Food | Drinks, like the guest app. Each quarter runs on its own (Q4 ends 31 Dec), stamps don't carry over. Bottle stamps go to whoever scans the receipt, max 6 a bill.",
         zh: "護照：同客人 app 一樣可以轉食物 | 飲品。每季獨立計（第四季 12 月 31 日完），印花唔會帶過去。酒樽印花歸掃描收據嗰位，每張單最多 6 個。",
