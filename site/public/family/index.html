@@ -798,7 +798,7 @@
     const items = today.length ? today.map(x => (x.emoji ? x.emoji + " " : "") + esc(zh ? x.zh : x.en)).join(" · ") : esc(t("today_none"));
     el.innerHTML = '<div class="ph-top"><span class="ph-tier">' + esc(R.tierName(tier, "en")) + '</span><span class="ph-zh">' + esc(R.tierName(tier, "zh")) + "</span>" +
       (goodName(me.name) ? '<span class="ph-name">' + esc(goodName(me.name)) + "</span>" : "") + "</div>" +
-      '<div class="ph-today"><span class="ph-k">' + t("today_k") + ":</span> " + items + "</div>" +
+      '<div class="ph-today"><span class="ph-k">' + t("today_k") + (zh ? "：</span>" : ":</span> ") + items + "</div>" +
       '<button type="button" class="ph-show" id="phShow"><span class="ph-qr" aria-hidden="true">' + QR_ICO + "</span>" + esc(tt("counter_btn")) + "</button>";
     $("#phShow").onclick = () => showStaffFull(me);
   }

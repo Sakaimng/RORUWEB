@@ -814,7 +814,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
     $("#monthSlot").appendChild(st.monthEl);
     $$("#csvBtns [data-x]").forEach(b => b.onclick = async () => {
       b.disabled = true; try { const rows = await R.rpc("owner_export", { p_token: st.sess.token, p_kind: b.dataset.x }); if (!rows.length) { R.toast("Nothing to export yet"); b.disabled = false; return; }
-        const cols = Object.keys(rows[0]); const csv = "\ufeff" + [cols.map(c => c.replace(/points/g, "roll")).join(",")].concat(rows.map(r => cols.map(c => { let v = r[c]; if (v == null) v = ""; v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(","))).join("\n");
+        const cols = Object.keys(rows[0]); const csv = "\ufeff" + [cols.map(c => c.replace(/points/g, "roru")).join(",")].concat(rows.map(r => cols.map(c => { let v = r[c]; if (v == null) v = ""; v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(","))).join("\n");
         const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" })); a.download = R.prog("en").toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + b.dataset.x + "-" + new Date().toISOString().slice(0, 10) + ".csv"; document.body.appendChild(a); a.click(); a.remove(); } catch (e) { R.toast(R.errText(e)); } b.disabled = false; });
   }
 
