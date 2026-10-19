@@ -760,3 +760,62 @@ body.g-open #members:has(.member:only-child){margin:0}
 .thB .split-line{background:#fff;box-shadow:0 8px 24px -16px rgba(22,24,31,.25)}
 
 main.views .clamp-x.clamp-x.clamp-x{display:none!important}
+
+/* f39 ROLL coin + ROLL of the week */
+.roll-coin{display:inline-block;width:1em;height:1em;vertical-align:-.14em;perspective:120px;flex:none;line-height:0}
+.roll-coin svg{width:100%;height:100%;display:block;transform-style:preserve-3d;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.35))}
+.roll-coin.spin svg{animation:rollSpin 1s cubic-bezier(.25,.7,.35,1) both}
+.roll-coin.idle svg{animation:rollIdle 7s ease-in-out 1.2s infinite}
+@keyframes rollSpin{0%{transform:rotateY(0) scale(.85)}55%{transform:rotateY(560deg) scale(1.12)}100%{transform:rotateY(720deg) scale(1)}}
+@keyframes rollIdle{0%,84%{transform:rotateY(0)}98%,100%{transform:rotateY(360deg)}}
+@media (prefers-reduced-motion: reduce){.roll-coin.spin svg,.roll-coin.idle svg{animation:none}}
+.c-num .roll-coin{width:.78em;height:.78em;margin-right:.18em;vertical-align:-.06em}
+.toast .rc-toast{width:1.25em;height:1.25em;margin-right:.1em;vertical-align:-.28em}
+.rw-chip{display:inline-flex;align-items:center;gap:7px;margin-top:10px;padding:5px 11px 5px 7px;border-radius:999px;font-size:13px;font-weight:700;line-height:1.2;letter-spacing:.01em;
+  background:linear-gradient(135deg,rgba(243,194,79,.2),rgba(183,121,15,.14));border:1px solid rgba(232,184,74,.55);color:#F3D27A;max-width:100%;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rw-chip .roll-coin{width:18px;height:18px}
+.rw-chip b{font-weight:800;color:#FFE29A;white-space:nowrap}
+.rw-chip span.rw-t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+html.lt .rw-chip{background:linear-gradient(135deg,#FFF3CF,#FBE3A6);border-color:#E2B24A;color:#6B4605}
+html.lt .rw-chip b{color:#8A5A00}
+.rw-tag{display:inline-flex;align-items:center;gap:4px;padding:1px 7px 1px 4px;border-radius:999px;font-size:12px;font-weight:800;background:rgba(243,194,79,.18);border:1px solid rgba(232,184,74,.5);color:#E8B84A;white-space:nowrap}
+.rw-tag .roll-coin{width:14px;height:14px}
+html.lt .rw-tag{background:#FFF1C9;color:#8A5A00;border-color:#E2B24A}
+
+.rw-staff{margin:4px 0 14px;padding:12px;border-radius:14px;border:1.5px solid rgba(232,184,74,.55);background:linear-gradient(135deg,rgba(243,194,79,.13),rgba(183,121,15,.08))}
+.rw-tog{display:flex;gap:12px;align-items:flex-start;cursor:pointer}
+.rw-tog input{width:26px;height:26px;flex:none;margin:2px 0 0;accent-color:#E8B84A}
+.rw-tog-t{display:flex;flex-direction:column;gap:3px;min-width:0}
+.rw-tog-t b{font-size:16px;line-height:1.3}
+.rw-tog-t b .roll-coin{width:20px;height:20px;vertical-align:-4px}
+.rw-tog-t small{font-size:13px;opacity:.75}
+.rw-qty{display:flex;align-items:center;gap:10px;margin-top:10px;padding-left:38px;font-size:14px}
+.rw-qty .btn{width:44px;min-width:44px;padding:6px 0;font-size:20px;line-height:1}
+.rw-qty b{font-size:20px;min-width:24px;text-align:center}
+.oi .rc-ok{width:1em;height:1em}
+html.lt .rw-staff{background:#FFF8E3;border-color:#E2B24A}
+
+.rw-own{border:1.5px solid rgba(232,184,74,.6)!important;background:linear-gradient(135deg,rgba(243,194,79,.14),rgba(183,121,15,.06))!important;margin:6px 0 16px}
+.rw-own-h{display:flex;gap:12px;align-items:center}
+.rw-own-h>.roll-coin{width:44px;height:44px}
+.rw-own-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.rw-own-t small{font-size:13px;opacity:.75;line-height:1.35}
+.rw-own-t b{font-size:19px;line-height:1.25}
+.rw-own-b{display:flex;gap:10px;margin-top:12px}
+.rw-own-b .btn{flex:1}
+.rw-gh{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin:14px 0 6px}
+.rw-it{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.1);margin-bottom:6px;cursor:pointer;min-height:48px}
+.rw-it input{width:22px;height:22px;flex:none;margin:0;accent-color:#E8B84A}
+.rw-it-n{display:flex;flex-direction:column;min-width:0;flex:1}
+.rw-it-n b{font-size:16px;font-weight:700}
+.rw-it-n small{font-size:13px;opacity:.65}
+.rw-it-p{font-size:15px;font-weight:700;white-space:nowrap;opacity:.85}
+.rw-it-p em{font-style:normal;opacity:.5;font-weight:500;font-size:13px}
+.rw-it.on{border-color:#E8B84A;background:rgba(232,184,74,.12)}
+.rw-sel{position:sticky;bottom:-1px;margin-top:12px;padding:14px;border-radius:14px;border:1.5px solid #E8B84A;background:#16130b}
+.rw-sel .rw-own-h>.roll-coin{width:36px;height:36px}
+.rw-sel .fl{margin:12px 0 0}
+html.lt .rw-own{background:#FFF8E3!important;border-color:#E2B24A!important}
+html.lt .rw-it{border-color:rgba(0,0,0,.12)}
+html.lt .rw-it.on{background:#FFF3CF}
+html.lt .rw-sel{background:#FFF8E3}

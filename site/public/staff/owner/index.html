@@ -8,14 +8,14 @@
 <title data-tt="{prog} — Owner">High Rollers — Owner</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f38b">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f38b">
-<link rel="stylesheet" href="/loyalty/scratch.css?v=f38b">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f39">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f39">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f39">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f38b"></script>
-<script src="/loyalty/passport.js?v=f38b"></script>
-<script src="/loyalty/scratch.js?v=f38b"></script>
-<script src="/loyalty/monthend.js?v=f38b"></script>
+<script src="/loyalty/loyalty.js?v=f39"></script>
+<script src="/loyalty/passport.js?v=f39"></script>
+<script src="/loyalty/scratch.js?v=f39"></script>
+<script src="/loyalty/monthend.js?v=f39"></script>
 <style>
 /* v36 owner dashboard */
 .dash{margin:16px 0 18px}
@@ -384,7 +384,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
     <button class="mi" data-go="scratch"><i><svg viewBox="0 0 32 32" aria-hidden="true" style="width:1.3em;height:1.3em;vertical-align:-.3em"><path d="M4 9.5a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2V13a3 3 0 0 0 0 6v3.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V19a3 3 0 0 0 0-6z" fill="#F64501" stroke="currentColor" stroke-width="1.6"/><path d="M11 10v12" stroke="#fff" stroke-width="1.8" stroke-dasharray="2 2.2"/><path d="M18.6 10.6l1.3 3.6 3.6 1.3-3.6 1.3-1.3 3.6-1.3-3.6-3.6-1.3 3.6-1.3z" fill="#fff"/></svg></i><span>Roru Day scratch card<small>Cards given, prizes won, cost, minimum bill &amp; odds</small></span></button>
     <button class="mi" data-go="staff"><i>🔑</i><span>Staff &amp; PINs<small>Who can sign in, PINs, who looked at what</small></span></button>
     <button class="mi" data-go="reports"><i>📄</i><span>Reports<small>Month-end report, downloads, charts</small></span></button>
-    <button class="mi" data-go="settings"><i>⚙️</i><span>Settings<small>Points, levels, special nights, extras</small></span></button>
+    <button class="mi" data-go="settings"><i>⚙️</i><span>Settings<small>ROLL, levels, special nights, extras</small></span></button>
     <button class="mi" data-help><i>❓</i><span>How it works<small>Show the quick tour again</small></span></button>
     <button class="mi" data-refresh><i><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-.12em"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg></i><span>Refresh</span></button>
     <button class="mi dim" data-logout><i>🚪</i><span>Sign out</span></button>
@@ -484,8 +484,8 @@ body.thB{--muted:rgba(22,24,31,.64)}
     const tk = { p_token: st.sess.token }, soft = (p) => p.catch(() => null);
     try {
       const r = await Promise.all([R.rpc("owner_stats", tk), soft(R.rpc("owner_dashboard", tk)), soft(R.rpc("staff_today", tk)), soft(R.rpc("staff_queue", tk)), soft(R.rpc("staff_bonus_queue", tk)), soft(R.rpc("staff_pos_queue", tk)),
-        soft(R.rpc("owner_perks", tk)), soft(R.rpc("owner_upgrade_log", tk)), soft(R.rpc("owner_extras", tk)), soft(R.rpc("owner_features", tk)), soft(R.rpc("owner_access_log", { p_token: st.sess.token, p_limit: 30 })), soft(R.rpc("staff_splits", { p_token: st.sess.token, p_days: 30 }))]);
-      [st.data, st.dash, st.today, st.queue, st.bq, st.pos, st.perks, st.ulog, st.extras, st.features, st.alog, st.splits] = r;
+        soft(R.rpc("owner_perks", tk)), soft(R.rpc("owner_upgrade_log", tk)), soft(R.rpc("owner_extras", tk)), soft(R.rpc("owner_features", tk)), soft(R.rpc("owner_access_log", { p_token: st.sess.token, p_limit: 30 })), soft(R.rpc("staff_splits", { p_token: st.sess.token, p_days: 30 })), soft(R.rpc("owner_roll_week", tk))]);
+      [st.data, st.dash, st.today, st.queue, st.bq, st.pos, st.perks, st.ulog, st.extras, st.features, st.alog, st.splits, st.rw] = r;
     } catch (e) { if (e.code === "staff_not_signed_in" || e.code === "owner_only") { logout(); return; } R.toast(R.errText(e)); return; }
     $$("details[id]").forEach(x => st.open[x.id] = x.open);
     $(".views").appendChild($("#dashHome"));
@@ -518,18 +518,18 @@ body.thB{--muted:rgba(22,24,31,.64)}
   // f34 one-friend offers come through as 2-way rows.
   function splitRows(list) {
     const pst = (i) => i.status === "accepted" ? '<span class="sp-ok">✓</span>' : i.status === "pending" ? '<span class="sp-wait">⏳ waiting</span>' : i.status === "declined" ? '<span class="sp-no">said no</span>' : i.status === "expired" ? '<span class="sp-no">no answer</span>' : '<span class="sp-no">cancelled</span>';
-    const gst = (g) => g.open ? '<span class="sp-wait">⏳ Waiting for answers</span>' : (+g.accepted || 0) > 0 ? '<span class="sp-ok">✓ ' + ((+g.accepted || 0) + 1) + " of " + g.people + " sharing</span>" : '<span class="sp-no">Nobody said yes · all points stayed with scanner</span>';
+    const gst = (g) => g.open ? '<span class="sp-wait">⏳ Waiting for answers</span>' : (+g.accepted || 0) > 0 ? '<span class="sp-ok">✓ ' + ((+g.accepted || 0) + 1) + " of " + g.people + " sharing</span>" : '<span class="sp-no">Nobody said yes · all ROLL stayed with scanner</span>';
     const money = (v) => hkd(+v);
     return rt([{ h: "Bill" }, { h: "Split" }, { h: "Each person's share" }, { h: "Status" }, { h: "When" }],
       list.map(g => ({ cells: [((/^Table /.test(g.receipt_no || "") ? "" : "#") + esc(g.receipt_no || "")) + " · " + hkd(g.bill) + (g.is_test ? ' <small class="muted">test</small>' : ""),
         '<b class="sp-tag">split ' + g.people + " ways</b>",
-        '<div class="sp-plist"><div><b>' + esc(g.scanner) + "</b> (scanned) · " + fmt(g.scanner_points) + " pts · " + money(g.scanner_hkd) + "</div>" +
-          (g.invites || []).map(i => "<div>" + esc(i.who) + " · " + (i.status === "accepted" ? fmt(i.points) + " pts · " + money(i.hkd) + " " : '<small class="muted">' + fmt(i.points) + " pts offered</small> ") + pst(i) + "</div>").join("") + "</div>",
+        '<div class="sp-plist"><div><b>' + esc(g.scanner) + "</b> (scanned) · " + fmt(g.scanner_points) + " ROLL · " + money(g.scanner_hkd) + "</div>" +
+          (g.invites || []).map(i => "<div>" + esc(i.who) + " · " + (i.status === "accepted" ? fmt(i.points) + " ROLL · " + money(i.hkd) + " " : '<small class="muted">' + fmt(i.points) + " ROLL offered</small> ") + pst(i) + "</div>").join("") + "</div>",
         gst(g), hkTime(g.created_at)] })));
   }
   function splitBox(limit, withCounts) {
     const sp = st.splits || {}, gs = sp.groups || [], c = sp.counts || {};
-    return (withCounts ? '<div class="stats">' + [["Bills split", sp.bills], ["Friends who said yes", c.accepted], ["Waiting for a friend", c.pending], ["Friend said no", c.declined], ["No answer (share stayed)", c.expired], ["Points moved to friends", c.points_moved]].map(y => '<div class="stat"><b>' + fmt(y[1] || 0) + "</b><span>" + y[0] + "</span></div>").join("") + "</div>" : "") +
+    return (withCounts ? '<div class="stats">' + [["Bills split", sp.bills], ["Friends who said yes", c.accepted], ["Waiting for a friend", c.pending], ["Friend said no", c.declined], ["No answer (share stayed)", c.expired], ["ROLL moved to friends", c.points_moved]].map(y => '<div class="stat"><b>' + fmt(y[1] || 0) + "</b><span>" + y[0] + "</span></div>").join("") + "</div>" : "") +
       (gs.length ? splitRows(gs.slice(0, limit)) : '<p class="empty">No split receipts yet.</p>');
   }
   function splitLine() {
@@ -567,20 +567,20 @@ body.thB{--muted:rgba(22,24,31,.64)}
       '<p class="purpose">What happened at the counter today, and anything that needs your OK.</p>' +
       '<div class="kpis" id="todayKpis">' +
         tile("nori", "Guest visits today", visitsToday, "members who checked in · higher is better", '<div class="kt">' + (lastWk != null ? trendTxt(visitsToday, lastWk, "last " + new Date().toLocaleDateString("en-GB", { timeZone: "Asia/Hong_Kong", weekday: "short" })) : "") + "</div>" + spark(ser.map(s => s.v), "#4CC38A", "v")) +
-        tile("tobiko", "Points given out today", t.points || 0, "1 point per HK$1 spent, more for higher levels", spark(ser.map(s => s.s), "#F64501", "p")) +
+        tile("tobiko", "ROLL given out today", t.points || 0, "1 ROLL per HK$1 spent, more for higher levels", spark(ser.map(s => s.s), "#F64501", "p")) +
         tile("kama", "Free items claimed today", t.redeemed || 0, "rewards guests used at the counter") +
         tile("gohan", "Bills waiting for your OK", waiting, waiting ? "check them below · lower is better" : "all clear · lower is better") + "</div>" +
-      '<div class="qa" id="quick"><button data-q="find"><i>🔎</i>Find a guest<small>By name or last 4 digits</small></button><button data-q="approve"' + (waiting ? ' class="hot"' : "") + '><i>✅</i>Approve bills' + (waiting ? " (" + waiting + ")" : "") + '<small>' + (waiting ? waiting + (waiting === 1 ? " bill needs" : " bills need") + " a check" : "Nothing waiting") + '</small></button><button data-q="rewards"><i>🎁</i>Change rewards<small>Names, points, on/off</small></button><button data-q="month"><i>📄</i>Month-end report<small>PDF for Florencia</small></button></div>' +
+      '<div class="qa" id="quick"><button data-q="find"><i>🔎</i>Find a guest<small>By name or last 4 digits</small></button><button data-q="approve"' + (waiting ? ' class="hot"' : "") + '><i>✅</i>Approve bills' + (waiting ? " (" + waiting + ")" : "") + '<small>' + (waiting ? waiting + (waiting === 1 ? " bill needs" : " bills need") + " a check" : "Nothing waiting") + '</small></button><button data-q="rewards"><i>🎁</i>Change rewards<small>Names, ROLL, on/off</small></button><button data-q="month"><i>📄</i>Month-end report<small>PDF for Florencia</small></button></div>' +
       '<div class="cols2"><div>' +
-      sec("Bills waiting for your OK", waiting ? '<span class="opill warn">' + waiting + "</span>" : "") + '<p class="hint">Big bills or unclear receipts stop here. Approve gives the guest their points; Reject gives none.</p><div id="apList">' +
+      sec("Bills waiting for your OK", waiting ? '<span class="opill warn">' + waiting + "</span>" : "") + '<p class="hint">Big bills or unclear receipts stop here. Approve gives the guest their ROLL; Reject gives none.</p><div id="apList">' +
         (waiting ? q.map(r => '<div class="li" data-rid="' + r.id + '"><div class="bd"><div class="t1">' + esc(r.who || "Guest") + ' <span class="amt">' + hkd2(r.total_hkd) + '</span></div><div class="t2">' + [r.at ? hkTime(r.at) : "", r.shop ? shopNm(r.shop) : "", srcNm(r.source)].filter(Boolean).map(esc).join(" · ") + (r.receipt_no ? ' <span class="idc">receipt ' + esc(r.receipt_no) + "</span>" : "") + "</div>" +
             (r.reason ? '<div class="t2 why">⚠️ ' + esc(r.reason) + "</div>" : "") + '<div class="fl" style="margin:12px 0 0"><span>Bill total in HK$ (change it if the receipt shows a different amount)</span><input class="fin" inputmode="decimal" value="' + (+r.total_hkd).toFixed(2) + '"></div>' +
             '<div class="bigbtn" style="margin-top:10px"><button class="btn" data-ok="' + r.id + '">✓ Approve</button><button class="btn ghost" data-no="' + r.id + '">✕ Reject</button></div></div></div>').join("") +
-          bq.map(b => '<div class="li"><div class="bd"><div class="t1">👯 Bring-a-friend bonus · ' + fmt(b.points) + ' points each</div><div class="t2">' + esc(b.member || "A member") + " brought " + esc(b.friend || "a friend") + (b.created_at ? " · " + hkTime(b.created_at) : "") + "</div>" + (b.reason ? '<div class="t2 why">⚠️ ' + esc(b.reason) + "</div>" : "") +
+          bq.map(b => '<div class="li"><div class="bd"><div class="t1">👯 Bring-a-friend bonus · ' + fmt(b.points) + ' ROLL each</div><div class="t2">' + esc(b.member || "A member") + " brought " + esc(b.friend || "a friend") + (b.created_at ? " · " + hkTime(b.created_at) : "") + "</div>" + (b.reason ? '<div class="t2 why">⚠️ ' + esc(b.reason) + "</div>" : "") +
             '<div class="bigbtn" style="margin-top:10px"><button class="btn" data-bok="' + b.receipt_id + '">✓ Approve</button><button class="btn ghost" data-bno="' + b.receipt_id + '">✕ Reject</button></div></div></div>').join("")
         : '<p class="empty">✓ Nothing waiting. Staff can approve bills at the counter too.</p>') + "</div>" +
       "</div><div>" +
-      sec("Free items handed over", pos.length > 5 ? '<button class="lnk" id="posMore">See all ' + pos.length + "</button>" : "") + '<p class="hint">Rewards guests claimed. Undo gives the points back if one was a mistake.</p><div id="posList">' + (pos.length ? pos.map((p, i) => '<div class="li' + (i >= 5 ? " more hide" : "") + '"><div class="bd"><div class="t1">' + esc(p.give_en || "Reward") + '</div><div class="t2">' + [p.who || "", p.redeemed_at ? hkTime(p.redeemed_at) : "", p.redeemed_by ? "handed over by " + p.redeemed_by : ""].filter(Boolean).map(esc).join(" · ") + (p.is_test ? " · test" : "") + ' <span class="idc">code ' + esc(p.code) + "</span></div>" +
+      sec("Free items handed over", pos.length > 5 ? '<button class="lnk" id="posMore">See all ' + pos.length + "</button>" : "") + '<p class="hint">Rewards guests claimed. Undo gives the ROLL back if one was a mistake.</p><div id="posList">' + (pos.length ? pos.map((p, i) => '<div class="li' + (i >= 5 ? " more hide" : "") + '"><div class="bd"><div class="t1">' + esc(p.give_en || "Reward") + '</div><div class="t2">' + [p.who || "", p.redeemed_at ? hkTime(p.redeemed_at) : "", p.redeemed_by ? "handed over by " + p.redeemed_by : ""].filter(Boolean).map(esc).join(" · ") + (p.is_test ? " · test" : "") + ' <span class="idc">code ' + esc(p.code) + "</span></div>" +
           '<div class="t3">' + (p.upgraded ? '<span class="opill warn">⬆️ swapped up from ' + esc(p.from_en || "") + "</span>" : "") + (p.logged_at ? '<span class="opill">Rung up on the POS</span>' : '<span class="opill no">Not rung up on the POS yet</span>') + (p.pos_item ? '<span class="muted">POS button: ' + esc(p.pos_item) + "</span>" : "") + "</div>" +
           '<div class="acts"><button class="btn ghost sm" data-undo="' + esc(p.code) + '" data-nm="' + esc(p.give_en || "") + '">↩︎ Undo</button></div></div></div>').join("") : '<p class="empty">No free items claimed yet.</p>') + "</div>" +
       "</div></div>" +
@@ -588,7 +588,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
 
       sec("Best guests", '<button class="lnk" data-go2="guests">All guests ›</button>') + '<p class="hint">Who spent the most with you in the last 12 months.</p><div class="lilist">' + (top.length ? top.map((m, i) => guestLi(m, i)).join("") : '<p class="empty">No members yet.</p>') + "</div>" +
       '<details class="grp" id="todayLog" style="margin-top:16px"><summary>Everything that happened today (' + ((t.log || []).length) + ')</summary><div class="in">' + ((t.log || []).length ? rt([{ h: "What happened" }, { h: "Guest" }, { h: "Time" }, { h: "Done by" }],
-        t.log.map(l => ({ cells: [l.type === "redeem" ? "🎁 Claimed: " + esc(l.reward || "") : l.type === "visit" ? "🍣 Visit stamped" : "🧾 " + hkd(l.amount) + " bill → " + fmt(l.points) + " points" + (l.source === "ocr" ? " (scanned)" : l.source === "staff" ? " (by staff)" : "") + (l.split_role ? ' · <b class="sp-tag">' + (+l.split_n > 2 ? "split " + l.split_n + " ways with " : "½ split with ") + esc(l.split_with || "") + "</b>" : ""), esc(l.who || "—"), hkTime(l.at), esc(l.by || "Guest, on their phone")] }))) : '<p class="empty">Nothing yet today.</p>') + "</div></details>";
+        t.log.map(l => ({ cells: [l.type === "redeem" ? "🎁 Claimed: " + esc(l.reward || "") : l.type === "visit" ? "🍣 Visit stamped" : "🧾 " + hkd(l.amount) + " bill → " + fmt(l.points) + " ROLL" + (l.source === "ocr" ? " (scanned)" : l.source === "staff" ? " (by staff)" : "") + (l.split_role ? ' · <b class="sp-tag">' + (+l.split_n > 2 ? "split " + l.split_n + " ways with " : "½ split with ") + esc(l.split_with || "") + "</b>" : ""), esc(l.who || "—"), hkTime(l.at), esc(l.by || "Guest, on their phone")] }))) : '<p class="empty">Nothing yet today.</p>') + "</div></details>";
     const T = $("#v-today");
     T.querySelector('[data-q="find"]').onclick = () => { go("guests"); setTimeout(() => $("#gq") && $("#gq").focus(), 50); };
     T.querySelector('[data-q="approve"]').onclick = () => { const a = $("#apList"); a.scrollIntoView({ behavior: "smooth", block: "start" }); };
@@ -596,35 +596,35 @@ body.thB{--muted:rgba(22,24,31,.64)}
     T.querySelector('[data-q="month"]').onclick = () => { go("reports"); };
     $$("[data-go2]", T).forEach(b => b.onclick = () => go(b.dataset.go2));
     if ($("#posMore")) $("#posMore").onclick = (e) => { $$("#posList .more").forEach(x => x.classList.remove("hide")); e.currentTarget.remove(); };
-    $$("[data-ok]", T).forEach(b => b.onclick = async () => { const tot = parseFloat(b.closest(".li").querySelector("input").value); if (!(tot > 0)) { R.toast("Type the bill total first"); return; } b.disabled = true; try { const r = await R.rpc("staff_review", { p_token: st.sess.token, p_receipt_id: +b.dataset.ok, p_approve: true, p_total_hkd: tot }); R.toast("Approved ✓ " + fmt(r.points) + " points given"); } catch (e) { R.toast(R.errText(e)); } load(); });
-    $$("[data-no]", T).forEach(b => b.onclick = async () => { if (!confirm("Reject this receipt? The guest gets no points for it.")) return; b.disabled = true; try { await R.rpc("staff_review", { p_token: st.sess.token, p_receipt_id: +b.dataset.no, p_approve: false }); R.toast("Rejected"); } catch (e) { R.toast(R.errText(e)); } load(); });
+    $$("[data-ok]", T).forEach(b => b.onclick = async () => { const tot = parseFloat(b.closest(".li").querySelector("input").value); if (!(tot > 0)) { R.toast("Type the bill total first"); return; } b.disabled = true; try { const r = await R.rpc("staff_review", { p_token: st.sess.token, p_receipt_id: +b.dataset.ok, p_approve: true, p_total_hkd: tot }); R.toast("Approved ✓ " + fmt(r.points) + " ROLL given"); } catch (e) { R.toast(R.errText(e)); } load(); });
+    $$("[data-no]", T).forEach(b => b.onclick = async () => { if (!confirm("Reject this receipt? The guest gets no ROLL for it.")) return; b.disabled = true; try { await R.rpc("staff_review", { p_token: st.sess.token, p_receipt_id: +b.dataset.no, p_approve: false }); R.toast("Rejected"); } catch (e) { R.toast(R.errText(e)); } load(); });
     $$("[data-bok],[data-bno]", T).forEach(b => b.onclick = async () => { b.disabled = true; try { await R.rpc("staff_review_bonus", { p_token: st.sess.token, p_receipt_id: +(b.dataset.bok || b.dataset.bno), p_approve: !!b.dataset.bok }); R.toast(b.dataset.bok ? "Approved ✓" : "Rejected"); } catch (e) { R.toast(R.errText(e)); } load(); });
     $$("[data-undo]", T).forEach(b => b.onclick = () => undoSheet(b.dataset.undo, b.dataset.nm));
     $$("[data-guest]", T).forEach(el => el.onclick = () => guestSheet(st.data.top[+el.dataset.guest]));
   }
   function undoSheet(code, nm) {
     openSheet("Undo a used reward", '<p style="font-size:16px;margin:0 0 14px"><b>' + esc(nm || code) + '</b><br><span class="muted">Code ' + esc(code) + "</span></p>" +
-      '<p class="muted" style="font-size:15px">The guest gets the points back (or the reward back to use again). It is recorded in the access log under your name.</p>' +
+      '<p class="muted" style="font-size:15px">The guest gets the ROLL back (or the reward back to use again). It is recorded in the access log under your name.</p>' +
       fld("Why? (shown in the log)", '<input class="fin" id="undoWhy" placeholder="e.g. rang up by mistake">'),
       '<button class="btn ghost" id="undoNo">Cancel</button><button class="btn" id="undoGo">↩︎ Undo it</button>', (b, f) => {
         f.querySelector("#undoNo").onclick = closeSheet;
         f.querySelector("#undoGo").onclick = async (e) => { const btn = e.currentTarget; btn.disabled = true;
-          try { const r = await R.rpc("staff_reverse_redeem", { p_token: st.sess.token, p_reward_code: code, p_reason: $("#undoWhy").value }); closeSheet(); R.toast("Undone ✓" + (r && r.refunded ? " · " + fmt(r.refunded) + " points back" : ""), 3500); load(); }
+          try { const r = await R.rpc("staff_reverse_redeem", { p_token: st.sess.token, p_reward_code: code, p_reason: $("#undoWhy").value }); closeSheet(); R.toast("Undone ✓" + (r && r.refunded ? " · " + fmt(r.refunded) + " ROLL back" : ""), 3500); load(); }
           catch (er) { R.toast(R.errText(er), 3500); btn.disabled = false; } };
       });
   }
   function guestLi(m, i) {
-    return '<div class="li tap" data-guest="' + i + '"><div class="bd"><div class="t1">' + esc(m.name || "—") + '</div><div class="t3">' + tchip(m.tier) + "<span>Spent <b>" + hkd(m.year_spend) + "</b></span><span><b>" + fmt(m.points) + "</b> points</span></div></div><span class=\"chev\">›</span></div>";
+    return '<div class="li tap" data-guest="' + i + '"><div class="bd"><div class="t1">' + esc(m.name || "—") + '</div><div class="t3">' + tchip(m.tier) + "<span>Spent <b>" + hkd(m.year_spend) + "</b></span><span><b>" + fmt(m.points) + "</b> ROLL</span></div></div><span class=\"chev\">›</span></div>";
   }
 
   // ===== GUESTS =====
   function renderGuests() {
     const d = st.data, S0 = d.settings, x = st.extras;
-    const statusHelp = "Guests move up a level by themselves, based on what they spent in the last " + (S0.tier_window_months || 12) + " months: " + TN("nori") + " to start, " + TN("gohan") + " from HK$" + fmt(S0.tier_gohan_hkd) + ", " + TN("tobiko") + " from HK$" + fmt(S0.tier_tobiko_hkd) + ". " + TN("kama") + " is invite only: anyone who spends HK$" + fmt(S0.kama_eligible_hkd) + "+ shows up under Kama below, and you tap Invite.<br>Higher levels earn more points for each HK$1: Nori " + S0.tier_mult_nori + "×, Gohan " + S0.tier_mult_gohan + "×, Tobiko " + S0.tier_mult_tobiko + "×, Kama " + S0.tier_mult_kama + "× (change it in ☰ Settings). Looking a guest up by phone number is noted in the staff access log.";
+    const statusHelp = "Guests move up a level by themselves, based on what they spent in the last " + (S0.tier_window_months || 12) + " months: " + TN("nori") + " to start, " + TN("gohan") + " from HK$" + fmt(S0.tier_gohan_hkd) + ", " + TN("tobiko") + " from HK$" + fmt(S0.tier_tobiko_hkd) + ". " + TN("kama") + " is invite only: anyone who spends HK$" + fmt(S0.kama_eligible_hkd) + "+ shows up under Kama below, and you tap Invite.<br>Higher levels earn more ROLL for each HK$1: Nori " + S0.tier_mult_nori + "×, Gohan " + S0.tier_mult_gohan + "×, Tobiko " + S0.tier_mult_tobiko + "×, Kama " + S0.tier_mult_kama + "× (change it in ☰ Settings). Looking a guest up by phone number is noted in the staff access log.";
     $("#v-guests").innerHTML = vh("Guests", fmt(d.members) + " members") + '<p class="purpose">Look up any member, see your best guests, and invite top spenders to Kama.</p>' +
       '<div class="search"><input id="gq" type="search" placeholder="Name or last 4 digits of phone" autocomplete="off" enterkeyhint="search"></div><div id="gres"></div>' +
       sec("Best guests · last 12 months") + help(statusHelp) +
-      (d.top.length ? rt([{ h: "Name" }, { h: "Level" }, { h: "Spent (12 months)", c: "n" }, { h: "Points balance", c: "n" }, { h: "Visits", c: "n" }, { h: "Visit stamps", c: "desk" }, { h: "Bills scanned", c: "desk n" }, { h: "Last visit" }, { h: "Phone", c: "desk" }, { h: "", c: "desk", l: "" }],
+      (d.top.length ? rt([{ h: "Name" }, { h: "Level" }, { h: "Spent (12 months)", c: "n" }, { h: "ROLL balance", c: "n" }, { h: "Visits", c: "n" }, { h: "Visit stamps", c: "desk" }, { h: "Bills scanned", c: "desk n" }, { h: "Last visit" }, { h: "Phone", c: "desk" }, { h: "", c: "desk", l: "" }],
         d.top.map((m, i) => ({ attrs: 'data-open="' + i + '"', cells: [esc(m.name || "—"), tchip(m.tier), hkd(m.year_spend), fmt(m.points), fmt(m.visits), m.stamps + " of " + (S0.rolls_per_plate || 5) + (m.plates ? " (+" + m.plates + " earned)" : ""), fmt(m.receipts), m.last ? R.fmtDay(m.last) : "", esc(m.phone_masked), '<span class="muted">›</span>'] }))) : '<p class="empty">No members yet.</p>') +
       sec("Kama · the invite-only top level") +
       '<p class="muted" style="font-size:14px;margin:0 0 10px">Can be invited: spent HK$' + fmt(S0.kama_eligible_hkd) + "+ in the last 12 months</p>" +
@@ -651,35 +651,76 @@ body.thB{--muted:rgba(22,24,31,.64)}
     found.forEach(f => { const i = st.data.top.findIndex(m => m.phone_masked === f.phone_masked && (m.name || "") === (f.name || "")); seen.add(i); rows.push({ m: Object.assign({}, i >= 0 ? st.data.top[i] : {}, f), i }); });
     local.forEach(([m, i]) => { if (!seen.has(i)) rows.push({ m, i }); });
     box.innerHTML = '<div class="sec" style="margin-top:4px"><h2>' + (rows.length ? rows.length + (rows.length === 1 ? " guest found" : " guests found") : "No match") + "</h2></div>" +
-      (rows.length ? rows.map((r, k) => '<div class="li tap" data-res="' + k + '"><div class="bd"><div class="t1">' + esc(r.m.name || "—") + '</div><div class="t2">' + esc(r.m.phone_masked || "") + (r.m.member_code ? ' <span class="idc">member ID ' + esc(r.m.member_code) + "</span>" : "") + '</div><div class="t3">' + tchip(r.m.tier) + (r.m.year_spend != null ? "<span>Spent <b>" + hkd(r.m.year_spend) + "</b></span>" : "") + "<span><b>" + fmt(r.m.points) + '</b> points</span></div></div><span class="chev">›</span></div>').join("") : '<p class="empty">Try the last 4 digits of their phone number.</p>');
+      (rows.length ? rows.map((r, k) => '<div class="li tap" data-res="' + k + '"><div class="bd"><div class="t1">' + esc(r.m.name || "—") + '</div><div class="t2">' + esc(r.m.phone_masked || "") + (r.m.member_code ? ' <span class="idc">member ID ' + esc(r.m.member_code) + "</span>" : "") + '</div><div class="t3">' + tchip(r.m.tier) + (r.m.year_spend != null ? "<span>Spent <b>" + hkd(r.m.year_spend) + "</b></span>" : "") + "<span><b>" + fmt(r.m.points) + '</b> ROLL</span></div></div><span class="chev">›</span></div>').join("") : '<p class="empty">Try the last 4 digits of their phone number.</p>');
     $$("[data-res]", box).forEach(el => el.onclick = () => guestSheet(rows[+el.dataset.res].m));
   }
   function guestSheet(m) {
     if (!m) return; const S0 = st.data.settings;
     const row = (l, v) => v === undefined || v === null || v === "" ? "" : '<div><span>' + l + "</span><b>" + v + "</b></div>";
     openSheet(m.name || "Guest", '<div style="margin:0 0 14px">' + tchip(m.tier) + "</div>" +
-      '<div class="nums">' + row("Phone", esc(m.phone_masked)) + row("Spent in the last 12 months", m.year_spend != null ? hkd(m.year_spend) : null) + row("Points balance", fmt(m.points)) +
+      '<div class="nums">' + row("Phone", esc(m.phone_masked)) + row("Spent in the last 12 months", m.year_spend != null ? hkd(m.year_spend) : null) + row("ROLL balance", fmt(m.points)) +
         row("Visits", m.visits != null ? fmt(m.visits) : null) + row("Visit stamps toward the next free item", m.stamps != null ? m.stamps + " of " + (S0.rolls_per_plate || 5) + (m.plates ? " · " + m.plates + " earned so far" : "") : null) + row("Bills scanned", m.receipts != null ? fmt(m.receipts) : null) +
         row("Rewards ready to use", m.pending_rewards != null ? fmt(m.pending_rewards) : null) + row("Bills waiting for approval", m.pending_receipts ? fmt(m.pending_receipts) : null) + row("Last visit", m.last ? R.fmtDay(m.last) : null) + row("Here today", m.visited_today ? "Yes" : null) + row('<span class="idc" style="margin:0">Member ID</span>', m.member_code ? '<span class="idc" style="margin:0">' + esc(m.member_code) + "</span>" : null) + "</div>" +
       '<p class="muted" style="font-size:14px;margin-top:16px">To add a bill, stamp a visit or hand over a reward, use the staff iPad (it shows the full number, birthday and history, and logs who looked).</p>', '<button class="btn ghost" id="gClose">Close</button>', (b, f) => { f.querySelector("#gClose").onclick = closeSheet; });
   }
 
   // ===== REWARDS =====
-  const KIND = { plate: "🍣 Free after visits", ladder: "★ Swap for points", birthday: "🎂 Birthday treat", gold: "✨⁠ Gold receipt" };
+  const KIND = { plate: "🍣 Free after visits", ladder: "★ Swap for ROLL", birthday: "🎂 Birthday treat", gold: "✨⁠ Gold receipt" };
   // f38b: one span per label, so the swapped-in hand-roll image stays inline with its words in the phone table (cells are flex there)
   Object.keys(KIND).forEach(k => { KIND[k] = '<span class="knd">' + KIND[k] + "</span>"; });
   function renderRewards() {
     const d = st.data, S0 = d.settings, pk = st.perks;
-    $("#v-rewards").innerHTML = vh("Rewards", d.rewards.filter(r => r.active).length + " shown to guests · tap one to change it") + '<p class="purpose">What guests can get for their points and visits, and the extra benefits each level gets.</p>' +
-      help("Guests earn " + S0.points_per_hkd + " point for every HK$1 they spend (more at higher levels) and swap points for the ★ items. They only see the name and the points, never menu prices. Points come off when the guest taps Use; staff just check the code.<br>The 🍣 item is free after every " + (S0.rolls_per_plate || 5) + " visits (change the number in ☰ Settings). <b>POS button</b> is the button staff press on the POS when they hand it over. Changes go live straight away.") +
-      rt([{ h: "Free item" }, { h: "How guests get it" }, { h: "Points needed", c: "n" }, { h: "Chinese name" }, { h: "POS button" }, { h: "Guests see it" }, { h: "", l: "", c: "desk" }],
-        d.rewards.map((r, i) => ({ attrs: 'data-rw="' + i + '"' + (r.active ? "" : ' style="opacity:.6"'), cells: [esc(r.name_en), KIND[r.kind] || esc(r.kind), r.kind === "plate" ? "none · free every " + (S0.rolls_per_plate || 5) + " visits" : r.kind === "ladder" ? fmt(r.points_cost) + " points" : (+r.points_cost ? fmt(r.points_cost) + " points" : "—"), esc(r.name_zh), esc(r.pos_item || "—"), r.active ? '<span class="opill">Yes</span>' : '<span class="opill no">No, hidden</span>', '<button class="btn ghost sm">Change</button>'] }))) +
-      (pk ? sec("What each level gets") + '<p class="hint">Extra benefits by level. Higher levels also get everything below them.</p>' + help("Guests see the benefits that are switched on; benefits for a level they haven't reached show greyed out with the level they need. \"Not confirmed yet\" means it is still a proposal. Numbers like the points bonus fill themselves in from ☰ Settings, so you never need to retype them.") +
+    $("#v-rewards").innerHTML = vh("Rewards", d.rewards.filter(r => r.active).length + " shown to guests · tap one to change it") + '<p class="purpose">What guests can get for their ROLL and visits, and the extra benefits each level gets.</p>' + rwCard() +
+      help("Guests earn " + S0.points_per_hkd + " ROLL for every HK$1 they spend (more at higher levels) and swap ROLL for the ★ items. They only see the name and the ROLL, never menu prices. ROLL comes off when the guest taps Use; staff just check the code.<br>The 🍣 item is free after every " + (S0.rolls_per_plate || 5) + " visits (change the number in ☰ Settings). <b>POS button</b> is the button staff press on the POS when they hand it over. Changes go live straight away.") +
+      rt([{ h: "Free item" }, { h: "How guests get it" }, { h: "ROLL needed", c: "n" }, { h: "Chinese name" }, { h: "POS button" }, { h: "Guests see it" }, { h: "", l: "", c: "desk" }],
+        d.rewards.map((r, i) => ({ attrs: 'data-rw="' + i + '"' + (r.active ? "" : ' style="opacity:.6"'), cells: [esc(r.name_en), KIND[r.kind] || esc(r.kind), r.kind === "plate" ? "none · free every " + (S0.rolls_per_plate || 5) + " visits" : r.kind === "ladder" ? fmt(r.points_cost) + " ROLL" : (+r.points_cost ? fmt(r.points_cost) + " ROLL" : "—"), esc(r.name_zh), esc(r.pos_item || "—"), r.active ? '<span class="opill">Yes</span>' : '<span class="opill no">No, hidden</span>', '<button class="btn ghost sm">Change</button>'] }))) +
+      (pk ? sec("What each level gets") + '<p class="hint">Extra benefits by level. Higher levels also get everything below them.</p>' + help("Guests see the benefits that are switched on; benefits for a level they haven't reached show greyed out with the level they need. \"Not confirmed yet\" means it is still a proposal. Numbers like the ROLL bonus fill themselves in from ☰ Settings, so you never need to retype them.") +
         '<div class="phone">' + ["nori", "gohan", "tobiko", "kama"].map(tk => { const ps = pk.perks.map((p, i) => [p, i]).filter(([p]) => p.tier === tk); return ps.length ? '<p class="muted" style="font-size:14px;margin:14px 0 8px;display:flex;gap:8px;align-items:center">' + tchip(tk) + "</p>" + ps.map(([p, i]) => '<div class="li tap' + (p.status === "on" ? "" : " off") + '" data-pk="' + i + '"><div class="bd"><div class="t1">' + esc((p.emoji ? p.emoji + " " : "") + tok(p.name_en, p.tier)) + '</div><div class="t2">' + esc(tok(p.name_zh, p.tier)) + " · " + (p.status === "on" ? "guests see it" : "hidden") + (p.confirmed ? "" : " · not confirmed yet") + '</div></div><span class="chev">›</span></div>').join("") : ""; }).join("") + "</div>" +
         '<div class="desk">' + rt([{ h: "Benefit" }, { h: "Level" }, { h: "Chinese" }, { h: "Guests see it" }, { h: "", l: "", c: "desk" }],
           pk.perks.map((p, i) => ({ attrs: 'data-pk="' + i + '"' + (p.status === "on" ? "" : ' style="opacity:.6"'), cells: [esc((p.emoji ? p.emoji + " " : "") + tok(p.name_en, p.tier)), esc(TN(p.tier)) + (p.confirmed ? "" : ' <span class="opill warn">Not confirmed yet</span>'), esc(tok(p.name_zh, p.tier)), p.status === "on" ? '<span class="opill">Yes</span>' : '<span class="opill no">No, hidden</span>', '<button class="btn ghost sm">Change</button>'] }))) + "</div>" : "");
     $$("tr[data-rw]", $("#v-rewards")).forEach(tr => tr.onclick = () => rewardSheet(d.rewards[+tr.dataset.rw]));
+    if ($("#rwPick")) $("#rwPick").onclick = () => rwSheet();
+    if ($("#rwStop")) $("#rwStop").onclick = async (e) => { if (!confirm("Stop the ROLL of the week? Guests stop seeing it and nothing earns 2x until you pick again.")) return; e.currentTarget.disabled = true;
+      try { await R.rpc("owner_set_roll_week", { p_token: st.sess.token, p_item_id: null }); R.toast("Stopped ✓"); load(); } catch (er) { R.toast(R.errText(er)); e.currentTarget.disabled = false; } };
     $$("[data-pk]", $("#v-rewards")).forEach(tr => tr.onclick = () => perkSheet(pk.perks[+tr.dataset.pk]));
+  }
+
+  // ----- f39 ROLL of the week (Rewards tab, top): the owner picks one menu item; ordering it earns 2x ROLL until changed -----
+  const RW_KIND = [["roll", "Hand rolls"], ["set", "Roll sets"], ["food", "Small plates"], ["dessert", "Desserts"], ["drink", "Drinks"]];
+  const mx = (m) => String(+m || 2).replace(/\.0+$/, "") + "x";
+  function rwCard() {
+    const w = st.rw || {}, c = w.current || {}, tw = w.this_week || {};
+    if (!c.on) return '<div class="card rw-own" id="rwOwn"><div class="rw-own-h">' + R.coin(false) + '<div class="rw-own-t"><small>ROLL of the week</small><b>Off</b><small>Pick one dish or drink. Ordering it earns 2x ROLL until you change it.</small></div></div><div class="rw-own-b"><button class="btn" id="rwPick">Pick this week’s item</button></div></div>';
+    return '<div class="card rw-own on" id="rwOwn"><div class="rw-own-h">' + R.coin(false, "idle") + '<div class="rw-own-t"><small>ROLL of the week · since ' + esc(R.fmtDay(c.starts_on)) + '</small><b>' + esc(c.name_en) + ' <span class="rw-tag">' + mx(c.multiplier) + "</span></b>" +
+      (c.name_zh ? '<small>' + esc(c.name_zh) + "</small>" : "") + '<small>HK$' + fmt(c.price_hkd) + " each · " + fmt(tw.qty || 0) + " ordered on " + fmt(tw.bills || 0) + (+tw.bills === 1 ? " bill" : " bills") + " · +" + fmt(tw.extra || 0) + " extra ROLL so far</small></div></div>" +
+      '<div class="rw-own-b"><button class="btn" id="rwPick">Change item</button><button class="btn ghost" id="rwStop">Stop</button></div>' +
+      '<p class="hint" style="margin:10px 0 0">Guests see it on their Card tab within seconds. Scanned receipts get the 2x by themselves when the item is on the bill; on “Add bill” staff tick it.</p></div>';
+  }
+  function rwSheet() {
+    const w = st.rw || {}, c = w.current || {}, menu = (w.menu || []).slice();
+    let sel = c.on ? c.item_id : null;
+    const row = (it) => '<label class="rw-it' + (sel === it.id ? " on" : "") + '" data-kind="' + esc(it.kind) + '" data-q="' + esc((it.name_en + " " + (it.name_zh || "")).toLowerCase()) + '"><input type="radio" name="rwItem" value="' + it.id + '"' + (sel === it.id ? " checked" : "") + '><span class="rw-it-n"><b>' + esc(it.name_en) + "</b>" + (it.name_zh ? "<small>" + esc(it.name_zh) + "</small>" : "") + '</span><span class="rw-it-p">' + (it.price_hkd ? "HK$" + fmt(it.price_hkd) : '<em>no price</em>') + "</span></label>";
+    const body = '<p class="muted" style="font-size:15px;margin:0 0 12px">Pick one item. From now on, ordering it earns <b>2x ROLL</b> on its price, until you change or stop it. Use it to push slow movers or high-margin dishes.</p>' +
+      '<input class="fin" id="rwQ" type="search" placeholder="Search the menu" autocomplete="off" style="margin-bottom:10px">' +
+      '<div id="rwList">' + RW_KIND.map(([k, lbl]) => { const its = menu.filter(x => x.kind === k); return its.length ? '<div class="rw-grp" data-grp="' + k + '"><p class="rw-gh">' + lbl + "</p>" + its.map(row).join("") + "</div>" : ""; }).join("") + "</div>" +
+      '<div id="rwSelBox" class="rw-sel hide"></div>';
+    openSheet("ROLL of the week", body, '<button class="btn ghost" id="rwNo">Cancel</button><button class="btn" id="rwSave" disabled>Make it ROLL of the week</button>', (b, f) => {
+      const paint = () => {
+        const it = menu.find(x => x.id === sel); $$(".rw-it", b).forEach(l => l.classList.toggle("on", +l.querySelector("input").value === sel));
+        const box = $("#rwSelBox"); if (!it) { box.classList.add("hide"); f.querySelector("#rwSave").disabled = true; return; }
+        box.classList.remove("hide");
+        box.innerHTML = '<div class="rw-own-h">' + R.coin(true) + '<div class="rw-own-t"><small>Guests will see</small><b>ROLL of the week: ' + esc(it.name_en) + ' · 2x</b></div></div>' +
+          fld("Price used for the 2x (HK$)", '<input class="fin" id="rwPrice" type="number" min="1" inputmode="decimal" value="' + esc(it.price_hkd || "") + '">', "From the menu. A guest who orders 1 earns " + (it.price_hkd ? fmt(it.price_hkd) : "this many") + " extra ROLL (more at higher levels).");
+        const pr = $("#rwPrice"); const okp = () => { f.querySelector("#rwSave").disabled = !(+pr.value > 0); }; pr.oninput = okp; okp();
+      };
+      b.onchange = (e) => { if (e.target.name === "rwItem") { sel = +e.target.value; paint(); setTimeout(() => { const x = $("#rwSelBox"); if (x) x.scrollIntoView({ behavior: "smooth", block: "nearest" }); }, 50); } };
+      $("#rwQ").oninput = () => { const q = $("#rwQ").value.trim().toLowerCase(); $$(".rw-it", b).forEach(l => l.classList.toggle("hide", !!q && !l.dataset.q.includes(q))); $$(".rw-grp", b).forEach(g => g.classList.toggle("hide", !g.querySelector(".rw-it:not(.hide)"))); };
+      paint();
+      f.querySelector("#rwNo").onclick = closeSheet;
+      f.querySelector("#rwSave").onclick = async (e) => { const btn = e.currentTarget; btn.disabled = true;
+        try { await R.rpc("owner_set_roll_week", { p_token: st.sess.token, p_item_id: sel, p_price_hkd: +$("#rwPrice").value, p_multiplier: 2 }); closeSheet(); R.toast("Saved ✓ · guests see it now"); load(); }
+        catch (er) { R.toast(er.code === "price_required" ? "Type the price first" : R.errText(er)); btn.disabled = false; } };
+    });
   }
   function rewardSheet(r) {
     const S0 = st.data.settings;
@@ -688,12 +729,12 @@ body.thB{--muted:rgba(22,24,31,.64)}
       fld("Name guests see (English)", inp("name_en", r.name_en), "e.g. Any highball, on us") + fld("Name guests see (Chinese)", inp("name_zh", r.name_zh), "Shown when a guest switches to 中文") +
       fld("Small print (English)", area("detail_en", r.detail_en), "e.g. One per visit. Show the code to staff.") + fld("Small print (Chinese)", area("detail_zh", r.detail_zh)) +
       (r.kind === "plate" ? '<p class="muted" style="font-size:15px;margin:0 0 14px">Unlocks after ' + (S0.rolls_per_plate || 5) + ' visit stamps (change the number under ☰ Settings).</p><input type="hidden" name="points_cost" value="0">'
-        : fld("Points needed", inp("points_cost", r.points_cost, 'type="number" min="0" inputmode="numeric"'), "e.g. 588 · avoid the number 4")) +
+        : fld("ROLL needed", inp("points_cost", r.points_cost, 'type="number" min="0" inputmode="numeric"'), "e.g. 588 · avoid the number 4")) +
       fld("POS button staff press", inp("pos", r.pos_item || "", 'placeholder="e.g. HIGHBALL"'), "Shown on the staff iPad when it's handed over, and in the month-end report.") +
       tog("Show to guests", "Off hides it from the guest page", 'name="active"', r.active),
       '<button class="btn ghost" id="rwNo">Cancel</button><button class="btn" id="rwSave">Save</button>', (b, f) => {
         const g = (n) => b.querySelector("[name=" + n + "]");
-        const prev = () => { const pts = r.kind === "plate" ? "free after " + (S0.rolls_per_plate || 5) + " visits" : fmt(g("points_cost").value) + " points"; $("#rwPrev").innerHTML = 'Guests see: <b>“' + esc(g("name_en").value || "…") + '”</b> · ' + pts + (g("active").checked ? "" : ' <span class="muted">(hidden right now)</span>'); };
+        const prev = () => { const pts = r.kind === "plate" ? "free after " + (S0.rolls_per_plate || 5) + " visits" : fmt(g("points_cost").value) + " ROLL"; $("#rwPrev").innerHTML = 'Guests see: <b>“' + esc(g("name_en").value || "…") + '”</b> · ' + pts + (g("active").checked ? "" : ' <span class="muted">(hidden right now)</span>'); };
         b.oninput = prev; b.onchange = prev; prev();
         f.querySelector("#rwNo").onclick = closeSheet;
         f.querySelector("#rwSave").onclick = async (e) => { const btn = e.currentTarget; btn.disabled = true;
@@ -707,7 +748,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
     openSheet("Change benefit · " + TN(p.tier), (p.confirmed ? "" : '<p style="margin:0 0 12px"><span class="opill warn">Not confirmed yet (still a proposal)</span></p>') +
       '<div class="gsee" id="pkPrev"></div>' +
       fld("Benefit name (English)", inp("name_en", p.name_en), "e.g. Birthday hand roll on us") + fld("Benefit name (Chinese)", inp("name_zh", p.name_zh)) +
-      fld("Small print (English)", area("detail_en", p.detail_en || "")) + fld("Small print (Chinese)", area("detail_zh", p.detail_zh || ""), "Tip: typing {x} shows this level's points bonus (" + tok("{x}", p.tier) + "×) and {p} shows the Kama Dinner passes (" + tok("{p}", p.tier) + "). The preview above shows exactly what guests read.") +
+      fld("Small print (English)", area("detail_en", p.detail_en || "")) + fld("Small print (Chinese)", area("detail_zh", p.detail_zh || ""), "Tip: typing {x} shows this level's ROLL bonus (" + tok("{x}", p.tier) + "×) and {p} shows the Kama Dinner passes (" + tok("{p}", p.tier) + "). The preview above shows exactly what guests read.") +
       tog("Show on the guest page", "Off hides it", 'name="on"', p.status === "on"),
       '<button class="btn ghost" id="pkNo">Cancel</button><button class="btn" id="pkSave">Save</button>', (b, f) => {
         const g = (n) => b.querySelector("[name=" + n + "]");
@@ -765,15 +806,15 @@ body.thB{--muted:rgba(22,24,31,.64)}
     if (!st.monthEl) { st.monthEl = document.createElement("div"); st.monthEl.className = "card"; st.monthEl.id = "monthBox"; window.RORU_MONTHEND.mount(st.monthEl, () => st.sess.token); }
     const v = $("#v-reports");
     v.innerHTML = vh("Reports", "Month-end report, downloads and numbers") + '<p class="purpose">Your month-end report for Florencia, spreadsheets to download, and how the extras are doing.</p>' + '<div id="monthSlot"></div>' +
-      sec("Split receipts · last 30 days") + '<p class="hint">Each bill is scanned once. The guest who scanned picks how many people share it (2 to ' + esc((st.data.settings || {}).split_max_people || 6) + ', them included) and types each friend\'s number. Every friend\'s share is the points divided by the number of people, rounded down; the scanner keeps the leftover. Spend splits the same way to the cent, so the rows always add up to the bill. Each friend says yes on their own; a friend who says no or doesn\'t answer within ' + esc((st.data.settings || {}).split_offer_hours || 12) + ' hours leaves their share with the scanner. Yeses stay yeses.</p><div id="splitsAll">' + splitBox(60, true) + '</div>' +
+      sec("Split receipts · last 30 days") + '<p class="hint">Each bill is scanned once. The guest who scanned picks how many people share it (2 to ' + esc((st.data.settings || {}).split_max_people || 6) + ', them included) and types each friend\'s number. Every friend\'s share is the ROLL divided by the number of people, rounded down; the scanner keeps the leftover. Spend splits the same way to the cent, so the rows always add up to the bill. Each friend says yes on their own; a friend who says no or doesn\'t answer within ' + esc((st.data.settings || {}).split_offer_hours || 12) + ' hours leaves their share with the scanner. Yeses stay yeses.</p><div id="splitsAll">' + splitBox(60, true) + '</div>' +
       sec("Download spreadsheets") + '<p class="hint">Opens in Excel, Numbers or Google Sheets. They include phone numbers, so keep them inside the business (HK privacy law).</p>' +
       '<div class="qa" id="csvBtns">' + [["members", "👥", "All members"], ["receipts", "🧾", "All bills"], ["visits", "🍣", "All visits"], ["rewards", "🎁", "Free items claimed"], ["consents", "✍️", "Sign-up agreements"], ["marketing_optins", "📣", "Who said yes to messages"]].map(c => '<button data-x="' + c[0] + '"><i>' + c[1] + "</i>" + c[2] + "<small>Spreadsheet</small></button>").join("") + "</div>" +
-      (x ? sec("How the extras are doing") + '<p class="hint">Totals since the programme started.</p><div class="stats">' + [["Gold receipts won ✨⁠", x.gold_receipts], ["Friends who joined 👯", x.referrals_joined], ["Friend bonuses paid", x.referrals_rewarded], ["Points given for friends", x.referral_points], ["Birthdays saved 🎂", x.birthdays_on_file], ["Birthday rolls given", x.birthday_rolls]].map(y => '<div class="stat"><b>' + fmt(y[1]) + "</b><span>" + y[0] + "</span></div>").join("") + "</div>" +
+      (x ? sec("How the extras are doing") + '<p class="hint">Totals since the programme started.</p><div class="stats">' + [["Gold receipts won ✨⁠", x.gold_receipts], ["Friends who joined 👯", x.referrals_joined], ["Friend bonuses paid", x.referrals_rewarded], ["ROLL given for friends", x.referral_points], ["Birthdays saved 🎂", x.birthdays_on_file], ["Birthday rolls given", x.birthday_rolls]].map(y => '<div class="stat"><b>' + fmt(y[1]) + "</b><span>" + y[0] + "</span></div>").join("") + "</div>" +
         '<p class="muted" style="font-size:14px;margin:16px 0 10px">Members who brought the most friends</p>' + (x.top_referrers.length ? x.top_referrers.map(b => '<div class="li"><div class="bd"><div class="t1">' + esc(b.name || "—") + '</div><div class="t2">' + esc(b.phone_masked) + " · " + fmt(b.joined) + (+b.joined === 1 ? " friend joined" : " friends joined") + "</div></div></div>").join("") : '<p class="empty">None yet.</p>') : "");
     $("#monthSlot").appendChild(st.monthEl);
     $$("#csvBtns [data-x]").forEach(b => b.onclick = async () => {
       b.disabled = true; try { const rows = await R.rpc("owner_export", { p_token: st.sess.token, p_kind: b.dataset.x }); if (!rows.length) { R.toast("Nothing to export yet"); b.disabled = false; return; }
-        const cols = Object.keys(rows[0]); const csv = "\ufeff" + [cols.join(",")].concat(rows.map(r => cols.map(c => { let v = r[c]; if (v == null) v = ""; v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(","))).join("\n");
+        const cols = Object.keys(rows[0]); const csv = "\ufeff" + [cols.map(c => c.replace(/points/g, "roll")).join(",")].concat(rows.map(r => cols.map(c => { let v = r[c]; if (v == null) v = ""; v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(","))).join("\n");
         const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" })); a.download = R.prog("en").toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + b.dataset.x + "-" + new Date().toISOString().slice(0, 10) + ".csv"; document.body.appendChild(a); a.click(); a.remove(); } catch (e) { R.toast(R.errText(e)); } b.disabled = false; });
   }
 
@@ -781,37 +822,37 @@ body.thB{--muted:rgba(22,24,31,.64)}
   // f28: plain label + example for every number. [label, example / what it does]
   const EDIT = {
     rolls_per_plate: ["Visits needed for the free visit item", "e.g. 5 → guests see “Free hand roll after 5 visits”"],
-    points_per_hkd: ["Points for every HK$1 spent", "e.g. 1 → a HK$300 bill earns 300 points, before the level bonus"],
+    points_per_hkd: ["ROLL for every HK$1 spent", "e.g. 1 → a HK$300 bill earns 300 ROLL, before the level bonus"],
     tier_gohan_hkd: ["Spend to reach Gohan (HK$, last 12 months)", "e.g. 5888"],
     tier_tobiko_hkd: ["Spend to reach Tobiko (HK$, last 12 months)", "e.g. 15888"],
     kama_eligible_hkd: ["Spend to be invited to Kama (HK$, last 12 months)", "e.g. 25888 · they show up in Guests for you to invite"],
     tier_window_months: ["Months of spending that count toward a level", "e.g. 12"],
-    tier_mult_nori: ["Points bonus at Nori", "e.g. 1 → HK$100 earns 100 points"],
-    tier_mult_gohan: ["Points bonus at Gohan", "e.g. 1.25 → HK$100 earns 125 points"],
-    tier_mult_tobiko: ["Points bonus at Tobiko", "e.g. 1.5 → HK$100 earns 150 points"],
-    tier_mult_kama: ["Points bonus at Kama", "e.g. 2 → HK$100 earns 200 points"],
+    tier_mult_nori: ["ROLL bonus at Nori", "e.g. 1 → HK$100 earns 100 ROLL"],
+    tier_mult_gohan: ["ROLL bonus at Gohan", "e.g. 1.25 → HK$100 earns 125 ROLL"],
+    tier_mult_tobiko: ["ROLL bonus at Tobiko", "e.g. 1.5 → HK$100 earns 150 ROLL"],
+    tier_mult_kama: ["ROLL bonus at Kama", "e.g. 2 → HK$100 earns 200 ROLL"],
     receipts_per_day: ["Bills one guest can scan per day", "e.g. 3"],
-    approve_over_hkd: ["Bills above this need a staff check (HK$)", "e.g. 1500 · smaller bills get points straight away"],
+    approve_over_hkd: ["Bills above this need a staff check (HK$)", "e.g. 1500 · smaller bills get ROLL straight away"],
     receipt_max_age_hours: ["How old a receipt can be to scan (hours)", "e.g. 72 = 3 days"],
     gold_roll_chance: ["Chance of a gold visit stamp (looks only, no prize)", "0 to 1 · e.g. 0.05 = 1 in 20"],
     gold_receipt_odds: ["Chance a bill becomes a gold receipt", "0 to 1 · e.g. 0.05 = 1 in 20 bills"],
-    gold_receipt_mult: ["Gold receipt points bonus", "e.g. 2 = double points on that bill"],
-    referral_bonus_points: ["Bring-a-friend points (each person gets)", "e.g. 188"],
+    gold_receipt_mult: ["Gold receipt ROLL bonus", "e.g. 2 = double ROLL on that bill"],
+    referral_bonus_points: ["Bring-a-friend ROLL (each person gets)", "e.g. 188"],
     referral_cap_per_year: ["Most friend bonuses one member can get a year", "e.g. 10"],
     birthday_window_days: ["Birthday treat works this many days either side", "e.g. 3 → from 3 days before to 3 days after"],
     birthday_min_days: ["Days a birthday must be saved before the treat works", "e.g. 30 · stops people changing it to get a free roll"],
-    roru_day_points_mult: ["Roru Day points bonus (not built yet)", "e.g. 2 = double points"],
+    roru_day_points_mult: ["Roru Day ROLL bonus (not built yet)", "e.g. 2 = double ROLL"],
     hook_mon_on: ["Monday double stamps: 1 = on, 0 = off", "Easier with the switch under Weekly specials"],
     hook_mon_stamps: ["Monday: visit stamps per visit", "e.g. 2"],
     hook_tue_on: ["Tuesday friends night: 1 = on, 0 = off", "Easier with the switch under Weekly specials"],
-    hook_tue_bonus_mult: ["Tuesday: friend bonus multiplied by", "e.g. 2 = double friend points"],
+    hook_tue_bonus_mult: ["Tuesday: friend bonus multiplied by", "e.g. 2 = double friend ROLL"],
     hook_wed_on: ["Wednesday gold rush: 1 = on, 0 = off", "Easier with the switch under Weekly specials"],
     hook_wed_gold_odds: ["Wednesday: chance of a gold receipt", "0 to 1 · e.g. 0.2 = 1 in 5"],
     referral_min_spend: ["Friend bonus only if the friend's first bill is at least (HK$)", "e.g. 388 · the one place to change the bring-a-friend minimum"],
-    referral_visit2_points: ["Come-back bonus: points for a new friend who visits again", "e.g. 88 · 0 = off"],
+    referral_visit2_points: ["Come-back bonus: ROLL for a new friend who visits again", "e.g. 88 · 0 = off"],
     referral_visit2_days: ["Come-back bonus: within this many days of their first visit", "e.g. 30"],
-    roru_day_max_point_rewards: ["Roru Day: points rewards a guest can use per bill (free first drink always stacks)", "e.g. 1 · 0 = no limit"],
-    split_offer_hours: ["Split receipt: hours a friend has to say yes", "e.g. 12 · after that the points stay with the guest who scanned"],
+    roru_day_max_point_rewards: ["Roru Day: ROLL rewards a guest can use per bill (free first drink always stacks)", "e.g. 1 · 0 = no limit"],
+    split_offer_hours: ["Split receipt: hours a friend has to say yes", "e.g. 12 · after that the ROLL stays with the guest who scanned"],
     split_offers_per_day: ["Split receipt: requests a guest can send per day", "e.g. 5"],
     split_max_people: ["Split receipt: most people on one bill (scanner included)", "2 to 6 · e.g. 6 = the scanner + 5 friends"],
     rejoin_cooloff_days: ["Days before a deleted account can rejoin", "15 or 30"],
@@ -826,21 +867,21 @@ body.thB{--muted:rgba(22,24,31,.64)}
     const tmCur = [30, 60, 90, 120].includes(+S0.staff_card_timeout_s) ? +S0.staff_card_timeout_s : 60;
     const UPR = [["Every claim (normal)", "When no rule below applies", null, "upgrade_chance"], ["Slow nights · Mon–Wed", "Hong Kong time", "upgrade_slow_on", "upgrade_slow_chance"], ["Guest we haven't seen", "Previous visit " + esc(S0.upgrade_lapsed_days) + "+ days ago", "upgrade_lapsed_on", "upgrade_lapsed_chance"], ["Both at once", "Slow night and a guest we haven't seen", null, "upgrade_both_chance"]];
     const RULE = { base: "Normal", slow_night: "Slow night (Mon–Wed)", lapsed: "Guest we hadn't seen", both: "Slow night + guest we hadn't seen", off: "Switched off" };
-    const NIGHTS = [["mon", "MON · Double stamps", "Every visit counts " + S0.hook_mon_stamps + "× on the plate", "hook_mon_stamps", "Visit stamps per visit"], ["tue", "TUE · Friends night", "Bring-a-friend bonus ×" + S0.hook_tue_bonus_mult, "hook_tue_bonus_mult", "Friend points multiplied by"], ["wed", "WED · Gold rush", "Gold receipt odds " + odds(S0.hook_wed_gold_odds) + " (normal " + odds(S0.gold_receipt_odds) + ")", "hook_wed_gold_odds", "Gold receipt chance (0.2 = 1 in 5)"]];
-    $("#v-settings").innerHTML = vh("Settings", "Tap a section to open it") + '<p class="purpose">The rules of the programme: points per dollar, when guests move up a level, special nights and extras.</p>' +
+    const NIGHTS = [["mon", "MON · Double stamps", "Every visit counts " + S0.hook_mon_stamps + "× on the plate", "hook_mon_stamps", "Visit stamps per visit"], ["tue", "TUE · Friends night", "Bring-a-friend bonus ×" + S0.hook_tue_bonus_mult, "hook_tue_bonus_mult", "Friend ROLL multiplied by"], ["wed", "WED · Gold rush", "Gold receipt odds " + odds(S0.hook_wed_gold_odds) + " (normal " + odds(S0.gold_receipt_odds) + ")", "hook_wed_gold_odds", "Gold receipt chance (0.2 = 1 in 5)"]];
+    $("#v-settings").innerHTML = vh("Settings", "Tap a section to open it") + '<p class="purpose">The rules of the programme: ROLL per dollar, when guests move up a level, special nights and extras.</p>' +
       grp("timeout", "🔒 Staff iPad: auto-close guest details", help("After staff open a guest, their card (phone, birthday, spend) closes by itself when nobody taps the iPad for this long. Staff see a countdown in the last 10 seconds; any tap restarts it. \"Done ✓ Next guest\" closes it at once. Staff stay signed in.<br>客人資料喺無人操作一段時間後會自動關閉，最後 10 秒會倒數；按一下就重新計時。店員唔會被登出。") +
         '<div class="setrow">' + fld("Close a guest's details after · 自動關閉", '<select class="fin" id="tmSel">' + [30, 60, 90, 120].map(v => '<option value="' + v + '"' + (v === tmCur ? " selected" : "") + ">" + v + " s / 秒" + (v === 60 ? " (default 預設)" : "") + "</option>").join("") + "</select>") + '<button class="btn sm" id="tmSave">Save</button></div>') +
-      grp("expiry", "⏳ Points expiry", (() => { const rule = S0.points_expiry, y = new Date(Date.now() + 8 * 3600e3).getUTCFullYear();
-        return '<div class="setrow"><div class="lb" style="font-size:16px"><b>' + (rule === "annual_dec31" ? "Points expire on 31 Dec each year" : "No expiry rule set") + '</b><small class="muted" style="display:block;font-size:13px">' + (rule === "annual_dec31" ? "積分每年 12 月 31 日到期 · 积分每年 12 月 31 日到期 · next expiry 31 Dec " + y : "") + "</small></div></div>" +
-          help("Guests see it under their points (\"1,234 points · expire 31 Dec " + y + "\"), in Rewards and in the terms. Stored rule: points_expiry = " + esc(rule || "none") + ". Nothing has expired yet: no balance is touched until the year-end expiry job is built (00:00 HKT on 31 Dec), with a WhatsApp reminder on 1 Dec to members who still have points."); })()) +
-      grp("upgrade", "🎁 Surprise upgrades", '<p class="hint">Now and then, a guest who swaps points gets the next reward up for free. Guests just see the better reward, marked ⬆️.</p>' + help("The draw happens the moment they tap Use and is saved, so reloading the page can't change it. Guests are never told the chances.") +
+      grp("expiry", "⏳ ROLL expiry", (() => { const rule = S0.points_expiry, y = new Date(Date.now() + 8 * 3600e3).getUTCFullYear();
+        return '<div class="setrow"><div class="lb" style="font-size:16px"><b>' + (rule === "annual_dec31" ? "ROLL expires on 31 Dec each year" : "No expiry rule set") + '</b><small class="muted" style="display:block;font-size:13px">' + (rule === "annual_dec31" ? "卷幣每年 12 月 31 日到期 · 卷币每年 12 月 31 日到期 · next expiry 31 Dec " + y : "") + "</small></div></div>" +
+          help("Guests see it under their ROLL (\"1,234 ROLL · expire 31 Dec " + y + "\"), in Rewards and in the terms. Stored rule: points_expiry = " + esc(rule || "none") + ". Nothing has expired yet: no balance is touched until the year-end expiry job is built (00:00 HKT on 31 Dec), with a WhatsApp reminder on 1 Dec to members who still have ROLL."); })()) +
+      grp("upgrade", "🎁 Surprise upgrades", '<p class="hint">Now and then, a guest who swaps ROLL gets the next reward up for free. Guests just see the better reward, marked ⬆️.</p>' + help("The draw happens the moment they tap Use and is saved, so reloading the page can't change it. Guests are never told the chances.") +
         tog("Surprise upgrades", "Turns all of them on or off", 'data-uk="upgrade_on"', on("upgrade_on")) +
         UPR.map(u => '<div class="card" style="margin:10px 0;padding:12px 14px">' + (u[2] ? tog("<b>" + u[0] + "</b>", u[1], 'data-uk="' + u[2] + '"', on(u[2])) : '<div class="lb" style="font-size:16px"><b>' + u[0] + '</b><small class="muted" style="display:block;font-size:13px">' + u[1] + "</small></div>") +
           '<div class="setrow" style="border:0;padding-bottom:0">' + fld("Chance: 1 in …", '<input class="fin" data-uo="' + u[3] + '" inputmode="numeric" value="' + oneIn(S0[u[3]]) + '">', "e.g. 10 → about 1 in 10 claims get upgraded") + '<button class="btn sm" data-uosave="' + u[3] + '">Save</button></div></div>').join("") +
         '<div class="setrow">' + fld("“Haven't seen” = previous visit at least … days ago", '<input class="fin" id="upDays" inputmode="numeric" value="' + esc(S0.upgrade_lapsed_days) + '">') + '<button class="btn sm" id="upDaysSave">Save</button></div>' +
         (ul && ul.recent.length ? '<p class="muted" style="font-size:14px;margin:14px 0 8px">Latest claims</p>' + rt([{ h: "What happened" }, { h: "Time" }, { h: "Guest" }, { h: "Why" }], ul.recent.slice(0, 8).map(x => ({ cells: [x.upgraded ? "⬆️ " + esc(x.asked) + " → " + esc(x.got) : esc(x.asked) + " (no upgrade)", hkTime(x.earned_at), esc(x.who) + (x.is_test ? " · test" : ""), (RULE[x.rule] || esc(x.rule)) + " · chance 1 in " + oneIn(x.odds)] }))) : "")) +
-      grp("suggest", "✦ “Suggested for you” card on the guest page", help("One card at the top of each guest's page: the reward they can use now, or how close the next one is (in visits, never a points number). Once a guest has 2+ scanned receipts, it also uses what they ordered (read from the receipt text against our menu; no photos are kept).") +
-        tog("Show the card", "", 'data-uk="suggest_card_on"', on("suggest_card_on")) + tog("Use what they ordered", "Reads the items on scanned receipts. Off = suggestions use points only", 'data-uk="suggest_items_on"', on("suggest_items_on"))) +
+      grp("suggest", "✦ “Suggested for you” card on the guest page", help("One card at the top of each guest's page: the reward they can use now, or how close the next one is (in visits, never a ROLL number). Once a guest has 2+ scanned receipts, it also uses what they ordered (read from the receipt text against our menu; no photos are kept).") +
+        tog("Show the card", "", 'data-uk="suggest_card_on"', on("suggest_card_on")) + tog("Use what they ordered", "Reads the items on scanned receipts. Off = suggestions use ROLL only", 'data-uk="suggest_items_on"', on("suggest_items_on"))) +
       grp("nights", "📅 Weekly specials for slow nights (Mon–Wed)", '<p class="hint">Switch a night on and guests see a banner on their page that day; the bonus applies by itself.</p>' + help("Hong Kong time. Today is " + new Date().toLocaleDateString("en-GB", { timeZone: "Asia/Hong_Kong", weekday: "long" }) + ".") +
         NIGHTS.map(n => '<div class="card" style="margin:10px 0;padding:12px 14px">' + tog("<b>" + n[1] + "</b>", n[2], 'data-hk="hook_' + n[0] + '_on"', on("hook_" + n[0] + "_on")) + '<div class="setrow" data-k="' + n[3] + '" style="border:0;padding-bottom:0">' + fld(n[4], '<input class="fin" name="v" inputmode="decimal" value="' + esc(S0[n[3]]) + '">') + '<button class="btn sm" data-setsave>Save</button></div></div>').join("")) +
       grp("cool", "♻️ Wait before a deleted account can rejoin", '<p class="hint">Stops people deleting and rejoining to get the welcome treats again.</p>' + help("They start from zero and never count as a new friend. We keep only a scrambled code of the number (it can't be turned back into the number) and the date they deleted.") +
@@ -848,7 +889,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
       grp("kd", "🍣 Kama Dinner", setrow("Passes per Kama member per year", "kama_dinner_passes", S0.kama_dinner_passes, 'inputmode="numeric"', "e.g. 2 · coming alone uses 1 pass, bringing a +1 uses 2")) +
       grp("features", "🧩 Turn extras on or off", '<p class="hint">Gold receipt, Bring a friend and Birthday roll are ready: on = guests can use them. The rest are teasers: on = guests see a locked “Coming soon” card.</p>' +
         fs.map(x => tog((x.emoji ? x.emoji + " " : "") + "<b>" + esc(x.name_en) + "</b> " + esc(x.name_zh), (x.status === "on" ? "On · guests can use it" : x.status === "soon" ? "Teaser · shows “Coming soon”" : "Off · hidden") + (x.detail_en ? " · " + esc(x.detail_en) : ""), 'data-fk="' + esc(x.key) + '"', x.status !== "off")).join("")) +
-      grp("nums", "🔢 Points, levels and limits", '<p class="hint">Change a number, then tap Save next to it. It applies from the next bill or visit.</p>' +
+      grp("nums", "🔢 ROLL, levels and limits", '<p class="hint">Change a number, then tap Save next to it. It applies from the next bill or visit.</p>' +
         Object.keys(EDIT).map(k => setrow(EDIT[k][0], k, S0[k], "", EDIT[k][1])).join("")) +
       grp("ro", "Technical settings (read only, for Tab)", rt([{ h: "Setting" }, { h: "Value" }], Object.entries(S0).filter(x => !EDIT[x[0]] && !/^(upgrade_|suggest_|staff_card_timeout_s)/.test(x[0])).sort().map(x => ({ cells: [esc(x[0]), "<b>" + esc(x[1]) + "</b>"] }))));
     const V = $("#v-settings");
@@ -869,7 +910,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
     if (st.view !== "today") go("today");
     const vis = (...sels) => () => { for (const s of sels) { const x = typeof s === "function" ? s() : $(s); if (x && x.offsetParent) return x; } return null; };
     const secBy = (re) => () => [...document.querySelectorAll("#v-today h2")].map(h => h.closest(".sec") || h).find(h => h.offsetParent && re.test(h.textContent));
-    R.tour("owner_f38", [
+    R.tour("owner_f39", [
       { before: () => go("today"), el: "#todayKpis",
         en: "Today's numbers. The grey line under each one says what it means.",
         zh: "今日嘅數字。每個數字下面灰色嗰行講咗佢代表乜。", zhs: "今天的数字。每个数字下面的灰色小字说明它代表什么。" },
@@ -880,9 +921,9 @@ body.thB{--muted:rgba(22,24,31,.64)}
       { before: () => go("guests"), el: vis("#gq", "#v-guests .vh"),
         en: "Find a guest: type their name or the last 4 digits of their phone.",
         zh: "搵客人：輸入名或者電話最後 4 個數字。", zhs: "找客人：输入名字或电话最后 4 位数字。" },
-      { before: () => go("rewards"), el: vis(() => [...document.querySelectorAll("#v-rewards [data-rw]")].find(x => x.offsetParent), "#v-rewards .vh"),
-        en: "Tap a reward to change its name or points, or switch it off. Guests see it straight away.",
-        zh: "撳一個獎賞就可以改名、改積分或者關咗佢，客人即刻見到。", zhs: "点一个奖赏就可以改名、改积分或关闭，客人马上看到。" },
+      { before: () => go("rewards"), el: vis("#rwOwn", () => [...document.querySelectorAll("#v-rewards [data-rw]")].find(x => x.offsetParent), "#v-rewards .vh"),
+        en: "Rewards. On top: ROLL of the week. Pick one item and ordering it earns 2x ROLL; guests see it within seconds. Below: tap a reward to change its name or ROLL, or switch it off.",
+        zh: "獎賞。最頂係本週卷幣：揀一樣嘢，客人叫佢就賺雙倍卷幣，幾秒內就見到。下面撳一個獎賞就可以改名、改卷幣或者關咗佢。", zhs: "奖赏。最上面是本周卷币：选一样东西，客人点它就赚双倍卷币，几秒内就能看到。下面点一个奖赏就可以改名、改卷币或关闭。" },
       { before: () => go("passport"), el: vis("#v-passport .pp-otog", "#ppOwnerKpis", "#v-passport .vh"),
         en: "Passport: switch Food | Drinks, like the guest app. Each quarter runs on its own (Q4 ends 31 Dec), stamps don't carry over. Bottle stamps go to whoever scans the receipt, max 6 a bill.",
         zh: "護照：同客人 app 一樣可以轉食物 | 飲品。每季獨立計（第四季 12 月 31 日完），印花唔會帶過去。酒樽印花歸掃描收據嗰位，每張單最多 6 個。",
@@ -900,9 +941,9 @@ body.thB{--muted:rgba(22,24,31,.64)}
         zh: "報告：圖表、俾 Florencia 嘅月結 PDF，同埋所有分單（2 至 6 人）都喺呢度。「今日」只顯示數量。",
         zhs: "报告：图表、给 Florencia 的月结 PDF，以及所有分单（2 到 6 人）都在这里。“今日”只显示数量。" },
       { before: () => go("settings"), el: vis("#g-nums", "#v-settings .vh"),
-        en: "Settings: the rules, each with an example: points per HK$1, levels, most people on one split, and points expire on 31 Dec each year.",
-        zh: "設定：所有規則，每條都有例子：每 HK$1 幾多分、等級、一張單最多幾多人分，同埋積分每年 12 月 31 日到期。",
-        zhs: "设置：所有规则，每条都有例子：每 HK$1 多少分、等级、一张单最多几人分，以及积分每年 12 月 31 日到期。" },
+        en: "Settings: the rules, each with an example: ROLL per HK$1, levels, most people on one split, and ROLL expires on 31 Dec each year.",
+        zh: "設定：所有規則，每條都有例子：每 HK$1 幾多卷幣、等級、一張單最多幾多人分，同埋卷幣每年 12 月 31 日到期。",
+        zhs: "设置：所有规则，每条都有例子：每 HK$1 多少卷币、等级、一张单最多几人分，以及卷币每年 12 月 31 日到期。" },
       { before: () => go("today"), el: vis("#themeBtn", "#side [data-theme]", "#menuBtn"),
         en: "☀️ / 🌙 switches light and dark (the staff and guest apps have it too). To see this again: menu → How it works.",
         zh: "☀️ / 🌙 轉淺色同深色（員工同客人 app 都有）。想再睇：選單 → 點樣用。",
@@ -974,7 +1015,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
           '<div class="posbar">' + (pt ? '<i style="width:' + (100 * pl / pt).toFixed(1) + '%;background:#4CC38A"></i><i style="width:' + (100 * pn / pt).toFixed(1) + '%;background:#F64501"></i>' : "") + "</div>" +
           '<div class="legend" style="margin-top:0"><span><i style="background:#4CC38A"></i>Rung up ' + fmt(pl) + '</span><span><i style="background:#F64501"></i>Not rung up ' + fmt(pn) + "</span></div></div>" +
       "</div>" +
-      '<details><summary>More numbers</summary><div class="in"><div class="nums">' + [["Members", fmt(d.members)], ["Guest visits today", fmt(d.visits_today)], ["Bills scanned today", fmt(d.receipts_today)], ["Bills waiting for approval", fmt(d.pending)], ["Guest visits, all time", fmt(d.visits_all)], ["Visits stamped without a bill", fmt(d.visits_only_all)], ["Free visit items earned", fmt(d.plates_completed)], ["Bills scanned, all time", fmt(d.receipts_all)], ["Bills rejected", fmt(d.rejected)], ["Members spent, all time", hkd(d.spend_all)], ["Points given out, all time", fmt(d.points_issued)], ["Points guests still hold", fmt(d.points_outstanding)], ["Rewards earned, not used yet", fmt(d.rewards_earned)], ["Free items claimed, all time", fmt(d.rewards_redeemed)], ["Can be invited to Kama", fmt(d.kama_eligible.length)]].map(r => "<div>" + r[0] + "<span>" + r[1] + "</span></div>").join("") + "</div>" +
+      '<details><summary>More numbers</summary><div class="in"><div class="nums">' + [["Members", fmt(d.members)], ["Guest visits today", fmt(d.visits_today)], ["Bills scanned today", fmt(d.receipts_today)], ["Bills waiting for approval", fmt(d.pending)], ["Guest visits, all time", fmt(d.visits_all)], ["Visits stamped without a bill", fmt(d.visits_only_all)], ["Free visit items earned", fmt(d.plates_completed)], ["Bills scanned, all time", fmt(d.receipts_all)], ["Bills rejected", fmt(d.rejected)], ["Members spent, all time", hkd(d.spend_all)], ["ROLL given out, all time", fmt(d.points_issued)], ["ROLL guests still hold", fmt(d.points_outstanding)], ["Rewards earned, not used yet", fmt(d.rewards_earned)], ["Free items claimed, all time", fmt(d.rewards_redeemed)], ["Can be invited to Kama", fmt(d.kama_eligible.length)]].map(r => "<div>" + r[0] + "<span>" + r[1] + "</span></div>").join("") + "</div>" +
         '<h3 style="margin-top:18px">By shop, all time</h3><div style="margin-top:8px"><table class="rt"><tr><th>Shop</th><th class="n">Guest visits</th><th class="n">Bills</th><th class="n">Members spent</th><th class="n">Free items claimed</th></tr>' + d.per_shop.map(s => "<tr><td>" + esc(shopNm(s.shop)) + '</td><td class="n">' + fmt(s.visits) + '</td><td class="n">' + fmt(s.receipts) + '</td><td class="n">' + hkd(s.spend) + '</td><td class="n">' + fmt(s.redeemed) + "</td></tr>").join("") + "</table></div></div></details>" +
       '<details><summary>Day by day · last 30 days</summary><div class="in"><table class="rt"><tr><th>Day</th><th>Shop</th><th class="n">Guest visits</th><th class="n">Bills</th><th class="n">Members spent</th></tr>' +
         (Object.keys(days).sort().reverse().map(k => days[k].map((r, n) => "<tr><td>" + (n ? "" : R.fmtDay ? R.fmtDay(k) : k) + "</td><td>" + shopNm(r.shop) + '</td><td class="n">' + fmt(r.visits) + '</td><td class="n">' + fmt(r.receipts) + '</td><td class="n">' + hkd(r.spend) + "</td></tr>").join("")).join("") || '<tr><td colspan="5" class="muted">Nothing yet</td></tr>') + "</table></div></details>";

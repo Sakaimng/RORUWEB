@@ -13,14 +13,14 @@
 <link rel="manifest" href="/loyalty/staff.webmanifest">
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f38b">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f38b">
-<link rel="stylesheet" href="/loyalty/scratch.css?v=f38b">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f39">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f39">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f39">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f38b"></script>
-<script src="/loyalty/passport.js?v=f38b"></script>
-<script src="/loyalty/scratch.js?v=f38b"></script>
-<script src="/loyalty/monthend.js?v=f38b"></script>
+<script src="/loyalty/loyalty.js?v=f39"></script>
+<script src="/loyalty/passport.js?v=f39"></script>
+<script src="/loyalty/scratch.js?v=f39"></script>
+<script src="/loyalty/monthend.js?v=f39"></script>
 <style>body{overscroll-behavior:none}
 .gcard{border:1px solid var(--line);background:var(--ink2);border-radius:18px;padding:14px 16px;margin:0 0 12px}
 .gcard .gh{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
@@ -107,6 +107,8 @@
             <p class="small muted" id="aWho"></p>
             <label class="field"><span data-t="s_total"></span><input id="aTotal" type="text" inputmode="decimal" autocomplete="off" style="font-size:28px;font-weight:900"></label>
             <label class="field"><span data-t="s_rno"></span><input id="aNo" type="text" autocapitalize="characters" autocomplete="off"></label>
+            <div class="rw-staff hide" id="aRw"><label class="rw-tog"><input type="checkbox" id="aRwOn"><span class="rw-tog-t"><b id="aRwLbl"></b><small id="aRwSub"></small></span></label>
+              <div class="rw-qty hide" id="aRwQty"><span data-t="s_rw_how"></span><button type="button" class="btn ghost sm" id="aRwMinus" aria-label="−">−</button><b id="aRwN">1</b><button type="button" class="btn ghost sm" id="aRwPlus" aria-label="+">+</button></div></div>
             <div class="err hide" id="aErr"></div>
             <div class="row"><button class="btn" id="aGo" data-t="s_award"></button><button class="btn ghost sm" id="aBack" data-t="s_back" style="width:auto"></button></div>
           </div></div>
@@ -142,14 +144,17 @@
   const R = window.RORU, t0 = R.t, $ = (s) => document.querySelector(s);
   // staff strings
   const S = { en: { s_login: "Staff sign in", s_login_sub: "Pick the shop, then enter your PIN.", s_pin_ph: "PIN", s_type: "Type the guest's number", s_scan: "Scan QR", s_demo: "Demo: ignore the 1-per-day limit",
-      s_add: "ADD BILL", g_life: "Lifetime spend", g_12m: "Last 12 months", g_visits: "Visits", g_avg: "Avg / visit", g_last: "Last visit", g_fav: "Favourites", g_more: "More", g_since: "Member since", g_receipts: "Approved receipts", g_code: "Member code", g_bday: "Birthday", g_nobday: "not given", g_bd_today: "🎂 Birthday today!", g_bd_week: "🎂 Birthday this week", g_bd_month: "🎂 Birthday month", g_today: "today", g_yday: "yesterday", g_ago: "{n} days ago", g_never: "no visits yet", g_hand: " hand roll", g_logged: "Guest views are logged for privacy (PDPO).", g_loading: "Loading guest…", s_visit: "VISIT ONLY", s_visit_sub: "stamp, no bill", s_add_sub2: "points + visit stamp", r_stamp: "+1 visit stamp", r_stamp_already: "Visit already stamped today", r_plate: "Plate full — visit reward unlocked!", r_visit_title: "Visit stamped 🍣", s_stamps: "stamps", s_bonus_checks: "Friend bonus checks", s_each: "each", r_gold_receipt: "✨⁠ GOLD RECEIPT", s_rate: "earned at", s_now: "now", s_visit_log: "visit stamp", s_redeem: "REDEEM", s_today: "Today", s_queue: "To approve", s_total: "Bill total HK$", s_rno: "Receipt no. (optional)", s_award: "Add points", s_approve: "Approve", s_reject: "Reject", s_queue_empty: "Nothing waiting", s_pts: "pts", r_points: "+{n} points", s_back: "Back", s_find: "Type at least 4 digits", s_none: "No member found — ask them to join at rorubaru.com/family", s_already: "Already has today's roll", s_visited: "today ✓",
-      r_added: "+1 roll", r_gold: "GOLD ROLL!", r_gold_sub: "Give the gold treat 🎉", r_bonus: "+1 bonus roll (streak)", r_full: "Plate full — reward unlocked", r_full_sub: "They scratch the nori on their phone", r_redeemed: "Redeemed ✓", r_already: "Already got today's roll", r_already_sub: "One roll per guest per day", r_err: "Didn't work", r_already_redeemed: "Already redeemed", r_already_redeemed_sub: "This reward was already used. Only a manager can reverse it.", r_receipt_used: "This receipt was already added", s_log_redeem: "redeemed", s_log_rejected: "rejected", s_split_title: "Split receipts", s_split_sub: "today · one bill shared by 2 to 6 members", s_split_with: "split with {who}", s_split_waiting: "waiting for {who}", s_split_declined: "{who} said no", s_split_expired: "no answer, points stayed with the scanner", s_split_cancelled: "cancelled by the guest", s_split_none: "No split receipts today.", s_split_n_with: "split {n} ways with {who}", s_split_ways: "split {n} ways", s_split_open: "waiting for answers", s_split_done_n: "{a} of {n} sharing", s_split_scanned: "scanned", s_split_noyes: "nobody said yes, all with the scanner", s_split_st_pending: "waiting", s_split_st_declined: "said no, share stayed with scanner", s_split_st_expired: "no answer, share stayed with scanner", s_split_st_cancelled: "cancelled", s_log_staff: "(staff)", s_not_scratched: "not scratched yet", sg_next: "next reward", sg_first: "first reward",
+      s_add: "ADD BILL", g_life: "Lifetime spend", g_12m: "Last 12 months", g_visits: "Visits", g_avg: "Avg / visit", g_last: "Last visit", g_fav: "Favourites", g_more: "More", g_since: "Member since", g_receipts: "Approved receipts", g_code: "Member code", g_bday: "Birthday", g_nobday: "not given", g_bd_today: "🎂 Birthday today!", g_bd_week: "🎂 Birthday this week", g_bd_month: "🎂 Birthday month", g_today: "today", g_yday: "yesterday", g_ago: "{n} days ago", g_never: "no visits yet", g_hand: " hand roll", g_logged: "Guest views are logged for privacy (PDPO).", g_loading: "Loading guest…", s_visit: "VISIT ONLY", s_visit_sub: "stamp, no bill", s_add_sub2: "ROLL + visit stamp", r_stamp: "+1 visit stamp", r_stamp_already: "Visit already stamped today", r_plate: "Plate full — visit reward unlocked!", r_visit_title: "Visit stamped 🍣", s_stamps: "stamps", s_bonus_checks: "Friend bonus checks", s_each: "each", r_gold_receipt: "✨⁠ GOLD RECEIPT", s_rate: "earned at", s_now: "now", s_visit_log: "visit stamp", s_redeem: "REDEEM", s_today: "Today", s_queue: "To approve", s_total: "Bill total HK$", s_rno: "Receipt no. (optional)", s_award: "Add ROLL", s_approve: "Approve", s_reject: "Reject", s_queue_empty: "Nothing waiting", s_pts: "ROLL", r_points: "+{n} ROLL", s_back: "Back", s_find: "Type at least 4 digits", s_none: "No member found — ask them to join at rorubaru.com/family", s_already: "Already has today's roll", s_visited: "today ✓",
+      r_added: "+1 roll", r_gold: "GOLD ROLL!", r_gold_sub: "Give the gold treat 🎉", r_bonus: "+1 bonus roll (streak)", r_full: "Plate full — reward unlocked", r_full_sub: "They scratch the nori on their phone", r_redeemed: "Redeemed ✓", r_already: "Already got today's roll", r_already_sub: "One roll per guest per day", r_err: "Didn't work", r_already_redeemed: "Already redeemed", r_already_redeemed_sub: "This reward was already used. Only a manager can reverse it.", r_receipt_used: "This receipt was already added", s_log_redeem: "redeemed", s_log_rejected: "rejected", s_split_title: "Split receipts", s_split_sub: "today · one bill shared by 2 to 6 members", s_split_with: "split with {who}", s_split_waiting: "waiting for {who}", s_split_declined: "{who} said no", s_split_expired: "no answer, ROLL stayed with the scanner", s_split_cancelled: "cancelled by the guest", s_split_none: "No split receipts today.", s_split_n_with: "split {n} ways with {who}", s_split_ways: "split {n} ways", s_split_open: "waiting for answers", s_split_done_n: "{a} of {n} sharing", s_split_scanned: "scanned", s_split_noyes: "nobody said yes, all with the scanner", s_split_st_pending: "waiting", s_split_st_declined: "said no, share stayed with scanner", s_split_st_expired: "no answer, share stayed with scanner", s_split_st_cancelled: "cancelled", s_log_staff: "(staff)", s_not_scratched: "not scratched yet", sg_next: "next reward", sg_first: "first reward",
       wrong_pin: "Wrong PIN", locked_try_later: "Too many tries — wait 15 min", pending_none: "No rewards to redeem", rolls_lbl: "rolls", cam_err: "Camera not available — type the number instead", logout: "Sign out", s_pos: "Log on POS", s_pos_sub: "Ring each item, then tap once", s_pos_give: "GIVE", s_pos_ring: "Ring on POS", s_pos_log: "Logged on POS ✓", s_pos_done: "Logged", s_pos_not: "Not logged yet", s_pos_none: "Nothing to log", s_upgraded: "UPGRADED", s_from: "Guest claimed", s_pos_more: "Show {n} more", s_done: "Done ✓ Next guest", s_closing: "Closing in {n}…", s_closing_long: "Closes by itself after {n} s with no taps" },
     zh: { s_login: "店員登入", s_login_sub: "選擇分店，然後輸入你的 PIN。", s_pin_ph: "PIN", s_type: "輸入客人電話號碼", s_scan: "掃描 QR", s_demo: "示範：忽略每日一次限制",
-      s_add: "加單", g_life: "累計消費", g_12m: "過去 12 個月", g_visits: "到訪次數", g_avg: "每次平均", g_last: "上次到訪", g_fav: "最愛", g_more: "更多", g_since: "入會日期", g_receipts: "已批核收據", g_code: "會員編號", g_bday: "生日", g_nobday: "未提供", g_bd_today: "🎂 今日生日！", g_bd_week: "🎂 本星期生日", g_bd_month: "🎂 生日月", g_today: "今日", g_yday: "昨日", g_ago: "{n} 日前", g_never: "未有到訪", g_hand: "手卷", g_logged: "查閱會員資料會被記錄（私隱條例）。", g_loading: "載入中…", s_visit: "只蓋到訪印", s_visit_sub: "無單據，只蓋印", s_add_sub2: "積分 + 到訪印", r_stamp: "+1 到訪印", r_stamp_already: "今日已蓋過到訪印", r_plate: "集齊一碟 — 到訪獎賞解鎖！", r_visit_title: "已蓋到訪印 🍣", s_stamps: "個印", s_bonus_checks: "朋友獎賞核實", s_each: "每人", r_gold_receipt: "✨⁠ 金色收據", s_rate: "倍數", s_now: "升至", s_visit_log: "到訪印", s_redeem: "兌換", s_today: "今日", s_queue: "待批核", s_total: "帳單總額 HK$", s_rno: "收據號碼（可選）", s_award: "加積分", s_approve: "批核", s_reject: "拒絕", s_queue_empty: "沒有待批核", s_pts: "分", r_points: "+{n} 分", s_back: "返回", s_find: "請輸入至少 4 位數字", s_none: "找不到會員 — 請客人到 rorubaru.com/family 加入", s_already: "今日已加過", s_visited: "今日 ✓",
-      r_added: "+1 手卷", r_gold: "金色手卷！", r_gold_sub: "請送上金色小禮 🎉", r_bonus: "+1 額外手卷（連續到訪）", r_full: "集齊一碟 — 獎賞解鎖", r_full_sub: "客人在手機刮開紫菜", r_redeemed: "已兌換 ✓", r_already: "今日已經加過", r_already_sub: "每位客人每日一個手卷", r_err: "未能完成", r_already_redeemed: "已兌換", r_already_redeemed_sub: "此獎賞已經用咗，只有經理可以退回。", r_receipt_used: "此收據已經加過", s_log_redeem: "已兌換", s_log_rejected: "已拒絕", s_split_title: "分單收據", s_split_sub: "今日 · 一張單 2 至 6 位會員平分", s_split_with: "同 {who} 分單", s_split_waiting: "等緊 {who} 確認", s_split_declined: "{who} 拒絕咗", s_split_expired: "冇回覆，積分留返俾掃描嘅客人", s_split_cancelled: "客人取消咗", s_split_none: "今日未有分單收據。", s_split_n_with: "同 {who} {n} 人分單", s_split_ways: "{n} 人分單", s_split_open: "等緊回覆", s_split_done_n: "{n} 人之中 {a} 人分", s_split_scanned: "掃描者", s_split_noyes: "冇人確認，全部留返俾掃描者", s_split_st_pending: "等緊", s_split_st_declined: "拒絕咗，份額留返俾掃描者", s_split_st_expired: "冇回覆，份額留返俾掃描者", s_split_st_cancelled: "已取消", s_log_staff: "（店員）", s_not_scratched: "未刮開", sg_next: "下一份獎賞", sg_first: "第一份獎賞",
+      s_add: "加單", g_life: "累計消費", g_12m: "過去 12 個月", g_visits: "到訪次數", g_avg: "每次平均", g_last: "上次到訪", g_fav: "最愛", g_more: "更多", g_since: "入會日期", g_receipts: "已批核收據", g_code: "會員編號", g_bday: "生日", g_nobday: "未提供", g_bd_today: "🎂 今日生日！", g_bd_week: "🎂 本星期生日", g_bd_month: "🎂 生日月", g_today: "今日", g_yday: "昨日", g_ago: "{n} 日前", g_never: "未有到訪", g_hand: "手卷", g_logged: "查閱會員資料會被記錄（私隱條例）。", g_loading: "載入中…", s_visit: "只蓋到訪印", s_visit_sub: "無單據，只蓋印", s_add_sub2: "卷幣 + 到訪印", r_stamp: "+1 到訪印", r_stamp_already: "今日已蓋過到訪印", r_plate: "集齊一碟 — 到訪獎賞解鎖！", r_visit_title: "已蓋到訪印 🍣", s_stamps: "個印", s_bonus_checks: "朋友獎賞核實", s_each: "每人", r_gold_receipt: "✨⁠ 金色收據", s_rate: "倍數", s_now: "升至", s_visit_log: "到訪印", s_redeem: "兌換", s_today: "今日", s_queue: "待批核", s_total: "帳單總額 HK$", s_rno: "收據號碼（可選）", s_award: "加卷幣", s_approve: "批核", s_reject: "拒絕", s_queue_empty: "沒有待批核", s_pts: "卷幣", r_points: "+{n} 卷幣", s_back: "返回", s_find: "請輸入至少 4 位數字", s_none: "找不到會員 — 請客人到 rorubaru.com/family 加入", s_already: "今日已加過", s_visited: "今日 ✓",
+      r_added: "+1 手卷", r_gold: "金色手卷！", r_gold_sub: "請送上金色小禮 🎉", r_bonus: "+1 額外手卷（連續到訪）", r_full: "集齊一碟 — 獎賞解鎖", r_full_sub: "客人在手機刮開紫菜", r_redeemed: "已兌換 ✓", r_already: "今日已經加過", r_already_sub: "每位客人每日一個手卷", r_err: "未能完成", r_already_redeemed: "已兌換", r_already_redeemed_sub: "此獎賞已經用咗，只有經理可以退回。", r_receipt_used: "此收據已經加過", s_log_redeem: "已兌換", s_log_rejected: "已拒絕", s_split_title: "分單收據", s_split_sub: "今日 · 一張單 2 至 6 位會員平分", s_split_with: "同 {who} 分單", s_split_waiting: "等緊 {who} 確認", s_split_declined: "{who} 拒絕咗", s_split_expired: "冇回覆，卷幣留返俾掃描嘅客人", s_split_cancelled: "客人取消咗", s_split_none: "今日未有分單收據。", s_split_n_with: "同 {who} {n} 人分單", s_split_ways: "{n} 人分單", s_split_open: "等緊回覆", s_split_done_n: "{n} 人之中 {a} 人分", s_split_scanned: "掃描者", s_split_noyes: "冇人確認，全部留返俾掃描者", s_split_st_pending: "等緊", s_split_st_declined: "拒絕咗，份額留返俾掃描者", s_split_st_expired: "冇回覆，份額留返俾掃描者", s_split_st_cancelled: "已取消", s_log_staff: "（店員）", s_not_scratched: "未刮開", sg_next: "下一份獎賞", sg_first: "第一份獎賞",
       wrong_pin: "PIN 錯誤", locked_try_later: "嘗試太多次 — 請等 15 分鐘", pending_none: "沒有可兌換的獎賞", rolls_lbl: "手卷", cam_err: "無法使用相機 — 請輸入號碼", logout: "登出", s_pos: "POS 記錄", s_pos_sub: "先在 POS 入單，再按一下", s_pos_give: "送出", s_pos_ring: "POS 入單", s_pos_log: "已入 POS ✓", s_pos_done: "已記錄", s_pos_not: "未記錄", s_pos_none: "暫時沒有", s_upgraded: "已升級", s_from: "客人原本換", s_pos_more: "再顯示 {n} 項", s_done: "完成 ✓ 下一位", s_closing: "{n} 秒後關閉", s_closing_long: "{n} 秒無操作會自動關閉" } };
   const t = (k, v) => { let s = (S[R.lang()] && S[R.lang()][k]) || S.en[k]; if (!s) return t0(k, v); if (v) for (const x in v) s = s.replace("{" + x + "}", v[x]); return s.split("{prog}").join(R.prog()); };
+  // f39 ROLL of the week (bills typed at the counter are totals only, so staff tick it and say how many were on the bill)
+  Object.assign(S.en, { s_rw_lbl: "Includes ROLL of the week: {item}", s_rw_sub: "{m}x ROLL on HK${p} each · tick only if it's on the bill", s_rw_how: "How many on the bill?", s_rw_ok: "{item} · {m}x bonus +{n} ROLL", s_rw_bar: "ROLL of the week: {item} · {m}x" });
+  Object.assign(S.zh, { s_rw_lbl: "單入面有本週卷幣：{item}", s_rw_sub: "每份 HK${p} 賺 {m}倍卷幣 · 單上有先剔", s_rw_how: "單上有幾多份？", s_rw_ok: "{item} · {m}倍獎勵 +{n} 卷幣", s_rw_bar: "本週卷幣：{item} · {m}倍" });
   if (R.theme) R.theme.init("roru_theme"); // f38: dark + light, the same switch as the guest app
   await R.gate(); $("#app").style.visibility = "visible";
   document.querySelectorAll(".langs button").forEach(b => b.onclick = () => { R.setLang(b.dataset.lang); render(); });
@@ -255,8 +260,22 @@
   function rewardChips(me) { const zh = R.lang() === "zh", list = (me.rewards || []).filter(r => r.status === "earned" || r.status === "revealed"); if (!list.length) return "";
     return '<div class="rchips"><span class="rchips-k">🎁 ' + esc(tf("chips_k")) + "</span>" + list.map(r => '<button type="button" class="rchip" data-rchip="' + esc(r.code) + '">' + esc(zh ? r.name_zh : r.name_en) + "<small>" + esc(r.code) + "</small></button>").join("") + "</div>"; }
   document.addEventListener("click", e => { const c = e.target.closest("[data-rchip]"); if (c && st.sel) { bump(); confirmRedeem(c.dataset.rchip); } });
-  $("#addRoll").onclick = () => { if (!st.sel) return; $("#award").classList.remove("hide"); $("#aTotal").value = ""; $("#aNo").value = ""; $("#aErr").classList.add("hide"); setTimeout(() => $("#aTotal").focus(), 50); };
+  $("#addRoll").onclick = () => { if (!st.sel) return; $("#award").classList.remove("hide"); $("#aTotal").value = ""; $("#aNo").value = ""; $("#aErr").classList.add("hide"); rwReset(); setTimeout(() => $("#aTotal").focus(), 50); };
   $("#aBack").onclick = () => $("#award").classList.add("hide");
+  let rwN = 1;
+  function paintAwardRw() {
+    const d = st.rw, box = $("#aRw"); if (!box) return;
+    if (!d || !d.on) { box.classList.add("hide"); $("#aRwOn").checked = false; return; }
+    const m = String(+d.multiplier).replace(/\.0+$/, "");
+    $("#aRwLbl").innerHTML = R.coin(false, "idle") + " " + esc(t("s_rw_lbl", { item: R.rwName(d) })) + ' <span class="rw-tag">' + esc(m) + "x</span>";
+    $("#aRwSub").textContent = t("s_rw_sub", { m, p: String(+d.price_hkd).replace(/\.0+$/, "") });
+    box.classList.remove("hide"); $("#aRwQty").classList.toggle("hide", !$("#aRwOn").checked); $("#aRwN").textContent = rwN;
+  }
+  function rwReset() { rwN = 1; if ($("#aRwOn")) $("#aRwOn").checked = false; paintAwardRw(); }
+  $("#aRwOn").onchange = () => { paintAwardRw(); if ($("#aRwOn").checked) R.coinSpin($("#aRwLbl .roll-coin")); };
+  $("#aRwMinus").onclick = () => { rwN = Math.max(1, rwN - 1); paintAwardRw(); };
+  $("#aRwPlus").onclick = () => { rwN = Math.min(30, rwN + 1); paintAwardRw(); };
+  st.rwLive = R.rollWeek((d) => { st.rw = d; paintAwardRw(); });
   $("#visitBtn").onclick = async () => {
     if (!st.sel) return; $("#visitBtn").disabled = true;
     try { const r = await R.rpc("staff_visit", { p_token: st.sess.token, p_who: st.sel.member_code, p_shop: st.shop, p_demo: !!($("#demo") && $("#demo").checked && st.cfg && st.cfg.env !== "live") }); const v = r.visit || {};
@@ -266,10 +285,12 @@
   };
   $("#aGo").onclick = async () => {
     if (!st.sel) return; $("#aGo").disabled = true; $("#aErr").classList.add("hide");
-    try { const r = await R.rpc("staff_award", { p_token: st.sess.token, p_who: st.sel.member_code, p_total_hkd: parseFloat(String($("#aTotal").value).replace(/[^0-9.]/g, "")), p_receipt_no: $("#aNo").value.trim() || null, p_shop: st.shop });
+    const rwQ = st.rw && st.rw.on && $("#aRwOn").checked ? rwN : 0;
+    try { const r = await R.rpc(rwQ ? "staff_award_roll_week" : "staff_award", Object.assign({ p_token: st.sess.token, p_who: st.sel.member_code, p_total_hkd: parseFloat(String($("#aTotal").value).replace(/[^0-9.]/g, "")), p_receipt_no: $("#aNo").value.trim() || null, p_shop: st.shop }, rwQ ? { p_qty: rwQ } : {}));
       const v = r.visit || {}; const okTitle = (v.gold ? t("r_gold_receipt") + (v.gold_reward ? " 🥃 " + t("gold_highball") : "") + " · " : "") + t("r_points", { n: r.points }) + (v.added ? "  ·  " + t("r_stamp") : "") + (v.referral_bonus ? "  ·  👯 +" + v.referral_bonus : "");
+      const rwk = r.roll_week, rwTxt = rwk ? t("s_rw_ok", { item: R.rwName(rwk) + (rwk.qty > 1 ? " ×" + rwk.qty : ""), m: String(+rwk.multiplier).replace(/\.0+$/, ""), n: rwk.points }) : "";
       const okSub = t("s_rate") + " " + mult(r.multiplier) + (r.member.tier && r.multiplier && +r.member.multiplier !== +r.multiplier ? " · " + t("s_now") + " " + tierName(r.member.tier) + " ⬆" : " (" + tierName(r.member.tier) + ")") + " · " + r.member.points + " " + t("s_pts") + " · 🍣 " + r.member.stamps + "/" + r.member.per_plate + (v.plate_full ? " — " + t("r_plate") + (v.reward ? " 🎁 " + (R.lang() === "zh" ? v.reward.name_zh : v.reward.name_en) : "") : v.added ? "" : " — " + t("r_stamp_already"));
-      R.burst(); $("#award").classList.add("hide"); await stayOn(r.member); ok(v.gold ? "✨⁠" : v.plate_full ? "🎉" : "🧾", okTitle, okSub); loadToday(); }
+      R.burst(); $("#award").classList.add("hide"); await stayOn(r.member); ok(v.gold ? "✨⁠" : v.plate_full ? "🎉" : R.coin(true, "rc-ok"), okTitle + (rwTxt ? "  ·  " + rwTxt : ""), okSub); loadToday(); }
     catch (e) { $("#aErr").textContent = e.code === "receipt_already_used" ? t("r_receipt_used") : R.errText(e); $("#aErr").classList.remove("hide"); }
     $("#aGo").disabled = false;
   };
@@ -301,15 +322,15 @@
   const SF = {
     en: { s_newguest: "New guest", s_splits: "Splits", a_bill: "Add bill", a_visit: "Visit", a_redeem: "Redeem", a_stamp: "Stamp",
       rc_title: "Use this reward?", rc_ring: "Ring on POS", rc_then: "Ring it on POS first, then tap Confirm. Confirm also logs it on POS.", rc_go: "Rung on POS · Confirm", rc_cancel: "Cancel",
-      rc_up: "Surprise upgrade from", rc_done: "Redeemed · logged on POS ✓", rc_none: "No rewards ready for this guest", rc_pick: "Which reward?", rc_used: "Already used", rc_pts: "{n} pts were taken when the guest tapped Use",
+      rc_up: "Surprise upgrade from", rc_done: "Redeemed · logged on POS ✓", rc_none: "No rewards ready for this guest", rc_pick: "Which reward?", rc_used: "Already used", rc_pts: "{n} ROLL was taken when the guest tapped Use",
       see_all: "See all ({n})", see_less: "Show less", st_pick: "Stamp", st_food: "Food", st_drinks: "Drinks", chips_k: "Ready to use", aw_for: "for {who}" },
     zh: { s_newguest: "下一位客人", s_splits: "分單", a_bill: "加單", a_visit: "到訪", a_redeem: "兌換", a_stamp: "蓋印",
       rc_title: "用呢個獎賞？", rc_ring: "POS 要打", rc_then: "先喺 POS 打咗，再撳確認。確認同時會記錄已打 POS。", rc_go: "已打 POS · 確認", rc_cancel: "取消",
-      rc_up: "驚喜升級，原本係", rc_done: "已兌換 · 已記錄 POS ✓", rc_none: "呢位客人未有可用獎賞", rc_pick: "邊個獎賞？", rc_used: "已經用咗", rc_pts: "客人撳「使用」嗰陣已扣 {n} 分",
+      rc_up: "驚喜升級，原本係", rc_done: "已兌換 · 已記錄 POS ✓", rc_none: "呢位客人未有可用獎賞", rc_pick: "邊個獎賞？", rc_used: "已經用咗", rc_pts: "客人撳「使用」嗰陣已扣 {n} 卷幣",
       see_all: "睇晒全部（{n}）", see_less: "收起", st_pick: "蓋印", st_food: "食物", st_drinks: "飲品", chips_k: "可以用", aw_for: "客人：{who}" },
     zhs: { s_newguest: "下一位客人", s_splits: "分单", a_bill: "加单", a_visit: "到访", a_redeem: "兑换", a_stamp: "盖印",
       rc_title: "使用这个奖赏？", rc_ring: "POS 要打", rc_then: "先在 POS 打好，再点确认。确认同时会记录已打 POS。", rc_go: "已打 POS · 确认", rc_cancel: "取消",
-      rc_up: "惊喜升级，原本是", rc_done: "已兑换 · 已记录 POS ✓", rc_none: "这位客人还没有可用奖赏", rc_pick: "哪个奖赏？", rc_used: "已经用过", rc_pts: "客人点“使用”时已扣 {n} 分",
+      rc_up: "惊喜升级，原本是", rc_done: "已兑换 · 已记录 POS ✓", rc_none: "这位客人还没有可用奖赏", rc_pick: "哪个奖赏？", rc_used: "已经用过", rc_pts: "客人点“使用”时已扣 {n} 卷币",
       see_all: "查看全部（{n}）", see_less: "收起", st_pick: "盖印", st_food: "食物", st_drinks: "饮品", chips_k: "可以用", aw_for: "客人：{who}" }
   };
   const tf = (k, v) => { const L0 = R.lang() === "zh" ? (R.hans && R.hans() ? SF.zhs : SF.zh) : SF.en; let s = (L0[k] != null ? L0[k] : SF.en[k]) || k; if (v) for (const x in v) s = s.split("{" + x + "}").join(v[x]); return s; };
@@ -534,7 +555,7 @@
       window.__ppCard = sample.pp; sample = null;
     };
     const vis = (...sels) => () => { for (const s of sels) { const x = typeof s === "function" ? s() : $(s); if (x && x.offsetParent) return x; } return null; };
-    R.tour("staff_f38", [
+    R.tour("staff_f39", [
       { before: clearSample, el: () => $("#padCol") && $("#padCol").offsetParent ? $("#disp") : $("#disp"),
         en: "Find a guest: type their phone number, or tap Scan QR and scan the QR on their phone (Show at counter on their Card, or the Me tab).",
         zh: "搵客人：輸入佢電話號碼，或者撳「掃描 QR」掃佢手機上嘅 QR（會員卡嘅「櫃檯出示」或者「我」頁）。",
@@ -544,9 +565,9 @@
         zh: "客人打開之後，底部有動作列：加單、到訪、兌換、蓋印。一直喺手指位，唔使碌。",
         zhs: "客人打开后，底部有操作栏：加单、到访、兑换、盖印。一直在拇指位置，不用滚动。" },
       { before: showSample, el: '#actBar [data-act="bill"]',
-        en: "Add bill: type the total and bill number when a receipt can't be scanned. Visit gives one stamp a day with no bill. Points expire on 31 Dec each year.",
-        zh: "加單：收據掃唔到就輸入總數同單號。到訪：冇單嘅時候每日一個印花。積分每年 12 月 31 日到期。",
-        zhs: "加单：收据扫不到就输入总额和单号。到访：没有账单时每天一个印花。积分每年 12 月 31 日到期。" },
+        en: "Add bill: type the total and bill number when a receipt can't be scanned. If the ROLL of the week is on the bill, tick it and say how many: that part earns 2x. Visit gives one stamp a day with no bill.",
+        zh: "加單：收據掃唔到就輸入總數同單號。單上有本週卷幣嗰樣嘢，就剔埋同揀數量：嗰部分賺雙倍。到訪：冇單嘅時候每日一個印花。",
+        zhs: "加单：收据扫不到就输入总额和单号。账单上有本周卷币那一样，就勾选并选数量：那部分赚双倍。到访：没有账单时每天一个印花。" },
       { before: showSample, el: () => $(".rchips") || $('#actBar [data-act="redeem"]'),
         en: "Redeem: tap the guest's reward, ring it on POS, then Confirm. Confirm also logs it on POS. Guest showing a reward QR? Scan it, then Confirm.",
         zh: "兌換：撳客人嘅獎賞，喺 POS 打咗，再撳確認。確認同時記錄已打 POS。客人出示獎賞 QR？掃完再確認。",

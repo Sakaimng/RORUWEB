@@ -184,9 +184,9 @@
         return badge(CL(bd), got >= its.length ? W("Tried every " + lb[0].toLowerCase(), "全部" + lb[1] + "試齊", lb[2] + "全部尝遍") : W("Try every " + lb[0].toLowerCase(), "試齊所有" + lb[1], "尝遍所有" + lb[2]), got, its.length, botIcon(c)); }).join("") +
       badge(W("Full cellar", "酒窖全開", "酒窖全开"), allDiff ? W("Every bottle on the list", "酒牌上每支都試齊", "酒单上每瓶都尝过") : W("Every bottle on the list", "試齊酒牌上每一支", "尝遍酒单上每一瓶"), d.different, d.total, BOT_WINE);
     // f37 (Dominic): the sharing rule, word for word in all three languages; the logic is unchanged (the scanner gets the bottles, split shares never stamp)
-    const shareRule = W("Sharing a bill? Bottle stamps go to whoever scans the receipt. Splitting the bill shares the points, not the bottle stamps. Max " + d.max_per_bill + " bottle stamps per bill.",
-      "同枱夾單？酒樽印花歸掃描收據嗰位。分單只會分積分，唔會分酒樽印花。每張單最多" + d.max_per_bill + "個酒樽印花。",
-      "同桌分单？酒瓶印花归扫描收据的人。分单只分积分，不分酒瓶印花。每张单最多" + d.max_per_bill + "个酒瓶印花。");
+    const shareRule = W("Sharing a bill? Bottle stamps go to whoever scans the receipt. Splitting the bill shares the ROLL, not the bottle stamps. Max " + d.max_per_bill + " bottle stamps per bill.",
+      "同枱夾單？酒樽印花歸掃描收據嗰位。分單只會分卷幣，唔會分酒樽印花。每張單最多" + d.max_per_bill + "個酒樽印花。",
+      "同桌分单？酒瓶印花归扫描收据的人。分单只分卷币，不分酒瓶印花。每张单最多" + d.max_per_bill + "个酒瓶印花。");
     const how = !z ? ["Every bottle you pay for counts. Scan your receipt and it stamps itself. Glasses don't count.", "One stamp for each different bottle; ordering a favourite again still counts toward the rewards.", "Rewards at 3, 6 and 10 bottles, once each a quarter. Show staff before you pay.", shareRule, "Receipt won't read? Staff can stamp it on the iPad.", QRULE()]
       : hans() ? ["每瓶付费的酒（整瓶）都算：扫描收据就会自动盖印。杯装不算。", "每款不同的酒一个印花；同一款再点也会计入奖赏进度。", "奖赏：3 瓶、6 瓶、10 瓶，每季每项兑换一次，结账前出示给店员。", shareRule, "收据读不到？请店员帮你在 iPad 上盖印。", QRULE()]
       : ["每支付咗錢嘅酒（整支）都計：掃描收據就自動蓋印。杯裝唔計。", "每款唔同嘅酒一個印花；同一款再叫都計入獎賞進度。", "獎賞：3 支、6 支、10 支，每季每樣換一次，埋單前俾店員睇。", shareRule, "收據讀唔到？叫店員幫你喺 iPad 蓋。", QRULE()];
@@ -262,9 +262,9 @@
     const nm = /\p{L}/u.test(c.name || "") ? c.name : W("this guest", "呢位客人");
     const cats = [...new Set(d.bottles.map(b => b.cat))];
     const ov = sheet('<div class="pp-sh-h"><button class="pp-x" data-x aria-label="Close">‹</button><div><h2>' + W("Stamp bottles", "蓋酒瓶印花") + '</h2><small>' + esc(nm) + " · " + W(d.count + " bottles so far", "暫時 " + d.count + " 支", "目前 " + d.count + " 瓶") + "</small></div></div>" +
-      '<p class="pp-rule">' + W("Tap + for each <b>bottle</b> on this guest's bill (not glasses). Sharing a bill? Bottle stamps go to whoever scans the receipt. Splitting the bill shares the points, not the bottle stamps. Max <b>" + max + "</b> bottle stamps per bill.",
-        "喺呢位客人張單上面每支<b>整支酒</b>撳一下 +（杯裝唔計）。同枱夾單？酒樽印花歸掃描收據嗰位。分單只會分積分，唔會分酒樽印花。每張單最多<b>" + max + "</b>個酒樽印花。",
-        "在这位客人的账单上，每瓶<b>整瓶酒</b>按一下 +（杯装不算）。同桌分单？酒瓶印花归扫描收据的人。分单只分积分，不分酒瓶印花。每张单最多<b>" + max + "</b>个酒瓶印花。") + "</p>" +
+      '<p class="pp-rule">' + W("Tap + for each <b>bottle</b> on this guest's bill (not glasses). Sharing a bill? Bottle stamps go to whoever scans the receipt. Splitting the bill shares the ROLL, not the bottle stamps. Max <b>" + max + "</b> bottle stamps per bill.",
+        "喺呢位客人張單上面每支<b>整支酒</b>撳一下 +（杯裝唔計）。同枱夾單？酒樽印花歸掃描收據嗰位。分單只會分卷幣，唔會分酒樽印花。每張單最多<b>" + max + "</b>個酒樽印花。",
+        "在这位客人的账单上，每瓶<b>整瓶酒</b>按一下 +（杯装不算）。同桌分单？酒瓶印花归扫描收据的人。分单只分卷币，不分酒瓶印花。每张单最多<b>" + max + "</b>个酒瓶印花。") + "</p>" +
       '<label class="pp-bill"><span>' + W("Bill no. (optional)", "單號（可以留空）", "单号（可留空）") + '</span><input id="dkBill" autocomplete="off" autocapitalize="characters" placeholder="e.g. A-001238"></label>' +
       cats.map(ct => '<h3>' + W((DCAT[ct] || DCAT.other)[0] + " · " + (DCAT[ct] || DCAT.other)[1], (DCAT[ct] || DCAT.other)[1] + " · " + (DCAT[ct] || DCAT.other)[0], (DCAT[ct] || DCAT.other)[2] + " · " + (DCAT[ct] || DCAT.other)[0]) + '</h3><div class="pp-pick dk-pick">' + d.bottles.filter(b => b.cat === ct).map(b =>
         '<div class="pp-pk dk-pk" data-id="' + b.id + '"><span class="pp-pk-ic dk-pk-ic">' + botIcon(ct) + '</span><span class="pp-pk-t"><b>' + esc(zh() ? b.zh : b.en) + "</b><small>" + (b.price ? "HK$" + Math.round(+b.price) + (b.note ? " · " + esc(b.note) : "") + " · " : "") + (b.n ? W("had " + b.n + " this quarter", "今季飲過 " + b.n + " 支", "本季已点 " + b.n + " 瓶") : W("new for this guest", "第一次")) + '</small></span><span class="dk-step"><button type="button" class="dk-minus" aria-label="−">−</button><b>0</b><button type="button" class="dk-plus" aria-label="+">+</button></span></div>').join("") + "</div>").join("") +
@@ -445,7 +445,7 @@
           return top && avg ? '<div class="dk-tot"><b>' + (tot / (top * avg) * 100).toFixed(1) + '%</b><span>All ' + rs.length + " rewards together (" + money(tot) + ") for a guest who reaches " + top + " bottles, against " + top + " average bottles (" + money(Math.round(top * avg)) + ", before service charge)</span></div>" : ""; })() +
         (d.rewards || []).map(r => '<div class="pp-orow"><span><b>' + r.n + " bottles:</b> " + esc(r.en) + "<br><small>" + esc(r.cost_note || "") + "</small></span><b>" + money(r.cost) + ' <small>' + pct(r.cost, r.n, cheapest) + " min · " + pct(r.cost, r.n, avg) + " typical</small></b></div>").join("") +
       "</div></div>" +
-      '<p class="pp-osub" style="margin-top:10px">How bottles get stamped: the receipt scan reads bottle lines and checks the price, so a HK$88 glass of Pessegueiro or an HK$80 glass of Heavensake never counts but the bottle does; a line like "2 Sari Black" stamps 2. Staff can tap bottles on the iPad with "Stamp bottles". Sharing a bill? Bottle stamps go to whoever scans the receipt. Splitting the bill shares the points, not the bottle stamps. Max ' + d.max_per_bill + " bottle stamps per bill. Rewards are marked used by staff; every stamp, reward and undo is in Staff &amp; PINs → activity.</p>";
+      '<p class="pp-osub" style="margin-top:10px">How bottles get stamped: the receipt scan reads bottle lines and checks the price, so a HK$88 glass of Pessegueiro or an HK$80 glass of Heavensake never counts but the bottle does; a line like "2 Sari Black" stamps 2. Staff can tap bottles on the iPad with "Stamp bottles". Sharing a bill? Bottle stamps go to whoever scans the receipt. Splitting the bill shares the ROLL, not the bottle stamps. Max ' + d.max_per_bill + " bottle stamps per bill. Rewards are marked used by staff; every stamp, reward and undo is in Staff &amp; PINs → activity.</p>";
     v.appendChild(el);
     $("#dkEdit").onclick = ownerDrinksEdit;
   }

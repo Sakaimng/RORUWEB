@@ -99,7 +99,7 @@
     let h = "";
     if (d.today && d.today.roru_day) {
       h += '<div class="sc-day"><div class="sc-day-h">' + pic("handroll", "sc-day-ic") + "<div><b>" + W("Tonight is Roru Day", "今晚係 Roru Day") + "</b><small>" + W("Members' first drink is on us: any drink except draft sake.", "會員第一杯飲品我們請：除咗生清酒，任何飲品都得。") + "</small></div></div>" +
-        '<p>' + W("Spend " + money(d.min_bill) + " or more, then scan your receipt here: your scratch card comes by itself. Gold receipt tonight? A 2nd free drink plus 2x points.", "消費滿 " + money(d.min_bill) + "，埋單後喺度掃描收據，刮刮卡自動送到。今晚拎到金色收據？再送多一杯飲品，仲有雙倍積分。") + "</p></div>";
+        '<p>' + W("Spend " + money(d.min_bill) + " or more, then scan your receipt here: your scratch card comes by itself. Gold receipt tonight? A 2nd free drink plus 2x ROLL.", "消費滿 " + money(d.min_bill) + "，埋單後喺度掃描收據，刮刮卡自動送到。今晚拎到金色收據？再送多一杯飲品，仲有雙倍卷幣。") + "</p></div>";
     } else if (d.next_day && !nw.length && !open.length) {
       h += '<div class="sc-next">' + TICKET + "<span>" + W("Next Roru Day: <b>" + fmtD(d.next_day, false, true) + "</b>. First drink on us, and scan a receipt of " + money(d.min_bill) + " or more for a scratch card.", "下一個 Roru Day：<b>" + fmtD(d.next_day, true, true) + "</b>。第一杯飲品我們請，掃描滿 " + money(d.min_bill) + " 嘅收據仲有刮刮卡。") + "</span></div>";
     }
@@ -268,7 +268,7 @@
     }).join("");
     return '<div class="sc-st-h">' + TICKET + '<div class="sc-st-t"><b>' + W("Roru Day scratch card", "Roru Day 刮刮卡") + "</b><small>" + sub + "</small></div>" +
       "</div>" +
-      (t.roru_day ? '<div class="sc-st-note">' + W("Tonight: members' first drink is free (any drink except draft sake). Gold receipt = a 2nd free drink + 2x points.", "今晚：會員第一杯飲品免費（生清酒除外）。金色收據 = 第二杯免費 + 雙倍積分。") + "</div>" : "") + rows +
+      (t.roru_day ? '<div class="sc-st-note">' + W("Tonight: members' first drink is free (any drink except draft sake). Gold receipt = a 2nd free drink + 2x ROLL.", "今晚：會員第一杯飲品免費（生清酒除外）。金色收據 = 第二杯免費 + 雙倍卷幣。") + "</div>" : "") + rows +
       (live ? '<div class="sc-st-fb"><span>' + W("Receipt scan didn't work?", "掃唔到收據？") + '</span><button class="btn ghost sm" type="button" data-scgive>' + W("Give by hand (manager)", "人手派（經理）") + "</button></div>" : "");
   }
   function staffPaint() {
@@ -337,7 +337,7 @@
       const rv = e.target.closest(".sc-st [data-screveal]"); if (rv) return simpleCall("staff_scratch_reveal", +rv.dataset.screveal, rv, W("Revealed ✓", "已揭曉 ✓"));
       const us = e.target.closest(".sc-st [data-scuse]"); if (us) return simpleCall("staff_scratch_use", +us.dataset.scuse, us, W("Marked used ✓", "已標記用咗 ✓"));
       const uu = e.target.closest(".sc-st [data-scuseundo]"); if (uu) return undoCall("staff_scratch_use_undo", { p_card_id: +uu.dataset.scuseundo }, uu);
-      const ud = e.target.closest(".sc-st [data-scundo]"); if (ud) { if (!confirm(W("Cancel this scratch card? Any points or stamp it gave come back off.", "取消呢張刮刮卡？佢俾嘅積分或者印花會扣返。"))) return; return undoCall("staff_scratch_undo", { p_card_id: +ud.dataset.scundo }, ud); }
+      const ud = e.target.closest(".sc-st [data-scundo]"); if (ud) { if (!confirm(W("Cancel this scratch card? Any ROLL or stamp it gave come back off.", "取消呢張刮刮卡？佢俾嘅卷幣或者印花會扣返。"))) return; return undoCall("staff_scratch_undo", { p_card_id: +ud.dataset.scundo }, ud); }
     });
   }
 
@@ -380,11 +380,11 @@
           '<div class="pp-orow"><span>Cards per bill</span><b>1, for the person who paid · 1 per guest a night</b></div>' +
           '<div class="pp-orow"><span>Prize valid for</span><b>' + d.valid_days + " days, Mon–Wed</b></div>" +
           '<div class="pp-orow"><span>Free first drink</span><b>Any drink except draft sake</b></div>' +
-          '<div class="pp-orow"><span>Gold receipt</span><b>1 in 20 · 2x points + a free drink</b></div>' +
+          '<div class="pp-orow"><span>Gold receipt</span><b>1 in 20 · 2x ROLL + a free drink</b></div>' +
           srcHtml() +
           '<h2 style="margin-top:18px">Roru Days</h2><p class="pp-osub">One a month, Mon to Wed. Each uses one prize set.</p>' + (dayRows || '<p class="pp-osub">None yet.</p>') + "</div></div>" +
       '<details class="pp-ocard pp-oall"><summary>Prize sets and odds</summary><div class="sc-sets">' + d.sets.map(setCard).join("") + "</div></details>" +
-      '<p class="pp-osub" style="margin-top:10px">Costs are ingredient cost from the October cost sheet. +88 points and the extra visit stamp cost nothing on the night and go onto the guest\'s card by themselves. Guests never see the odds.</p>';
+      '<p class="pp-osub" style="margin-top:10px">Costs are ingredient cost from the October cost sheet. +88 ROLL and the extra visit stamp cost nothing on the night and go onto the guest\'s card by themselves. Guests never see the odds.</p>';
     $("#scEdit").onclick = ownerEdit;
   }
   function srcHtml() {

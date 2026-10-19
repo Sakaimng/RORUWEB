@@ -8,13 +8,13 @@
 <title data-tt="{prog} — RORUBARU">High Rollers — RORUBARU</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f38b">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f38b">
-<link rel="stylesheet" href="/loyalty/scratch.css?v=f38b">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f39">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f39">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f39">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f38b"></script>
-<script src="/loyalty/passport.js?v=f38b"></script>
-<script src="/loyalty/scratch.js?v=f38b"></script>
+<script src="/loyalty/loyalty.js?v=f39"></script>
+<script src="/loyalty/passport.js?v=f39"></script>
+<script src="/loyalty/scratch.js?v=f39"></script>
 </head>
 <body>
 <div class="wrap" id="app" style="visibility:hidden">
@@ -66,7 +66,7 @@
     <div data-tab="card" id="actBanner" class="act-banner hide" role="status"></div>
     <div data-tab="card" class="perkhero t-nori" id="perkHero"></div>
     <div data-tab="card" class="card c-pts" id="ptsCard">
-      <div class="c-pts-l"><div class="c-k" data-t="your_points"></div><div class="c-num" id="pts">0</div></div>
+      <div class="c-pts-l"><div class="c-k" data-t="your_points"></div><div class="c-num"><span id="ptsCoin"></span><span id="pts">0</span></div><button type="button" class="rw-chip hide" id="rwChip"></button></div>
       <div class="c-pts-r"><div class="c-exp hide" id="ptsExp"></div><div class="notice hide" id="pendingNote"></div></div>
     </div>
     <button data-tab="card" type="button" class="card c-visits" id="visitRow" aria-haspopup="dialog">
@@ -258,31 +258,31 @@
     const zh = R.lang() === "zh";
     // f38: 7 steps, one per place in the new layout (Card, points, visits, scan + split, Passport, Rewards, Me). EN / 繁中 / 简中.
     const shown = (el) => el && el.getClientRects().length && !el.closest(".hide") ? el : null;
-    R.tour("guest_f38", [
+    R.tour("guest_f39", [
       { before: () => setTab("card"), el: () => shown($("#perkHero")),
         en: "This is your card: your level and today's perks. Tap “Show at counter” and staff scan your QR.",
         zh: "呢張係你嘅會員卡：等級同今日著數。撳「櫃檯出示」，店員就掃你個 QR。",
         zhs: "这是你的会员卡：等级和今天的优惠。点“柜台出示”，店员就会扫你的二维码。" },
       { before: () => setTab("card"), el: () => shown($("#ptsCard")),
-        en: "Your points. Every HK$1 you spend earns points. Points expire on 31 Dec each year.",
-        zh: "你嘅積分。每消費 HK$1 都有積分。積分每年 12 月 31 日到期。",
-        zhs: "你的积分。每消费 HK$1 都有积分。积分每年 12 月 31 日到期。" },
+        en: "Your ROLL, our house token. Every HK$1 you spend earns ROLL and the coin spins when they land. ROLL expires on 31 Dec each year. The gold chip is the ROLL of the week: order that item for 2x.",
+        zh: "你嘅卷幣，RORUBARU 嘅專屬代幣。每消費 HK$1 都有卷幣，入賬時金幣會轉。卷幣每年 12 月 31 日到期。金色標籤係本週卷幣：叫嗰樣賺雙倍。",
+        zhs: "你的卷币，RORUBARU 的专属代币。每消费 HK$1 都有卷币，入账时金币会转。卷币每年 12 月 31 日到期。金色标签是本周卷币：点那一样赚双倍。" },
       { before: () => setTab("card"), el: () => shown($("#visitRow")),
         en: "Visits: one stamp per visit. 5 stamps = a free hand roll, any roll, Wagyu included. Tap the row to see your plate.",
         zh: "到訪：每次嚟一個印花。集 5 個 = 免費手卷一條，任揀，和牛都得。撳一下睇你隻碟。",
         zhs: "到访：每次来一个印花。集 5 个 = 免费手卷一条，任选，和牛也可以。点一下看你的碟子。" },
       { before: () => setTab("card"), el: () => shown($("#scanCard")),
-        en: "After you pay, scan your receipt here. Each receipt scans once. Eating with members? Split it with 2 to 6 people and everyone gets equal points.",
-        zh: "埋單後喺度掃描收據，每張只可以掃一次。同會員朋友一齊食？可以 2 至 6 人分單，人人攞一樣嘅積分。",
-        zhs: "结账后在这里扫描收据，每张只能扫一次。和会员朋友一起吃？可以 2 到 6 人分单，每人得到一样的积分。" },
+        en: "After you pay, scan your receipt here. Each receipt scans once. Eating with members? Split it with 2 to 6 people and everyone gets equal ROLL.",
+        zh: "埋單後喺度掃描收據，每張只可以掃一次。同會員朋友一齊食？可以 2 至 6 人分單，人人攞一樣嘅卷幣。",
+        zhs: "结账后在这里扫描收据，每张只能扫一次。和会员朋友一起吃？可以 2 到 6 人分单，每人得到一样的卷币。" },
       { before: () => setTab("passport"), el: () => shown(document.querySelector("#ppSec .pp-tog")) || shown(document.querySelector("#ppSec .pp-hero")) || $('#tabBar [data-tab="passport"]'),
         en: "Passport: switch between Food and Drinks. A stamp for every new dish and bottle unlocks free food and drinks. Q4 ends 31 Dec, then stamps start again.",
         zh: "護照：可以轉食物或者飲品。每款新菜式同新酒都有印花，集夠換免費嘢食同飲品。第四季 12 月 31 日完，之後印花重新開始。",
         zhs: "护照：可以切换食物或饮品。每款新菜和新酒都有印花，集够换免费食物和饮品。第四季 12 月 31 日结束，之后印花重新开始。" },
       { before: () => setTab("rewards"), el: () => shown($("#readySec")) || $('#tabBar [data-tab="rewards"]'),
-        en: "Rewards: anything ready to use is at the top. Below: use your points, your level, and ways to earn more.",
-        zh: "獎賞：可以用嘅嘢喺最頂。下面係用積分換、你嘅等級，同埋賺多啲嘅方法。",
-        zhs: "奖赏：可以用的放在最上面。下面是用积分兑换、你的等级，以及赚更多的方法。" },
+        en: "Rewards: anything ready to use is at the top. Below: use your ROLL, your level, and ways to earn more.",
+        zh: "獎賞：可以用嘅嘢喺最頂。下面係用卷幣換、你嘅等級，同埋賺多啲嘅方法。",
+        zhs: "奖赏：可以用的放在最上面。下面是用卷币兑换、你的等级，以及赚更多的方法。" },
       { before: () => setTab("me"), el: () => shown($("#meQr")) || $('#tabBar [data-tab="me"]'),
         en: "Me: your QR, your history (splits too), bring a friend, settings, and this guide any time.",
         zh: "我：你嘅 QR、紀錄（包括分單）、帶朋友嚟、設定，隨時可以再睇呢個教學。",
@@ -298,7 +298,7 @@
     const [y, m, dd] = String(d).split("-").map(Number), n = Number(points || 0);
     // f38: the number sits right beside it on the Card, so the line only says when they expire
     el.innerHTML = R.lang() === "zh" ? "⏳ " + y + "年" + m + "月" + dd + "日<br>到期"
-      : "⏳ Expire<br>" + dd + " " + ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][m - 1] + " " + y;
+      : "⏳ Expires<br>" + dd + " " + ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][m - 1] + " " + y;
     el.classList.remove("hide");
   }
   $("#howBtn").onclick = () => guestTour(true);
@@ -311,6 +311,20 @@
   document.querySelectorAll("#tabBar button").forEach(b => b.onclick = () => setTab(b.dataset.tab));
   setTab((() => { try { return sessionStorage.getItem("roru_tab"); } catch (e) { return null; } })() || "card", true);
   const state = { token: localStorage.getItem("roru_member_token"), me: null, phone: "", cfg: null, lastPoints: null, lastStamps: null };
+  // f39: ROLL coin next to the balance + ROLL of the week chip (live: realtime, 30 s poll fallback)
+  $("#ptsCoin").innerHTML = R.coin(false);
+  function paintRw(switched) {
+    const d = state.rw, el = $("#rwChip"), escR = (x) => String(x == null ? "" : x).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); if (!el) return;
+    if (!d || !d.on) { el.classList.add("hide"); return; }
+    const zh = R.lang() === "zh", m = String(+d.multiplier).replace(/\.0+$/, "");
+    const txt = t("rw_chip", { item: R.rwName(d), m });
+    const i = txt.indexOf(":") >= 0 ? txt.indexOf(":") : txt.indexOf("：");
+    el.innerHTML = R.coin(!!switched, switched ? "" : "idle") + (i > 0 ? '<span class="rw-t">' + escR(txt.slice(0, i + 1)) + " <b>" + escR(txt.slice(i + 1).trim()) + "</b></span>" : '<span class="rw-t">' + escR(txt) + "</span>");
+    el.classList.remove("hide");
+    el.onclick = () => { R.coinSpin(el.querySelector(".roll-coin")); R.toast(t("rw_info", { item: R.rwName(d), m }), 4500); };
+    if (switched) { R.toast("🎉 " + t("rw_now", { item: R.rwName(d), m }), 3500); setTimeout(() => { const c = el.querySelector(".roll-coin"); if (c) { c.classList.remove("spin"); c.classList.add("idle"); } }, 1100); }
+  }
+  const RW = R.rollWeek((d, switched) => { state.rw = d; paintRw(switched); if (state.me) { try { renderHistory(state.me, R.lang() === "zh"); } catch (e) {} } }, () => state.token);
   R.rpc("family_features").then(fs => { state.features = fs; render(); }).catch(() => {});
   R.rpc("family_config").then(c => { state.cfg = c; if (state.me) render(); if (c.test_mode) { $("#testHint").classList.remove("hide"); $("#testCode").textContent = "135790"; } }).catch(() => {});
 
@@ -586,7 +600,8 @@
     const next = me.ladder.find(l => l.points_cost > me.points) || me.ladder[me.ladder.length - 1];
     if (next) { $("#nextReward").textContent = (me.points >= next.points_cost ? "✓ " : t("need_more", { n: next.points_cost - me.points }) + " → ") + (zh ? next.name_zh : next.name_en); $("#bar").style.width = Math.min(100, 100 * me.points / next.points_cost) + "%"; }
     $("#pendingNote").classList.toggle("hide", !me.pending_receipts); $("#pendingNote").textContent = "⏳ " + t("pending_hint", { n: me.pending_receipts });
-    if (gained) { R.toast(t("added_points", { n: me.points - state.lastPoints }), 2600); R.burst(); }
+    if (gained) { R.toast(t("added_points", { n: me.points - state.lastPoints }), 2600); R.burst(); R.coinSpin($("#ptsCoin .roll-coin")); }
+    paintRw(false);
     state.lastStamps = me.visits_total;
     state.lastPoints = me.points;
     // ladder
@@ -871,42 +886,42 @@
 
   // ===================== f38: new layout helpers (strings, Card banner, visit row, history, sheets, theme) =====================
   const F = {
-    en: { ready_h: "Ready to use", ready_empty: "Nothing ready yet. Codes you unlock and scratch-card prizes show up here.", ladder_h: "Use your points", level_h: "Your level", earn_h: "Ways to earn more",
+    en: { ready_h: "Ready to use", ready_empty: "Nothing ready yet. Codes you unlock and scratch-card prizes show up here.", ladder_h: "Use your ROLL", level_h: "Your level", earn_h: "Ways to earn more",
       qr_h: "My QR", qr_sub: "Show it at the counter", counter_btn: "Show at counter", hist_h: "History", hist_all: "See all ({n})", hist_less: "Show less",
       set_h: "Settings", set_lang: "Language", set_theme: "Theme", th_dark: "Dark", th_light: "Light", help_h: "Help", rules_btn: "Rules & FAQ", close: "Close",
       perks_more: "See every level's perks", perks_less: "Only my level", v_k: "Visits", v_more: "{n} more → {r}", v_soon: "1 more → {r}", v_ready: "{r} unlocked! It's in Rewards",
-      next_k: "Next reward", b_gin1: "{who} wants to split a bill with you", b_ginn: "{n} split requests are waiting for you", b_gin_sub: "Your share {p} pts · tap to answer",
+      next_k: "Next reward", b_gin1: "{who} wants to split a bill with you", b_ginn: "{n} split requests are waiting for you", b_gin_sub: "Your share {p} ROLL · tap to answer",
       b_out: "Your split is waiting on {n} friend(s)", b_out_sub: "Tap to see who has said yes", b_sc: "You've got a scratch card!", b_sc_sub: "Tap to scratch it. Every card wins.",
       b_pz: "Use today: {p}", b_pz_sub: "Your scratch-card prize · show staff", b_rw: "You unlocked {r}!", b_rw_sub: "Tap to scratch and see your code",
       b_roru: "Tonight is Roru Day", b_roru_sub: "Members' first drink is on us (any drink except draft sake)",
       e_gold: "Gold receipt", e_visits: "Visits", e_visits_t: "Every visit adds a stamp. 5 stamps = {r}.", e_pp: "Passport", e_pp_t: "A stamp for every new dish and bottle this quarter. Collect them for free food and drinks.",
       e_days: "Mon–Wed specials", e_friend: "Bring a friend", e_friend_t: "You both get +{n} when their first receipt of {m}+ is approved. Come back within {d} days for +{v} more.",
-      e_friend_t0: "You both get +{n} when their first receipt of {m}+ is approved.", e_go_me: "Your link", e_go_pp: "Open", v2_line: "🎉 Come back within {d} days: +{v} more points.",
-      info_ladder: "How points work", split_req_h: "Split requests", hist_split: "Split {n} ways", hist_you: "You", hist_tap: "Details", hist_none: "No receipts yet. Scan one on the Card tab.", rules_h: "Rules & FAQ" },
-    zh: { ready_h: "可以用", ready_empty: "暫時未有。解鎖咗嘅換領碼同刮刮卡獎品會喺度出現。", ladder_h: "用積分換", level_h: "你嘅等級", earn_h: "賺多啲",
+      e_friend_t0: "You both get +{n} when their first receipt of {m}+ is approved.", e_go_me: "Your link", e_go_pp: "Open", v2_line: "🎉 Come back within {d} days: +{v} more ROLL.",
+      info_ladder: "How ROLL work", split_req_h: "Split requests", hist_split: "Split {n} ways", hist_you: "You", hist_tap: "Details", hist_none: "No receipts yet. Scan one on the Card tab.", rules_h: "Rules & FAQ" },
+    zh: { ready_h: "可以用", ready_empty: "暫時未有。解鎖咗嘅換領碼同刮刮卡獎品會喺度出現。", ladder_h: "用卷幣換", level_h: "你嘅等級", earn_h: "賺多啲",
       qr_h: "我嘅 QR", qr_sub: "喺櫃檯俾店員掃", counter_btn: "櫃檯出示", hist_h: "紀錄", hist_all: "睇晒全部（{n}）", hist_less: "收起",
       set_h: "設定", set_lang: "語言", set_theme: "外觀", th_dark: "深色", th_light: "淺色", help_h: "幫助", rules_btn: "規則同常見問題", close: "關閉",
       perks_more: "睇晒每個等級嘅著數", perks_less: "只睇我嘅等級", v_k: "到訪", v_more: "再 {n} 次 → {r}", v_soon: "再 1 次 → {r}", v_ready: "{r} 已解鎖！喺「獎賞」度",
-      next_k: "下一個獎賞", b_gin1: "{who} 想同你分單", b_ginn: "有 {n} 個分單邀請等緊你", b_gin_sub: "你份 {p} 分 · 撳嚟回覆",
+      next_k: "下一個獎賞", b_gin1: "{who} 想同你分單", b_ginn: "有 {n} 個分單邀請等緊你", b_gin_sub: "你份 {p} 卷幣 · 撳嚟回覆",
       b_out: "你嘅分單仲等緊 {n} 位朋友", b_out_sub: "撳嚟睇邊個已經答應", b_sc: "你有一張刮刮卡！", b_sc_sub: "撳嚟刮開，每張都有獎。",
       b_pz: "今日可以用：{p}", b_pz_sub: "你嘅刮刮卡獎品 · 俾店員睇", b_rw: "你解鎖咗 {r}！", b_rw_sub: "撳嚟刮開睇換領碼",
       b_roru: "今晚係 Roru Day", b_roru_sub: "會員第一杯飲品我哋請（生清酒除外）",
       e_gold: "金色收據", e_visits: "到訪", e_visits_t: "每次到訪加一個印花。集 5 個 = {r}。", e_pp: "護照", e_pp_t: "今季每款新菜式同新酒都有一個印花，集夠換免費嘢食同飲品。",
       e_days: "星期一至三特別優惠", e_friend: "帶朋友嚟", e_friend_t: "朋友第一張 {m} 或以上嘅收據批核後，你哋各自 +{n}。佢 {d} 日內再嚟，再多 +{v}。",
-      e_friend_t0: "朋友第一張 {m} 或以上嘅收據批核後，你哋各自 +{n}。", e_go_me: "你嘅連結", e_go_pp: "打開", v2_line: "🎉 {d} 日內再嚟：再多 +{v} 分。",
-      info_ladder: "積分點運作", split_req_h: "分單邀請", hist_split: "{n} 人分單", hist_you: "你", hist_tap: "詳情", hist_none: "未有收據。喺「會員卡」掃描一張啦。", rules_h: "規則同常見問題" },
-    zhs: { ready_h: "可以使用", ready_empty: "暂时还没有。解锁的兑换码和刮刮卡奖品会显示在这里。", ladder_h: "用积分兑换", level_h: "你的等级", earn_h: "赚更多",
+      e_friend_t0: "朋友第一張 {m} 或以上嘅收據批核後，你哋各自 +{n}。", e_go_me: "你嘅連結", e_go_pp: "打開", v2_line: "🎉 {d} 日內再嚟：再多 +{v} 卷幣。",
+      info_ladder: "卷幣點運作", split_req_h: "分單邀請", hist_split: "{n} 人分單", hist_you: "你", hist_tap: "詳情", hist_none: "未有收據。喺「會員卡」掃描一張啦。", rules_h: "規則同常見問題" },
+    zhs: { ready_h: "可以使用", ready_empty: "暂时还没有。解锁的兑换码和刮刮卡奖品会显示在这里。", ladder_h: "用卷币兑换", level_h: "你的等级", earn_h: "赚更多",
       qr_h: "我的二维码", qr_sub: "在柜台给店员扫", counter_btn: "柜台出示", hist_h: "记录", hist_all: "查看全部（{n}）", hist_less: "收起",
       set_h: "设置", set_lang: "语言", set_theme: "外观", th_dark: "深色", th_light: "浅色", help_h: "帮助", rules_btn: "规则和常见问题", close: "关闭",
       perks_more: "查看每个等级的优惠", perks_less: "只看我的等级", v_k: "到访", v_more: "再 {n} 次 → {r}", v_soon: "再 1 次 → {r}", v_ready: "{r} 已解锁！在“奖赏”里",
-      next_k: "下一个奖赏", b_gin1: "{who} 想和你分单", b_ginn: "有 {n} 个分单邀请在等你", b_gin_sub: "你的份额 {p} 分 · 点击回复",
+      next_k: "下一个奖赏", b_gin1: "{who} 想和你分单", b_ginn: "有 {n} 个分单邀请在等你", b_gin_sub: "你的份额 {p} 卷币 · 点击回复",
       b_out: "你的分单还在等 {n} 位朋友", b_out_sub: "点击查看谁已同意", b_sc: "你有一张刮刮卡！", b_sc_sub: "点击刮开，每张都有奖。",
       b_pz: "今天可用：{p}", b_pz_sub: "你的刮刮卡奖品 · 出示给店员", b_rw: "你解锁了 {r}！", b_rw_sub: "点击刮开查看兑换码",
       b_roru: "今晚是 Roru Day", b_roru_sub: "会员第一杯饮品我们请（生清酒除外）",
       e_gold: "金色收据", e_visits: "到访", e_visits_t: "每次到访加一个印花。集 5 个 = {r}。", e_pp: "护照", e_pp_t: "本季每款新菜和新酒都有一个印花，集够换免费食物和饮品。",
       e_days: "周一至周三特别优惠", e_friend: "带朋友来", e_friend_t: "朋友第一张 {m} 或以上的收据批准后，你们各得 +{n}。对方 {d} 天内再来，再多 +{v}。",
-      e_friend_t0: "朋友第一张 {m} 或以上的收据批准后，你们各得 +{n}。", e_go_me: "你的链接", e_go_pp: "打开", v2_line: "🎉 {d} 天内再来：再多 +{v} 分。",
-      info_ladder: "积分怎么用", split_req_h: "分单邀请", hist_split: "{n} 人分单", hist_you: "你", hist_tap: "详情", hist_none: "还没有收据。在“会员卡”扫描一张吧。", rules_h: "规则和常见问题" }
+      e_friend_t0: "朋友第一张 {m} 或以上的收据批准后，你们各得 +{n}。", e_go_me: "你的链接", e_go_pp: "打开", v2_line: "🎉 {d} 天内再来：再多 +{v} 卷币。",
+      info_ladder: "卷币怎么用", split_req_h: "分单邀请", hist_split: "{n} 人分单", hist_you: "你", hist_tap: "详情", hist_none: "还没有收据。在“会员卡”扫描一张吧。", rules_h: "规则和常见问题" }
   };
   const isHans = () => !!(R.hans && R.hans());
   function tt(k, v) { const L0 = R.lang() === "zh" ? (isHans() ? F.zhs : F.zh) : F.en; let s = (L0 && L0[k] != null) ? L0[k] : (F.en[k] || k);
@@ -990,6 +1005,8 @@
       let h = '<div class="hx-l"><span>' + escR(R.fmtTime ? R.fmtTime(r.at) : R.fmtDay(r.at)) + "</span><span>" + escR(zh ? (r.shop_zh || "") : (r.shop || "")) + "</span></div>" +
         '<div class="hx-l"><span>' + escR(/^STAFF-/.test(r.receipt_no) ? "(staff)" : r.receipt_no) + "</span><span>HK$" + (+r.total_hkd).toFixed(0) + "</span></div>";
       if (r.status === "approved") h += '<div class="hx-l"><span>' + escR(t("points")) + "</span><span>+" + r.points + (r.multiplier && +r.multiplier !== 1 ? " (" + multTxt(r.multiplier) + ")" : "") + (r.stamped ? " · 🍣" : "") + (r.gold ? " · ✨\u2060" : "") + "</span></div>";
+      const rwb = state.rw && (state.rw.mine || []).find(x => +x.receipt_id === +r.id);
+      if (rwb) h += '<div class="hx-l"><span><span class="rw-tag">' + R.coin(false) + escR(t("rw_short", { m: String(+rwb.multiplier).replace(/\.0+$/, "") })) + "</span> " + escR(R.rwName(rwb)) + (rwb.qty > 1 ? " ×" + rwb.qty : "") + "</span><span>+" + rwb.points + "</span></div>";
       if (g) { h += '<div class="hx-sp"><b>🍣🍣 ' + escR(tt("hist_split", { n: g.people })) + " · HK$" + Math.round(g.bill) + "</b>" +
           '<div class="gout-p you"><span>' + escR(tt("hist_you")) + "</span><span><b>" + pts(g.scanner_points) + "</b></span></div>" +
           (g.invites || []).map(i => '<div class="gout-p"><span>' + escR(i.who) + " · " + pts(i.points) + " · HK$" + String(i.hkd).replace(/\.0+$/, "") + "</span><span>" + (i.status === "accepted" ? '<span class="sp-ok">✓ ' + escR(t("gout_yes")) + "</span>" : i.status === "pending" ? '<span class="sp-wait">⏳ ' + escR(t("gout_wait")) + "</span>" : i.status === "declined" ? '<span class="sp-no">✕ ' + escR(t("gout_no")) + "</span>" : i.status === "expired" ? '<span class="sp-no">⌛ ' + escR(t("gout_exp")) + "</span>" : '<span class="sp-no">' + escR(t("gout_cx")) + "</span>") + "</span></div>").join("") + "</div>"; }
@@ -1021,18 +1038,18 @@
   function rulesHtml() {
     const zh = R.lang() === "zh", hs = isHans(), me = state.me || {}, ppd = (state.cfg && state.cfg.points_per_hkd) || me.points_per_hkd || 1, vr = me.visit_reward, rn = vr ? (zh ? vr.name_zh : vr.name_en) : "";
     const Q = zh ? (hs ? [
-      ["积分", "每消费 HK$1 得 " + ppd + " 分（等级越高越多）。积分每年 12 月 31 日到期。"], ["收据", "每张收据只可扫描一次。读不到？请店员帮你加。每天最多 3 张。"],
-      ["分单", "和会员朋友一起吃？2 到 6 人可以分一张单，每人得到一样的积分。朋友在 12 小时内回复。"], ["到访", "每次到访一个印花。集 5 个 = " + rn + "。"],
+      ["卷币", "每消费 HK$1 得 " + ppd + " 卷币（等级越高越多）。卷币每年 12 月 31 日到期。"], ["收据", "每张收据只可扫描一次。读不到？请店员帮你加。每天最多 3 张。"],
+      ["分单", "和会员朋友一起吃？2 到 6 人可以分一张单，每人得到一样的卷币。朋友在 12 小时内回复。"], ["到访", "每次到访一个印花。集 5 个 = " + rn + "。"],
       ["护照", "食物和饮品分开收集。季度结束（第四季：12 月 31 日）后印花重新开始，不会累积。酒瓶印花归扫描收据的人，每张单最多 6 个。"],
-      ["等级", "等级看过去 12 个月的消费，越高每 HK$1 积分越多，优惠越多。"], ["刮刮卡", "Roru Day 扫描 HK$388 或以上的收据，就有刮刮卡，每张都有奖。"]] : [
-      ["積分", "每消費 HK$1 有 " + ppd + " 分（等級越高越多）。積分每年 12 月 31 日到期。"], ["收據", "每張收據只可以掃一次。讀唔到？叫店員幫你加。每日最多 3 張。"],
-      ["分單", "同會員朋友一齊食？2 至 6 人可以分一張單，人人攞一樣嘅積分。朋友要喺 12 個鐘內回覆。"], ["到訪", "每次到訪一個印花。集 5 個 = " + rn + "。"],
+      ["等级", "等级看过去 12 个月的消费，越高每 HK$1 卷币越多，优惠越多。"], ["刮刮卡", "Roru Day 扫描 HK$388 或以上的收据，就有刮刮卡，每张都有奖。"]] : [
+      ["卷幣", "每消費 HK$1 有 " + ppd + " 卷幣（等級越高越多）。卷幣每年 12 月 31 日到期。"], ["收據", "每張收據只可以掃一次。讀唔到？叫店員幫你加。每日最多 3 張。"],
+      ["分單", "同會員朋友一齊食？2 至 6 人可以分一張單，人人攞一樣嘅卷幣。朋友要喺 12 個鐘內回覆。"], ["到訪", "每次到訪一個印花。集 5 個 = " + rn + "。"],
       ["護照", "食物同飲品分開集。季度完咗（第四季：12 月 31 日）印花重新開始，唔會累積。酒樽印花歸掃描收據嗰位，每張單最多 6 個。"],
-      ["等級", "等級睇過去 12 個月嘅消費，越高每 HK$1 積分越多，著數越多。"], ["刮刮卡", "Roru Day 掃描 HK$388 或以上嘅收據，就有刮刮卡，每張都有獎。"]]) : [
-      ["Points", "Every HK$1 earns " + ppd + " point(s), more at higher levels. Points expire on 31 Dec each year."], ["Receipts", "Each receipt scans once. Won't read? Ask staff to add it. Up to 3 a day."],
-      ["Splitting", "Eating with members? Split one bill between 2 and 6 people and everyone gets equal points. Friends answer within 12 hours."], ["Visits", "One stamp per visit. 5 stamps = " + rn + "."],
+      ["等級", "等級睇過去 12 個月嘅消費，越高每 HK$1 卷幣越多，著數越多。"], ["刮刮卡", "Roru Day 掃描 HK$388 或以上嘅收據，就有刮刮卡，每張都有獎。"]]) : [
+      ["ROLL", "Every HK$1 earns " + ppd + " ROLL, more at higher levels. ROLL expires on 31 Dec each year."], ["Receipts", "Each receipt scans once. Won't read? Ask staff to add it. Up to 3 a day."],
+      ["Splitting", "Eating with members? Split one bill between 2 and 6 people and everyone gets equal ROLL. Friends answer within 12 hours."], ["Visits", "One stamp per visit. 5 stamps = " + rn + "."],
       ["Passport", "Food and Drinks are collected separately. When the quarter ends (Q4: 31 Dec) stamps start again; they don't carry over. Bottle stamps go to whoever scans the receipt, max 6 a bill."],
-      ["Levels", "Your level follows what you spent in the last 12 months. Higher levels earn more points per HK$1 and get more perks."], ["Scratch cards", "On Roru Day, scan a receipt of HK$388 or more and you get a scratch card. Every card wins."]];
+      ["Levels", "Your level follows what you spent in the last 12 months. Higher levels earn more ROLL per HK$1 and get more perks."], ["Scratch cards", "On Roru Day, scan a receipt of HK$388 or more and you get a scratch card. Every card wins."]];
     return '<div class="rules">' + Q.map(q => "<details><summary>" + escR(q[0]) + "</summary><p>" + escR(q[1]) + "</p></details>").join("") + "</div>";
   }
   $("#rulesBtn").onclick = () => openSheet(tt("rules_h"), rulesHtml());
@@ -1159,6 +1176,8 @@
           '<button class="btn' + (r.status === "approved" && splitIntent ? " ghost" : "") + '" id="rDone">' + t("r_done") + "</button>";
         const gr = g && r.visit ? r.visit.gold_reward : null; // v48: gold receipt = 2x points + a free highball
         if (gr && r.status === "approved") $("#scanDone").insertAdjacentHTML("afterbegin", '<div class="notice" style="background:linear-gradient(135deg,#f3d27a,#b9862a);color:#0b0d12;font-weight:800">✨⁠🥃 ' + escR(t("gold_won")) + "</div>");
+        const rwk = r.visit && r.visit.roll_week;
+        if (rwk && r.status === "approved") { $("#scanDone").querySelector("h2").insertAdjacentHTML("afterend", '<div class="notice" style="display:flex;align-items:center;gap:8px;font-weight:800;border-color:rgba(232,184,74,.6)">' + R.coin(true) + escR(t("rw_earned", { n: rwk.points, item: R.rwName(rwk) + (rwk.qty > 1 ? " ×" + rwk.qty : ""), m: String(+rwk.multiplier).replace(/\.0+$/, "") })) + "</div>"); RW.refresh(); }
         showScan("scanDone"); $("#rDone").onclick = () => { showScan("scanIdle"); setSplitIntent(false); };
         const sdone = $("#scanDone"), afterSend = () => { showScan("scanIdle"); setSplitIntent(false); };
         wireSplitForm(sdone, afterSend);
