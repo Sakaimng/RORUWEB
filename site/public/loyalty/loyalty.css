@@ -761,7 +761,7 @@ body.g-open #members:has(.member:only-child){margin:0}
 
 main.views .clamp-x.clamp-x.clamp-x{display:none!important}
 
-/* f39 ROLL coin + ROLL of the week */
+/* f39 $RORU coin + $RORU of the week */
 .roll-coin{display:inline-block;width:1em;height:1em;vertical-align:-.14em;perspective:120px;flex:none;line-height:0}
 .roll-coin svg{width:100%;height:100%;display:block;transform-style:preserve-3d;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.35))}
 .roll-coin.spin svg{animation:rollSpin 1s cubic-bezier(.25,.7,.35,1) both}
@@ -819,3 +819,24 @@ html.lt .rw-own,body.thB .rw-own{background:#FFF8E3!important;border-color:#E2B2
 html.lt .rw-it,body.thB .rw-it{border-color:rgba(0,0,0,.12)}
 html.lt .rw-it.on,body.thB .rw-it.on{background:#FFF3CF}
 html.lt .rw-sel,body.thB .rw-sel{background:#FFF8E3}
+
+/* f40 $RORU: unit after the balance, weekly bonus banner under the balance box (styled like the Monday banner) */
+.c-num .c-unit{font-size:17px;font-weight:800;letter-spacing:.01em;color:#E8B84A;margin-left:.32em;vertical-align:.12em}
+body.lt .c-num .c-unit{color:#9A6A00}
+.wk-banner{width:100%;text-align:left;font:inherit;margin:0 0 10px;border-width:1.5px;-webkit-tap-highlight-color:transparent}
+.wk-banner .wk-ic img,.wk-banner .wk-ic .hr-emoji{width:30px;height:30px;display:block}
+.wk-banner small{color:#F3C24F;font-weight:800;opacity:1;font-size:13px}
+body.lt .wk-banner small{color:#9A5A00}
+.wk-banner.wk-new{animation:wkNew .9s ease-out 1}
+@keyframes wkNew{0%{transform:scale(.97);box-shadow:0 0 0 0 rgba(246,69,1,.55)}60%{transform:scale(1.015);box-shadow:0 0 0 8px rgba(246,69,1,0)}100%{transform:none;box-shadow:none}}
+@media (prefers-reduced-motion: reduce){.wk-banner.wk-new{animation:none}}
+
+/* f40: balance row never wraps; the number shrinks to fit (fitPts) instead */
+.card.c-pts .c-pts-l{flex:1;min-width:0}
+.card.c-pts .c-pts-r{flex:none}
+.card.c-pts .c-num{white-space:nowrap}
+.card.c-pts .c-exp{white-space:nowrap}
+.wk-banner{padding:8px 14px}
+.card.c-pts{padding:10px 16px;margin-bottom:8px}
+.card.c-pts .c-num{margin-top:0}
+.wk-banner{padding:7px 14px;margin-bottom:8px}

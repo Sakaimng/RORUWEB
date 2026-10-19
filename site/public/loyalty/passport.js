@@ -10,10 +10,10 @@
   const hkDate = (iso) => { if (!iso) return null; const d = new Date(new Date(iso).getTime() + 8 * 3600e3); return [d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()]; };
   const fmtD = (p, z, short) => p ? (z ? (short ? "" : p[0] + "年") + p[1] + "月" + p[2] + "日" : p[2] + " " + MON[p[1] - 1] + (short ? "" : " " + p[0])) : "";
   const IMG = "/loyalty/img/";
-  const ROLL = '<img class="pp-roll" src="' + IMG + 'handroll_64.png" srcset="' + IMG + 'handroll_64.png 1x, ' + IMG + 'handroll_128.png 2x" alt="">';
+  const $RORU = '<img class="pp-roll" src="' + IMG + 'handroll_64.png" srcset="' + IMG + 'handroll_64.png 1x, ' + IMG + 'handroll_128.png 2x" alt="">';
   const BOWL = '<svg class="pp-svg" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15.5h24c0 6.4-5.4 11.5-12 11.5S4 21.9 4 15.5z"/><path d="M11 27.5h10"/><path d="M11 10.5c0-1.6 1.6-1.6 1.6-3.2S11 5.7 11 4.2M16 10.5c0-1.6 1.6-1.6 1.6-3.2S16 5.7 16 4.2M21 10.5c0-1.6 1.6-1.6 1.6-3.2S21 5.7 21 4.2"/></svg>';
   const SWEET = '<svg class="pp-svg" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 15.5a6.5 6.5 0 0 1 13 0"/><path d="M7 15.5h18l-2.4 11.5H9.4z"/><path d="M13 9.6c1-1.8 3-2.3 4.6-1.4"/></svg>';
-  const icon = (g) => g === "roll" ? ROLL : g === "dessert" ? SWEET : BOWL;
+  const icon = (g) => g === "roll" ? $RORU : g === "dessert" ? SWEET : BOWL;
   const CARD = '<img class="pp-card-ic" src="' + IMG + 'stampcard_64.png" srcset="' + IMG + 'stampcard_64.png 1x, ' + IMG + 'stampcard_128.png 2x" alt="">';
   const GRP = { roll: ["Hand rolls", "手卷"], app: ["Appetisers", "前菜"], dessert: ["Desserts", "甜品"] };
   const hans = () => !!(R.hans && R.hans());
@@ -80,7 +80,7 @@
       const t = fresh[fresh.length - 1];
       if (R.burst) R.burst(["#F64501", "#E8B84A", "#F6F3E7"]);
       const ov = document.createElement("div"); ov.className = "pp-cele"; ov.setAttribute("role", "dialog");
-      ov.innerHTML = '<div class="pp-cele-c"><div class="pp-cele-art">' + (kind === "drinks" ? (t.n >= 10 ? BOT_WINE : t.n >= 6 ? SAKE_IMG : HIGHBALL) : (t.n >= 20 ? CARD : t.n >= 10 ? ROLL : SWEET)) + '</div><div class="pp-cele-k">' + (z ? (hans() ? "已解锁！" : "解鎖咗！") : "Unlocked!") + "</div><h2>" + esc(z ? ((hans() && t.zhs) || t.zh || t.en) : t.en) + "</h2><p>" +
+      ov.innerHTML = '<div class="pp-cele-c"><div class="pp-cele-art">' + (kind === "drinks" ? (t.n >= 10 ? BOT_WINE : t.n >= 6 ? SAKE_IMG : HIGHBALL) : (t.n >= 20 ? CARD : t.n >= 10 ? $RORU : SWEET)) + '</div><div class="pp-cele-k">' + (z ? (hans() ? "已解锁！" : "解鎖咗！") : "Unlocked!") + "</div><h2>" + esc(z ? ((hans() && t.zhs) || t.zh || t.en) : t.en) + "</h2><p>" +
         (kind === "drinks" ? (z ? (hans() ? t.n + " 瓶已达成。结账前出示给店员即可兑换。" : t.n + " 支酒達成。埋單前俾店員睇就換到。") : t.n + " bottles down. Show staff before you pay to claim it.") : (z ? (hans() ? t.n + " 个印花已集齐。出示给店员即可兑换。" : t.n + " 個印花達成。俾店員睇就換到。") : t.n + " stamps collected. Show staff to claim it.")) +
         '</p><button class="btn" type="button" data-x>' + (z ? "正！" : "Nice one") + "</button></div>";
       ov.addEventListener("click", (e) => { if (e.target === ov || e.target.closest("[data-x]")) ov.remove(); });
@@ -123,7 +123,7 @@
       const right = st === "used" ? '<span class="pp-pz-s used">' + W("Enjoyed ✓ ", "已享用 ✓ ") + fmtD(hkDate(t.used_at), z, true) + "</span>"
         : st === "ready" ? '<span class="pp-pz-s ready">' + W("Ready! Show staff", "可以換！俾店員睇") + "</span>"
         : '<span class="pp-pz-s">' + W(left + " to go", "仲差 " + left + " 個") + "</span>";
-      const art = t.n >= p.total ? CARD : t.n >= 10 ? ROLL : SWEET;
+      const art = t.n >= p.total ? CARD : t.n >= 10 ? $RORU : SWEET;
       return '<div class="pp-pz ' + st + '"><div class="pp-pz-n"><b>' + t.n + "</b><small>" + W("stamps", "印花") + '</small></div><div class="pp-pz-art">' + art + '</div><div class="pp-pz-t"><b>' + esc(z ? (t.zh || t.en) : t.en) + "</b>" + (z ? "<small>" + esc(t.en) + "</small>" : (t.zh ? "<small>" + esc(t.zh) + "</small>" : "")) + "</div>" + right + "</div>";
     }).join("");
     const groups = ["roll", "app", "dessert"].map(g => {
@@ -148,7 +148,7 @@
       '<div class="card pp-how"><h2>' + W("How stamps work", "點樣蓋印花") + "</h2><ul>" + how.map(h => "<li>" + esc(h) + "</li>").join("") + "</ul></div>";
     const dk = G.drinks && G.drinks.on ? G.drinks : null;
     if (!dk && G.mode === "drinks") G.mode = "food";
-    const tog = dk ? '<div class="pp-tog" role="tablist" aria-label="' + W("Passport", "護照") + '"><button type="button" role="tab" data-ppmode="food" aria-selected="' + (G.mode === "food") + '" class="' + (G.mode === "food" ? "on" : "") + '">' + ROLL + "<span>" + W("Food", "食物") + "</span><em>" + p.count + "/" + p.total + "</em></button>" +
+    const tog = dk ? '<div class="pp-tog" role="tablist" aria-label="' + W("Passport", "護照") + '"><button type="button" role="tab" data-ppmode="food" aria-selected="' + (G.mode === "food") + '" class="' + (G.mode === "food" ? "on" : "") + '">' + $RORU + "<span>" + W("Food", "食物") + "</span><em>" + p.count + "/" + p.total + "</em></button>" +
       '<button type="button" role="tab" data-ppmode="drinks" aria-selected="' + (G.mode === "drinks") + '" class="' + (G.mode === "drinks" ? "on" : "") + '">' + BOT_SAKE + "<span>" + W("Drinks", "飲品") + "</span><em>" + dk.count + "</em></button></div>" : "";
     sec.innerHTML = tog + (G.mode === "drinks" && dk ? drinksHtml(dk, z) : foodHtml);
     // f38: the rules sit behind the ⓘ on the passport card (same text, opens as a sheet)
@@ -184,9 +184,9 @@
         return badge(CL(bd), got >= its.length ? W("Tried every " + lb[0].toLowerCase(), "全部" + lb[1] + "試齊", lb[2] + "全部尝遍") : W("Try every " + lb[0].toLowerCase(), "試齊所有" + lb[1], "尝遍所有" + lb[2]), got, its.length, botIcon(c)); }).join("") +
       badge(W("Full cellar", "酒窖全開", "酒窖全开"), allDiff ? W("Every bottle on the list", "酒牌上每支都試齊", "酒单上每瓶都尝过") : W("Every bottle on the list", "試齊酒牌上每一支", "尝遍酒单上每一瓶"), d.different, d.total, BOT_WINE);
     // f37 (Dominic): the sharing rule, word for word in all three languages; the logic is unchanged (the scanner gets the bottles, split shares never stamp)
-    const shareRule = W("Sharing a bill? Bottle stamps go to whoever scans the receipt. Splitting the bill shares the ROLL, not the bottle stamps. Max " + d.max_per_bill + " bottle stamps per bill.",
-      "同枱夾單？酒樽印花歸掃描收據嗰位。分單只會分卷幣，唔會分酒樽印花。每張單最多" + d.max_per_bill + "個酒樽印花。",
-      "同桌分单？酒瓶印花归扫描收据的人。分单只分卷币，不分酒瓶印花。每张单最多" + d.max_per_bill + "个酒瓶印花。");
+    const shareRule = W("Sharing a bill? Bottle stamps go to whoever scans the receipt. Splitting the bill shares the $RORU, not the bottle stamps. Max " + d.max_per_bill + " bottle stamps per bill.",
+      "同枱夾單？酒樽印花歸掃描收據嗰位。分單只會分 RORU幣，唔會分酒樽印花。每張單最多" + d.max_per_bill + "個酒樽印花。",
+      "同桌分单？酒瓶印花归扫描收据的人。分单只分 RORU币，不分酒瓶印花。每张单最多" + d.max_per_bill + "个酒瓶印花。");
     const how = !z ? ["Every bottle you pay for counts. Scan your receipt and it stamps itself. Glasses don't count.", "One stamp for each different bottle; ordering a favourite again still counts toward the rewards.", "Rewards at 3, 6 and 10 bottles, once each a quarter. Show staff before you pay.", shareRule, "Receipt won't read? Staff can stamp it on the iPad.", QRULE()]
       : hans() ? ["每瓶付费的酒（整瓶）都算：扫描收据就会自动盖印。杯装不算。", "每款不同的酒一个印花；同一款再点也会计入奖赏进度。", "奖赏：3 瓶、6 瓶、10 瓶，每季每项兑换一次，结账前出示给店员。", shareRule, "收据读不到？请店员帮你在 iPad 上盖印。", QRULE()]
       : ["每支付咗錢嘅酒（整支）都計：掃描收據就自動蓋印。杯裝唔計。", "每款唔同嘅酒一個印花；同一款再叫都計入獎賞進度。", "獎賞：3 支、6 支、10 支，每季每樣換一次，埋單前俾店員睇。", shareRule, "收據讀唔到？叫店員幫你喺 iPad 蓋。", QRULE()];
@@ -262,9 +262,9 @@
     const nm = /\p{L}/u.test(c.name || "") ? c.name : W("this guest", "呢位客人");
     const cats = [...new Set(d.bottles.map(b => b.cat))];
     const ov = sheet('<div class="pp-sh-h"><button class="pp-x" data-x aria-label="Close">‹</button><div><h2>' + W("Stamp bottles", "蓋酒瓶印花") + '</h2><small>' + esc(nm) + " · " + W(d.count + " bottles so far", "暫時 " + d.count + " 支", "目前 " + d.count + " 瓶") + "</small></div></div>" +
-      '<p class="pp-rule">' + W("Tap + for each <b>bottle</b> on this guest's bill (not glasses). Sharing a bill? Bottle stamps go to whoever scans the receipt. Splitting the bill shares the ROLL, not the bottle stamps. Max <b>" + max + "</b> bottle stamps per bill.",
-        "喺呢位客人張單上面每支<b>整支酒</b>撳一下 +（杯裝唔計）。同枱夾單？酒樽印花歸掃描收據嗰位。分單只會分卷幣，唔會分酒樽印花。每張單最多<b>" + max + "</b>個酒樽印花。",
-        "在这位客人的账单上，每瓶<b>整瓶酒</b>按一下 +（杯装不算）。同桌分单？酒瓶印花归扫描收据的人。分单只分卷币，不分酒瓶印花。每张单最多<b>" + max + "</b>个酒瓶印花。") + "</p>" +
+      '<p class="pp-rule">' + W("Tap + for each <b>bottle</b> on this guest's bill (not glasses). Sharing a bill? Bottle stamps go to whoever scans the receipt. Splitting the bill shares the $RORU, not the bottle stamps. Max <b>" + max + "</b> bottle stamps per bill.",
+        "喺呢位客人張單上面每支<b>整支酒</b>撳一下 +（杯裝唔計）。同枱夾單？酒樽印花歸掃描收據嗰位。分單只會分 RORU幣，唔會分酒樽印花。每張單最多<b>" + max + "</b>個酒樽印花。",
+        "在这位客人的账单上，每瓶<b>整瓶酒</b>按一下 +（杯装不算）。同桌分单？酒瓶印花归扫描收据的人。分单只分 RORU币，不分酒瓶印花。每张单最多<b>" + max + "</b>个酒瓶印花。") + "</p>" +
       '<label class="pp-bill"><span>' + W("Bill no. (optional)", "單號（可以留空）", "单号（可留空）") + '</span><input id="dkBill" autocomplete="off" autocapitalize="characters" placeholder="e.g. A-001238"></label>' +
       cats.map(ct => '<h3>' + W((DCAT[ct] || DCAT.other)[0] + " · " + (DCAT[ct] || DCAT.other)[1], (DCAT[ct] || DCAT.other)[1] + " · " + (DCAT[ct] || DCAT.other)[0], (DCAT[ct] || DCAT.other)[2] + " · " + (DCAT[ct] || DCAT.other)[0]) + '</h3><div class="pp-pick dk-pick">' + d.bottles.filter(b => b.cat === ct).map(b =>
         '<div class="pp-pk dk-pk" data-id="' + b.id + '"><span class="pp-pk-ic dk-pk-ic">' + botIcon(ct) + '</span><span class="pp-pk-t"><b>' + esc(zh() ? b.zh : b.en) + "</b><small>" + (b.price ? "HK$" + Math.round(+b.price) + (b.note ? " · " + esc(b.note) : "") + " · " : "") + (b.n ? W("had " + b.n + " this quarter", "今季飲過 " + b.n + " 支", "本季已点 " + b.n + " 瓶") : W("new for this guest", "第一次")) + '</small></span><span class="dk-step"><button type="button" class="dk-minus" aria-label="−">−</button><b>0</b><button type="button" class="dk-plus" aria-label="+">+</button></span></div>').join("") + "</div>").join("") +
@@ -358,7 +358,7 @@
     if (mode === "drinks") drinksSheet(); else stampSheet();
     const ov = [...document.querySelectorAll(".pp-ov")].pop(); if (!ov) return; const sh = $(".pp-sh", ov);
     const sw = document.createElement("div"); sw.className = "pp-tog pp-sw"; sw.setAttribute("role", "tablist");
-    sw.innerHTML = '<button type="button" data-sw="food" class="' + (mode === "food" ? "on" : "") + '"' + (foodOk ? "" : " disabled") + ">" + ROLL + "<span>" + W("Food", "食物") + '</span></button><button type="button" data-sw="drinks" class="' + (mode === "drinks" ? "on" : "") + '"' + (drinkOk ? "" : " disabled") + ">" + BOT_SAKE + "<span>" + W("Drinks", "飲品") + "</span></button>";
+    sw.innerHTML = '<button type="button" data-sw="food" class="' + (mode === "food" ? "on" : "") + '"' + (foodOk ? "" : " disabled") + ">" + $RORU + "<span>" + W("Food", "食物") + '</span></button><button type="button" data-sw="drinks" class="' + (mode === "drinks" ? "on" : "") + '"' + (drinkOk ? "" : " disabled") + ">" + BOT_SAKE + "<span>" + W("Drinks", "飲品") + "</span></button>";
     const hd = $(".pp-sh-h", sh); if (hd) hd.after(sw); else sh.prepend(sw);
     $$("[data-sw]", sw).forEach(b => b.onclick = () => { if (b.dataset.sw !== mode) window.__ppStaff.open(b.dataset.sw); });
   } };
@@ -420,7 +420,7 @@
     if (v.querySelector(".dk-own")) {
       let m = "food"; try { m = localStorage.getItem("roru_owner_pp_mode") || "food"; } catch (e) {}
       const tg = document.createElement("div"); tg.className = "pp-tog pp-otog"; tg.setAttribute("role", "tablist");
-      tg.innerHTML = '<button type="button" data-opm="food">' + ROLL + "<span>Food</span><em>" + (d.total || "") + '</em></button><button type="button" data-opm="drinks">' + BOT_SAKE + "<span>Drinks</span><em>" + ((O.drinks && (O.drinks.drinks || []).filter(x => x.in).length) || "") + "</em></button>";
+      tg.innerHTML = '<button type="button" data-opm="food">' + $RORU + "<span>Food</span><em>" + (d.total || "") + '</em></button><button type="button" data-opm="drinks">' + BOT_SAKE + "<span>Drinks</span><em>" + ((O.drinks && (O.drinks.drinks || []).filter(x => x.in).length) || "") + "</em></button>";
       v.prepend(tg);
       const setM = (k) => { v.dataset.ppmode = k; $$("[data-opm]", tg).forEach(b => { b.classList.toggle("on", b.dataset.opm === k); b.setAttribute("aria-selected", b.dataset.opm === k); }); try { localStorage.setItem("roru_owner_pp_mode", k); } catch (e) {} };
       $$("[data-opm]", tg).forEach(b => b.onclick = () => { setM(b.dataset.opm); window.scrollTo(0, 0); });
@@ -445,7 +445,7 @@
           return top && avg ? '<div class="dk-tot"><b>' + (tot / (top * avg) * 100).toFixed(1) + '%</b><span>All ' + rs.length + " rewards together (" + money(tot) + ") for a guest who reaches " + top + " bottles, against " + top + " average bottles (" + money(Math.round(top * avg)) + ", before service charge)</span></div>" : ""; })() +
         (d.rewards || []).map(r => '<div class="pp-orow"><span><b>' + r.n + " bottles:</b> " + esc(r.en) + "<br><small>" + esc(r.cost_note || "") + "</small></span><b>" + money(r.cost) + ' <small>' + pct(r.cost, r.n, cheapest) + " min · " + pct(r.cost, r.n, avg) + " typical</small></b></div>").join("") +
       "</div></div>" +
-      '<p class="pp-osub" style="margin-top:10px">How bottles get stamped: the receipt scan reads bottle lines and checks the price, so a HK$88 glass of Pessegueiro or an HK$80 glass of Heavensake never counts but the bottle does; a line like "2 Sari Black" stamps 2. Staff can tap bottles on the iPad with "Stamp bottles". Sharing a bill? Bottle stamps go to whoever scans the receipt. Splitting the bill shares the ROLL, not the bottle stamps. Max ' + d.max_per_bill + " bottle stamps per bill. Rewards are marked used by staff; every stamp, reward and undo is in Staff &amp; PINs → activity.</p>";
+      '<p class="pp-osub" style="margin-top:10px">How bottles get stamped: the receipt scan reads bottle lines and checks the price, so a HK$88 glass of Pessegueiro or an HK$80 glass of Heavensake never counts but the bottle does; a line like "2 Sari Black" stamps 2. Staff can tap bottles on the iPad with "Stamp bottles". Sharing a bill? Bottle stamps go to whoever scans the receipt. Splitting the bill shares the $RORU, not the bottle stamps. Max ' + d.max_per_bill + " bottle stamps per bill. Rewards are marked used by staff; every stamp, reward and undo is in Staff &amp; PINs → activity.</p>";
     v.appendChild(el);
     $("#dkEdit").onclick = ownerDrinksEdit;
   }
