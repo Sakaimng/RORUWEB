@@ -776,11 +776,11 @@ main.views .clamp-x.clamp-x.clamp-x{display:none!important}
 .rw-chip .roll-coin{width:18px;height:18px}
 .rw-chip b{font-weight:800;color:#FFE29A;white-space:nowrap}
 .rw-chip span.rw-t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-html.lt .rw-chip{background:linear-gradient(135deg,#FFF3CF,#FBE3A6);border-color:#E2B24A;color:#6B4605}
-html.lt .rw-chip b{color:#8A5A00}
+html.lt .rw-chip,body.thB .rw-chip{background:linear-gradient(135deg,#FFF3CF,#FBE3A6);border-color:#E2B24A;color:#6B4605}
+html.lt .rw-chip b,body.thB .rw-chip b{color:#8A5A00}
 .rw-tag{display:inline-flex;align-items:center;gap:4px;padding:1px 7px 1px 4px;border-radius:999px;font-size:12px;font-weight:800;background:rgba(243,194,79,.18);border:1px solid rgba(232,184,74,.5);color:#E8B84A;white-space:nowrap}
 .rw-tag .roll-coin{width:14px;height:14px}
-html.lt .rw-tag{background:#FFF1C9;color:#8A5A00;border-color:#E2B24A}
+html.lt .rw-tag,body.thB .rw-tag{background:#FFF1C9;color:#8A5A00;border-color:#E2B24A}
 
 .rw-staff{margin:4px 0 14px;padding:12px;border-radius:14px;border:1.5px solid rgba(232,184,74,.55);background:linear-gradient(135deg,rgba(243,194,79,.13),rgba(183,121,15,.08))}
 .rw-tog{display:flex;gap:12px;align-items:flex-start;cursor:pointer}
@@ -793,7 +793,7 @@ html.lt .rw-tag{background:#FFF1C9;color:#8A5A00;border-color:#E2B24A}
 .rw-qty .btn{width:44px;min-width:44px;padding:6px 0;font-size:20px;line-height:1}
 .rw-qty b{font-size:20px;min-width:24px;text-align:center}
 .oi .rc-ok{width:1em;height:1em}
-html.lt .rw-staff{background:#FFF8E3;border-color:#E2B24A}
+html.lt .rw-staff,body.thB .rw-staff{background:#FFF8E3;border-color:#E2B24A}
 
 .rw-own{border:1.5px solid rgba(232,184,74,.6)!important;background:linear-gradient(135deg,rgba(243,194,79,.14),rgba(183,121,15,.06))!important;margin:6px 0 16px}
 .rw-own-h{display:flex;gap:12px;align-items:center}
@@ -815,7 +815,7 @@ html.lt .rw-staff{background:#FFF8E3;border-color:#E2B24A}
 .rw-sel{position:sticky;bottom:-1px;margin-top:12px;padding:14px;border-radius:14px;border:1.5px solid #E8B84A;background:#16130b}
 .rw-sel .rw-own-h>.roll-coin{width:36px;height:36px}
 .rw-sel .fl{margin:12px 0 0}
-html.lt .rw-own{background:#FFF8E3!important;border-color:#E2B24A!important}
-html.lt .rw-it{border-color:rgba(0,0,0,.12)}
-html.lt .rw-it.on{background:#FFF3CF}
-html.lt .rw-sel{background:#FFF8E3}
+html.lt .rw-own,body.thB .rw-own{background:#FFF8E3!important;border-color:#E2B24A!important}
+html.lt .rw-it,body.thB .rw-it{border-color:rgba(0,0,0,.12)}
+html.lt .rw-it.on,body.thB .rw-it.on{background:#FFF3CF}
+html.lt .rw-sel,body.thB .rw-sel{background:#FFF8E3}

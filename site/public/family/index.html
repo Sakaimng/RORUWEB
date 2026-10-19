@@ -319,7 +319,7 @@
     const zh = R.lang() === "zh", m = String(+d.multiplier).replace(/\.0+$/, "");
     const txt = t("rw_chip", { item: R.rwName(d), m });
     const i = txt.indexOf(":") >= 0 ? txt.indexOf(":") : txt.indexOf("：");
-    el.innerHTML = R.coin(!!switched, switched ? "" : "idle") + (i > 0 ? '<span class="rw-t">' + escR(txt.slice(0, i + 1)) + " <b>" + escR(txt.slice(i + 1).trim()) + "</b></span>" : '<span class="rw-t">' + escR(txt) + "</span>");
+    el.innerHTML = R.coin(!!switched, switched ? "" : "idle") + (i > 0 ? '<span class="rw-t">' + escR(txt.slice(0, i + 1)) + (txt[i] === ":" ? " " : "") + "<b>" + escR(txt.slice(i + 1).trim()) + "</b></span>" : '<span class="rw-t">' + escR(txt) + "</span>");
     el.classList.remove("hide");
     el.onclick = () => { R.coinSpin(el.querySelector(".roll-coin")); R.toast(t("rw_info", { item: R.rwName(d), m }), 4500); };
     if (switched) { R.toast("🎉 " + t("rw_now", { item: R.rwName(d), m }), 3500); setTimeout(() => { const c = el.querySelector(".roll-coin"); if (c) { c.classList.remove("spin"); c.classList.add("idle"); } }, 1100); }
