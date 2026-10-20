@@ -863,3 +863,22 @@ body.lt .wk-banner small{color:#9A5A00}
 .card.c-pts{padding:10px 16px;margin-bottom:8px}
 .card.c-pts .c-num{margin-top:0}
 .wk-banner{padding:7px 14px;margin-bottom:8px}
+
+/* f42: $RORU of the week picker — slim selection bar pinned above the sheet buttons (owner) */
+.sheet .sf.rw-sf{flex-wrap:wrap}
+.rw-bar{flex:1 0 100%;border:1.5px solid #E8B84A;border-radius:14px;background:#16130b;overflow:hidden}
+.rw-bar-m{display:flex;align-items:center;gap:10px;width:100%;min-height:46px;padding:8px 12px;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.rw-bar-m>.roll-coin{width:24px;height:24px}
+.rw-bar-t{flex:1;min-width:0;font-size:15px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rw-bar-t b{font-weight:800}
+.rw-bar-t em{font-style:normal;color:#E8B84A;font-weight:700}
+.rw-bar-e{flex:none;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:rgba(232,184,74,.16);color:#E8B84A;font-size:17px;font-weight:700}
+.rw-bar-ed{padding:0 12px 12px}
+.rw-bar-ed label{display:block;font-size:13px;opacity:.75;margin:0 0 6px}
+.rw-bar-row{display:flex;gap:8px}
+.rw-bar-row .fin{flex:1;padding:10px 12px}
+.rw-bar-row .btn,.sheet .sf .rw-bar-row .btn{width:auto;flex:none;padding:10px 18px;font-size:15px}
+.rw-bar-ed small{display:block;font-size:12px;opacity:.65;margin-top:6px;line-height:1.35}
+html.lt .rw-bar,body.thB .rw-bar{background:#FFF8E3;border-color:#E2B24A}
+html.lt .rw-bar-e,body.thB .rw-bar-e{background:#FBE3A6;color:#8A5A00}
+html.lt .rw-bar-t em,body.thB .rw-bar-t em{color:#8A5A00}

@@ -8,14 +8,14 @@
 <title data-tt="{prog} — Owner">High Rollers — Owner</title>
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="/loyalty/loyalty.css?v=f41">
-<link rel="stylesheet" href="/loyalty/passport.css?v=f41">
-<link rel="stylesheet" href="/loyalty/scratch.css?v=f41">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f42">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f42">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f42">
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=f41"></script>
-<script src="/loyalty/passport.js?v=f41"></script>
-<script src="/loyalty/scratch.js?v=f41"></script>
-<script src="/loyalty/monthend.js?v=f41"></script>
+<script src="/loyalty/loyalty.js?v=f42"></script>
+<script src="/loyalty/passport.js?v=f42"></script>
+<script src="/loyalty/scratch.js?v=f42"></script>
+<script src="/loyalty/monthend.js?v=f42"></script>
 <style>
 /* v36 owner dashboard */
 .dash{margin:16px 0 18px}
@@ -455,7 +455,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
   }
   function labelTables(root) { $$("table.rt", root).forEach(t => { const hr = t.querySelector("tr"); if (!hr || !hr.querySelector("th")) return; hr.classList.add("rh"); const hs = $$("th", hr).map(th => th.textContent.trim()); $$("tr", t).forEach(tr => { if (tr === hr) return; $$("td", tr).forEach((td, i) => { if (!td.hasAttribute("data-label")) td.setAttribute("data-label", hs[i] || ""); }); }); }); }
   // ----- sheet (full screen on phone, dialog on desktop) -----
-  function openSheet(title, body, foot, mount) { $("#sheetB").oninput = null; $("#sheetB").onchange = null; $("#sheetT").textContent = title; $("#sheetB").innerHTML = body; $("#sheetF").innerHTML = foot || ""; $("#sheet").classList.add("show"); document.body.classList.add("noscroll"); $("#sheetB").scrollTop = 0; if (mount) mount($("#sheetB"), $("#sheetF")); }
+  function openSheet(title, body, foot, mount) { $("#sheetB").oninput = null; $("#sheetB").onchange = null; $("#sheetT").textContent = title; $("#sheetB").innerHTML = body; $("#sheetF").className = "sf"; $("#sheetF").innerHTML = foot || ""; $("#sheet").classList.add("show"); document.body.classList.add("noscroll"); $("#sheetB").scrollTop = 0; if (mount) mount($("#sheetB"), $("#sheetF")); }
   function closeSheet() { $("#sheet").classList.remove("show"); document.body.classList.remove("noscroll"); }
   $("#sheetX").onclick = closeSheet; $("#sheet").onclick = (e) => { if (e.target === $("#sheet")) closeSheet(); };
   // ----- ☰ menu + navigation (3 tabs: Today / Guests / Rewards; the rest behind ☰) -----
@@ -737,23 +737,39 @@ body.thB{--muted:rgba(22,24,31,.64)}
         : '<p class="muted" style="font-size:15px;margin:0 0 12px">Pick one item. From now on, ordering it earns <b>2x $RORU</b> on its price, until you change or stop it' + ((w.queue || []).length ? " or the next week in Up next starts (Up next stays as it is)" : "") + '. Use it to push slow movers or high-margin dishes.</p>') +
       '<input class="fin" id="rwQ" type="search" placeholder="Search the menu" autocomplete="off" style="margin-bottom:10px">' +
       '<div id="rwList">' + RW_KIND.map(([k, lbl]) => { const its = menu.filter(x => x.kind === k); return its.length ? '<div class="rw-grp" data-grp="' + k + '"><p class="rw-gh">' + lbl + "</p>" + its.map(row).join("") + "</div>" : ""; }).join("") + "</div>" +
-      '<div id="rwSelBox" class="rw-sel hide"></div>';
-    openSheet(isQ ? "Up next · " + qDay : "$RORU of the week", body, '<button class="btn ghost" id="rwNo">Cancel</button><button class="btn" id="rwSave" disabled>' + (isQ ? "Add to " + esc(qDay) : "Make it $RORU of the week") + "</button>", (b, f) => {
+      "";
+    // f42 (Dominic Oct 21: the inline preview box blocked the item list): the list keeps the whole sheet; the pick is one slim bar pinned above the buttons; tap it (or ✎) to change the price.
+    let price = sel && c.price_hkd ? +c.price_hkd : null, editing = false;
+    openSheet(isQ ? "Up next · " + qDay : "$RORU of the week", body, '<div id="rwBar" class="rw-bar hide"></div><button class="btn ghost" id="rwNo">Cancel</button><button class="btn" id="rwSave" disabled>' + (isQ ? "Add to " + esc(qDay) : "Make it $RORU of the week") + "</button>", (b, f) => {
+      f.classList.add("rw-sf");
+      const bar = f.querySelector("#rwBar"), save = f.querySelector("#rwSave");
+      const sumTxt = (it) => '<b>' + esc(it.name_en) + "</b> · " + (+price > 0 ? "2x on HK$" + fmt(+price) : '<em>set a price</em>');
+      const okp = () => { save.disabled = !(+price > 0); };
       const paint = () => {
         const it = menu.find(x => x.id === sel); $$(".rw-it", b).forEach(l => l.classList.toggle("on", +l.querySelector("input").value === sel));
-        const box = $("#rwSelBox"); if (!it) { box.classList.add("hide"); f.querySelector("#rwSave").disabled = true; return; }
-        box.classList.remove("hide");
-        box.innerHTML = '<div class="rw-own-h">' + R.coin(true) + '<div class="rw-own-t"><small>' + (isQ ? "From " + esc(qDay) + ", guests will see" : "Guests will see") + '</small><b>This week: ' + esc(it.name_en) + ' = double $RORU</b></div></div>' +
-          fld("Price used for the 2x (HK$)", '<input class="fin" id="rwPrice" type="number" min="1" inputmode="decimal" value="' + esc(it.price_hkd || "") + '">', "From the menu. A guest who orders 1 earns " + (it.price_hkd ? fmt(it.price_hkd) : "this many") + " extra $RORU (more at higher levels).");
-        const pr = $("#rwPrice"); const okp = () => { f.querySelector("#rwSave").disabled = !(+pr.value > 0); }; pr.oninput = okp; okp();
+        if (!it) { bar.classList.add("hide"); save.disabled = true; return; }
+        bar.classList.remove("hide"); bar.classList.toggle("ed", editing);
+        bar.innerHTML = '<button type="button" class="rw-bar-m" id="rwBarM" aria-expanded="' + editing + '" aria-label="Change the price">' + R.coin(false) + '<span class="rw-bar-t" id="rwBarT">' + sumTxt(it) + '</span><span class="rw-bar-e" aria-hidden="true">' + (editing ? "✕" : "✎") + "</span></button>" +
+          (editing ? '<div class="rw-bar-ed"><label for="rwPrice">Price used for the 2x (HK$)</label><div class="rw-bar-row"><input class="fin" id="rwPrice" type="number" min="1" inputmode="decimal" value="' + esc(price || "") + '"><button type="button" class="btn ghost" id="rwPrDone">Done</button></div>' +
+            '<small>' + (it.price_hkd ? "Menu price HK$" + fmt(it.price_hkd) + ". " : "") + (isQ ? "From " + esc(qDay) + ", guests" : "Guests") + " see “This week: " + esc(it.name_en) + " = double $RORU”.</small></div>" : "");
+        bar.querySelector("#rwBarM").onclick = () => { editing = !editing; paint(); if (editing) { const x = $("#rwPrice"); if (x) { x.focus(); x.select && x.select(); } } };
+        const pr = $("#rwPrice");
+        if (pr) {
+          pr.oninput = () => { price = +pr.value > 0 ? +pr.value : null; $("#rwBarT").innerHTML = sumTxt(it); okp(); };
+          pr.onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); if (+price > 0) { editing = false; paint(); } } else if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); editing = false; paint(); } };
+          bar.querySelector("#rwPrDone").onclick = () => { editing = false; paint(); };
+        }
+        okp();
       };
-      b.onchange = (e) => { if (e.target.name === "rwItem") { sel = +e.target.value; paint(); setTimeout(() => { const x = $("#rwSelBox"); if (x) x.scrollIntoView({ behavior: "smooth", block: "nearest" }); }, 50); } };
+      b.onchange = (e) => { if (e.target.name === "rwItem") { sel = +e.target.value; const it = menu.find(x => x.id === sel); price = it && it.price_hkd ? +it.price_hkd : null; editing = !(+price > 0); paint(); } };
       $("#rwQ").oninput = () => { const q = $("#rwQ").value.trim().toLowerCase(); $$(".rw-it", b).forEach(l => l.classList.toggle("hide", !!q && !l.dataset.q.includes(q))); $$(".rw-grp", b).forEach(g => g.classList.toggle("hide", !g.querySelector(".rw-it:not(.hide)"))); };
+      if (sel && !(+price > 0)) { const it0 = menu.find(x => x.id === sel); price = it0 && it0.price_hkd ? +it0.price_hkd : null; }
       paint();
+      if (sel) setTimeout(() => { const l = b.querySelector(".rw-it.on"); if (l) l.scrollIntoView({ block: "center" }); }, 30);
       f.querySelector("#rwNo").onclick = closeSheet;
-      f.querySelector("#rwSave").onclick = async (e) => { const btn = e.currentTarget; btn.disabled = true;
-        if (isQ) { const it = menu.find(x => x.id === sel), pr = +$("#rwPrice").value || it.price_hkd; closeSheet(); rwQueueSave(((st.rw || {}).queue || []).concat([{ item_id: sel, price_hkd: pr, name_en: it.name_en }]), "Added for " + qDay + " ✓"); return; }
-        try { await R.rpc("owner_set_roll_week", { p_token: st.sess.token, p_item_id: sel, p_price_hkd: +$("#rwPrice").value, p_multiplier: 2 }); closeSheet(); R.toast("Saved ✓ · guests see it now"); load(); }
+      save.onclick = async (e) => { const btn = e.currentTarget; if (!(+price > 0)) { editing = true; paint(); return; } btn.disabled = true;
+        if (isQ) { const it = menu.find(x => x.id === sel); closeSheet(); rwQueueSave(((st.rw || {}).queue || []).concat([{ item_id: sel, price_hkd: +price, name_en: it.name_en }]), "Added for " + qDay + " ✓"); return; }
+        try { await R.rpc("owner_set_roll_week", { p_token: st.sess.token, p_item_id: sel, p_price_hkd: +price, p_multiplier: 2 }); closeSheet(); R.toast("Saved ✓ · guests see it now"); load(); }
         catch (er) { R.toast(er.code === "price_required" ? "Type the price first" : R.errText(er)); btn.disabled = false; } };
     });
   }
@@ -957,8 +973,8 @@ body.thB{--muted:rgba(22,24,31,.64)}
         en: "Find a guest: type their name or the last 4 digits of their phone.",
         zh: "搵客人：輸入名或者電話最後 4 個數字。", zhs: "找客人：输入名字或电话最后 4 位数字。" },
       { before: () => go("rewards"), el: vis("#rwOwn", () => [...document.querySelectorAll("#v-rewards [data-rw]")].find(x => x.offsetParent), "#v-rewards .vh"),
-        en: "Rewards. On top: $RORU of the week. Pick one item and ordering it earns 2x $RORU; guests see it within seconds. Up next: line up the coming weeks (up to 8) and it switches by itself every Monday 00:00. Below: tap a reward to change its name or $RORU, or switch it off.",
-        zh: "獎賞。最頂係本週加倍：揀一樣嘢，客人叫佢就賺雙倍 RORU幣，幾秒內就見到。「下週起」（Up next）可以預先排好之後幾個禮拜（最多 8 個），每個禮拜一 00:00 自動轉。再下面撳一個獎賞就可以改名、改 RORU幣或者關咗佢。", zhs: "奖赏。最上面是本周加倍：选一样东西，客人点它就赚双倍 RORU币，几秒内就能看到。「下周起」（Up next）可以预先排好接下来几周（最多 8 周），每周一 00:00 自动切换。再下面点一个奖赏就可以改名、改 RORU币或关闭。" },
+        en: "Rewards. On top: $RORU of the week. Pick one item and ordering it earns 2x $RORU; guests see it within seconds. Up next: line up the coming weeks (up to 8) and it switches by itself every Monday 00:00. In the picker the item list stays full; your pick sits in a slim bar above the buttons, tap ✎ to change the price. Below: tap a reward to change its name or $RORU, or switch it off.",
+        zh: "獎賞。最頂係本週加倍：揀一樣嘢，客人叫佢就賺雙倍 RORU幣，幾秒內就見到。「下週起」（Up next）可以預先排好之後幾個禮拜（最多 8 個），每個禮拜一 00:00 自動轉。揀嘢嗰陣成張清單都睇到，揀咗嘅會喺按鈕上面嘅細條顯示，撳 ✎ 改價錢。再下面撳一個獎賞就可以改名、改 RORU幣或者關咗佢。", zhs: "奖赏。最上面是本周加倍：选一样东西，客人点它就赚双倍 RORU币，几秒内就能看到。「下周起」（Up next）可以预先排好接下来几周（最多 8 周），每周一 00:00 自动切换。选的时候整张清单都看得到，选中的会显示在按钮上方的细条里，点 ✎ 改价钱。再下面点一个奖赏就可以改名、改 RORU币或关闭。" },
       { before: () => go("passport"), el: vis("#v-passport .pp-otog", "#ppOwnerKpis", "#v-passport .vh"),
         en: "Passport: switch Food | Drinks, like the guest app. Each quarter runs on its own (Q4 ends 31 Dec), stamps don't carry over. Bottle stamps go to whoever scans the receipt, max 6 a bill.",
         zh: "護照：同客人 app 一樣可以轉食物 | 飲品。每季獨立計（第四季 12 月 31 日完），印花唔會帶過去。酒樽印花歸掃描收據嗰位，每張單最多 6 個。",
