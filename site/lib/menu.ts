@@ -85,8 +85,10 @@ export const A_LA_CARTE: MenuBoard = {
     {
       name: "Appetisers",
       items: [
+        { name: "Daily Crudo", price: 88 },
         { name: "Daily Miso Soup", nameZh: "味噌湯", price: 48 },
         { name: "Edamame", nameZh: "枝豆", price: 48 },
+        { name: "Grilled Kama", price: 148 },
         { name: "Kisu Tempura", nameZh: "天婦羅鱚魚", price: 88 },
         { name: "Negitoro Dip", price: 88 },
         { name: "Potato Salad", nameZh: "薯仔沙律", price: 58 },
@@ -97,7 +99,7 @@ export const A_LA_CARTE: MenuBoard = {
       name: "Desserts",
       items: [
         { name: "Monaka", nameZh: "最中", price: 68 },
-        { name: "Warabi Mochi", nameZh: "蕨餅", price: 68 },
+        { name: "Mapo Tofu Ice Cream", nameZh: "麻婆豆腐雪糕", price: 68 },
       ],
     },
     {
