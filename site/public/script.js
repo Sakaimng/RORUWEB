@@ -113,8 +113,8 @@ controls.minDistance = 7;
 controls.maxDistance = 48;
 controls.minPolarAngle = 0.28;
 controls.maxPolarAngle = 1.32;
-controls.minAzimuthAngle = -1.25;
-controls.maxAzimuthAngle = 1.25;
+controls.minAzimuthAngle = -Infinity;   // v50: free orbit; the default now looks from the kitchen side so the guests' faces show
+controls.maxAzimuthAngle = Infinity;
 controls.screenSpacePanning = false;
 canvas.tabIndex = 0;
 
@@ -196,12 +196,13 @@ const wallMat = new THREE.MeshLambertMaterial({ color: 0x5f5a54, map: stoneTex }
 const H = 3.2;
 // walls straight off the plan (v47): the back wall by the entrance, the kitchen's rear wall a step further back,
 // the store room beside the kitchen, then the end of the room: curtain, toilet lobby, two WC cubicles
+const BOH_UP = [];
 const SOLID = [];   // footprints you cannot walk through (walk mode): [x0, z0, x1, z1]
 function wallXZ(x0, z0, x1, z1, m = wallMat, h = H, solid = true) { const w = Math.abs(x1 - x0) || 0.16, d = Math.abs(z1 - z0) || 0.16; box(w, h, d, m, (x0 + x1) / 2, h / 2, (z0 + z1) / 2); if (solid) SOLID.push([Math.min(x0, x1) - (x0 === x1 ? 0.08 : 0), Math.min(z0, z1) - (z0 === z1 ? 0.08 : 0), Math.max(x0, x1) + (x0 === x1 ? 0.08 : 0), Math.max(z0, z1) + (z0 === z1 ? 0.08 : 0)]); }
 wallXZ(L.glassX, L.frontZ, -4.26, L.frontZ);            // back wall by the entrance (events wall)
-wallXZ(-4.26, L.frontZ, -4.26, L.northZ);               // step back to the kitchen
-wallXZ(-4.26, L.northZ, 2.51, L.northZ);                // kitchen rear wall
-wallXZ(2.51, L.northZ, 2.51, -0.4);                     // store room beside the kitchen
+// v50: the kitchen walls are cut low in the overview (like the hallway wall) because the camera now looks in from the kitchen side; full height in walk mode
+const KITCHEN_WALLS = [[-4.26, L.frontZ, -4.26, L.northZ], [-4.26, L.northZ, 2.51, L.northZ], [2.51, L.northZ, 2.51, -0.4]];
+for (const [a, b, c, d] of KITCHEN_WALLS) wallXZ(a, b, c, d, wallMat, 1.05);
 wallXZ(2.51, -0.4, 7.67, -0.4);                         // back wall of the bar flap + toilet lobby
 box(L.wcX1 + 0.1 - L.glassX, 1.05, 0.16, wallMat, (L.wcX1 + 0.1 + L.glassX) / 2, 0.525, L.southZ);       // side wall (cut low for the view)
 SOLID.push([L.glassX, L.southZ - 0.08, L.wcX1 + 0.1, L.southZ + 0.3]);
@@ -520,7 +521,7 @@ const WC = { lids: [], cubes: [], curtain: [], taps: [] };
   // back of house around the room (stairs, store rooms, building lobby): plain blocks up to the first floor
   const boh = mat(0x2a2b31);
   for (const [a, b, c, d] of [[-7.32, -4.5, -4.34, -2.17], [-4.34, -4.5, 10.1, -2.59], [2.59, -2.59, 10.1, -0.48], [x1 + 0.13, -0.48, 10.1, 4.45], [basinWallX + 0.08, -0.48, x1 + 0.13, zTop - 0.04], [sx + 0.08, zBot + 0.08, x1 + 0.13, 4.45]])
-    box(c - a, 3.33, d - b, boh, (a + c) / 2, 3.33 / 2, (b + d) / 2);
+    { box(c - a, 1.05, d - b, boh, (a + c) / 2, 0.525, (b + d) / 2); BOH_UP.push([a, b, c, d]); }   // v50: cut low in the overview (the camera looks in over them), full height in walk mode
 }
 function stepWC(dt, cam, walking, t) {
   // lids: open when you are within ~1.25 m in walk mode (or after a tap), close as you leave
@@ -568,15 +569,18 @@ const plateRim = mat(0x6f9a94), plateIn = mat(0xe6e0d4), chopMat = mat(0x2a1a12)
 const seats = [];
 // (v47) counted and placed off the plan: 6 on the left leg + the corner seat, 14 on the long run (5, a column, 9),
 // 5 on the shorter right leg = 26. Positions are the plan's stool centres, pulled ~0.1 m in toward the counter.
-for (const fy of [1100, 1210, 1340, 1445, 1550, 1655]) seats.push({ x: L.XL - 0.8, z: PLAN(0, fy)[1], side: 'L' });
+for (const fy of [1100, 1211, 1322, 1433, 1544, 1655]) seats.push({ x: L.XL - 0.8, z: PLAN(0, fy)[1], side: 'L' });
 seats.push({ x: L.XL - 0.66, z: L.F + 0.55, side: 'C' });
 for (const fx of [1033, 1165, 1297, 1426, 1558, 1823, 1943, 2059, 2173, 2288, 2404, 2520, 2635, 2746]) seats.push({ x: PLAN(fx, 0)[0], z: L.F + 0.75, side: 'F' });
 for (const fy of [1290, 1392, 1493, 1596, 1698]) seats.push({ x: L.XR + 0.8, z: PLAN(0, fy)[1], side: 'R' });
+const COL_TOPS = [];
 // columns where the plan draws them (one in the left leg, two in the long-run stool line); stainless-clad in his photos
 const colMat = new THREE.MeshPhongMaterial({ color: 0x7d858d, specular: 0xffffff, shininess: 140 });   // mirror-polished stainless cladding (Kurate RORU-32/33/35)
 for (const [fx0, fy0, fx1, fy1] of [[935, 1205, 1065, 1285], [1620, 1755, 1720, 1867], [2805, 1755, 2947, 1867]]) {
   const [x0, z0] = PLAN(fx0, fy0), [x1, z1] = PLAN(fx1, fy1);
-  box(x1 - x0, H, z1 - z0, colMat, (x0 + x1) / 2, H / 2, (z0 + z1) / 2); SOLID.push([x0, z0, x1, z1]);
+  const cr = Math.min(x1 - x0, z1 - z0) * 0.42, ccx = (x0 + x1) / 2, ccz = (z0 + z1) / 2;   // v50: round, slimmer, cut low like the walls so it never hides the counter
+  cyl(cr, cr, 1.05, 16, colMat, ccx, 0.525, ccz); cyl(cr + 0.02, cr + 0.02, 0.04, 16, mat(0x2a2b30), ccx, 1.07, ccz);
+  COL_TOPS.push([cr, ccx, ccz]); SOLID.push([x0, z0, x1, z1]);
 }
 SOLID.push([-4.26, L.northZ, 2.51, -0.28], [3.5, -0.4, 4.4, 0.72]);   // the kitchen and the bar flap are staff only
 const _arcGeo = new THREE.TorusGeometry(0.21, 0.034, 6, 16, Math.PI);
@@ -706,6 +710,88 @@ for (const [x, z] of [[-6.95, 3.65], [5.75, 3.75], [-7.0, -1.75]]) {
   for (let k = 0; k < 7; k++) prop(PG.bigLeaf, pick([0x5f9e5c, 0x76b56d, 0x4d8a52, 0x8cc47e]), x + rr(-0.16, 0.16), 0.6 + k * 0.1 + rr(0, 0.08), z + rr(-0.16, 0.16), rr(0, 3), rr(0, 3), 0, 1, 1.15, 1);
   SOLID.push([x - 0.25, z - 0.25, x + 0.25, z + 0.25]);
 }
+
+// ---------- v50 density pass: many more small props in the same rounded style (all merged into the two prop meshes = 2 draw calls) ----------
+{
+  const DG = {
+    ochoko: new THREE.CylinderGeometry(0.026, 0.02, 0.035, 8),
+    dish: new THREE.CylinderGeometry(0.045, 0.04, 0.012, 10),
+    napkin: new THREE.BoxGeometry(0.09, 0.07, 0.05),
+    napkinIn: new THREE.BoxGeometry(0.08, 0.04, 0.035),
+    stand: new THREE.BoxGeometry(0.09, 0.12, 0.01),
+    standBase: new THREE.BoxGeometry(0.1, 0.012, 0.05),
+    plank: new THREE.BoxGeometry(1, 0.04, 0.26),
+    shelf: new THREE.BoxGeometry(1, 0.03, 0.22),
+    post: new THREE.BoxGeometry(0.03, 1, 0.03),
+    lampBase: new THREE.CylinderGeometry(0.03, 0.045, 0.14, 8),
+    lampShade: new THREE.CylinderGeometry(0.05, 0.085, 0.09, 10),
+    lantern: new THREE.SphereGeometry(0.16, 12, 9).scale(1, 1.15, 1),
+    lanternRim: new THREE.CylinderGeometry(0.075, 0.075, 0.03, 10),
+    book: new THREE.BoxGeometry(0.035, 0.15, 0.11),
+    boat: new THREE.CylinderGeometry(0.05, 0.05, 0.19, 10, 1, true, -Math.PI / 2, Math.PI).rotateZ(Math.PI / 2).rotateX(Math.PI / 2),
+    boatRice: new THREE.BoxGeometry(0.17, 0.03, 0.07),
+    tray: new THREE.BoxGeometry(0.52, 0.02, 0.2),
+    plateS: new THREE.CylinderGeometry(0.1, 0.09, 0.014, 14),
+    tub: new THREE.CylinderGeometry(0.15, 0.14, 0.13, 14),
+    tubBand: new THREE.CylinderGeometry(0.153, 0.153, 0.02, 14),
+    squeeze: new THREE.CylinderGeometry(0.022, 0.022, 0.11, 8),
+    bowl: new THREE.SphereGeometry(0.06, 10, 6, 0, Math.PI * 2, Math.PI * 0.5, Math.PI * 0.5),
+    stackPl: new THREE.CylinderGeometry(0.1, 0.095, 0.08, 14),
+  };
+  const P = (geo, c, x, y, z, ry = 0, sx = 1, sy = 1, sz = 1, list = PROP.lit) => prop(geo, c, x, y, z, ry, 0, 0, sx, sy, sz, list);
+  const boat = (x, y, z, ry) => {   // a hand roll as Roru serves it: a low, wide open nori boat (never a cone)
+    const cs = Math.cos(ry), sn = Math.sin(ry);
+    P(DG.boat, 0x1f2a1c, x, y + 0.05, z, ry);
+    P(DG.boatRice, 0xf7f4ec, x, y + 0.035, z, ry);
+    const tc = pick([0xff6f4f, 0xf58a5d, 0xd8332e, 0xf6cf5f, 0xee7a72]);
+    for (let k = -2; k <= 2; k++) prop(PG.dot, tc, x + cs * k * 0.032, y + 0.058, z - sn * k * 0.032, 0, 0, 0, 1.9, 1.1, 1.6);
+    prop(PG.dot, 0x9fd27a, x + cs * 0.05, y + 0.064, z - sn * 0.05, 0, 0, 0, 1.2, 0.8, 1.2);
+  };
+  // every seat: soy dish, sake cup, and between seats napkin holders and little menu stands
+  seats.forEach((st, i) => {
+    if (st.side === 'C') return;
+    const u = st.side === 'F' ? [0, -1] : st.side === 'L' ? [1, 0] : [-1, 0], pp = [-u[1], u[0]];
+    const at = (a, b) => [st.plate.x + pp[0] * a + u[0] * b, st.plate.z + pp[1] * a + u[1] * b];
+    const ry = Math.atan2(u[0], u[1]);
+    let [x, z] = at(-0.19, 0.02); P(DG.dish, 0xf3efe6, x, L.CH + 0.036, z); P(DG.dish, 0x2a1a12, x, L.CH + 0.042, z, 0, 0.7, 0.3, 0.7);
+    [x, z] = at(-0.17, 0.13); P(DG.ochoko, pick([0xf6f3e7, 0x9fc8c2, 0x2f3b4a]), x, L.CH + 0.048, z);
+    if (i % 2 === 0) { [x, z] = at(-0.3, 0.16); P(DG.napkin, 0xb8bfc6, x, L.CH + 0.065, z, ry); P(DG.napkinIn, 0xffffff, x, L.CH + 0.11, z, ry); }
+    else { [x, z] = at(-0.3, 0.16); P(DG.standBase, 0x3a2418, x, L.CH + 0.036, z, ry); P(DG.stand, 0xf6f3e7, x, L.CH + 0.1, z, ry); P(DG.stand, ORANGE, x, L.CH + 0.14, z + 0.0005, ry, 1.02, 0.25, 1.1); }
+    if (i % 3 === 1) { [x, z] = at(0.0, 0.22); P(DG.plateS, 0xf2ece0, x, L.CH + 0.038, z); boat(x - 0.02 * u[1], L.CH + 0.045, z, ry + Math.PI / 2); }
+  });
+  // low wall behind the long run: a wooden cap shelf carrying plants, sake, little lamps, books and jars
+  const capY = 1.05, capZ = L.southZ - 0.12, x0 = L.glassX + 0.5, x1 = L.eastX - 0.3;
+  P(DG.plank, 0x8a5a3c, (x0 + x1) / 2, capY + 0.02, capZ, 0, x1 - x0, 1, 1);
+  { let i = 0; for (let x = x0 + 0.2; x < x1 - 0.1; x += 0.42, i++) {
+    if (x > -2.75 && x < 0.75) { if (i % 2) smallPlant(x, capZ, capY + 0.04); continue; }   // the neon sign stands here
+    const k = i % 6, y = capY + 0.04;
+    if (k === 0) { smallPlant(x, capZ, y); jar(x + 0.12, capZ + 0.04, y); }
+    else if (k === 1) { sake(x - 0.06, capZ, y, true); sake(x + 0.06, capZ + 0.03, y); }
+    else if (k === 2) { P(DG.lampBase, 0x2a2a2e, x, y + 0.07, capZ); P(DG.lampShade, 0xffe2b0, x, y + 0.18, capZ, 0, 1, 1, 1, PROP.glow); }
+    else if (k === 3) { for (let b = 0; b < 4; b++) P(DG.book, pick([0xF64501, 0x2f6b45, 0xf2ece0, 0x1e3f5c, 0xe8c46a]), x - 0.06 + b * 0.04, y + 0.075, capZ, 0, 1, rr(0.8, 1.1), 1); }
+    else if (k === 4) { canister(x, capZ, y); prop(PG.cup, 0xf1eee6, x + 0.12, y + 0.03, capZ); }
+    else { smallPlant(x, capZ, y); sake(x + 0.13, capZ, y); }
+  } }
+  // bottle shelf unit at the west end of the wall (three tiers of sake + shochu)
+  { const sx0 = -6.85, sx1 = -5.75, sz = L.southZ - 0.2;
+    for (const xx of [sx0, sx1]) P(DG.post, 0x3a2418, xx, 1.05 + 0.55, sz, 0, 1, 1.1, 1);
+    for (const ty of [1.1, 1.45, 1.8]) { P(DG.shelf, 0x8a5a3c, (sx0 + sx1) / 2, ty, sz, 0, sx1 - sx0 + 0.06, 1, 1); for (let xx = sx0 + 0.08; xx < sx1 - 0.04; xx += 0.11) sake(xx, sz + rr(-0.03, 0.03), ty + 0.015, rand() > 0.6); } }
+  // paper lanterns over the hallway behind the guests
+  for (let x = -5.2; x <= 4.9; x += 1.45) {
+    prop(PG.cord, 0x1a1a1c, x, 2.75, 3.72, 0, 0, 0, 1, 0.9, 1);
+    P(DG.lantern, 0xfff0d6, x, 2.2, 3.72, 0, 1, 1, 1, PROP.glow);
+    P(DG.lanternRim, 0x1a1a1c, x, 2.38, 3.72); P(DG.lanternRim, 0x1a1a1c, x, 2.02, 3.72);
+  }
+  // prep bench: trays of ready hand-roll boats, a rice tub, stacked plates, bowls, sauce bottles
+  { const [px0, pz0] = PLAN(1310, 1131), [px1, pz1] = PLAN(2473, 1294), pcx = (px0 + px1) / 2, pcz = (pz0 + pz1) / 2, pd = pz1 - pz0;
+    const zb = pcz - pd / 2 + 0.14;
+    for (let t = 0; t < 4; t++) { const tx = pcx - 2.0 + t * 1.3; P(DG.tray, 0x2a2a2e, tx, 0.96, zb); for (let b = -1; b <= 1; b++) boat(tx + b * 0.15, 0.97, zb, Math.PI / 2); }
+    for (const tx of [pcx - 2.55, pcx + 2.5]) { P(DG.stackPl, 0xf2ece0, tx, 0.99, zb); for (let b = 0; b < 3; b++) P(DG.bowl, 0xe9e2d4, tx + 0.18, 1.01 + b * 0.025, zb, 0, 1, 1, 1); }
+    for (let k = 0; k < 6; k++) P(DG.squeeze, k % 2 ? 0xd8332e : 0xf6cf5f, pcx - 0.7 + k * 0.28, 1.0, zb + 0.02);
+  }
+  // rice tubs + hinoki boxes at both ends of the long-run ledge
+  for (const tx of [L.XL + 0.45, L.XR - 0.45]) { P(DG.tub, 0xc9955e, tx, LEDGE_Y + 0.065, L.F - 0.27); P(DG.tubBand, 0x6b6f75, tx, LEDGE_Y + 0.05, L.F - 0.27); P(DG.tubBand, 0x6b6f75, tx, LEDGE_Y + 0.11, L.F - 0.27); }
+}
 const propLit = new THREE.Mesh(mergeGeometries(PROP.lit), new THREE.MeshLambertMaterial({ vertexColors: true }));
 propLit.castShadow = false; propLit.receiveShadow = false; scene.add(propLit);
 const propGlow = new THREE.Mesh(mergeGeometries(PROP.glow), new THREE.MeshBasicMaterial({ vertexColors: true }));
@@ -719,6 +805,20 @@ propGlow.userData.noShadow = true; scene.add(propGlow);
   PENDANTS.forEach(([x, z], i) => { _pm.makeTranslation(x, L.CH + 0.042, z); im.setMatrixAt(i, _pm); });
   im.userData.noShadow = true; im.renderOrder = 2; scene.add(im); }
 
+
+// ---------- v50: RORUBARU neon sign in Megazoid on the wall behind the long run, facing the counter ----------
+const SAKE_FRIDGE = (() => { const fx = -4.9, fz = L.southZ - 0.3;
+  box(0.72, 1.25, 0.36, steel, fx, 0.625, fz); plane(0.62, 1.05, fridgeFace, fx, 0.66, fz - 0.185, Math.PI);
+  box(0.62, 0.05, 0.02, glow(0xff8a5c), fx, 1.2, fz - 0.19); SOLID.push([fx - 0.36, fz - 0.18, fx + 0.36, fz + 0.18]); return fx; })();
+{ const nx = -1.0, nz = L.southZ - 0.16, ny = 1.6;
+  box(2.95, 0.82, 0.05, mat(0x111114), nx, ny, nz + 0.03);
+  box(0.04, 0.5, 0.04, mat(0x111114), nx - 1.2, 1.2, nz + 0.03); box(0.04, 0.5, 0.04, mat(0x111114), nx + 1.2, 1.2, nz + 0.03);
+  const halo = (() => { const c = document.createElement('canvas'); c.width = 256; c.height = 64; const g = c.getContext('2d'); const gr = g.createRadialGradient(128, 32, 4, 128, 32, 128); gr.addColorStop(0, 'rgba(255,110,40,0.55)'); gr.addColorStop(1, 'rgba(255,110,40,0)'); g.fillStyle = gr; g.fillRect(0, 0, 256, 64); return new THREE.CanvasTexture(c); })();
+  const hp = plane(3.6, 1.2, new THREE.MeshBasicMaterial({ map: halo, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }), nx, ny, nz - 0.01, Math.PI); hp.userData.noShadow = true;
+  const neonMat = new THREE.MeshBasicMaterial({ map: fitText('RORUBARU', { color: '#FFB27A', glowColor: 'rgba(246,69,1,0.95)' }), transparent: true, depthWrite: false });
+  const np = plane(2.8, 0.7, neonMat, nx, ny, nz - 0.02, Math.PI); np.userData.noShadow = true; np.renderOrder = 3;
+  MEGA_SIGNS.push([neonMat, () => fitText('RORUBARU', { color: '#FFC79E', glowColor: 'rgba(246,69,1,1)' })]);
+}
 // ---------- DJ booth (on the plan against the glass, DJ faces into the room) ----------
 const dj = { x: -6.53, z: 2.27 };   // v47: plan PLAN(420..590, 1515..1860)
 box(0.7, 1.0, 1.5, mat(0x121216), dj.x, 0.5, dj.z);
@@ -833,7 +933,7 @@ class Person {
     } else if (o.logo) { const lg = new THREE.Mesh(G.logo, logoMat); lg.position.set(0, HIP + 0.33, 0.212); lg.userData.noShadow = true; this.body.add(lg); }
     if (o.phones) { const p = new THREE.Mesh(G.phones, mat(0x222226)); p.position.y = 0.03; p.rotation.y = Math.PI / 2; head.add(p); }
     const sh = new THREE.Mesh(G.shadow, shadowMat); sh.position.y = 0.075; sh.userData.noShadow = true; g.add(sh); this.shadow = sh; g.children[0].userData.person = true; this.body.userData.person = true;
-    const s = o.scale ?? rr(0.94, 1.06); this.body.scale.setScalar(s);
+    const s = o.scale ?? rr(0.7, 0.74); this.body.scale.setScalar(s);   // v50: guests smaller so neighbours never touch (seat pitch 0.5–0.6 m)
     if (QUALITY === 'high') this.body.traverse((c) => { if (c.isMesh && !c.userData.noShadow && c.material !== eyeMat && c.material !== faceMat) c.castShadow = true; });
     this.path = []; this.speed = o.speed ?? rr(1.15, 1.45); this.phase = rand() * 6.28; this.seated = false;
     this.blinkIn = rr(0.5, 4); this.blinkT = -1;
@@ -846,7 +946,7 @@ class Person {
   sit(face) {
     this.seated = true; this.targetHeading = face;
     this.legs.forEach(l => l.rotation.x = -Math.PI / 2);
-    this.body.position.y = SEAT_LIFT; this.shadow.visible = false;
+    this.body.position.y = 0.79 - HIP * this.body.scale.y; this.shadow.visible = false;
   }
   stand() { this.seated = false; this.legs.forEach(l => l.rotation.x = 0); this.body.position.y = 0; this.shadow.visible = true; }
   update(dt, t) {
@@ -1032,7 +1132,7 @@ function guestIdle(p, t, dt) {
 // chefs (black tees, grey aprons, caps — as on opening night)
 const CHEF_HOMES = [-3.3, -1.9, -0.5, 0.9, 2.3, 3.2].map(x => ({ x, z: 1.05 }));
 CHEF_HOMES.forEach((h, i) => {
-  const c = new Person({ shirt: 0x17171a, pants: 0x1c1c20, apron: 0x2e2e33, shoe: 0x111114, cap: i === 2 ? ORANGE : (i % 2 ? 0x111111 : null), band: i % 2 || i === 2 ? null : CREAM, hairStyle: [0, 2, 0, 4, 1, 3][i], speed: 1.7, scale: 1 });
+  const c = new Person({ shirt: 0x17171a, pants: 0x1c1c20, apron: 0x2e2e33, shoe: 0x111114, cap: i === 2 ? ORANGE : (i % 2 ? 0x111111 : null), band: i % 2 || i === 2 ? null : CREAM, hairStyle: [0, 2, 0, 4, 1, 3][i], speed: 1.7, scale: 0.8 });
   c.place(h.x, h.z); c.home = h; c.state = 'idle'; c.heading = c.targetHeading = Math.PI; c.group.rotation.y = Math.PI;
   sim.chefs.push(c);
 });
@@ -1102,7 +1202,7 @@ function updateFlying(dt) {
 }
 
 // DJ, host and back-kitchen cook
-const djP = new Person({ shirt: 0x111114, pants: 0x1a1a1d, phones: true, hair: 0x111111, hairStyle: 4, logo: true, speed: 1, scale: 1.02 });
+const djP = new Person({ shirt: 0x111114, pants: 0x1a1a1d, phones: true, hair: 0x111111, hairStyle: 4, logo: true, speed: 1, scale: 0.82 });
 djP.place(dj.x - 0.55, dj.z); djP.heading = djP.targetHeading = Math.PI / 2; djP.group.rotation.y = Math.PI / 2;
 djP.setAnim((p, t) => {
   const beat = t * (124 / 60) * Math.PI * 2;
@@ -1112,9 +1212,9 @@ djP.setAnim((p, t) => {
   p.arms[1].rotation.x = -0.75 + (Math.sin(beat / 8) > 0.6 ? Math.sin(beat * 2) * 0.35 : 0); p.arms[1].rotation.z = 0.2;
   if (t % 16 > 13) p.arms[0].rotation.x = -2.6 + Math.sin(beat) * 0.2; // hands up for the drop
 });
-const host = new Person({ shirt: 0x17171a, pants: 0x1c1c20, logo: true, hairStyle: 3, speed: 1 });
+const host = new Person({ shirt: 0x17171a, pants: 0x1c1c20, logo: true, hairStyle: 3, speed: 1, scale: 0.8 });
 host.place(-6.55, 0.85); host.heading = host.targetHeading = Math.PI; host.group.rotation.y = Math.PI;
-const cook = new Person({ shirt: 0x17171a, pants: 0x1c1c20, apron: 0x2e2e33, shoe: 0x111114, cap: 0x111111, speed: 1.1 });
+const cook = new Person({ shirt: 0x17171a, pants: 0x1c1c20, apron: 0x2e2e33, shoe: 0x111114, cap: 0x111111, speed: 1.1, scale: 0.8 });
 cook.place(-1.9, -1.2);
 function cookLoop() { cook.go([{ x: 1.4, z: -1.2 }], () => { cook.targetHeading = Math.PI; cook.setAnim(chefRolling); setTimeoutSim(() => { cook.setAnim(null); cook.head.rotation.x = 0; cook.go([{ x: -1.9, z: -1.2 }], () => { cook.targetHeading = Math.PI; cook.setAnim(chefRolling); setTimeoutSim(() => { cook.setAnim(null); cook.head.rotation.x = 0; cookLoop(); }, 5); }); }, 4); }); }
 const simTimers = [];
@@ -1446,11 +1546,16 @@ function worldUV(o) {
 
 // ---------- the real street around the shop (OpenStreetMap), day/night, and the three ways to look ----------
 const city = buildCity(scene);
+if (params.has('nocity')) city.group.visible = false;
+
 camera.far = 3200; camera.updateProjectionMatrix();
 scene.fog = new THREE.Fog(0x0b0d12, 150, 640);
 // pieces that only exist while you walk inside: a ceiling and the full-height side wall
 const walkShell = new THREE.Group(); walkShell.visible = false; scene.add(walkShell);
 box(L.wcX1 + 0.1 - L.glassX, 0.08, L.southZ - L.northZ, mat(0x1b1b20), (L.wcX1 + 0.1 + L.glassX) / 2, H + 0.06, (L.southZ + L.northZ) / 2, walkShell);
+for (const [a, b, c, d] of BOH_UP) box(c - a, 3.33 - 1.05, d - b, mat(0x2a2b31), (a + c) / 2, 1.05 + (3.33 - 1.05) / 2, (b + d) / 2, walkShell);
+for (const [a, b, c, d] of KITCHEN_WALLS) { const w = Math.abs(c - a) || 0.16, dd = Math.abs(d - b) || 0.16; box(w, H - 1.05, dd, wallMat, (a + c) / 2, 1.05 + (H - 1.05) / 2, (b + d) / 2, walkShell); }
+for (const [cr, cx, cz] of COL_TOPS) cyl(cr, cr, H - 1.09, 16, colMat, cx, 1.09 + (H - 1.09) / 2, cz, walkShell);
 box(L.wcX1 + 0.1 - L.glassX, H - 1.05, 0.16, wallMat, (L.wcX1 + 0.1 + L.glassX) / 2, 1.05 + (H - 1.05) / 2, L.southZ, walkShell);
 // (v47) at eye level the long hallway wall is the one lit wall, floor to ~2.7 m: backlit stone behind mesh in black steel frames (Kurate RORU-30/32)
 box(L.eastX - L.glassX - 0.5, 1.62, 0.03, tealPanel, (L.eastX + L.glassX) / 2 + 0.05, 1.04 + 0.81, L.southZ - 0.1, walkShell);
@@ -1540,7 +1645,7 @@ function updateCompass() {
 
 // modes: room (the bar), street (the block from above), walk (ground level from the MTR)
 let mode = 'room';
-const ROOM_LIMITS = { minDistance: 7, maxDistance: 48, minPolarAngle: 0.28, maxPolarAngle: 1.32, minAzimuthAngle: -1.25, maxAzimuthAngle: 1.25 };
+const ROOM_LIMITS = { minDistance: 7, maxDistance: 48, minPolarAngle: 0.28, maxPolarAngle: 1.32, minAzimuthAngle: -Infinity, maxAzimuthAngle: Infinity };
 const STREET_LIMITS = { minDistance: 10, maxDistance: 560, minPolarAngle: 0.05, maxPolarAngle: 1.45, minAzimuthAngle: -Infinity, maxAzimuthAngle: Infinity };
 const NORTH_AZ = Math.atan2(-city.north[0], -city.north[1]);
 function streetView() { const portrait = innerWidth / innerHeight < 0.9; return { t: new THREE.Vector3(-4, 0, 30), az: NORTH_AZ + 0.32, pol: portrait ? 0.5 : 0.6, d: portrait ? 400 : 300 }; }
@@ -1710,8 +1815,9 @@ addEventListener('keyup', (e) => { WALK.keys[e.key.toLowerCase()] = false; });
 
 // ---------- camera framing ----------
 const VIEW = {
-  wide: { target: new THREE.Vector3(0.2, 0.4, -0.9), az: -0.45, polar: 0.95, dist: 23.5, fov: 38 },
-  tall: { target: new THREE.Vector3(-3.6, 0.4, -0.2), az: -0.62, polar: 0.82, dist: 33, fov: 55 },
+  // v50: looks in from the kitchen side (north-east) so the guests at the long run face the camera; closer, so faces read on a phone
+  wide: { target: new THREE.Vector3(-0.6, 0.4, 1.7), az: 2.62, polar: 0.9, dist: 15.5, fov: 38 },
+  tall: { target: new THREE.Vector3(-1.2, 0.4, 2.2), az: 2.62, polar: 0.86, dist: 17.5, fov: 40 },
 };
 let homeView;
 function frame(initial) {
@@ -1939,7 +2045,7 @@ function render(dt) {
   if (mode === 'street' && !fly.on) { const t = controls.target; const r = Math.hypot(t.x, t.z); if (r > 300) { t.x *= 300 / r; t.z *= 300 / r; } t.y = Math.max(0, Math.min(30, t.y)); }
   if (Math.abs(DN.k - DN.target) > 0.002) { DN.k += Math.sign(DN.target - DN.k) * Math.min(Math.abs(DN.target - DN.k), dt / 1.1); applyDN(DN.k); }
   const camD = camera.position.distanceTo(controls.target);
-  if (mode === 'walk') city.setCut(0, false, 0); else if (mode === 'room') city.setCut(camD > 60 ? 10 : 0, true, camD > 60 ? 0 : 28); else city.setCut(Math.min(40, 12 + camD * 0.06), true, 0, camD > 90 ? camD * 0.42 : 0);
+  if (mode === 'walk') city.setCut(0, false, 0); else if (mode === 'room') city.setCut(10, true, camD > 60 ? 0 : 28);   // v50: always cut a sight-line hole now that the default looks in over the neighbouring block else city.setCut(Math.min(40, 12 + camD * 0.06), true, 0, camD > 90 ? camD * 0.42 : 0);
   city.update(dt, camera, controls.target, mode);
   renderer.render(scene, camera);
   updateLabels(); updatePops(dt); updateHotspots(); updateCityLabels(); updateCompass();
