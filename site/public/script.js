@@ -409,12 +409,12 @@ for (let x = -4; x <= 2; x += 3) { const f = cyl(0.17, 0.17, 0.05, 12, mat(0x6d7
 // (v47) built in full further down: curtain, lobby, double basin, two washlet cubicles
 
 // ceiling LED outline above the counter (the white light loop in the photos)
-const ledMat = glow(0xdfe6f5);
+const ledMat = glow(0xdfe6f5); const LEDG = new THREE.Group(); scene.add(LEDG);   // v51: walk mode only (its long run read as a stray white line across the top of the phone view)
 const ledPts = [[-5.35, -1.0], [-5.35, 2.6], [-4.75, 3.25], [4.5, 3.25], [5.15, 2.6], [5.15, 0.1]];
 for (let i = 0; i < ledPts.length - 1; i++) {
   const [ax, az] = ledPts[i], [bx, bz] = ledPts[i + 1];
   const len = Math.hypot(bx - ax, bz - az);
-  const m = box(len, 0.035, 0.035, ledMat, (ax + bx) / 2, 2.85, (az + bz) / 2);
+  const m = box(len, 0.035, 0.035, ledMat, (ax + bx) / 2, 2.85, (az + bz) / 2, LEDG);
   m.rotation.y = -Math.atan2(bz - az, bx - ax);
 }
 // exposed ducts (painted black ceiling services)
@@ -591,6 +591,13 @@ seats.forEach((s, si) => {
   if (s.side === 'L') { s.face = Math.PI / 2; s.chef = { x: L.XL + 0.6, z: s.z }; s.chefFace = -Math.PI / 2; s.plate = { x: L.XL - 0.2, z: s.z }; }
   if (s.side === 'R') { s.face = -Math.PI / 2; s.chef = { x: L.XR - 0.6, z: s.z }; s.chefFace = Math.PI / 2; s.plate = { x: L.XR + 0.2, z: s.z }; }
   if (s.side === 'C') { s.face = 3 * Math.PI / 4; s.chef = { x: L.XL + 0.55, z: L.F - 0.55 }; s.chefFace = -Math.PI / 4; s.plate = { x: L.XL - 0.18, z: L.F + 0.18 }; }
+  // v51: guests on the two legs sit turned on their stools toward the room (the default camera looks in from the kitchen side), so their faces show
+  if (s.side === 'L' || s.side === 'R' || s.side === 'C') {
+    const camA = Math.atan2(4.1 - s.x, -7.8 - s.z), d = Math.atan2(Math.sin(camA - s.face), Math.cos(camA - s.face));
+    s.guestFace = s.face + d * (s.side === 'R' ? 0.62 : 0.5);
+    const cd = Math.atan2(Math.sin(camA - s.chefFace), Math.cos(camA - s.chefFace));
+    if (s.side !== 'C') s.chefFace = s.chefFace + cd * 0.45;   // chefs serving a leg turn a little toward the room too
+  }
   const bx = -Math.sin(s.face), bz = -Math.cos(s.face);   // toward the stool's back (away from the counter)
   const px = -bz, pz = bx;
   cyl(0.2, 0.19, 0.08, 14, stoolSeat, s.x, 0.72, s.z);
@@ -1069,7 +1076,7 @@ function seatGuest(g, s, direct = false) {
   g.state = 'entering';
   const arrive = () => {
     s.reserved = false; s.occupied = g; g.state = 'seated';
-    g.place(s.x, s.z); g.sit(s.face);
+    g.place(s.x, s.z); g.sit(s.guestFace != null ? s.guestFace : s.face);
     g.cup = new THREE.Mesh(G.cup, mat(CREAM)); scene.add(g.cup);
     const off = s.side === 'F' ? [0.22, 0] : s.side === 'C' ? [0.2, -0.06] : [0, s.side === 'L' ? -0.22 : 0.22];
     g.cup.position.set(s.plate.x + off[0], L.CH + 0.06, s.plate.z + off[1]);
@@ -1554,6 +1561,7 @@ scene.fog = new THREE.Fog(0x0b0d12, 150, 640);
 const walkShell = new THREE.Group(); walkShell.visible = false; scene.add(walkShell);
 box(L.wcX1 + 0.1 - L.glassX, 0.08, L.southZ - L.northZ, mat(0x1b1b20), (L.wcX1 + 0.1 + L.glassX) / 2, H + 0.06, (L.southZ + L.northZ) / 2, walkShell);
 for (const m of HOOD) walkShell.attach(m);
+walkShell.attach(LEDG);
 for (const [a, b, c, d] of BOH_UP) box(c - a, 3.33 - 1.05, d - b, mat(0x2a2b31), (a + c) / 2, 1.05 + (3.33 - 1.05) / 2, (b + d) / 2, walkShell);
 for (const [a, b, c, d] of KITCHEN_WALLS) { const w = Math.abs(c - a) || 0.16, dd = Math.abs(d - b) || 0.16; box(w, H - 1.05, dd, wallMat, (a + c) / 2, 1.05 + (H - 1.05) / 2, (b + d) / 2, walkShell); }
 for (const [cr, cx, cz] of COL_TOPS) cyl(cr, cr, H - 1.09, 16, colMat, cx, 1.09 + (H - 1.09) / 2, cz, walkShell);
@@ -1584,8 +1592,11 @@ const hemiL = scene.children.find((o) => o.isHemisphereLight), ambL = scene.chil
 const DN = { k: 1, target: 1, manual: false };
 const hkHour = () => { const d = new Date(Date.now() + 8 * 3600e3); return d.getUTCHours() + d.getUTCMinutes() / 60; };
 const autoNight = () => { const h = hkHour(); return (h >= 18.5 || h < 6.5) ? 1 : 0; };
-DN.target = DN.k = params.has('day') ? 0 : params.has('night') ? 1 : autoNight();
+// v51: on the preview link (or ?bright) the room is always lit bright, warm and soft like the reel; ?night still shows the night view, and the toggle still works
+const BRIGHT = (FORCE_OPEN || params.has('bright')) && !params.has('night');
+DN.target = DN.k = params.has('day') || BRIGHT ? 0 : params.has('night') ? 1 : autoNight();
 const C = { bgN: new THREE.Color(0x0b0d12), bgD: new THREE.Color(0xa7c2da), hN: new THREE.Color(0xa9b8d8), hD: new THREE.Color(0xeef3f8), gN: new THREE.Color(0x2a2018), gD: new THREE.Color(0x8d8371), sN: new THREE.Color(0xc9d6ff), sD: new THREE.Color(0xfff0d8) };
+if (BRIGHT) { C.hD.set(0xfff1e2); C.gD.set(0xb09a82); C.sD.set(0xffe8c8); C.bgD.set(0xf4e3d3); }   // v51: warm pastel daylight on the preview
 const SOUTH = new THREE.Vector3(-city.north[0], 0, -city.north[1]);
 function applyDN(k) {
   scene.background.lerpColors(C.bgD, C.bgN, k); scene.fog.color.copy(scene.background);
@@ -1602,7 +1613,7 @@ function applyDN(k) {
 }
 applyDN(DN.k);
 document.getElementById('dayNight')?.addEventListener('click', () => { DN.target = DN.target > 0.5 ? 0 : 1; DN.manual = true; applyDN(DN.k); });
-setInterval(() => { if (!DN.manual) DN.target = autoNight(); }, 60000);
+setInterval(() => { if (!DN.manual && !BRIGHT) DN.target = autoNight(); }, 60000);
 
 // labels on the street: bilingual road names, landmarks, MTR exit, the bus stop by the door
 const cityLabels = [];
