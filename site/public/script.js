@@ -402,8 +402,8 @@ box(1.0, 0.5, 0.8, mat(0x5b616a), -3.4, 2.3, -1.75);
   box(0.07, 2.3, 0.03, glow(0xff2a1c), -4.45, 1.45, L.frontZ + 0.11);
   const rw = plane(0.9, 1.6, new THREE.MeshBasicMaterial({ color: 0xff2a1c, transparent: true, opacity: 0.18, depthWrite: false, blending: THREE.AdditiveBlending }), -4.45, 1.45, L.frontZ + 0.12); rw.userData.keep = true; }
 // exposed silver ducts under the black ceiling, over the back kitchen
-cyl(0.16, 0.16, 6.6, 12, mat(0xaab0b8), -0.87, 2.98, L.northZ + 0.55).rotation.z = Math.PI / 2;
-for (let x = -4; x <= 2; x += 3) cyl(0.17, 0.17, 0.05, 12, mat(0x6d737b), x, 2.98, L.northZ + 0.55).rotation.z = Math.PI / 2;
+const HOOD = [cyl(0.16, 0.16, 6.6, 12, mat(0xaab0b8), -0.87, 2.98, L.northZ + 0.55)]; HOOD[0].rotation.z = Math.PI / 2;   // v50: only shown in walk mode (it cut across the new overview)
+for (let x = -4; x <= 2; x += 3) { const f = cyl(0.17, 0.17, 0.05, 12, mat(0x6d737b), x, 2.98, L.northZ + 0.55); f.rotation.z = Math.PI / 2; HOOD.push(f); }
 
 // washrooms (right)
 // (v47) built in full further down: curtain, lobby, double basin, two washlet cubicles
@@ -1553,6 +1553,7 @@ scene.fog = new THREE.Fog(0x0b0d12, 150, 640);
 // pieces that only exist while you walk inside: a ceiling and the full-height side wall
 const walkShell = new THREE.Group(); walkShell.visible = false; scene.add(walkShell);
 box(L.wcX1 + 0.1 - L.glassX, 0.08, L.southZ - L.northZ, mat(0x1b1b20), (L.wcX1 + 0.1 + L.glassX) / 2, H + 0.06, (L.southZ + L.northZ) / 2, walkShell);
+for (const m of HOOD) walkShell.attach(m);
 for (const [a, b, c, d] of BOH_UP) box(c - a, 3.33 - 1.05, d - b, mat(0x2a2b31), (a + c) / 2, 1.05 + (3.33 - 1.05) / 2, (b + d) / 2, walkShell);
 for (const [a, b, c, d] of KITCHEN_WALLS) { const w = Math.abs(c - a) || 0.16, dd = Math.abs(d - b) || 0.16; box(w, H - 1.05, dd, wallMat, (a + c) / 2, 1.05 + (H - 1.05) / 2, (b + d) / 2, walkShell); }
 for (const [cr, cx, cz] of COL_TOPS) cyl(cr, cr, H - 1.09, 16, colMat, cx, 1.09 + (H - 1.09) / 2, cz, walkShell);
