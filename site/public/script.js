@@ -1592,8 +1592,8 @@ const hemiL = scene.children.find((o) => o.isHemisphereLight), ambL = scene.chil
 const DN = { k: 1, target: 1, manual: false };
 const hkHour = () => { const d = new Date(Date.now() + 8 * 3600e3); return d.getUTCHours() + d.getUTCMinutes() / 60; };
 const autoNight = () => { const h = hkHour(); return (h >= 18.5 || h < 6.5) ? 1 : 0; };
-// v51: on the preview link (or ?bright) the room is always lit bright, warm and soft like the reel; ?night still shows the night view, and the toggle still works
-const BRIGHT = (FORCE_OPEN || params.has('bright')) && !params.has('night');
+// v51/v52: everywhere (rorubaru.com and the preview) the room is lit bright, warm and soft like the reel; ?night still shows the night view, and the toggle still works
+const BRIGHT = !params.has('night');   // live site too (Dominic liked it, Oct 27): bright by default at any hour; the open/closed status still follows real HK hours
 DN.target = DN.k = params.has('day') || BRIGHT ? 0 : params.has('night') ? 1 : autoNight();
 const C = { bgN: new THREE.Color(0x0b0d12), bgD: new THREE.Color(0xa7c2da), hN: new THREE.Color(0xa9b8d8), hD: new THREE.Color(0xeef3f8), gN: new THREE.Color(0x2a2018), gD: new THREE.Color(0x8d8371), sN: new THREE.Color(0xc9d6ff), sD: new THREE.Color(0xfff0d8) };
 if (BRIGHT) { C.hD.set(0xfff1e2); C.gD.set(0xb09a82); C.sD.set(0xffe8c8); C.bgD.set(0xf4e3d3); }   // v51: warm pastel daylight on the preview
