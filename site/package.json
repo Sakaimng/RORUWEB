@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "dev:turbo": "next dev --turbopack",
+    "prebuild": "node scripts/menu-jsonld.mjs",
     "build": "next build",
+    "assets:menu-jsonld": "node scripts/menu-jsonld.mjs",
     "start": "next start",
     "lint": "next lint",
     "assets:home-covers": "node scripts/optimize-home-covers.mjs",

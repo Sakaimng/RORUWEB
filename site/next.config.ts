@@ -6,6 +6,20 @@ const nextConfig: NextConfig = {
       beforeFiles: [
         /** The 3D RORUBARU room (static, in public/) is the homepage. Language and inner pages stay Next.js routes. */
         { source: "/", destination: "/rorubaru-3d.html" },
+        /**
+         * The old Next.js pages (menu, about, events, reserve, delivery, story, order and the
+         * /ja + /zh-Hant versions) are retired: those URLs now serve the same 3D room, and a small
+         * script in rorubaru-3d.html opens the matching panel (and language) from the path.
+         * The address stays the same, so links and Google results keep working.
+         */
+        ...["", "/ja", "/zh-Hant"].flatMap((lang) =>
+          ["menu", "about", "story", "events", "reserve", "delivery", "order"].map((page) => ({
+            source: `${lang}/${page}`,
+            destination: "/rorubaru-3d.html",
+          })),
+        ),
+        { source: "/ja", destination: "/rorubaru-3d.html" },
+        { source: "/zh-Hant", destination: "/rorubaru-3d.html" },
         /** The two largest story videos are served from the site's mirror (too big for the repo upload path). */
         { source: "/story/story_v3_16x9.mp4", destination: "https://rorubaru-live-counter.sites.tab.bot/story/story_v3_16x9.mp4" },
         { source: "/story/story_v3_9x16.mp4", destination: "https://rorubaru-live-counter.sites.tab.bot/story/story_v3_9x16.mp4" },
