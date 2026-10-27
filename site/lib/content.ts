@@ -37,8 +37,9 @@ export const TOCK_URL = "https://www.exploretock.com/roru-baru";
 /** Inquiries: shown in the footer and as fallback when email delivery is not configured. */
 export const INQUIRY_PUBLIC_EMAIL = "hello@rorubaru.com";
 
+/** RORUBARU's own Google Business Profile place (opens the listing in Maps). */
 export const SITE_MAP_URL =
-  "https://maps.google.com/?q=100-102+Queen's+Road+East,+Wan+Chai,+Hong+Kong";
+  "https://www.google.com/maps/place/?q=place_id:ChIJiXGqd_gBBDQRx5p02pi-TIY";
 
 /** Single line for the fixed nav address strip. */
 export const SITE_ADDRESS_DOCK_LINE =

@@ -1,7 +1,7 @@
 import { MenuPageClient } from "@/components/menu/MenuPageClient";
 import { PageOverlayShell } from "@/components/PageOverlayShell";
 import { JsonLd } from "@/components/JsonLd";
-import { MENU_BOARDS, type MenuItem } from "@/lib/menu";
+import { PUBLISHED_MENU_BOARDS, type MenuItem } from "@/lib/menu";
 import type { Lang } from "@/lib/i18n";
 import { breadcrumbList, menuSchema } from "@/lib/structured-data";
 
@@ -37,7 +37,7 @@ export function MenuView({ lang }: { lang: Lang }) {
           RORUBARU menu — hand rolls (temaki), à la carte and drinks in Wan Chai,
           Hong Kong
         </h2>
-        {MENU_BOARDS.map((board) => (
+        {PUBLISHED_MENU_BOARDS.map((board) => (
           <section key={board.id}>
             <h3>{board.name}</h3>
             {board.note ? <p>{board.note}</p> : null}

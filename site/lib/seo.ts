@@ -69,7 +69,7 @@ export const TOCK_RESERVATION_URL = "https://www.exploretock.com/roru-baru";
 
 /** Postal address (PostalAddress schema fields). */
 export const SITE_ADDRESS = {
-  streetAddress: "G/F, 100–102 Queen's Road East",
+  streetAddress: "G/F, 100-102 Queen's Road East",
   addressLocality: "Wan Chai",
   addressRegion: "Hong Kong Island",
   postalCode: "",
@@ -87,7 +87,12 @@ export const SITE_GEO = {
 
 /** Google Maps link (matches lib/content.ts SITE_MAP_URL). */
 export const SITE_MAP_URL =
-  "https://maps.google.com/?q=100-102+Queen's+Road+East,+Wan+Chai,+Hong+Kong";
+  "https://www.google.com/maps/place/?q=place_id:ChIJiXGqd_gBBDQRx5p02pi-TIY";
+
+/** RORUBARU's Google Business Profile (Place ID verified Oct 8 2026) + its review link. */
+export const GOOGLE_BUSINESS_PROFILE_URL = SITE_MAP_URL;
+export const GOOGLE_REVIEW_URL =
+  "https://search.google.com/local/writereview?placeid=ChIJiXGqd_gBBDQRx5p02pi-TIY";
 
 /**
  * Opening hours for `openingHoursSpecification`.
@@ -114,7 +119,6 @@ export const SERVES_CUISINE = [
   "Japanese",
   "Hand Roll",
   "Temaki",
-  "Sushi",
   "Sake Bar",
 ] as const;
 
@@ -130,6 +134,8 @@ export const SOCIAL_PROFILES = [
   "https://www.tripadvisor.com/Restaurant_Review-g294217-d34135021-Reviews-Roru_Baru-Hong_Kong.html",
   "https://www.openrice.com/en/hongkong/r-roru-baru-wan-chai-japanese-sushi-sashimi-r1123011",
   "https://www.xiaohongshu.com/user/profile/65e060a1000000000500f54e",
+  "https://www.google.com/maps/place/?q=place_id:ChIJiXGqd_gBBDQRx5p02pi-TIY",
+  "https://www.foodpanda.hk/restaurant/fbv3/rorubaru-extended-delivery-fbv3",
 ] as const;
 
 /** Default Open Graph share image (served from /public). */

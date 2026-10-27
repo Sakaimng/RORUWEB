@@ -101,7 +101,6 @@ export const rootMetadata: Metadata = {
   other: {
     "mobile-web-app-capable": "yes",
     copyright: "© 2026 We Rolling Limited. All rights reserved.",
-    robots: "noai, noimageai",
   },
 };
 

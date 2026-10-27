@@ -31,7 +31,7 @@ import {
   absoluteUrl,
 } from "@/lib/seo";
 import type { SiteEvent } from "@/lib/content";
-import { MENU_BOARDS, PRICE_CURRENCY, type MenuItem } from "@/lib/menu";
+import { PUBLISHED_MENU_BOARDS, PRICE_CURRENCY, type MenuItem } from "@/lib/menu";
 import { withLocale } from "@/lib/locale-routing";
 import type { Lang } from "@/lib/i18n";
 
@@ -246,7 +246,7 @@ export function menuSchema(): JsonLdNode {
     inLanguage: "en",
     url: absoluteUrl("/menu"),
     isPartOf: { "@id": RESTAURANT_ID },
-    hasMenuSection: MENU_BOARDS.map((board) => ({
+    hasMenuSection: PUBLISHED_MENU_BOARDS.map((board) => ({
       "@type": "MenuSection",
       name: board.name,
       ...(board.note ? { description: board.note } : {}),

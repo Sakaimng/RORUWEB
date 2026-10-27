@@ -6,31 +6,42 @@ import { SITE_URL } from "@/lib/seo";
  * and points to the sitemap so search engines discover every page.
  */
 /**
- * AI-training and content-copy scrapers are refused site-wide. Search engines
- * (Googlebot, Bingbot, Applebot, DuckDuckBot…) and link previews
- * (facebookexternalhit, Twitterbot, WhatsApp) stay fully allowed via "*".
- * Google-Extended / Applebot-Extended only opt out of AI training, not search.
+ * AI answer engines and AI search crawlers are ALLOWED (Dominic, Oct 27 2026), so
+ * ChatGPT, Perplexity, Claude, Apple Intelligence and Gemini can read and quote
+ * the site when people ask about hand rolls in Hong Kong. They fall under "*".
+ * Only bulk scrapers that build training datasets / resell content are refused.
  */
-const AI_SCRAPERS = [
-  "GPTBot",
-  "ChatGPT-User",
+const BLOCKED_SCRAPERS = [
   "CCBot",
-  "ClaudeBot",
-  "Claude-Web",
-  "anthropic-ai",
-  "Google-Extended",
-  "PerplexityBot",
   "Bytespider",
-  "Amazonbot",
-  "Applebot-Extended",
   "Diffbot",
   "ImagesiftBot",
   "Omgilibot",
   "Omgili",
-  "FacebookBot",
-  "Meta-ExternalAgent",
-  "cohere-ai",
   "img2dataset",
+];
+
+/** Named explicitly so the welcome is unambiguous (same rules as "*"). */
+const AI_SEARCH_BOTS = [
+  "OAI-SearchBot",
+  "ChatGPT-User",
+  "GPTBot",
+  "PerplexityBot",
+  "Perplexity-User",
+  "ClaudeBot",
+  "Claude-SearchBot",
+  "Claude-User",
+  "Claude-Web",
+  "anthropic-ai",
+  "Applebot",
+  "Applebot-Extended",
+  "Google-Extended",
+  "Amazonbot",
+  "Meta-ExternalAgent",
+  "FacebookBot",
+  "cohere-ai",
+  "DuckAssistBot",
+  "MistralAI-User",
 ];
 
 export default function robots(): MetadataRoute.Robots {
@@ -42,7 +53,12 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/api/", "/story"],
       },
       {
-        userAgent: AI_SCRAPERS,
+        userAgent: AI_SEARCH_BOTS,
+        allow: "/",
+        disallow: ["/api/", "/story"],
+      },
+      {
+        userAgent: BLOCKED_SCRAPERS,
         disallow: "/",
       },
     ],

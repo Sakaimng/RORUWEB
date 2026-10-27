@@ -56,6 +56,14 @@ export function SiteFooter() {
               >
                 FACEBOOK
               </a>
+              <a
+                href="https://search.google.com/local/writereview?placeid=ChIJiXGqd_gBBDQRx5p02pi-TIY"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="roru-footer__link"
+              >
+                GOOGLE REVIEW
+              </a>
             </div>
 
             <div className="roru-footer__col">
