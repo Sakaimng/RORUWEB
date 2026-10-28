@@ -132,7 +132,7 @@ export const SOCIAL_PROFILES = [
   "https://www.facebook.com/profile.php?id=61587043343492",
   "https://www.exploretock.com/roru-baru",
   "https://www.tripadvisor.com/Restaurant_Review-g294217-d34135021-Reviews-Roru_Baru-Hong_Kong.html",
-  "https://www.openrice.com/en/hongkong/r-roru-baru-wan-chai-japanese-sushi-sashimi-r1123011",
+  "https://www.openrice.com/en/hongkong/r-roru-baru-wan-chai-r1123011",
   "https://www.xiaohongshu.com/user/profile/65e060a1000000000500f54e",
   "https://www.google.com/maps/place/?q=place_id:ChIJiXGqd_gBBDQRx5p02pi-TIY",
   "https://www.foodpanda.hk/restaurant/fbv3/rorubaru-extended-delivery-fbv3",

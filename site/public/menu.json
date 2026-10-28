@@ -195,6 +195,7 @@
      "items": [
       {
        "name": "Ossetra Caviar (50g)",
+       "private_only": true,
        "nameZh": "Ossetra 魚子醬 (50克)",
        "price": 488
       }
