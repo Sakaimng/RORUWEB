@@ -1035,7 +1035,7 @@ const sim = {
 };
 // opening hours drive the room: the same Hong Kong state as the header clock (hours.js)
 // preview link only (or ?open): the demo room is always open so the characters can be seen at any hour
-const FORCE_OPEN = params.has('open') || /room-preview/.test(location.hostname);
+const FORCE_OPEN = params.has('open') || /room-preview|costumes-preview/.test(location.hostname);
 const shopState = () => (FORCE_OPEN ? 'open' : hkStatus(new Date()).state);
 const SHOP = { state: shopState(), k: 0, closedAt: 0 };
 // seed today's count from the HK clock (demo: about 1.15 rolls a minute since noon)
@@ -1136,6 +1136,273 @@ function guestIdle(p, t, dt) {
   if (p.leaveIn !== undefined) { p.leaveIn -= dt; if (p.leaveIn <= 0) { p.leaveIn = undefined; p.head.rotation.set(0, 0, 0); leave(p); } }
 }
 
+// ---------- crew costumes (v51): the staff dress up for the season, same date windows + URL overrides as seasonal.js ----------
+// Halloween 24 Oct-1 Nov, Christmas 1-26 Dec, Lunar New Year (HK dates). ?season=halloween|christmas|cny previews one,
+// ?season=none = everyday outfits, ?seasondate=YYYY-MM-DD simulates a day. When seasonal.js has already decided
+// (window.RoruSeason) its choice wins, so the page theme and the costumes always match.
+// Low-poly primitives only, merged per person (vertex colours): about two extra draw calls per crew member.
+const CREW_SEASON = (() => {
+  const OWN = { halloween: 1, christmas: 1, cny: 1 };
+  try {
+    const rs = window.RoruSeason;
+    if (rs && 'theme' in rs) return OWN[rs.theme] ? rs.theme : null;
+    const qs = new URLSearchParams(location.search);
+    let q = (qs.get('season') || '').toLowerCase();
+    if (q) { try { sessionStorage.setItem('roruSeason', q); } catch (e) {} }
+    else { try { q = (sessionStorage.getItem('roruSeason') || '').toLowerCase(); } catch (e) {} }
+    if (q) return OWN[q] ? q : null;
+    const sd = qs.get('seasondate');
+    const day = /^\d{4}-\d{2}-\d{2}$/.test(sd || '') ? sd : new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+    const md = day.slice(5);
+    if (md >= '10-24' && md <= '11-01') return 'halloween';
+    if (md >= '12-01' && md <= '12-26') return 'christmas';
+    const CNY = [['2027-02-04', '2027-02-20'], ['2028-01-20', '2028-02-09']];
+    if (CNY.some(([a, b]) => day >= a && day <= b)) return 'cny';
+  } catch (e) {}
+  return null;
+})();
+document.documentElement.dataset.crew = CREW_SEASON || 'none';
+
+const COST_MAT = new THREE.MeshLambertMaterial({ vertexColors: true });
+const COST_BACK = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.BackSide });   // a cape's lining
+const COST_GLOW = new THREE.MeshBasicMaterial({ vertexColors: true });
+// one costume = a list of parts; each part is a small geometry already placed in head or body space
+function cPart(geo, hex, ops = []) {
+  for (const [op, a, b, c] of ops) {
+    if (op === 's') geo.scale(a, b, c); else if (op === 't') geo.translate(a, b, c);
+    else if (op === 'x') geo.rotateX(a); else if (op === 'y') geo.rotateY(a); else if (op === 'z') geo.rotateZ(a);
+  }
+  return vColor(geo, hex);
+}
+function cMesh(parts, material, parent, ops = []) {
+  if (!parts.length) return null;
+  const g = merged(parts);
+  for (const [op, a, b, c] of ops) { if (op === 'x') g.rotateX(a); else if (op === 'z') g.rotateZ(a); else if (op === 't') g.translate(a, b, c); }
+  const m = new THREE.Mesh(g, material);
+  if (QUALITY === 'high') m.castShadow = true;
+  parent.add(m); return m;
+}
+const SPH = (r, w = 12, h = 8) => new THREE.SphereGeometry(r, w, h);
+const CYL = (rt, rb, h, s = 14, open = false, t0 = 0, tl = Math.PI * 2) => new THREE.CylinderGeometry(rt, rb, h, s, 1, open, t0, tl);
+const CONE = (r, h, s = 12) => new THREE.ConeGeometry(r, h, s);
+const TOR = (r, tube, rs = 6, ts = 20, arc = Math.PI * 2) => new THREE.TorusGeometry(r, tube, rs, ts, arc);
+const CAPS = (r, len) => new THREE.CapsuleGeometry(r, len, 3, 6);
+
+// --- headgear (head space: head centre at 0, crown of the hair ~0.29, face toward +z) ---
+function hatWitch(crown, band, buckle) {
+  return [
+    cPart(CYL(0.4, 0.4, 0.03, 24), crown, [['t', 0, 0.22, 0]]),
+    cPart(CYL(0.13, 0.22, 0.27, 16), crown, [['t', 0, 0.36, 0]]),
+    cPart(CYL(0.214, 0.222, 0.065, 16), band, [['t', 0, 0.265, 0]]),
+    cPart(new THREE.BoxGeometry(0.075, 0.06, 0.02), buckle, [['t', 0, 0.265, 0.222]]),
+    cPart(new THREE.BoxGeometry(0.04, 0.03, 0.022), band, [['t', 0, 0.265, 0.224]]),
+    cPart(CONE(0.13, 0.28, 14), crown, [['t', 0, 0.14, 0], ['z', -0.6], ['t', 0, 0.48, 0]]),
+  ];
+}
+function hatSanta() {
+  return [
+    cPart(TOR(0.235, 0.058, 8, 22), 0xffffff, [['x', Math.PI / 2], ['t', 0, 0.2, 0]]),
+    cPart(CYL(0.12, 0.25, 0.25, 16), 0xc8102e, [['t', 0, 0.33, 0]]),
+    cPart(CONE(0.12, 0.26, 12), 0xc8102e, [['t', 0, 0.13, 0], ['z', -1.15], ['t', 0, 0.45, 0]]),
+    cPart(SPH(0.07), 0xffffff, [['t', 0.25, 0.56, 0]]),
+  ];
+}
+function hatElf() {
+  return [
+    cPart(TOR(0.235, 0.045, 8, 22), 0xc8102e, [['x', Math.PI / 2], ['t', 0, 0.2, 0]]),
+    cPart(CYL(0.1, 0.24, 0.3, 16), 0x1f8a4c, [['t', 0, 0.35, 0]]),
+    cPart(CONE(0.1, 0.32, 12), 0x1f8a4c, [['t', 0, 0.16, 0], ['z', 0.95], ['t', 0, 0.5, 0]]),
+    cPart(SPH(0.055), 0xf2c230, [['t', -0.27, 0.68, 0]]),
+  ];
+}
+function elfEars(skin) {
+  return [-1, 1].map((s) => cPart(CONE(0.05, 0.15, 8), skin, [['z', -s * 1.25], ['t', s * 0.32, 0.03, -0.01]]));
+}
+function antlers() {
+  const B = 0x8a5a33, out = [cPart(TOR(0.3, 0.016, 6, 24, Math.PI), 0x5b3a1e, [])];
+  for (const s of [-1, 1]) {
+    out.push(cPart(CAPS(0.026, 0.2), B, [['z', -s * 0.42], ['t', s * 0.21, 0.36, 0]]));
+    out.push(cPart(CAPS(0.02, 0.1), B, [['z', s * 0.35], ['t', s * 0.19, 0.46, 0]]));
+    out.push(cPart(CAPS(0.02, 0.1), B, [['z', -s * 1.15], ['t', s * 0.32, 0.4, 0]]));
+    out.push(cPart(CAPS(0.018, 0.08), B, [['z', -s * 0.25], ['t', s * 0.29, 0.5, 0]]));
+  }
+  return out;
+}
+const redNose = () => [cPart(SPH(0.045), 0xff2020, [['t', 0, -0.045, 0.275]])];
+function devilHorns(hex) {
+  return [-1, 1].map((s) => cPart(CONE(0.058, 0.18, 10), hex, [['t', 0, 0.09, 0], ['z', -s * 0.5], ['x', -0.15], ['t', s * 0.13, 0.22, 0.05]]));
+}
+function devilHood() {   // a red hood so the horns read cleanly over any hairstyle
+  return [
+    cPart(new THREE.SphereGeometry(0.315, 18, 9, 0, Math.PI * 2, 0, Math.PI * 0.5), 0xb3171b, [['t', 0, 0.02, -0.01]]),
+    cPart(TOR(0.3, 0.028, 6, 22), 0x7a0d10, [['x', Math.PI / 2], ['t', 0, 0.025, 0]]),
+    ...[-1, 1].map((s) => cPart(CONE(0.08, 0.27, 10), 0xff3b2a, [['t', 0, 0.135, 0], ['z', -s * 0.5], ['x', -0.12], ['t', s * 0.14, 0.25, 0.05]])),
+  ];
+}
+function pumpkinHat() {
+  const O = 0xf26a10, K = 0x1b1310, out = [
+    cPart(SPH(0.2, 14, 10), 0xff7a1a, [['s', 1.18, 0.72, 1.12], ['t', 0, 0.31, 0]]),
+    cPart(CYL(0.026, 0.036, 0.09, 6), 0x3b6b1e, [['t', 0, 0.47, 0]]),
+    cPart(SPH(0.05, 8, 6), 0x4c8a26, [['s', 1.7, 0.3, 0.9], ['z', 0.3], ['t', 0.07, 0.45, 0]]),
+  ];
+  for (const s of [-1, 1]) {
+    out.push(cPart(SPH(0.15, 12, 8), O, [['s', 1, 0.95, 1.1], ['t', s * 0.12, 0.3, 0]]));
+    out.push(cPart(CYL(0.038, 0.038, 0.012, 3), K, [['x', Math.PI / 2], ['t', s * 0.075, 0.345, 0.232]]));
+  }
+  out.push(cPart(new THREE.BoxGeometry(0.13, 0.024, 0.012), K, [['t', 0, 0.28, 0.232]]));
+  return out;
+}
+function catEars() {
+  const out = [];
+  for (const s of [-1, 1]) {
+    out.push(cPart(CONE(0.09, 0.17, 4), 0x1a1a1e, [['y', Math.PI / 4], ['t', 0, 0.085, 0], ['z', -s * 0.35], ['t', s * 0.15, 0.2, 0]]));
+    out.push(cPart(CONE(0.055, 0.11, 4), 0xff8fb0, [['y', Math.PI / 4], ['s', 1, 1, 0.45], ['t', 0, 0.065, 0.045], ['z', -s * 0.35], ['t', s * 0.15, 0.2, 0]]));
+    for (let k = -1; k <= 1; k++) out.push(cPart(CAPS(0.0045, 0.1), 0x222226, [['z', Math.PI / 2 + s * k * 0.22], ['t', s * 0.2, -0.06 + k * 0.022, 0.19]]));
+  }
+  out.push(cPart(SPH(0.022, 8, 6), 0xff6f96, [['t', 0, -0.048, 0.272]]));
+  return out;
+}
+const fangs = () => [-1, 1].map((s) => cPart(CONE(0.012, 0.035, 5), 0xffffff, [['x', Math.PI], ['t', s * 0.022, -0.1, 0.262]]));
+function bandana(hex, knot) {
+  const out = [cPart(TOR(0.272, 0.03, 6, 20), hex, [['x', Math.PI / 2 - 0.25], ['t', 0, 0.1, 0]])];
+  if (knot) out.push(cPart(SPH(0.045, 8, 6), hex, [['t', 0, 0.04, -0.285]]), cPart(SPH(0.04, 8, 6), hex, [['s', 1, 1.6, 0.6], ['z', 0.4], ['t', 0.04, -0.03, -0.29]]));
+  return out;
+}
+const skullBadge = () => [cPart(SPH(0.045, 10, 8), 0xf4f1e8, [['t', 0, 0.167, 0.282]]), cPart(SPH(0.012, 6, 4), 0x111111, [['t', -0.016, 0.172, 0.325]]), cPart(SPH(0.012, 6, 4), 0x111111, [['t', 0.016, 0.172, 0.325]])];
+function skullCap(dome, knob, band) {
+  return [
+    cPart(new THREE.SphereGeometry(0.295, 18, 8, 0, Math.PI * 2, 0, Math.PI * 0.4), dome, [['t', 0, 0.03, 0]]),
+    cPart(TOR(0.27, 0.022, 6, 22), band, [['x', Math.PI / 2], ['t', 0, 0.12, 0]]),
+    cPart(SPH(0.05, 10, 8), knob, [['t', 0, 0.33, 0]]),
+  ];
+}
+function lionHat() {
+  const R = 0xd7141a, G = 0xf2c230, out = [
+    cPart(SPH(0.28, 16, 12), R, [['s', 1.06, 0.74, 1.08], ['t', 0, 0.31, 0]]),
+    cPart(TOR(0.285, 0.05, 6, 22), 0xffffff, [['x', Math.PI / 2], ['t', 0, 0.2, 0]]),
+    cPart(CONE(0.05, 0.15, 8), G, [['x', 0.35], ['t', 0, 0.55, 0.07]]),
+    cPart(new THREE.BoxGeometry(0.2, 0.045, 0.04), G, [['t', 0, 0.27, 0.285]]),
+  ];
+  for (const s of [-1, 1]) {
+    out.push(cPart(SPH(0.07, 12, 8), 0xffffff, [['s', 1, 1, 0.6], ['t', s * 0.1, 0.38, 0.262]]));
+    out.push(cPart(SPH(0.035, 8, 6), 0x111111, [['t', s * 0.1, 0.38, 0.3]]));
+    out.push(cPart(new THREE.BoxGeometry(0.11, 0.03, 0.03), G, [['z', -s * 0.25], ['t', s * 0.1, 0.46, 0.235]]));
+    out.push(cPart(SPH(0.045, 8, 6), s < 0 ? 0x2bb24c : 0x2b7fd8, [['t', s * 0.15, 0.49, -0.02]]));
+  }
+  return out;
+}
+function santaBeard() {
+  return [
+    cPart(SPH(0.2, 14, 10), 0xffffff, [['s', 1.15, 0.85, 0.55], ['t', 0, -0.17, 0.16]]),
+    cPart(SPH(0.05, 8, 6), 0xffffff, [['s', 1.5, 0.75, 0.8], ['t', -0.045, -0.075, 0.262]]),
+    cPart(SPH(0.05, 8, 6), 0xffffff, [['s', 1.5, 0.75, 0.8], ['t', 0.045, -0.075, 0.262]]),
+  ];
+}
+// --- body space (hip at HIP, apron front ~z 0.217, torso front ~z 0.21) ---
+function cape(outer, inner, collar = true) {
+  const o = [cPart(CYL(0.17, 0.33, 0.62, 16, true, Math.PI / 2 - 0.35, Math.PI + 0.7), outer, [['t', 0, HIP + 0.17, 0]])];
+  const i = [cPart(CYL(0.165, 0.325, 0.62, 16, true, Math.PI / 2 - 0.35, Math.PI + 0.7), inner, [['t', 0, HIP + 0.17, 0]])];
+  if (collar) {
+    o.push(cPart(CYL(0.25, 0.17, 0.2, 16, true, Math.PI / 2 - 0.2, Math.PI + 0.4), outer, [['t', 0, HIP + 0.56, 0]]));
+    i.push(cPart(CYL(0.245, 0.165, 0.2, 16, true, Math.PI / 2 - 0.2, Math.PI + 0.4), inner, [['t', 0, HIP + 0.56, 0]]));
+    o.push(cPart(SPH(0.03, 8, 6), inner, [['t', 0, HIP + 0.46, 0.17]]));
+  }
+  return { o, i };
+}
+function ribs() {
+  const W = 0xf4f1e8, out = [cPart(CAPS(0.016, 0.26), W, [['t', 0, HIP + 0.22, 0.224]])];
+  [[0.34, 0.2], [0.28, 0.24], [0.22, 0.23], [0.16, 0.19]].forEach(([y, w]) => out.push(cPart(CAPS(0.014, w), W, [['z', Math.PI / 2], ['t', 0, HIP + y, 0.224]])));
+  out.push(cPart(SPH(0.05, 10, 6), W, [['s', 1.6, 0.8, 0.3], ['t', 0, HIP + 0.04, 0.222]]));
+  return out;
+}
+function santaSuit() {
+  return [
+    cPart(new THREE.BoxGeometry(0.06, 0.4, 0.02), 0xffffff, [['t', 0, HIP + 0.22, 0.212]]),
+    cPart(CYL(0.222, 0.222, 0.055, 18, true), 0x141414, [['t', 0, HIP + 0.12, 0]]),
+    cPart(new THREE.BoxGeometry(0.07, 0.055, 0.02), 0xf2c230, [['t', 0, HIP + 0.12, 0.226]]),
+  ];
+}
+let _fuTex = null;
+function fuTexture() {   // the lucky character in a red diamond, drawn once
+  if (_fuTex) return _fuTex;
+  const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
+  g.translate(64, 64); g.rotate(Math.PI / 4); g.fillStyle = '#D7141A'; g.fillRect(-42, -42, 84, 84);
+  g.lineWidth = 6; g.strokeStyle = '#F2C230'; g.strokeRect(-39, -39, 78, 78); g.setTransform(1, 0, 0, 1, 0, 0);
+  g.fillStyle = '#F2C230'; g.font = '900 62px "Noto Sans CJK HK", "PingFang HK", "Heiti TC", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText('\u798F', 64, 68);
+  _fuTex = new THREE.CanvasTexture(c); _fuTex.colorSpace = THREE.SRGBColorSpace; return _fuTex;
+}
+function fuBadge(p, y, z, size = 0.15) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(size, size), new THREE.MeshBasicMaterial({ map: fuTexture(), transparent: true, alphaTest: 0.1 }));
+  m.position.set(0, y, z); p.body.add(m); return m;
+}
+
+// --- dressing a person: hide the everyday cap, recolour shirt / apron / hands, add the costume ---
+function dress(p, look) {
+  const hide = new Set([G.cap, G.brim, G.band]);
+  let skin = 0xf2c8a0;
+  p.group.traverse((m) => {
+    if (!m.isMesh) return;
+    if (look.hat && hide.has(m.geometry)) m.visible = false;
+    if (m.geometry === G.head) skin = m.material.color.getHex();
+    if (look.shirt != null && (m.geometry === G.torso || m.geometry === G.arm)) m.material = mat(look.shirt);
+    if (look.apron != null && m.geometry === G.apron) m.material = mat(look.apron);
+    if (look.hands != null && m.geometry === G.hand) m.material = mat(look.hands);
+    if (look.noLogo && m.geometry === G.logo) m.visible = false;
+  });
+  const head = typeof look.head === 'function' ? look.head(skin) : (look.head || []);
+  cMesh(head, COST_MAT, p.head, look.headTilt || []);
+  if (look.glow) cMesh(look.glow, COST_GLOW, p.head);
+  if (look.body) cMesh(look.body, COST_MAT, p.body);
+  if (look.cape) { cMesh(look.cape.o, COST_MAT, p.body); cMesh(look.cape.i, COST_BACK, p.body); }
+  if (look.fu) fuBadge(p, look.fu[0], look.fu[1]);
+}
+
+const TILT = [['x', -0.1]];
+const CREW_LOOKS = {
+  // 6 counter chefs (left to right), then the host at the door, the back-kitchen cook and the DJ
+  halloween: () => ({
+    chefs: [
+      { hat: 1, head: hatWitch(0x1b1310, 0x8e44ad, 0xf5a623), headTilt: [['x', -0.1], ['z', 0.12]] },
+      { hat: 1, head: devilHood(), apron: 0xb3171b },
+      { hat: 1, head: pumpkinHat(), apron: 0xf26a10 },
+      { hat: 1, head: [...bandana(0x111114), ...skullBadge()], apron: 0x111114, body: ribs(), hands: 0xf4f1e8, noLogo: 1 },
+      { hat: 1, head: catEars() },
+      { hat: 1, head: fangs(), cape: cape(0x111114, 0xb3171b) },
+    ],
+    host: { head: hatWitch(0x4a1f6e, 0xf26a10, 0xf2c230), headTilt: [['x', -0.1], ['z', -0.12]], cape: cape(0x4a1f6e, 0xf26a10, false) },
+    cook: { hat: 1, head: bandana(0xf26a10, true), apron: 0xf26a10 },
+    dj: { glow: devilHorns(0xff2a1a) },
+  }),
+  christmas: () => ({
+    chefs: [
+      { hat: 1, head: hatSanta(), headTilt: TILT, apron: 0xc8102e },
+      { hat: 1, head: antlers(), glow: redNose(), apron: 0x1f6b45 },
+      { hat: 1, head: hatSanta(), headTilt: TILT, apron: 0xc8102e },
+      { hat: 1, head: (skin) => [...hatElf(), ...elfEars(skin)], headTilt: TILT, shirt: 0x1f8a4c, apron: 0xc8102e },
+      { hat: 1, head: antlers(), glow: redNose(), apron: 0x1f6b45 },
+      { hat: 1, head: (skin) => [...hatElf(), ...elfEars(skin)], headTilt: TILT, shirt: 0x1f8a4c, apron: 0xc8102e },
+    ],
+    host: { head: [...hatSanta(), ...santaBeard()], headTilt: TILT, shirt: 0xc8102e, body: santaSuit(), noLogo: 1 },
+    cook: { hat: 1, head: (skin) => [...hatElf(), ...elfEars(skin)], headTilt: TILT, shirt: 0x1f8a4c, apron: 0xc8102e },
+    dj: { head: antlers(), glow: redNose() },
+  }),
+  cny: () => ({
+    chefs: [0, 1, 2, 3, 4, 5].map((i) => i === 2
+      ? { hat: 1, head: lionHat(), shirt: 0xc8102e, apron: 0xe0a526, noLogo: 1, fu: [HIP + 0.24, 0.226] }
+      : { hat: 1, head: skullCap(i % 2 ? 0x8a0f14 : 0x141414, i % 2 ? 0xf2c230 : 0xd7141a, 0xf2c230), shirt: 0xc8102e, apron: 0xe0a526, noLogo: 1, fu: [HIP + 0.24, 0.226] }),
+    host: { head: lionHat(), shirt: 0xc8102e, noLogo: 1, fu: [HIP + 0.3, 0.222] },
+    cook: { hat: 1, head: skullCap(0x141414, 0xd7141a, 0xf2c230), shirt: 0xc8102e, apron: 0xe0a526, noLogo: 1, fu: [HIP + 0.24, 0.226] },
+    dj: { head: lionHat(), shirt: 0xc8102e, noLogo: 1, fu: [HIP + 0.3, 0.222] },
+  }),
+};
+function dressCrew() {
+  const make = CREW_LOOKS[CREW_SEASON]; if (!make) return;
+  const looks = make();
+  sim.chefs.forEach((c, i) => looks.chefs[i] && dress(c, looks.chefs[i]));
+  dress(host, looks.host); dress(cook, looks.cook); dress(djP, looks.dj);
+}
+
 // chefs (black tees, grey aprons, caps — as on opening night)
 const CHEF_HOMES = [-3.3, -1.9, -0.5, 0.9, 2.3, 3.2].map(x => ({ x, z: 1.05 }));
 CHEF_HOMES.forEach((h, i) => {
@@ -1227,6 +1494,7 @@ function cookLoop() { cook.go([{ x: 1.4, z: -1.2 }], () => { cook.targetHeading 
 const simTimers = [];
 function setTimeoutSim(fn, s) { simTimers.push({ fn, at: sim.t + s }); }
 cookLoop();
+dressCrew();   // v51 seasonal costumes (no-op outside the windows)
 
 // ---------- tick ----------
 function stepSim(dt) {
