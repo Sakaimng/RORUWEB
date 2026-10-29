@@ -240,7 +240,7 @@ if(L[u.slice(1)]&&window.RORU_I18N){e.preventDefault();window.RORU_I18N.set(L[u.
     <h3>RORU AFTER DARK <span class="tag">Ongoing</span></h3>
     <p class="note">Every Friday from 8PM - Late</p>
     <p>The last hand roll is never the end of the night at Roru.</p>
-    <p>Join us every Friday as the lights dim, the music turns up and the counter comes alive. Expect cocktails, sake and a soundtrack curated by DJ Mike Wolf of Sol Passion Music.</p>
+    <p>Join us every Friday as the lights dim, the music turns up and the counter comes alive. Expect cocktails, sake and a soundtrack from a rotating line-up of DJs.</p>
     <p>Come for dinner. Stay for another round. Kanpai!</p>
     <h3>SUZUSHII NIGHTS <span class="tag">Ongoing</span></h3>
     <p>As the season winds down, RORUBARU and Kowloon Spirits come together for Suzushii Nights, a celebration of craft, flavour and long evenings at the counter.</p>
@@ -427,6 +427,48 @@ if(L[u.slice(1)]&&window.RORU_I18N){e.preventDefault();window.RORU_I18N.set(L[u.
 </div>
 <noscript><p class="noscript">This page needs JavaScript. Book at <a href="https://www.exploretock.com/roru-baru">exploretock.com/roru-baru</a> · G/F, 100–102 Queen’s Road East, Wan Chai · +852 6317 5675 · <a href="https://www.instagram.com/rorubaru/">Instagram</a> · <a href="https://www.facebook.com/profile.php?id=61587043343492">Facebook</a></p></noscript>
 <audio id="music" src="audio/dj-night.mp3?v=drop" preload="none"></audio>
+<script>
+/* DJ week (classic, no modules): Fri 30 Oct 2026 has no DJ, the DJ night moves to Sat 31 Oct 2026 (Dominic, 29 Oct 2026).
+   Rewrites the DJ / Events / More panel templates only while the Hong Kong date is 2026-10-29 .. 2026-10-31;
+   from Sun 1 Nov (HK) the normal Friday copy shows again with no edit. Test: ?seasondate=2026-10-30 / 2026-11-01 */
+(function () {
+  try {
+    var m = /[?&]seasondate=(\d{4}-\d{2}-\d{2})/.exec(location.search);
+    var day = m ? m[1] : new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+    var on = day >= '2026-10-29' && day <= '2026-10-31';
+    window.RoruDjWeek = { day: day, on: on };
+    if (!on) return;
+    var S = {"eyebrow": "This week: Saturday", "title": "DJ night moves to Saturday", "cb": "This week only", "cs": "No DJ this Friday 30 Oct. The DJ plays Saturday 31 Oct, 8PM – late.", "lede": "Back to Fridays from 6 Nov. Hand rolls, highballs, music.", "book": "Book Saturday", "evnote": "This week: Saturday 31 Oct from 8PM - Late (no DJ Friday 30 Oct)", "evfoot": "Photos from rorubaru.com. This week RORU AFTER DARK is on Saturday 31 Oct from 8pm, back to Fridays from 6 Nov.", "moresub": "This week: Sat 31 Oct"};
+    var q = function (id, sel) { var t = document.getElementById(id); return t && t.content ? (sel ? t.content.querySelector(sel) : t.content) : null; };
+    var set = function (el, txt) { if (el) el.textContent = txt; };
+    /* DJ panel */
+    set(q('tpl-dj', '.eyebrow'), S.eyebrow);
+    set(q('tpl-dj', 'h2'), S.title);
+    var lede = q('tpl-dj', '.lede');
+    if (lede) {
+      set(lede, S.lede);
+      var c = document.createElement('div'); c.className = 'callout dj-week';
+      var b = document.createElement('b'); b.textContent = S.cb;
+      var s = document.createElement('span'); s.textContent = S.cs;
+      c.appendChild(b); c.appendChild(s); lede.parentNode.insertBefore(c, lede);
+    }
+    set(q('tpl-dj', '.actions a.btn'), S.book);
+    /* Events panel */
+    var ev = q('tpl-events');
+    if (ev) {
+      var ns = ev.querySelectorAll('.note');
+      for (var i = 0; i < ns.length; i++) {
+        var t = ns[i].textContent;
+        if (t.indexOf('Every Friday from 8PM') > -1) ns[i].textContent = S.evnote;
+        else if (t.indexOf('Fridays are RORU AFTER DARK') > -1) ns[i].textContent = S.evfoot;
+      }
+    }
+    /* More panel: the DJ row */
+    var mb = q('tpl-more', 'button[data-open="dj"]');
+    if (mb) { set(mb.querySelector('b'), 'DJ night'); set(mb.querySelector('i'), S.moresub); }
+  } catch (e) {}
+})();
+</script>
 <script type="module" src="ui.js?v=sv7"></script>
 <script type="module" src="upcoming.js?v=ev3"></script>
 <script type="module" src="hours.js"></script>
