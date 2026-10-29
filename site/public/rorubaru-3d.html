@@ -438,7 +438,7 @@ if(L[u.slice(1)]&&window.RORU_I18N){e.preventDefault();window.RORU_I18N.set(L[u.
     var on = day >= '2026-10-29' && day <= '2026-10-31';
     window.RoruDjWeek = { day: day, on: on };
     if (!on) return;
-    var S = {"eyebrow": "This week: Saturday", "title": "DJ night moves to Saturday", "cb": "This week only", "cs": "No DJ this Friday 30 Oct. The DJ plays Saturday 31 Oct, 8PM – late.", "lede": "Back to Fridays from 6 Nov. Hand rolls, highballs, music.", "book": "Book Saturday", "evnote": "This week: Saturday 31 Oct from 8PM - Late (no DJ Friday 30 Oct)", "evfoot": "Photos from rorubaru.com. This week RORU AFTER DARK is on Saturday 31 Oct from 8pm, back to Fridays from 6 Nov.", "moresub": "This week: Sat 31 Oct"};
+    var S = {"eyebrow": "This week: Saturday", "title": "DJ night moves to Saturday", "cb": "This week only", "cs": "No DJ this Friday 30 Oct. The DJ plays Saturday 31 Oct, 6PM – late.", "lede": "Back to Fridays from 6 Nov. Hand rolls, highballs, music.", "book": "Book Saturday", "evnote": "This week: Saturday 31 Oct from 6PM - Late (no DJ Friday 30 Oct)", "evfoot": "Photos from rorubaru.com. This week RORU AFTER DARK is on Saturday 31 Oct from 6pm, back to Fridays from 6 Nov.", "moresub": "This week: Sat 31 Oct"};
     var q = function (id, sel) { var t = document.getElementById(id); return t && t.content ? (sel ? t.content.querySelector(sel) : t.content) : null; };
     var set = function (el, txt) { if (el) el.textContent = txt; };
     /* DJ panel */
