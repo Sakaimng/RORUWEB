@@ -615,6 +615,18 @@ seats.forEach((s, si) => {
   if (si % 3 === 1) { const tx = s.plate.x - 0.17 * px - 0.06 * ux, tz = s.plate.z - 0.17 * pz - 0.06 * uz; cyl(0.022, 0.045, 0.1, 10, porcelain, tx, L.CH + 0.08, tz); cyl(0.012, 0.022, 0.05, 10, porcelain, tx, L.CH + 0.155, tz); }
   for (let k = _n0; k < scene.children.length; k++) scene.children[k].userData.setting = true;   // cleared when the shop is closed
 });
+// v52 (Oct 30 2026): chefs stay inside the U. A few serving spots sat in or past the counter (the first long-run stool
+// served from x = -4.10 sits inside the left leg; the last stool on each leg, z 1.86-2.33, was served from inside the long
+// run), so the chef walked into the counter at its corners. Every spot is now clamped to the chefs' floor (counter edge
+// less a body's width) and turned to face the plate it serves.
+const CHEF_BOX = { x0: L.XL + 0.39 + 0.22, x1: L.XR - 0.39 - 0.22, z0: L.ZB + 0.3, z1: L.F - 0.39 - 0.22 };
+const chefClamp = (p) => ({ x: Math.min(CHEF_BOX.x1, Math.max(CHEF_BOX.x0, p.x)), z: Math.min(CHEF_BOX.z1, Math.max(CHEF_BOX.z0, p.z)) });
+seats.forEach((s) => {
+  const c = chefClamp(s.chef);
+  if (Math.hypot(c.x - s.chef.x, c.z - s.chef.z) > 0.03) { s.chef = c; s.chefFace = Math.atan2(s.plate.x - c.x, s.plate.z - c.z); }
+  else s.chef = c;
+});
+
 // dried flowers in a glass bottle at each front corner of the counter (DSC07596)
 { const vase = new THREE.MeshPhongMaterial({ color: 0xc8dde0, transparent: true, opacity: 0.45, shininess: 80, depthWrite: false });
   const stem = mat(0x7f8a6a), bloom = mat(0x8e86a8);
@@ -1411,6 +1423,7 @@ CHEF_HOMES.forEach((h, i) => {
   sim.chefs.push(c);
 });
 function chefRoute(c, to) {
+  to = chefClamp(to);   // v52: never a waypoint inside the counter
   const pts = [];
   if (Math.abs(c.z - L.laneZ) > 0.05) pts.push({ x: c.x, z: L.laneZ });
   if (Math.abs(c.x - to.x) > 0.05) pts.push({ x: to.x, z: L.laneZ });
