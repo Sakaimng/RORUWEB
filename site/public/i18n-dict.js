@@ -3,6 +3,11 @@
 // zh dish names are his own (menu.json nameZh); the rest is ours. ui.js swaps text nodes by these.
 export default {
 "zh": {
+// Trick or Temaki × Six Pack Chef, Sat 31 Oct 2026 (Events panel card, gone after 31 Oct HK)
+"Sat 31 Oct": "10月31日（六）",
+"Halloween hand roll night · Sold out": "萬聖節手卷之夜 · 已滿座",
+"Top Chef finalist Six Pack Chef Wallace Wong joins Chef Joey Chan behind our counter for one night. It's sold out 🎃 but come earlier for our à la carte menu, plus a few one-night-only event specials.": "Top Chef 決賽選手 Six Pack 的 Wallace Wong 主廚，一晚限定同 Joey Chan 主廚一齊企吧檯。已經滿座 🎃 不過早啲嚟，一樣可以單點我哋嘅菜單，仲有幾款一晚限定活動特別菜式。",
+"Collab seats are gone. Book a seat for à la carte.": "合作晚餐座位已滿，單點可以照常預約。",
 // DJ week, Sat 31 Oct 2026 (shown only 29–31 Oct HK) + rotating DJs line (Oct 29 2026)
 "This week: Saturday": "今個星期：星期六",
 "DJ night moves to Saturday": "DJ 之夜改喺星期六",
@@ -274,6 +279,11 @@ export default {
 "Book": "預約"
 },
 "ja": {
+// Trick or Temaki × Six Pack Chef, Sat 31 Oct 2026 (Events panel card, gone after 31 Oct HK)
+"Sat 31 Oct": "10月31日（土）",
+"Halloween hand roll night · Sold out": "ハロウィン手巻きナイト · 満席",
+"Top Chef finalist Six Pack Chef Wallace Wong joins Chef Joey Chan behind our counter for one night. It's sold out 🎃 but come earlier for our à la carte menu, plus a few one-night-only event specials.": "Top Chef ファイナリストの Six Pack Chef ウォレス・ウォンシェフが、一夜限りでジョーイ・チャンシェフとカウンターに立ちます。満席となりました 🎃 少し早めに来れば、アラカルトメニューと一夜限りのイベント特別メニューをお楽しみいただけます。",
+"Collab seats are gone. Book a seat for à la carte.": "コラボ席は満席です。アラカルトのご予約はこちらから。",
 // DJ week, Sat 31 Oct 2026 (shown only 29–31 Oct HK) + rotating DJs line (Oct 29 2026)
 "This week: Saturday": "今週は土曜日",
 "DJ night moves to Saturday": "DJナイトは土曜日に変更",

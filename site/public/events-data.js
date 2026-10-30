@@ -6,6 +6,8 @@ export default [{"title": "Delia x Rorubaru", "date": "April 2026", "images": ["
 // "date" (and "end" for multi-night events) are calendar days in the event's own time zone: "tz" hours ahead of UTC
 // (8 = Hong Kong, the default; 7 = Vietnam). The banner and the panel card disappear after 23:59 local on the last day.
 // "book": omitted = the site's own Book link; a URL = that link; false = no booking button yet ("booking" note only).
+// "bar": false = Events panel card only, no small banner (the seasonal top bar already names the event).
+// Trick or Temaki × Six Pack Chef, Sat 31 Oct 2026: facts from our own poster and @rorubaru IG post DetRWGfO_dn (20 Oct: Wallace Wong + Joey Chan, from 6pm, one night only); "sold out" from Dominic, 30 Oct; gone after 23:59 HK on 31 Oct.
 // "seatings" (optional): one line each under "seatingsLabel". "barTime" (optional): shorter time/place for the banner.
 // Every English line here has its zh / ja line in i18n-dict.js.
 export const upcoming = [{
@@ -38,4 +40,16 @@ export const upcoming = [{
   booking: "Booking via Luma.",
   image: "events/vietnam-popup/rorubaru-vivaia.jpg",
   poster: "events/vietnam-popup/rorubaru-vivaia.jpg"
+}, {
+  id: "trick-or-temaki-2026-10-31",
+  title: "TRICK OR TEMAKI × Six Pack Chef",
+  date: "2026-10-31",
+  day: "Sat 31 Oct",
+  time: "from 6pm",
+  kind: "Halloween hand roll night · Sold out",
+  text: "Top Chef finalist Six Pack Chef Wallace Wong joins Chef Joey Chan behind our counter for one night. It's sold out 🎃 but come earlier for our à la carte menu, plus a few one-night-only event specials.",
+  booking: "Collab seats are gone. Book a seat for à la carte.",
+  bar: false,
+  image: "events/trick-or-temaki/01.jpg",
+  poster: "events/trick-or-temaki/poster.jpg"
 }];

@@ -2,7 +2,7 @@
 // Each event's own clock decides (ev.tz hours ahead of UTC, default 8 = Hong Kong, the same +8 h clock as script.js hkHour):
 // "Tonight" on its day(s), "Tomorrow" the day before, otherwise the date; gone after 23:59 local on its last day.
 // Booking = the site's own Book link (read from the header), or the event's own link, or none yet (ev.book === false).
-import { upcoming } from './events-data.js?v=ev2';
+import { upcoming } from './events-data.js?v=ev3';
 
 // × hides the banner for this page view only: every load/refresh shows it again.
 const LS = 'roru-evbar-x'; // old "dismissed forever" key: cleared, no longer read
@@ -91,7 +91,7 @@ function syncBar(ev) {
   }
 }
 
-function tick() { const list = all(); syncPanel(list); syncBar(list[0] || null); }
+function tick() { const list = all(); syncPanel(list); syncBar(list.filter((ev) => ev.bar !== false)[0] || null); }
 tick();
 setInterval(tick, 60e3);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(); });
