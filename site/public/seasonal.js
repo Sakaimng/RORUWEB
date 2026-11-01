@@ -3,6 +3,8 @@
    hanging decoration, an optional light particle layer and a favicon swap.
    Preview any theme: ?season=halloween|christmas|cny|easter|diwali|thanksgiving|newyear|setsubun|
    valentines|whiteday|sakura|sevens|kodomo|tuenng|tanabata|natsu|midautumn  ·  ?season=none = normal look
+   End date for an event message: until: 'YYYY-MM-DD' on a theme hides its banner (and swaps the event label for
+   after: '...') once the Hong Kong date is past that day (after 23:59 HK); the theme's look itself follows WINDOWS.
    Simulate a date: ?seasondate=2027-02-06   ·   effects off: ?seasonfx=0 (or tap the round season button)
    Buttons themed: data-season-buttons="css selector" on this script tag (default below). */
 (function () {
@@ -42,7 +44,7 @@
 
   /* tier: full = custom button art + decor + particles; light = palette + icon + simple effect */
   var THEMES = {
-    halloween:    { full: 1, fx: 'bats',   icon: 'pumpkin', label: 'Halloween · Trick or Temaki, Sat 31 Oct', fav: '#F54500', banner: 'Trick or Temaki \u00b7 Sat 31 Oct', hat: 'witch', corner: 'web', hangs: ['spider'], burst: ['#F54500', '#1b1310', '#8e44ad', '#ffb347'] },
+    halloween:    { full: 1, fx: 'bats',   icon: 'pumpkin', label: 'Halloween · Trick or Temaki, Sat 31 Oct', fav: '#F54500', banner: 'Trick or Temaki \u00b7 Sat 31 Oct', until: '2026-10-31', after: 'Happy Halloween', hat: 'witch', corner: 'web', hangs: ['spider'], burst: ['#F54500', '#1b1310', '#8e44ad', '#ffb347'] },
     christmas:    { full: 1, fx: 'snow',   icon: 'bauble',  label: 'Merry Christmas', fav: '#C8102E', banner: 'Merry Christmas from the counter', hat: 'santa', corner: 'lights', hangs: ['bauble', 'bauble2'], burst: ['#C8102E', '#ffffff', '#1f6b45', '#d4af37'] },
     cny:          { full: 1, fx: 'gold',   icon: 'lantern', label: 'Happy Lunar New Year', fav: '#D7141A', banner: '\u65B0\u5E74\u5FEB\u6A02 \u00b7 Happy Lunar New Year', hat: 'seal', corner: 'lanterns', hangs: ['lantern', 'lantern'], burst: ['#D7141A', '#f5c542', '#ffe08a', '#a50e12'] },
     easter:       { full: 1, fx: 'eggs',   icon: 'egg',     label: 'Happy Easter', fav: '#9AD9C0', banner: 'Hoppy Easter', hat: 'ears', corner: 'eggs', hangs: ['egg'], burst: ['#9fdcc4', '#c7a6f2', '#ffd98a', '#f7b6c8'] },
@@ -181,7 +183,10 @@
   if (!opt('wash', true)) body.classList.add('season-under');
   if (opt('wash', true)) { var wash = d.createElement('div'); wash.className = 'ssn-wash'; wash.setAttribute('aria-hidden', 'true'); body.appendChild(wash); }
   /* announcement banner under the top bar */
-  var bannerText = T.banner || T.label;
+  /* an event message with an end date (T.until, HK date) is gone after 23:59 HK that day: no banner, plain label */
+  var msgGone = !!(T.until && day > T.until);
+  var bannerText = msgGone ? '' : (T.banner || T.label);
+  var label = msgGone ? (T.after || T.label) : T.label;
   if (opt('banner', true) && bannerText) {
     var ban = d.createElement('div'); ban.className = 'ssn-banner'; ban.setAttribute('role', 'note');
     var ico = T.icon ? SVG[T.icon] : '<span class="ssn-emo">' + T.emoji + '</span>';
@@ -218,7 +223,7 @@
       var ang = (bi / 28) * Math.PI * 2, dist = 110 + ((bi * 37) % 90);
       bits += '<i style="background:' + cols[bi % cols.length] + ';--dx:' + Math.round(Math.cos(ang) * dist) + 'px;--dy:' + Math.round(Math.sin(ang) * dist) + 'px;--r:' + ((bi * 47) % 360) + 'deg"></i>';
     }
-    sp.innerHTML = '<div class="ssn-sp-in"><span class="ssn-sp-ico">' + (T.icon ? SVG[T.icon] : '<span class="ssn-emo">' + T.emoji + '</span>') + '</span><span class="ssn-sp-t">' + bannerText + '</span>' + bits + '</div>';
+    sp.innerHTML = '<div class="ssn-sp-in"><span class="ssn-sp-ico">' + (T.icon ? SVG[T.icon] : '<span class="ssn-emo">' + T.emoji + '</span>') + '</span><span class="ssn-sp-t">' + (bannerText || label) + '</span>' + bits + '</div>';
     body.appendChild(sp);
     setTimeout(function () { sp.classList.add('ssn-sp-out'); }, 1500);
     setTimeout(function () { if (sp.parentNode) sp.parentNode.removeChild(sp); }, 2200);
@@ -227,16 +232,16 @@
   var chip = d.createElement('button');
   chip.type = 'button'; chip.className = 'ssn-chip';
   chip.setAttribute('aria-pressed', fxOn ? 'true' : 'false');
-  chip.setAttribute('aria-label', T.label + ' \u2014 effects ' + (fxOn ? 'on' : 'off') + ', tap to switch');
-  chip.title = T.label;
-  chip.innerHTML = iconHTML() + '<span class="ssn-tip">' + T.label + '</span>';
+  chip.setAttribute('aria-label', label + ' \u2014 effects ' + (fxOn ? 'on' : 'off') + ', tap to switch');
+  chip.title = label;
+  chip.innerHTML = iconHTML() + '<span class="ssn-tip">' + label + '</span>';
   var mapctl = d.querySelector('.mapctl');
   if (mapctl) mapctl.appendChild(chip); else { chip.classList.add('ssn-chip-float'); body.appendChild(chip); }
   chip.addEventListener('click', function () {
     fxOn = !fxOn; lstore('roruSeasonFx', fxOn ? '1' : '0');
     body.classList.toggle('season-fx-off', !fxOn);
     chip.setAttribute('aria-pressed', fxOn ? 'true' : 'false');
-    chip.setAttribute('aria-label', T.label + ' \u2014 effects ' + (fxOn ? 'on' : 'off') + ', tap to switch');
+    chip.setAttribute('aria-label', label + ' \u2014 effects ' + (fxOn ? 'on' : 'off') + ', tap to switch');
     if (fxOn) startFx(); else stopFx();
   });
 

@@ -1,6 +1,7 @@
 // RORUBARU · upcoming events: a small dismissible banner for the next one + every upcoming event on top of the Events panel.
 // Each event's own clock decides (ev.tz hours ahead of UTC, default 8 = Hong Kong, the same +8 h clock as script.js hkHour):
-// "Tonight" on its day(s), "Tomorrow" the day before, otherwise the date; gone after 23:59 local on its last day.
+// "Tonight" on its day(s), "Tomorrow" the day before, otherwise the date; gone after 23:59 local on its last day
+// (ev.until, else ev.end, else ev.date). Test any day with ?seasondate=YYYY-MM-DD.
 // Booking = the site's own Book link (read from the header), or the event's own link, or none yet (ev.book === false).
 import { upcoming } from './events-data.js?v=ev3';
 
@@ -9,10 +10,13 @@ const LS = 'roru-evbar-x'; // old "dismissed forever" key: cleared, no longer re
 try { localStorage.removeItem(LS); } catch (e) {}
 let dismissedId = null;
 const tzOf = (ev) => (typeof ev.tz === 'number' ? ev.tz : 8);
-const today = (tz) => { const d = new Date(Date.now() + tz * 3600e3); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()); };
+// ?seasondate=YYYY-MM-DD simulates a day (same test switch as seasonal.js and roru-expire.js)
+const SD = (/[?&]seasondate=(\d{4}-\d{2}-\d{2})/.exec(location.search) || [])[1];
+const today = (tz) => { if (SD) return dayOf(SD); const d = new Date(Date.now() + tz * 3600e3); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()); };
 const dayOf = (s) => { const [y, m, d] = s.split('-').map(Number); return Date.UTC(y, m - 1, d); };
 const daysTo = (ev) => Math.round((dayOf(ev.date) - today(tzOf(ev))) / 864e5);
-const daysLeft = (ev) => Math.round((dayOf(ev.end || ev.date) - today(tzOf(ev))) / 864e5);
+// last day shown: "until" if set, else "end" (multi-night), else "date"; gone after 23:59 local that day
+const daysLeft = (ev) => Math.round((dayOf(ev.until || ev.end || ev.date) - today(tzOf(ev))) / 864e5);
 // start instant (local midnight of the first day) for ordering events in different time zones
 const startOf = (ev) => dayOf(ev.date) - tzOf(ev) * 3600e3;
 const all = () => upcoming.filter((ev) => daysLeft(ev) >= 0).sort((a, b) => startOf(a) - startOf(b));
