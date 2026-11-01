@@ -18,7 +18,7 @@
      md = every year (MM-DD .. MM-DD, may wrap the new year); d = exact dates (lunar / moving).
      p = priority when windows overlap (higher wins). */
   var WINDOWS = [
-    { t: 'halloween',    md: ['10-24', '11-01'], p: 50 },
+    { t: 'halloween',    md: ['10-24', '10-31'], p: 50 },
     { t: 'diwali',       d: ['2026-11-06', '2026-11-10'], p: 40 },
     { t: 'diwali',       d: ['2027-10-26', '2027-10-30'], p: 40 },      /* inside Halloween 2027: Halloween wins */
     { t: 'thanksgiving', d: ['2026-11-24', '2026-11-29'], p: 30 },
