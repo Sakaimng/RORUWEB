@@ -1,0 +1,173 @@
+/* owner-glass.css — f57 frosted-glass look for the OWNER dashboard only (/staff/owner).
+   Every rule is scoped under body.owner-glass, a class only staff/owner/index.html carries,
+   so /family and /staff can't pick any of this up. Visual layer only: no data, auth or API changes.
+   Dominic Oct 28 2026 12:14 HKT, reel "Glassy Dashboard V5", in RORUBARU orange/cream/charcoal. */
+
+/* ---------- backdrop: blurred photo of the Wan Chai counter + dark warm wash ---------- */
+body.owner-glass{background:transparent!important;background-image:none!important}
+@supports selector(:has(a)){html:has(body.owner-glass){background:#120c0b}}
+body.owner-glass::before{content:"";position:fixed;left:0;top:0;right:0;bottom:0;z-index:-2;pointer-events:none;
+  background:#1a0f0d url(/loyalty/img/owner-glass-bg.jpg?v=f57) center 30%/cover no-repeat}
+body.owner-glass::after{content:"";position:fixed;left:0;top:0;right:0;bottom:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(900px 560px at 8% -10%,rgba(245,69,0,.30),transparent 62%),
+    radial-gradient(700px 520px at 105% 105%,rgba(232,184,74,.14),transparent 60%),
+    linear-gradient(180deg,rgba(14,9,8,.40) 0%,rgba(14,9,8,.58) 45%,rgba(10,7,7,.78) 100%)}
+body.owner-glass.thB{background:transparent!important}
+@supports selector(:has(a)){html:has(body.owner-glass.thB){background:#efe9da}}
+body.owner-glass.thB::after{background:
+    radial-gradient(900px 560px at 100% -10%,rgba(245,69,0,.16),transparent 60%),
+    linear-gradient(180deg,rgba(246,243,232,.80),rgba(246,243,232,.88))}
+
+/* ---------- the glass recipe ---------- */
+body.owner-glass{--g-bg:rgba(255,255,255,.085);--g-hi:rgba(255,255,255,.16);--g-lo:rgba(255,255,255,.035);--g-bd:rgba(255,255,255,.17);
+  --g-in:rgba(255,255,255,.20);--g-sh:0 18px 44px -20px rgba(0,0,0,.75);--g-blur:blur(22px) saturate(150%);--g-solid:rgba(34,24,22,.94);
+  --muted:rgba(246,243,232,.74);--line:rgba(255,255,255,.12)}
+body.owner-glass.thB{--g-bg:rgba(255,255,255,.52);--g-hi:rgba(255,255,255,.80);--g-lo:rgba(255,255,255,.42);--g-bd:rgba(255,255,255,.85);
+  --g-in:rgba(255,255,255,.95);--g-sh:0 16px 40px -22px rgba(60,30,10,.40);--g-solid:rgba(255,253,248,.97);
+  --muted:rgba(22,24,31,.66);--line:rgba(22,24,31,.10)}
+
+body.owner-glass .kpi,body.owner-glass .dcard,body.owner-glass .card,body.owner-glass details.grp,body.owner-glass .dash details,
+body.owner-glass .ig,body.owner-glass .stat,body.owner-glass .li,body.owner-glass .qa button,body.owner-glass .split-line,
+body.owner-glass #v-reports button:not(.btn):not(.icb){
+  background:var(--g-bg) linear-gradient(155deg,var(--g-hi),var(--g-lo))!important;
+  border:1px solid var(--g-bd)!important;
+  box-shadow:inset 0 1px 0 var(--g-in),var(--g-sh)!important;
+  -webkit-backdrop-filter:var(--g-blur);backdrop-filter:var(--g-blur)}
+/* list rows that already sit inside a glass panel: lighter tint, no second blur (cheaper on iPhone) */
+body.owner-glass .ig .li,body.owner-glass .card .li,body.owner-glass .dcard .li,body.owner-glass details .li,body.owner-glass .dcard .stat,body.owner-glass .card .stat,
+body.owner-glass .dcard details,body.owner-glass .card details{
+  background:rgba(255,255,255,.05)!important;box-shadow:none!important;border-color:rgba(255,255,255,.10)!important;
+  -webkit-backdrop-filter:none;backdrop-filter:none}
+body.owner-glass.thB .ig .li,body.owner-glass.thB .card .li,body.owner-glass.thB .dcard .li,body.owner-glass.thB details .li,body.owner-glass.thB .dcard .stat,body.owner-glass.thB .card .stat,
+body.owner-glass.thB .dcard details,body.owner-glass.thB .card details{background:rgba(255,255,255,.55)!important;border-color:rgba(22,24,31,.07)!important}
+/* no backdrop-filter support (old browsers / some in-app views): solid charcoal so text stays readable */
+@supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+  body.owner-glass .kpi,body.owner-glass .dcard,body.owner-glass .card,body.owner-glass details.grp,body.owner-glass .dash details,body.owner-glass .ig,
+  body.owner-glass .stat,body.owner-glass .li,body.owner-glass .qa button,body.owner-glass .split-line,body.owner-glass .oh,body.owner-glass .otabs,body.owner-glass .side{background:var(--g-solid)!important}
+}
+
+/* rounded 2xl + gentle lift */
+body.owner-glass .kpi,body.owner-glass .dcard,body.owner-glass .card,body.owner-glass details.grp,body.owner-glass .ig{border-radius:24px!important}
+body.owner-glass .li,body.owner-glass .stat,body.owner-glass .qa button,body.owner-glass .dash details{border-radius:18px!important}
+@media (hover:hover){
+  body.owner-glass .kpi:hover,body.owner-glass .dcard:hover,body.owner-glass .li.tap:hover,body.owner-glass .qa button:hover,body.owner-glass .stat:hover{
+    transform:translateY(-3px);box-shadow:inset 0 1px 0 var(--g-in),0 26px 50px -22px rgba(0,0,0,.8)!important}
+  body.owner-glass.thB .kpi:hover,body.owner-glass.thB .dcard:hover,body.owner-glass.thB .li.tap:hover,body.owner-glass.thB .qa button:hover{box-shadow:inset 0 1px 0 var(--g-in),0 24px 46px -22px rgba(60,30,10,.45)!important}
+}
+body.owner-glass .dcard,body.owner-glass .stat{transition:transform .2s ease,box-shadow .2s ease}
+
+/* ---------- KPI tiles: big clean numbers, soft accent glow instead of a hard bar ---------- */
+body.owner-glass .kpi{padding:18px 18px 14px!important}
+body.owner-glass .kpi::before{height:2px;left:18px;right:18px;top:0;border-radius:0 0 3px 3px;opacity:1;
+  background:linear-gradient(90deg,transparent,var(--acc,#F54500),transparent)}
+body.owner-glass .kpi::after{content:"";position:absolute;width:140px;height:140px;right:-50px;top:-60px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,var(--acc,#F54500),transparent 70%);opacity:.18}
+body.owner-glass .kpi .lbl{font-size:13px;font-weight:600;letter-spacing:.01em;opacity:.9}
+body.owner-glass .kpi .val{font-family:Roru,system-ui,sans-serif;font-weight:900;letter-spacing:-.025em;
+  background:linear-gradient(180deg,#fff 0%,#FFF8EE 55%,rgba(246,243,232,.78) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+body.owner-glass.thB .kpi .val{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:#16181F}
+body.owner-glass .kpi .spark{height:38px;filter:drop-shadow(0 4px 8px rgba(245,69,0,.25))}
+body.owner-glass .k-tobiko,body.owner-glass .k-tobiko *{--acc:#F54500}
+
+/* headings in GT Maru */
+body.owner-glass .vh h1,body.owner-glass .sec h2,body.owner-glass .dash h3,body.owner-glass #login h1{font-family:Roru,system-ui,sans-serif;font-weight:900;letter-spacing:-.02em}
+body.owner-glass .vh h1{text-shadow:0 2px 18px rgba(0,0,0,.35)}
+body.owner-glass.thB .vh h1{text-shadow:none}
+
+/* ---------- top bar: floating glass pill ---------- */
+body.owner-glass .oh{position:-webkit-sticky;position:sticky;top:calc(8px + env(safe-area-inset-top));margin:calc(8px + env(safe-area-inset-top)) 10px 0;
+  padding:8px 10px 8px 14px!important;border-radius:22px;
+  background:rgba(30,20,18,.42)!important;border:1px solid var(--g-bd)!important;box-shadow:inset 0 1px 0 var(--g-in),0 14px 36px -18px rgba(0,0,0,.7);
+  -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%)}
+body.owner-glass.thB .oh{background:rgba(255,255,255,.55)!important}
+body.owner-glass .icb{background:rgba(255,255,255,.10)!important;border:1px solid rgba(255,255,255,.18)!important;color:inherit;border-radius:14px!important}
+body.owner-glass.thB .icb{background:rgba(255,255,255,.7)!important;border-color:rgba(22,24,31,.10)!important}
+
+/* ---------- phone: bottom tabs become a floating glass pill ---------- */
+@media (max-width:899px){
+  body.owner-glass .otabs{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));padding:6px!important;border-radius:28px;gap:4px;
+    background:rgba(28,19,17,.50)!important;border:1px solid var(--g-bd)!important;border-top:1px solid var(--g-bd)!important;
+    box-shadow:inset 0 1px 0 var(--g-in),0 18px 40px -14px rgba(0,0,0,.75);
+    -webkit-backdrop-filter:blur(26px) saturate(170%);backdrop-filter:blur(26px) saturate(170%)}
+  body.owner-glass.thB .otabs{background:rgba(255,255,255,.62)!important}
+  body.owner-glass .otabs button{min-height:52px;border-radius:22px;font-size:11.5px}
+  body.owner-glass .otabs button.on{background:linear-gradient(160deg,rgba(245,69,0,.95),rgba(214,56,0,.92));color:#fff!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px -8px rgba(245,69,0,.8)}
+  body.owner-glass .otabs button.on svg{color:#fff!important;filter:none!important}
+  body.owner-glass .otabs .badge{background:#fff;color:#F54500}
+  body.owner-glass .views{padding-bottom:calc(112px + env(safe-area-inset-bottom))}
+}
+
+/* ---------- desktop: slim glass icon rail + top pill nav ---------- */
+@media (min-width:900px){
+  body.owner-glass .oh{top:12px;margin:12px 16px 0;padding:8px 10px 8px 18px!important}
+  body.owner-glass .oshell{grid-template-columns:96px minmax(0,1fr);min-height:calc(100vh - 82px)}
+  body.owner-glass .side{top:88px!important;height:calc(100vh - 104px)!important;margin:16px 0 16px 16px;padding:10px 8px!important;border-radius:26px;
+    background:rgba(30,20,18,.40)!important;border:1px solid var(--g-bd)!important;box-shadow:inset 0 1px 0 var(--g-in),var(--g-sh);
+    -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);scrollbar-width:none}
+  body.owner-glass .side::-webkit-scrollbar{display:none}
+  body.owner-glass.thB .side{background:rgba(255,255,255,.55)!important}
+  body.owner-glass .side button{flex-direction:column;justify-content:center;gap:4px;padding:10px 4px!important;margin:0 0 4px;border-radius:18px;
+    font-size:10.5px!important;font-weight:700;line-height:1.15;text-align:center!important;color:var(--muted)}
+  body.owner-glass .side button i{width:auto;font-size:20px;line-height:1}
+  body.owner-glass .side button:hover{background:rgba(255,255,255,.10)!important;color:inherit}
+  body.owner-glass .side button.on{background:linear-gradient(160deg,rgba(245,69,0,.95),rgba(214,56,0,.9))!important;color:#fff!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 24px -10px rgba(245,69,0,.85)!important}
+  body.owner-glass.thB .side button.on{color:#fff!important}
+  body.owner-glass .side .badge{position:absolute;margin:0;top:4px;right:8px}
+  body.owner-glass .side button{position:relative}
+  body.owner-glass .side hr{margin:8px 10px;border-top-color:rgba(255,255,255,.14)}
+  body.owner-glass .side .tlang{display:flex;flex-direction:column;gap:3px;padding:2px 6px}
+  body.owner-glass .side .tlang button{font-size:10.5px!important;padding:5px 2px!important;margin:0;border-radius:10px}
+  body.owner-glass .side .thside span{flex:none}
+  body.owner-glass .views{padding:26px 34px 60px}
+  /* top pill nav (built by owner-glass.js; mirrors the rail, so it only clicks the rail's own buttons) */
+  body.owner-glass .gpills{display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.10);margin:0 auto}
+  body.owner-glass.thB .gpills{background:rgba(255,255,255,.6);border-color:rgba(22,24,31,.08)}
+  body.owner-glass .gpills button{appearance:none;-webkit-appearance:none;border:0;background:none;color:var(--muted);font:inherit;font-size:14px;font-weight:700;
+    padding:9px 18px;border-radius:999px;cursor:pointer;transition:background-color .2s ease,color .2s ease}
+  body.owner-glass .gpills button:hover{color:inherit;background:rgba(255,255,255,.08)}
+  body.owner-glass .gpills button.on{background:#F6F3E8;color:#16181F;box-shadow:0 6px 18px -8px rgba(0,0,0,.6)}
+  body.owner-glass.thB .gpills button.on{background:#16181F;color:#F6F3E8}
+}
+body.owner-glass .gpills{display:none}
+@media (min-width:900px){body.owner-glass .gpills{display:flex}}
+
+/* ---------- controls on glass ---------- */
+body.owner-glass .seg{background:rgba(255,255,255,.08)!important;border:1px solid rgba(255,255,255,.14);padding:3px}
+body.owner-glass .seg button.on,body.owner-glass .seg .on{background:#F6F3E8!important;color:#16181F!important}
+body.owner-glass.thB .seg{background:rgba(255,255,255,.6)!important;border-color:rgba(22,24,31,.08)}
+body.owner-glass.thB .seg button.on,body.owner-glass.thB .seg .on{background:#16181F!important;color:#F6F3E8!important}
+body.owner-glass .fin,body.owner-glass .search input,body.owner-glass #gq,body.owner-glass #meMonth{color:inherit;background:rgba(255,255,255,.08)!important;border:1px solid rgba(255,255,255,.20)!important;border-radius:14px}
+body.owner-glass.thB .fin,body.owner-glass.thB .search input,body.owner-glass.thB #gq,body.owner-glass.thB #meMonth{background:rgba(255,255,255,.75)!important;border-color:rgba(22,24,31,.14)!important}
+body.owner-glass .btn:not(.ghost){box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 10px 24px -12px rgba(245,69,0,.9)}
+body.owner-glass .tchip,body.owner-glass .opill.no{background:rgba(255,255,255,.10)}
+body.owner-glass .bars .bt,body.owner-glass .posbar{background:rgba(255,255,255,.10)}
+body.owner-glass.thB .bars .bt,body.owner-glass.thB .posbar{background:rgba(22,24,31,.08)}
+body.owner-glass .qa button i{background:rgba(255,255,255,.12)!important;border:1px solid rgba(255,255,255,.14)}
+body.owner-glass .qa button.hot,body.owner-glass .qa button.hot *{color:#fff!important}
+body.owner-glass .qa button.hot{background:linear-gradient(160deg,rgba(245,69,0,.92),rgba(196,54,0,.80))!important;border-color:rgba(255,150,100,.6)!important}
+body.owner-glass .qa button.hot i{background:rgba(255,255,255,.22)!important}
+body.owner-glass .tiny{opacity:.7}
+
+/* ---------- menu + sheets: heavier frosted panels ---------- */
+body.owner-glass .menu{background:rgba(8,5,5,.40)!important;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+body.owner-glass .menu .mp,body.owner-glass .sheet .sw0{background:rgba(32,22,20,.80)!important;border:1px solid rgba(255,255,255,.14);
+  -webkit-backdrop-filter:blur(30px) saturate(160%);backdrop-filter:blur(30px) saturate(160%)}
+body.owner-glass.thB .menu .mp,body.owner-glass.thB .sheet .sw0{background:rgba(255,253,248,.86)!important;border-color:rgba(255,255,255,.9)}
+@supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+  body.owner-glass .menu .mp,body.owner-glass .sheet .sw0{background:var(--g-solid)!important}}
+
+/* ---------- PIN screen ---------- */
+body.owner-glass #login{margin-top:28px!important;padding:26px 20px 22px;border-radius:28px;
+  background:rgba(255,255,255,.08) linear-gradient(155deg,rgba(255,255,255,.14),rgba(255,255,255,.03));border:1px solid var(--g-bd);
+  box-shadow:inset 0 1px 0 var(--g-in),var(--g-sh);-webkit-backdrop-filter:var(--g-blur);backdrop-filter:var(--g-blur)}
+@media (max-width:460px){body.owner-glass #login{margin-left:12px!important;margin-right:12px!important}}
+body.owner-glass #login .pad button{background:rgba(255,255,255,.10)!important;border:1px solid rgba(255,255,255,.18)!important;color:inherit}
+body.owner-glass.thB #login{background:rgba(255,255,255,.55)}
+body.owner-glass.thB #login .pad button{background:rgba(255,255,255,.75)!important;border-color:rgba(22,24,31,.08)!important}
+
+@media (prefers-reduced-motion:reduce){body.owner-glass .kpi,body.owner-glass .dcard,body.owner-glass .stat,body.owner-glass .gpills button{transition:none!important}
+  body.owner-glass .kpi:hover,body.owner-glass .dcard:hover,body.owner-glass .li.tap:hover,body.owner-glass .qa button:hover,body.owner-glass .stat:hover{transform:none}}

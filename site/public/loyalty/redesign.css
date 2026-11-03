@@ -1,0 +1,204 @@
+/* f43 (Oct 21 2026) — RORU High Rollers redesign: option A "calm wallet" + option B real food photos + option C visits ring.
+   Rules (files/loyalty/redesign/principles.md): one hero card, grouped lists with thin dividers (no boxes in boxes), orange only where you act,
+   one big number, 8pt spacing, 44pt+ targets. Brand fonts replace Geist: Megazoid = titles/display, GT Maru Black = caps headlines + every number,
+   GT Maru Medium = body, Zen Maru Gothic Black = CJK headlines. Loaded after loyalty.css / passport.css on guest, staff and owner pages. */
+@font-face{font-family:Roru;src:url(/fonts/gtmaru-medium.woff2) format("woff2");font-weight:100 600;font-display:swap}
+@font-face{font-family:Roru;src:url(/fonts/gtmaru-black.woff2) format("woff2");font-weight:650 1000;font-display:swap}
+@font-face{font-family:Roru;src:url(/fonts/zenmaru-black-sub.woff2) format("woff2");font-weight:650 1000;font-display:swap;unicode-range:U+2E80-2FFF,U+3000-303F,U+3040-30FF,U+3400-4DBF,U+4E00-9FFF,U+F900-FAFF,U+FF00-FFEF}
+@font-face{font-family:RoruCJK;src:url(/fonts/zenmaru-black-sub.woff2) format("woff2");font-display:swap;unicode-range:U+2E80-2FFF,U+3000-303F,U+3040-30FF,U+3400-4DBF,U+4E00-9FFF,U+F900-FAFF,U+FF00-FFEF}
+@font-face{font-family:Megazoid;src:url(/fonts/megazoid.woff2) format("woff2");font-display:swap}
+:root{--f-body:Roru,system-ui,-apple-system,"PingFang HK","PingFang TC","Noto Sans CJK HK","Microsoft JhengHei",sans-serif;--f-disp:Megazoid,Roru,system-ui,sans-serif;
+  --grp:#15171E;--div:rgba(246,243,231,.08);--r-card:24px;--r-grp:18px;--r-ph:14px}
+body.lt,body.thB{--grp:#FFFFFF;--div:rgba(22,24,31,.08)}
+html,body,:lang(zh-Hant),button,input,select,textarea{font-family:var(--f-body)}
+.display .ph{font-family:var(--f-body)}
+/* numbers: GT Maru Black, tabular (Megazoid digits read as letters, so never Megazoid for numbers) */
+.num,#pts,.lad-pts b,.pp-count b,.pp-pz-n b,.c-num,.stat b,.kpi b,.big,.vring b{font-family:Roru,system-ui,sans-serif;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+/* display titles: Megazoid (Latin only; CJK falls to Zen Maru Black) */
+h1,.ph-tier,.sf-tier,.brand .fam,.pp-k,.ig-h,.rw-h,.own-h1,.o-title{font-family:Megazoid,RoruCJK,Roru,system-ui,sans-serif;font-weight:400;letter-spacing:.02em}
+h1{font-size:28px}
+.brand .fam{font-size:14px;letter-spacing:.06em;opacity:1}
+.brand img{height:22px}
+
+/* ---------- Card tab: the wallet pass (one hero object) ---------- */
+.wallet{position:relative;border-radius:var(--r-card);padding:18px 18px 16px;margin:6px 0 20px;display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 1px 0 rgba(255,255,255,.18) inset,0 18px 40px -18px rgba(0,0,0,.55)}
+.wallet::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 80% at 100% 0,rgba(255,255,255,.22),transparent 55%)}
+.wallet.t-nori{background:linear-gradient(135deg,#2f8a4e,#14442a);color:#f6f3e7}
+.wallet.t-gohan{background:linear-gradient(135deg,#ffffff,#e6e1cf);color:#0b0d12}
+.wallet.t-tobiko{background:linear-gradient(135deg,#ff5a1f,#c42a00);color:#fff}
+.wallet.t-kama{background:linear-gradient(135deg,#ffe07a,#caa02a);color:#0b0d12}
+.wallet #perkHero{display:contents}
+.wallet .perkhero .ph-top{order:1;display:flex;align-items:baseline;gap:8px;flex-wrap:nowrap;position:relative;z-index:1}
+.wallet .perkhero .ph-tier{font-size:26px;line-height:1;letter-spacing:.04em}
+.wallet .perkhero .ph-zh{font-family:RoruCJK,Roru,sans-serif;font-size:18px;font-weight:900;opacity:.8}
+.wallet .perkhero .ph-name{margin-left:auto;font-size:15px;font-weight:500;opacity:.8;margin-top:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%}
+.wallet #ptsCard{order:2;background:none!important;border:0!important;box-shadow:none!important;padding:0;margin:18px 0 0;display:block;position:relative;z-index:1;color:inherit}
+.wallet #ptsCard .c-pts-l{display:block}
+.wallet #ptsCard .c-k{font-family:Roru,sans-serif;font-weight:900;font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.7;color:inherit}
+.wallet #ptsCard .c-num{display:flex;align-items:center;gap:10px;font-size:46px;line-height:1.05;margin-top:4px;white-space:nowrap;color:inherit}
+.wallet #ptsCard .c-num #pts{font-family:Roru,sans-serif;font-weight:900;font-variant-numeric:tabular-nums}
+.wallet #ptsCard .c-unit{font-size:15px;font-weight:900;opacity:.75;align-self:flex-end;margin-bottom:8px}
+.wallet #ptsCard .roll-coin{width:34px;height:34px}
+.wallet #ptsCard .c-pts-r{display:block;margin-top:2px}
+.wallet #ptsCard .c-exp{font-size:13px;font-weight:500;opacity:.75;color:inherit;text-align:left;line-height:1.3}
+.wallet #ptsCard .notice{margin-top:8px}
+.wallet .perkhero .ph-today{order:3;position:relative;z-index:1;font-size:15px;font-weight:500;line-height:1.35;margin-top:16px;padding-top:12px;border-top:1px solid currentColor;border-top-color:rgba(0,0,0,.12)}
+.wallet.t-nori .perkhero .ph-today,.wallet.t-tobiko .perkhero .ph-today{border-top-color:rgba(255,255,255,.2)}
+.wallet .perkhero .ph-today .ph-k{display:inline;font-family:Roru,sans-serif;font-weight:900;font-size:11px;letter-spacing:.14em;opacity:.7;margin:0 6px 0 0}
+.wallet .perkhero .ph-show{order:4;position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;margin-top:14px;border-radius:14px;font-size:16px;font-weight:900;background:rgba(11,13,18,.88);color:#F6F3E7}
+.wallet.t-nori .perkhero .ph-show,.wallet.t-tobiko .perkhero .ph-show{background:rgba(255,255,255,.95);color:#0b0d12}
+.wallet .wl-foot{display:none}
+
+/* ---------- grouped list (inset, thin dividers, no outlines) ---------- */
+.ig-h{font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:4px 4px 8px;opacity:.75;font-weight:400}
+.ig{background:var(--grp);border-radius:var(--r-grp);overflow:hidden;margin:0 0 20px}
+body.lt .ig{box-shadow:0 1px 2px rgba(22,24,31,.04),0 10px 26px -18px rgba(22,24,31,.25)}
+.ig-row{appearance:none;-webkit-appearance:none;display:flex!important;align-items:center;gap:14px;width:100%;min-height:76px;margin:0!important;padding:12px 14px!important;border:0!important;border-radius:0!important;
+  background:none!important;box-shadow:none!important;color:inherit;font:inherit;text-align:left;cursor:pointer;position:relative}
+.ig-row.hide{display:none!important}
+.ig-row+.ig-row:not(.hide)::before,.ig-row:not(.hide)~.ig-row:not(.hide)::before{content:"";position:absolute;top:0;left:80px;right:0;height:1px;background:var(--div)}
+.ig-art{flex:none;width:52px;height:52px;border-radius:var(--r-ph);display:grid;place-items:center;position:relative;overflow:hidden}
+.ig-ph{background:#222}
+.ig-ph img.food,img.ig-photo{width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block;border-radius:inherit}
+.ig-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.ig-t b{font-size:16px;font-weight:900;line-height:1.25}
+.ig-t small{font-size:13px;color:var(--muted);line-height:1.3;font-weight:500}
+.ig-t .c-k{text-transform:uppercase;letter-spacing:.12em;font-size:10.5px;font-weight:900;color:var(--muted)}
+.ig-row .c-go{flex:none;color:var(--muted);font-size:22px;line-height:1;opacity:.7}
+.wk-x{flex:none;font-size:20px;color:var(--gold);padding:4px 10px;border-radius:999px;background:rgba(232,184,74,.14)}
+body.lt .wk-x{background:#FFF1C9;color:#8A5A00}
+.ig-row.wk-banner{animation:none}
+.ig-row.wk-banner.wk-new{animation:wkPop .9s ease}
+@keyframes wkPop{0%{background:rgba(232,184,74,.25)}100%{background:transparent}}
+.ig-art.wk-ic{background:rgba(232,184,74,.12)}
+/* visits ring */
+.vring{background:none!important}
+.vring svg{position:absolute;inset:0}
+.vring .vr-bg{fill:none;stroke:var(--div);stroke-width:5}
+body.lt .vring .vr-bg{stroke:rgba(22,24,31,.1)}
+.vring .vr-fg{fill:none;stroke:var(--orange);stroke-width:5;stroke-linecap:round;transition:stroke-dasharray .6s ease}
+.vring b{position:relative;font-size:17px;line-height:1}
+.vring b small{font-size:10px;opacity:.6;font-weight:900}
+.c-visits .c-vrow{display:flex;gap:4px;margin-top:4px}
+.c-visits .c-vrow .vs{width:18px;height:18px;padding:0;background:none!important}
+.c-visits .c-vrow .vs .stamp,.c-visits .c-vrow .vs svg,.c-visits .c-vrow .vs img{width:18px!important;height:18px!important}
+.c-next .ig-coin{background:rgba(232,184,74,.12)}
+.c-next .ig-coin .roll-coin{width:30px;height:30px}
+.c-next .c-bar{display:block;height:6px;border-radius:99px;margin-top:6px;background:var(--div);overflow:hidden}
+body.lt .c-next .c-bar{background:#ECE6D6}
+.c-next .c-bar i{display:block;height:100%;border-radius:inherit;background:var(--gold)}
+/* the one main action on the Card: scan a receipt */
+.c-scan{background:none!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0 0 12px!important}
+.c-scan .btn{min-height:54px;border-radius:16px;font-size:17px}
+.act-banner{border-radius:var(--r-grp)}
+
+/* ---------- food photos everywhere: one shape, centred subject, same radius, never stretched ---------- */
+img.food{object-fit:cover;object-position:50% 50%;background:#1d1f26}
+
+/* Rewards: free-roll strip (3 real rolls the reward covers, each labelled) */
+.rw-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 12px}
+.rw-strip figure{margin:0;position:relative;aspect-ratio:1/1;border-radius:var(--r-ph);overflow:hidden}
+.rw-strip img.food{width:100%;height:100%;display:block}
+.rw-strip figcaption{position:absolute;left:0;right:0;bottom:0;padding:16px 8px 6px;font-size:12px;font-weight:900;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.65));text-align:left}
+/* Rewards: calmer sections */
+.rw-h{font-size:13px!important;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin:22px 4px 8px!important}
+.reward{border:0!important;border-radius:var(--r-grp)!important;background:var(--grp)!important;box-shadow:none}
+body.lt .reward{box-shadow:0 1px 2px rgba(22,24,31,.04),0 10px 26px -18px rgba(22,24,31,.25)!important}
+#ladder{background:var(--grp);border-radius:var(--r-grp);overflow:hidden}
+#ladder .lad{border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;margin:0!important;position:relative}
+#ladder .lad+.lad::before{content:"";position:absolute;top:0;left:16px;right:0;height:1px;background:var(--div)}
+.lad-pts b{font-size:18px}
+.lad .lad-bar i,.lad-bar i{background:var(--gold)!important}
+.lad-btn{background:var(--orange)}
+
+/* ---------- Passport: every tile the same shape; photo on top when we have the dish, icon when we don't ---------- */
+.pp-grid{gap:10px}
+.pp-cell{padding:0 0 10px!important;min-height:0!important;border-radius:16px!important;justify-content:flex-start}
+.pp-cell.off{border:1px solid var(--div)!important;background:var(--grp)!important}
+.pp-cell.on{border:1.5px solid var(--orange)!important;background:var(--grp)!important}
+.pp-cell .pp-ph,.pp-cell .pp-ic{width:100%;aspect-ratio:1/1;height:auto!important;margin:0 0 8px!important;display:grid;place-items:center;overflow:hidden;background:rgba(246,243,231,.04)}
+body.lt .pp-cell .pp-ic,body.lt .pp-cell .pp-ph{background:#F4F0E4}
+.pp-cell .pp-ic>*{transform:scale(1.15)}
+.pp-cell .pp-ph img.food{width:100%;height:100%;display:block}
+.pp-cell.off .pp-ph img.food{opacity:.92}
+.pp-nm,.pp-zh{padding:0 6px}
+.pp-stamp{top:8px!important;right:8px!important;background:rgba(15,17,22,.78)!important}
+.pp-cell.dk-cell{padding:12px 6px 10px!important}
+
+/* ---------- tab bar: calmer pill ---------- */
+.tabbar{border-top:1px solid var(--div)!important}
+
+/* ---------- staff + owner: same type, grouped surfaces, orange only on actions ---------- */
+body.own .card,body.staff .card,.staff .card{border-color:transparent}
+body.thB .card{border-color:transparent;box-shadow:0 1px 2px rgba(22,24,31,.04),0 10px 26px -18px rgba(22,24,31,.25)}
+
+/* ---------- f43 pass 2: calmer Passport hero, Rewards cards, banner ---------- */
+.wallet #ptsCard .c-unit{color:inherit!important;opacity:.7}
+.ig-row{min-height:68px}
+.wallet{margin:4px 0 16px}
+.act-banner{margin:0 0 16px!important}
+.pp-hero{background:var(--grp)!important;border:0!important;border-radius:var(--r-card)!important}
+body.lt .pp-hero{box-shadow:0 1px 2px rgba(22,24,31,.04),0 10px 26px -18px rgba(22,24,31,.25)}
+.pp-togo{background:rgba(246,69,1,.08)!important;border:0!important}
+.pp-badges{gap:0!important;margin-top:12px;border-top:1px solid var(--div)}
+.pp-badge{border:0!important;border-radius:0!important;background:none!important;padding:10px 2px!important;border-bottom:1px solid var(--div)!important}
+.pp-badge:last-child{border-bottom:0!important}
+.pp-badge.on b{color:var(--gold)!important}
+.pp-tog{background:var(--grp)!important;border:0!important}
+body.lt .pp-tog{box-shadow:0 6px 18px -10px rgba(22,24,31,.3)}
+.pp-prizes,.pp-how{background:var(--grp)!important;border:0!important}
+.pp-pz{border-top-color:var(--div)!important}
+.pp-count b{font-size:52px}
+.suggest{background:var(--grp)!important;border:0!important;box-shadow:inset 3px 0 0 var(--orange)}
+.sc-day,.sc-card{border:0!important}
+#readySec .reward.revealed .code{font-family:Roru,ui-monospace,monospace;font-weight:900;letter-spacing:.12em}
+
+/* small section labels are caps headlines: GT Maru Black, not Megazoid */
+.ig-h,.rw-h{font-family:Roru,RoruCJK,system-ui,sans-serif!important;font-weight:900!important;font-size:12px!important;letter-spacing:.14em!important;opacity:.6!important}
+.ig-h{margin:0 4px 8px!important}
+.sc-prizes,.sc-day{border:0!important;background:var(--grp)!important}
+body.lt .sc-prizes,body.lt .sc-day{box-shadow:0 1px 2px rgba(22,24,31,.04),0 10px 26px -18px rgba(22,24,31,.25)}
+
+/* ---------- owner Today (option A): one hero number, quiet list, actions as a list ---------- */
+#todayKpis{margin:14px 0 0}
+.o-hero .kpi{border-radius:var(--r-card)!important;padding:18px 18px 14px!important;background:var(--grp)!important;border:0!important}
+.o-hero .kpi::before{display:none}
+.o-hero .kpi .lbl{font-family:Roru,sans-serif;font-weight:900;font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.6}
+.o-hero .kpi .val{font-family:Roru,sans-serif;font-weight:900;font-size:56px!important;line-height:1;margin:8px 0 6px;font-variant-numeric:tabular-nums}
+.o-hero .kpi .spark{height:44px}
+.o-list{margin:12px 0 0!important}
+.o-row{cursor:default;min-height:64px!important}
+.o-row::before{left:14px!important}
+.o-v{font-size:26px;flex:none}
+.o-row.warn .o-v{color:var(--orange)}
+.qa.o-qa{display:block!important;margin:16px 0 8px!important}
+.qa.o-qa button{display:flex!important;flex-direction:row!important;align-items:center;gap:14px;width:100%;min-height:64px!important;padding:10px 14px!important;border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;position:relative;font-weight:500;text-align:left}
+.qa.o-qa button+button::before{content:"";position:absolute;top:0;left:66px;right:0;height:1px;background:var(--div)}
+.o-ic{width:38px!important;height:38px!important;border-radius:12px;background:rgba(246,243,231,.07);color:inherit}
+body.thB .o-ic{background:#F4F0E4}
+.qa.o-qa button.hot .o-ic{background:var(--orange);color:#fff}
+.qa.o-qa button.hot b{color:var(--orange)}
+.qa.o-qa button i{display:none}
+body.thB .o-hero .kpi,body.thB .ig{box-shadow:0 1px 2px rgba(22,24,31,.04),0 10px 26px -18px rgba(22,24,31,.25)!important}
+@media (min-width:700px){.qa.o-qa{display:grid!important;grid-template-columns:1fr 1fr}.qa.o-qa button+button::before{display:none}}
+
+/* ---------- staff (counter): calmer keypad + lists, same fonts; orange stays on Scan QR / actions ---------- */
+.pad button{border:0!important;background:var(--grp)!important;font-family:Roru,sans-serif;font-weight:900;font-variant-numeric:tabular-nums}
+body.lt .pad button{box-shadow:0 1px 2px rgba(22,24,31,.06)}
+.pad button:active{background:var(--orange)!important;color:#fff}
+.display{border:0!important;background:var(--grp)!important;font-family:Roru,sans-serif!important}
+.card .card,.card .li,.card .pq,.card .rw-it{border-color:var(--div)!important}
+
+/* f47 (Dominic Oct 21 2:51 PM: "I prefer the old version" = the two-line RORU / BARU logo, not the one-line wordmark).
+   At 22px the R's closed up and read as "AORU"; the trimmed logo (no transparent margin) at 38px reads cleanly and
+   matches the height of the language pill on the right, so both sit on one centre line. */
+.brand img.logo-2l{height:38px;width:auto;flex:none;display:block}
+.brand .fam{white-space:nowrap}
+.top{gap:10px}.top .langs{flex:none}.top .langs button{white-space:nowrap;padding:6px 8px}
+@media (max-width:389px){.brand img.logo-2l{height:32px}.top .brand .fam{font-size:12px}}
+@media (max-width:365px){.brand img.logo-2l{height:30px}.top .brand .fam{font-size:11px}.top .langs button{padding:6px 6px}}
+/* f46: tried-stamp sits top-LEFT on photo tiles: every centred roll leans up-right, so the top-left corner is bare wood and the stamp never covers the food */
+.pp-cell .pp-ph ~ .pp-stamp,.pp-cell.has-ph .pp-stamp{left:8px!important;right:auto!important}
+/* f46: every tile name gets the same 2-line slot, so the 中文 line and the tile bottoms line up across a row (Coconut Shrimp / Lobster Bomb wrap, Salmon does not) */
+.pp-cell .pp-nm{min-height:2.3em;display:flex;align-items:center;justify-content:center;text-align:center}

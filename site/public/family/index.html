@@ -1,0 +1,1489 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net; worker-src 'self' blob: https://cdn.jsdelivr.net; child-src 'self' blob:; connect-src 'self' https://gpudggbdwghzsanyvvgt.supabase.co wss://gpudggbdwghzsanyvvgt.supabase.co https://cdn.jsdelivr.net https://tessdata.projectnaptha.com data: blob:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; media-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="theme-color" content="#0b0d12">
+<title data-tt="{prog} — RORUBARU">High Rollers — RORUBARU</title>
+<link rel="icon" href="/icon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-icon.png">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f55">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f55">
+<link rel="stylesheet" href="/loyalty/redesign.css?v=f55">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f55">
+<link rel="stylesheet" href="/loyalty/split.css?v=f55">
+<link rel="stylesheet" href="/loyalty/kama.css?v=f55">
+<link rel="stylesheet" href="/loyalty/otp.css?v=f55">
+<link rel="stylesheet" href="/loyalty/calm.css?v=f55">
+<link rel="stylesheet" href="/loyalty/seasonal.css?v=s4">
+<script defer src="/loyalty/seasonal.js?v=s4" data-season-buttons=".btn:not(.ghost)" data-season-full=".btn:not(.ghost):not(.sm)" data-season-wash="off" data-season-pad="on"></script>
+<script src="/loyalty/vendor/qrcode.js"></script>
+<script src="/loyalty/loyalty.js?v=l1"></script>
+<script src="/loyalty/split.js?v=f55"></script>
+<script src="/loyalty/passport.js?v=f55"></script>
+<script src="/loyalty/scratch.js?v=f55"></script>
+<script src="/loyalty/kama.js?v=f55"></script>
+</head>
+<body>
+<div class="wrap" id="app" style="visibility:hidden">
+  <div class="top">
+    <div class="brand"><img class="logo-2l" src="/logo-2l.png?v=f47" alt="RORUBARU" width="73" height="38"><span class="fam" data-t="family"></span></div>
+    <div class="langs"><button data-lang="en">EN</button><button data-lang="zh">繁中</button><button data-lang="zhs">简中</button></div>
+  </div>
+
+  <!-- sign in -->
+  <section id="signin">
+    <h1 data-t="p_tag"></h1>
+    <p class="muted" id="subLine"></p>
+    <div class="card">
+      <div id="step1">
+        <label class="field"><span data-t="phone"></span><input id="phone" type="tel" inputmode="tel" autocomplete="tel" data-tp="phone_ph"></label>
+        <div class="err hide" id="err1"></div>
+        <button class="btn" id="btnSend" data-t="send"></button>
+      </div>
+      <div id="step2" class="hide">
+        <!-- f53 (Dominic Oct 27 12:53 AM, reel "Glassy OTP V2"): frosted-glass verify card, one box per digit, auto-verifies on the 6th digit.
+             One real input (#code) sits over the boxes so iOS code autofill, paste and backspace work natively. Same back-end calls as before. -->
+        <div class="otpg" id="otpG" data-state="idle">
+          <div class="otpg-card">
+            <span class="otpg-grab" aria-hidden="true"></span>
+            <div class="otpg-ask">
+              <h2 class="otpg-t" data-f="otp_t"></h2>
+              <p class="otpg-s" data-f="otp_s"></p>
+              <p class="otpg-to"><span id="sentTo"></span><span class="otpg-dot" aria-hidden="true"></span><a href="#" id="changeNo" data-t="change"></a></p>
+              <div class="otpg-field">
+                <div class="otpg-boxes" id="otpBoxes" aria-hidden="true"><span class="otpg-box" data-i="0"><b></b></span><span class="otpg-box" data-i="1"><b></b></span><span class="otpg-box" data-i="2"><b></b></span><span class="otpg-box" data-i="3"><b></b></span><span class="otpg-box" data-i="4"><b></b></span><span class="otpg-box" data-i="5"><b></b></span></div>
+                <input id="code" class="otpg-input" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="6" spellcheck="false" autocorrect="off" autocapitalize="off" enterkeyhint="done">
+              </div>
+              <p class="otpg-msg" id="otpMsg" role="status" aria-live="polite"></p>
+              <p class="otpg-resend"><span data-f="otp_none"></span> <a href="#" id="resend" data-f="otp_rs"></a></p>
+              <button type="button" class="otpg-new hide" id="otpNew" data-f="otp_new"></button>
+            </div>
+            <div class="otpg-done" aria-live="polite">
+              <span class="otpg-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="otpg-ck" d="M5.5 12.5l4.2 4.2L18.5 7.8"/></svg></span>
+              <h2 class="otpg-t" data-f="otp_ok_t"></h2>
+              <p class="otpg-s" data-f="otp_ok_s"></p>
+            </div>
+          </div>
+        </div>
+        <div class="notice hide" id="testHint"><span data-f="otp_demo"></span> <b class="code" id="testCode"></b></div>
+        <div id="joinBox" class="hide">
+          <h2 class="otpg-jh" data-f="otp_join_h"></h2>
+          <p class="small muted" data-f="otp_join_s"></p>
+          <label class="field" id="nameField"><span data-t="name"></span><input id="name" type="text" autocomplete="given-name" data-tp="name_ph"></label>
+          <label class="field" id="bdayField"><span data-t="bday_opt"></span><div class="row" style="gap:8px"><select id="bdM" class="sel"></select><select id="bdD" class="sel"></select></div></label>
+          <label class="check" id="consentRow"><input type="checkbox" id="consent"><span><span data-t="terms_agree_a"></span> <a href="/family/terms/" target="_blank" data-t="terms_link"></a> <span data-t="and"></span> <a href="/family/privacy/" target="_blank" data-t="privacy_link"></a> <span class="req">*</span></span></label>
+          <div class="optbox">
+            <div class="tiny" style="margin:0 0 6px" data-t="optional_title"></div>
+            <label class="check"><input type="checkbox" id="mktWa"><span data-t="mkt_wa"></span></label>
+            <label class="check"><input type="checkbox" id="mktPush"><span data-t="mkt_push"></span></label>
+          </div>
+          <div class="err hide" id="err2"></div>
+          <button class="btn" id="btnJoin" data-t="join" disabled></button>
+        </div>
+      </div>
+    </div>
+    <p class="tiny" data-t="preview_note"></p>
+  </section>
+
+  <!-- member -->
+  <!-- f38 (Dominic Oct 17 19:22 "go"): 4 tabs, one job each. Card = what I have + what to do now (fits one iPhone screen);
+       Passport = collect; Rewards = spend + my level + ways to earn; Me = my QR, history, friends, settings, help. Nothing removed, only moved. -->
+  <section id="member" class="hide">
+    <div class="row hide" id="helloRow" style="justify-content:space-between;align-items:flex-start">
+      <div><h1 id="hello" style="margin-bottom:2px"></h1><p class="muted small" id="tierLine"></p></div>
+      <span class="pill on" id="tierPill"></span>
+    </div>
+
+    <!-- ===== CARD ===== -->
+    <!-- f43 (Dominic Oct 21, option A "calm wallet" + B photos + C visits ring): tier card and balance are ONE wallet pass;
+         the weekly item, visits and next reward sit in one grouped list with thin dividers. Same elements and ids as f42, only regrouped. -->
+    <div data-tab="card" class="wallet" id="walletPass">
+      <div class="perkhero t-nori" id="perkHero"></div>
+      <div class="c-pts" id="ptsCard">
+        <div class="c-pts-l"><div class="c-k" data-t="your_points"></div><div class="c-num"><span id="ptsCoin"></span><span id="pts">0</span><span class="c-unit" data-t="points"></span></div></div>
+        <div class="c-pts-r"><div class="c-exp hide" id="ptsExp"></div><div class="notice hide" id="pendingNote"></div></div>
+      </div>
+      <div class="wl-foot" id="walletFoot"></div>
+    </div>
+    <div data-tab="card" id="actBanner" class="act-banner hide" role="status"></div><!-- f43: under the wallet pass, so the card stays the one hero -->
+    <h2 data-tab="card" class="ig-h" data-f="prog_h"></h2>
+    <div data-tab="card" class="ig" id="progList">
+      <!-- f40: the weekly bonus is its own row (Dominic Oct 19: the chip inside the balance box read like a second coin); f43: real photo of that dish -->
+      <button type="button" class="ig-row wk-banner hide" id="rwBanner"></button>
+      <button type="button" class="ig-row c-visits" id="visitRow" aria-haspopup="dialog">
+        <span class="ig-art vring" id="visitRing" aria-hidden="true"></span>
+        <span class="ig-t"><b id="visitSub"></b><span class="c-vrow" id="visitStamps"></span><small class="hide" id="visitLine"></small></span>
+        <span class="c-go" aria-hidden="true">›</span>
+      </button>
+      <button type="button" class="ig-row c-next" id="nextCard">
+        <span class="ig-art ig-coin" id="nextIc" aria-hidden="true"></span>
+        <span class="ig-t"><small class="c-k" data-f="next_k"></small><b id="nextReward"></b><span class="c-bar"><i id="bar"></i></span></span>
+        <span class="c-go" aria-hidden="true">›</span>
+      </button>
+    </div>
+    <!-- f49: Kama Dinner booking (Kama members only; loyalty/kama.js draws it) -->
+    <div data-tab="card" id="kamaHost" class="hide"></div>
+    <input id="photo" type="file" accept="image/*" capture="environment" class="hide"><!-- f50: the camera input (labels in the pre-scan sheet point here) -->
+    <div data-tab="card" id="ppTeaser" class="hide"></div>
+
+    <!-- things that open in a sheet (moved, not removed); f50: the receipt scan flow opens from the centre Scan button -->
+    <div id="sheetStore" hidden>
+      <!-- f50 (Dominic Oct 25 2:41 PM): the scan flow lives in a sheet opened by the centre Scan button in the tab bar -->
+      <div class="card c-scan" id="scanCard">
+        <div class="notice split-banner hide" id="splitBanner"></div>
+        <div id="scanIdle"></div>
+        <div id="scanBusy" class="hide center" style="padding:10px 0">
+          <img id="thumb" style="max-height:140px;border-radius:12px;display:none;margin:0 auto 10px">
+          <p data-t="reading"></p>
+          <div style="height:6px;border-radius:99px;background:var(--ink);overflow:hidden"><div id="ocrBar" style="height:100%;width:0;background:var(--orange);transition:width .3s"></div></div>
+        </div>
+        <div id="scanForm" class="hide">
+          <p class="small" id="readMsg"></p>
+          <label class="field"><span data-t="total"></span><input id="rTotal" type="text" inputmode="decimal" autocomplete="off"></label>
+          <label class="field"><span data-t="when"></span><input id="rAt" type="datetime-local"></label>
+          <label class="field"><span data-t="table"></span><input id="rTable" type="text" inputmode="numeric" autocapitalize="characters" autocomplete="off" maxlength="6"></label>
+          <label class="field hide" id="rNoWrap"><span data-t="receipt_no"></span><input id="rNo" type="text" autocapitalize="characters" autocomplete="off"></label>
+          <label class="field"><span data-t="shop"></span><div class="shops" id="rShops" style="margin:0"></div></label>
+          <div class="err hide" id="rErr"></div>
+          <button class="btn" id="rSubmit" data-t="confirm_add"></button>
+          <button class="btn ghost sx-rsplit" type="button" id="rSplit"></button>
+          <p class="note sx-once" id="rOnce"></p>
+          <p class="center small" style="margin-top:10px"><a href="#" id="rCancel" data-t="retake"></a></p>
+        </div>
+        <div id="scanDone" class="hide"></div>
+      </div>
+      <div class="hookbar hide" id="hookBar"></div>
+      <div id="splitInbox"></div>
+      <!-- visits (stamp plate): opens from the visit row -->
+      <div class="card center" id="plateCard">
+        <div class="tiny" style="letter-spacing:.1em;text-transform:uppercase" data-t="your_plate"></div>
+        <div class="plate-wrap"><div class="plate small-plate" id="plate"></div></div>
+        <div style="font-weight:900;font-size:18px;margin-top:6px" id="plateLine"></div>
+        <div class="small" id="plateDetail" style="color:var(--gold,#E8B84A);margin-top:2px"></div>
+        <div class="small muted" id="plateSub"></div>
+      </div>
+      <div class="card hide" id="meProgress">
+        <div id="meProgLine"></div><div class="tierbar"><div id="meProgFill"></div></div><div class="small muted" id="meProgSub"></div>
+      </div>
+    </div>
+
+    <!-- ===== PASSPORT ===== -->
+    <section data-tab="passport" id="ppSec"></section>
+
+    <!-- ===== REWARDS ===== -->
+    <!-- f51 (Dominic Oct 25 3:23 PM "rewards page, too much scrolling.. internal tab within rewards?"): Rewards splits into 4 sub-tabs, one screen each. Nothing removed, only regrouped:
+         Redeem = Ready to use + Suggested + Use your $RORU · Level = your status + level ladder · Perks = your perks + Roru Day + Birthday roll + Coming soon · Earn = Ways to earn more. -->
+    <i data-tab="rewards" class="rw-top" id="rwTop" aria-hidden="true"></i>
+    <nav data-tab="rewards" class="rw-tabs" id="rwTabs" role="tablist"><button type="button" role="tab" data-rsub="redeem" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h16v3H4zM5.5 12.5h13V20h-13zM12 9.5V20"/><path d="M12 9.5c-1.6-3.2-5.4-3-4.6-.2M12 9.5c1.6-3.2 5.4-3 4.6-.2"/></svg><span data-f="rs_redeem"></span><b class="rs-dot hide" id="rsDot"></b></button><button type="button" role="tab" data-rsub="level" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.2l2.5 5.2 5.6.8-4.1 3.9 1 5.6-5-2.7-5 2.7 1-5.6-4.1-3.9 5.6-.8z"/></svg><span data-f="rs_level"></span></button><button type="button" role="tab" data-rsub="perks" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 18.5h16M5 15.5l-1-8 4.6 3.4L12 5l3.4 5.9L20 7.5l-1 8z"/></svg><span data-f="rs_perks"></span></button><button type="button" role="tab" data-rsub="earn" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.3"/><path d="M12 7.6v8.8M8.2 12h7.6"/></svg><span data-f="rs_earn"></span></button></nav>
+    <section data-tab="rewards" data-rsub="redeem" id="readySec" class="rw-sec">
+      <h2 class="rw-h" data-f="ready_h"></h2>
+      <div id="rewards"></div>
+      <div id="scHost"></div>
+      <p class="muted small rw-empty hide" id="readyEmpty" data-f="ready_empty"></p>
+    </section>
+    <div data-tab="rewards" data-rsub="redeem" id="suggestCard"></div>
+    <section data-tab="rewards" data-rsub="redeem" id="ladderSec" class="rw-sec">
+      <h2 class="rw-h"><span data-f="ladder_h"></span><button type="button" class="info-i" data-info="ladder" aria-label="ⓘ">i</button></h2>
+      <p class="small muted lad-sub hide" data-t="ladder_sub"></p>
+      <div id="ladder"></div>
+    </section>
+    <section data-tab="rewards" data-rsub="level" id="levelSec" class="rw-sec">
+      <h2 class="rw-h" data-f="level_h"></h2>
+      <div class="card status" id="statusCard">
+        <div class="row" style="align-items:center;gap:12px">
+          <div class="tierbadge" id="tierBadge"></div>
+          <div class="grow">
+            <div class="tiny" style="letter-spacing:.1em;text-transform:uppercase;margin:0" data-t="your_status"></div>
+            <div style="font-size:26px;font-weight:900;line-height:1.1" id="tierName"></div>
+            <div class="small muted" id="multLine"></div>
+          </div>
+        </div>
+        <div class="lvl-to" id="lvlTo"></div>
+        <div class="tierbar"><div id="tierFill"></div></div>
+        <div class="row small" style="justify-content:space-between"><span id="yearSpend"></span><span id="tierNext" style="text-align:right"></span></div>
+        <div class="ladder" id="tierSteps"></div>
+      </div>
+    </section>
+    <section data-tab="rewards" data-rsub="perks" id="perksSec" class="rw-sec">
+      <div class="card hide perks-few" id="perksCard">
+        <h2 style="margin-top:0" data-t="perks_title"></h2>
+        <div id="perksBody"></div>
+        <button type="button" class="linkbtn perks-more" id="perksMore"></button>
+      </div>
+      <div id="scDayHost"></div>
+      <div class="card hide" id="bdayCard">
+        <h2 style="margin-top:0">🎂 <span data-t="bday_title"></span></h2>
+        <div id="bdayBody"></div>
+      </div>
+      <div id="soonWrap" class="hide">
+        <h2><span data-t="coming_soon"></span> <span class="pill" style="font-size:10px;vertical-align:middle">🔒</span></h2>
+        <div class="soon" id="soon"></div>
+      </div>
+    </section>
+    <section data-tab="rewards" data-rsub="earn" id="earnSec" class="rw-sec">
+      <h2 class="rw-h" data-f="earn_h"></h2>
+      <div class="card earn" id="earnList"></div>
+      <div class="tiny hide" id="goldLine"></div>
+    </section>
+
+    <!-- ===== ME ===== -->
+    <div data-tab="me" class="card meqr" id="meQr">
+      <div class="meqr-h"><h2 data-f="qr_h"></h2><span class="small muted" data-f="qr_sub"></span></div>
+      <div class="meqr-b">
+        <button type="button" class="qr" id="memberQr" aria-label="QR"></button>
+        <div class="meqr-t">
+          <p class="code" id="memberCode"></p>
+          <p class="small muted" id="memberPhone"></p>
+          <p class="tiny"><span data-t="member_since"></span> <span id="since"></span></p>
+          <button type="button" class="btn sm" id="meQrBig" data-f="counter_btn"></button>
+        </div>
+      </div>
+    </div>
+    <div data-tab="me" class="card" id="histCard">
+      <h2 style="margin-top:0" data-f="hist_h"></h2>
+      <div id="splitOutbox"></div>
+      <div id="history"></div>
+      <button type="button" class="btn ghost sm hide" id="histAll"></button>
+    </div>
+    <div data-tab="me" id="friendWrap">
+      <div class="card hide" id="friendCard">
+        <h2 style="margin-top:0">👯 <span data-t="friend_title"></span></h2>
+        <p class="small muted" id="friendSub"></p>
+        <p class="small fr-v2 hide" id="friendV2"></p>
+        <div class="notice hide" id="invitedBy"></div>
+        <div class="linkbox" id="friendLink"></div>
+        <div class="row" style="gap:8px;margin-top:8px"><button class="btn sm" id="friendShare" data-t="share"></button><button class="btn ghost sm" id="friendCopy" data-t="copy"></button></div>
+        <p class="tiny" id="friendStats"></p>
+      </div>
+      <div class="card" id="meInvite">
+        <h2 style="margin-top:0">👯 <span data-t="invite_title"></span></h2>
+        <p class="small muted" id="meInviteSub"></p>
+        <button class="btn sm" id="meInviteBtn" type="button" data-t="invite_btn" style="width:auto"></button>
+      </div>
+    </div>
+    <div data-tab="me" class="card" id="meProfile">
+      <h2 style="margin-top:0" data-t="me_profile"></h2>
+      <label class="field"><span data-t="me_name"></span><div class="row" style="gap:8px"><input id="meName" type="text" maxlength="30" autocomplete="given-name" data-tp="me_name_ph" style="flex:1;min-width:0"><button class="btn sm" id="meNameSave" type="button" data-t="save" style="width:auto"></button></div></label>
+      <div class="field"><span data-t="me_bday"></span><div id="meBday"></div></div>
+    </div>
+    <div data-tab="me" class="card" id="setCard">
+      <h2 style="margin-top:0" data-f="set_h"></h2>
+      <div class="set-row"><span data-f="set_lang"></span><div class="langs"><button data-lang="en">EN</button><button data-lang="zh">繁中</button><button data-lang="zhs">简中</button></div></div>
+      <div class="set-row"><span data-f="set_theme"></span><div class="langs thseg" id="themeSeg"><button type="button" data-th="A">🌙 <span data-f="th_dark"></span></button><button type="button" data-th="B">☀️ <span data-f="th_light"></span></button></div></div>
+    </div>
+    <div data-tab="me" class="card" id="privacyCard">
+      <h2 style="margin-top:0">🔒 <span data-t="priv_title"></span></h2>
+      <div class="notice hide" id="termsNeeded"><span data-t="terms_update"></span> <button class="btn sm" id="termsAccept" data-t="accept"></button></div>
+      <label class="check"><input type="checkbox" id="pWa"><span data-t="mkt_wa"></span></label>
+      <label class="check"><input type="checkbox" id="pPush"><span data-t="mkt_push"></span></label>
+      <p class="tiny" id="consentMeta"></p>
+      <button class="btn ghost sm" id="unsubAll" data-t="unsub_all" style="width:auto"></button>
+    </div>
+    <div data-tab="me" class="card" id="meHow">
+      <h2 style="margin-top:0" data-f="help_h"></h2>
+      <button class="btn ghost sm" id="howBtn" type="button">❓ <span id="howTxt">How it works</span></button>
+      <button class="btn ghost sm" id="rulesBtn" type="button" style="margin-top:8px">📜 <span data-f="rules_btn"></span></button>
+      <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:8px"><a class="btn ghost sm" href="/family/privacy/" data-t="privacy_link"></a><a class="btn ghost sm" href="/family/terms/" data-t="terms_link"></a></div>
+    </div>
+    <p data-tab="me" class="tiny" data-t="privacy"></p>
+    <p data-tab="me" class="tiny" data-t="preview_note"></p>
+    <div data-tab="me" class="row" style="margin-top:14px"><button class="btn ghost sm" id="signout" data-t="signout"></button><button class="btn ghost sm" id="delete" data-t="delete" style="margin-left:auto;color:#ff8a6a"></button></div>
+    <nav class="tabbar" id="tabBar" role="tablist"><button type="button" role="tab" data-tab="card"><i class="tb-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18M7 15h4"/></svg><span data-t="tab_card"></span></i></button><button type="button" role="tab" data-tab="passport" class="hide"><i class="tb-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2.8" width="14" height="18.4" rx="2.2"/><circle cx="12" cy="10.2" r="3.3"/><path d="M9 16.6h6"/></svg><span class="pp-tablbl">Passport</span></i></button><button type="button" class="tb-scan" id="tbScan" aria-haspopup="dialog"><i class="tb-scan-c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8V5.6c0-1.2.9-2.1 2.1-2.1H8M16 3.5h2.4c1.2 0 2.1.9 2.1 2.1V8M20.5 16v2.4c0 1.2-.9 2.1-2.1 2.1H16M8 20.5H5.6c-1.2 0-2.1-.9-2.1-2.1V16"/><path d="M8.6 7h6.8v10.4l-1.7-1.1-1.7 1.1-1.7-1.1-1.7 1.1z"/><path d="M10.6 10h2.8M10.6 12.8h2.8"/></svg></i><span class="tb-scan-l" data-t="tab_scan"></span></button><button type="button" role="tab" data-tab="rewards"><i class="tb-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="9" width="17" height="11" rx="1.5"/><path d="M2.5 9h19v-3h-19zM12 6v14M12 6c-2-3.5-6-3-5 0M12 6c2-3.5 6-3 5 0"/></svg><span data-t="tab_rewards"></span><b class="tb-dot hide" id="rwDot"></b></i></button><button type="button" role="tab" data-tab="me"><i class="tb-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.2-4 4.2-6 7.5-6s6.3 2 7.5 6"/></svg><span data-t="tab_me"></span></i></button></nav>
+
+  </section>
+</div>
+
+<script>
+(async function () {
+  const R = window.RORU, t = R.t, $ = (s) => document.querySelector(s);
+  try { if (new URLSearchParams(location.search).get("unsubscribe")) localStorage.setItem("roru_unsub", "1"); } catch (e) {}
+  try { const rf = new URLSearchParams(location.search).get("ref"); if (rf && /^[A-Za-z0-9]{6,12}$/.test(rf)) localStorage.setItem("roru_ref", rf.toUpperCase()); } catch (e) {}
+  if (R.theme) R.theme.init("roru_theme"); // f38: dark + light
+  await R.gate();
+  $("#app").style.visibility = "visible";
+  document.querySelectorAll(".langs button").forEach(b => b.onclick = () => { R.setLang(b.dataset.lang); render(); try { applyF(); } catch (x) {} });
+  // v46: bottom tab bar (Card / Rewards / Status / Me) — content is only regrouped, nothing removed
+
+  // ===== f27: first-time guest walkthrough (once per device; replay from Me -> How it works) =====
+  function guestTour(force) {
+    if (!R.tour || $("#member").classList.contains("hide")) return;
+    const zh = R.lang() === "zh";
+    // f38/f52: 7 steps, one per place in the layout (Card, $RORU, visits, centre Scan, Passport, Rewards sub-tabs, Me). EN / 繁中 / 简中.
+    const shown = (el) => el && el.getClientRects().length && !el.closest(".hide") ? el : null;
+    // f52 (Dominic Oct 25 3:52 PM "make sure you update tutorials walk through"): same 7 steps for the new layout. Step 4 spotlights the centre Scan,
+    // step 6 the Rewards pill bar (Redeem · Level · Perks · Earn). Short lines, EN / 繁 / 简. New key so every guest sees what moved once.
+    R.tour("guest_f52", [
+      { before: () => setTab("card"), el: () => shown($("#walletPass")),
+        en: "This is your member card. At the counter, tap “Show at counter” and staff scan your QR.",
+        zh: "呢張係你嘅會員卡。喺櫃檯撳「櫃檯出示」，店員掃你個 QR 就得。",
+        zhs: "这是你的会员卡。在柜台点“柜台出示”，店员扫你的二维码就行。" },
+      { before: () => setTab("card"), el: () => shown($("#ptsCard")),
+        en: "Your $RORU. Every HK$1 you spend earns $RORU, and this week's dish earns double. They're good until 31 Dec.",
+        zh: "你嘅 RORU幣。每消費 HK$1 都賺 RORU幣，叫本週菜式賺雙倍。有效期到 12 月 31 日。",
+        zhs: "你的 RORU币。每消费 HK$1 都赚 RORU币，点本周菜式赚双倍。有效期到 12 月 31 日。" },
+      { before: () => setTab("card"), el: () => shown($("#visitRow")),
+        en: "Visits: one stamp every time you come. 5 stamps = a free hand roll, any roll, Wagyu too.",
+        zh: "到訪：每次嚟都有一個印花。集 5 個 = 免費手卷一條，任揀，和牛都得。",
+        zhs: "到访：每次来都有一个印花。集 5 个 = 免费手卷一条，任选，和牛也可以。" },
+      { before: () => setTab("card"), el: () => shown($("#tbScan")), pad: 4, radius: 24,
+        en: "After you pay, tap {scan} **Scan** in the middle and take a photo of your receipt. Can't scan it? Tap “Type it instead”. Paid for friends? Tap “Split with friends” after the scan.",
+        zh: "埋單後，撳中間嘅 {scan}「**掃描**」影低收據。掃唔到？撳「改為手動輸入」。幫朋友埋單？掃完撳「同朋友分單」。",
+        zhs: "结账后，点中间的 {scan}「**扫描**」拍下收据。扫不了？点“改为手动输入”。帮朋友买单？扫完点“同朋友分单”。" },
+      { before: () => setTab("passport"), el: () => shown(document.querySelector("#ppSec .pp-tog")) || shown(document.querySelector("#ppSec .pp-hero")) || $('#tabBar [data-tab="passport"]'),
+        en: "Passport: switch between Food and Drinks. Try a new dish or bottle to get a stamp. Stamps unlock free food and drinks. They start again after 31 Dec.",
+        zh: "護照：可以轉食物或者飲品。試新菜式或者新酒就有印花，集印花換免費嘢食同飲品。12 月 31 日之後重新開始。",
+        zhs: "护照：可以切换食物或饮品。试新菜或新酒就有印花，集印花换免费食物和饮品。12 月 31 日之后重新开始。" },
+      { before: () => { setTab("rewards"); setRsub("redeem", true); }, el: () => shown($("#rwTabs")) || $('#tabBar [data-tab="rewards"]'), top: true, pad: 4, radius: 22,
+        en: "Rewards has 4 tabs up here:\n**Redeem**: use your rewards and $RORU\n**Level**: how close you are to the next level\n**Perks**: your member perks\n**Earn**: ways to get more $RORU",
+        zh: "獎賞喺上面分咗 4 頁：\n**兌換**：用你嘅獎賞同 RORU幣\n**等級**：離下一級仲有幾遠\n**禮遇**：你嘅會員禮遇\n**賺取**：賺多啲 RORU幣嘅方法",
+        zhs: "奖赏在上面分成 4 页：\n**兑换**：用你的奖赏和 RORU币\n**等级**：离下一级还有多远\n**礼遇**：你的会员礼遇\n**赚取**：赚更多 RORU币的方法" },
+      { before: () => setTab("me"), el: () => shown($("#meQr")) || $('#tabBar [data-tab="me"]'),
+        en: "Me: your QR, your history, bring a friend and settings. Tap “How it works” to see this guide again.",
+        zh: "我的：你嘅 QR、紀錄、帶朋友嚟同設定。撳「點樣用」可以再睇呢個教學。",
+        zhs: "我的：你的二维码、记录、带朋友来和设置。点“怎么用”可以再看这个教学。" }
+    ], { force: !!force, lang: zh ? "zh" : "en", onEnd: () => setTab("card") });
+  }
+  // f37: points expiry rule (setting points_expiry = annual_dec31; shown only, nothing expires yet)
+  let RULES = null, lastPts = null;
+  const RULES_P = R.rpc("family_rules", {}).then(r => { RULES = r; if (lastPts !== null) renderExpiry(lastPts); return r; }).catch(() => null);
+  // f40: coin + number + "$RORU" stay on one line; a long balance (or the Chinese unit) shrinks the number a little instead of wrapping
+  function fitPts() { const n = document.querySelector("#ptsCard .c-num"); if (!n || !n.getClientRects().length) return; n.style.fontSize = ""; let fs = 42; while (n.scrollWidth > n.clientWidth + 1 && fs > 28) { fs -= 2; n.style.fontSize = fs + "px"; } }
+  window.addEventListener("resize", () => { try { fitPts(); } catch (e) {} });
+  function renderExpiry(points) {
+    lastPts = points; const el = $("#ptsExp"); if (!el) return; const d = RULES && RULES.points_expire_on;
+    if (!d) { el.classList.add("hide"); return; }
+    const [y, m, dd] = String(d).split("-").map(Number), n = Number(points || 0);
+    // f38: the number sits right beside it on the Card, so the line only says when they expire
+    // f43: one line under the balance on the wallet pass
+    el.innerHTML = R.lang() === "zh" ? y + "年" + m + "月" + dd + "日前有效"
+      : "Good until " + dd + " " + ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][m - 1] + " " + y;
+    el.classList.remove("hide");
+  }
+  $("#howBtn").onclick = () => guestTour(true);
+  const TABS = ["card", "passport", "rewards", "me"];
+  // f51: Rewards sub-tabs (Redeem · Level · Perks · Earn). The last one chosen is remembered for the session; deep links (?tab=rewards&rw=perks, ?rw=level, the old ?tab=status)
+  // and in-app jumps (Card banner, next-reward row, gold receipt, claim) open the sub-tab that holds the thing they point at.
+  const RSUBS = ["redeem", "level", "perks", "earn"];
+  const DL = (() => { try { const q = new URLSearchParams(location.search); return { tab: (q.get("tab") || "").toLowerCase(), rw: (q.get("rw") || "").toLowerCase() }; } catch (e) { return {}; } })();
+  function setRsub(k, keepScroll) { if (!RSUBS.includes(k)) k = "redeem"; const m = $("#member"), was = m.dataset.rsubOn; m.dataset.rsubOn = k; try { sessionStorage.setItem("roru_rsub", k); } catch (e) {}
+    document.querySelectorAll("#rwTabs [data-rsub]").forEach(b => { const on = b.dataset.rsub === k; b.classList.toggle("on", on); b.setAttribute("aria-selected", on ? "true" : "false"); b.tabIndex = on ? 0 : -1; });
+    if (was === k) return;
+    document.querySelectorAll('#member > [data-rsub="' + k + '"]').forEach(el => { el.style.display = "none"; void el.offsetHeight; el.style.display = ""; }); // same WebKit nudge as setTab
+    if (!keepScroll && m.dataset.tabOn === "rewards") { const top = $("#rwTop").getBoundingClientRect().top + window.scrollY - 8; if (window.scrollY > top) window.scrollTo(0, Math.max(0, top)); } }
+  function rsubOf(sel) { const x = sel && $(sel), h = x && x.closest("#member > [data-rsub]"); return h ? h.dataset.rsub : null; }
+  { const rt = $("#rwTabs");
+    rt.querySelectorAll("[data-rsub]").forEach(b => b.onclick = () => setRsub(b.dataset.rsub));
+    rt.addEventListener("keydown", e => { if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return; const i = RSUBS.indexOf($("#member").dataset.rsubOn), n = RSUBS[(i + (e.key === "ArrowRight" ? 1 : RSUBS.length - 1)) % RSUBS.length]; setRsub(n); const nb = rt.querySelector('[data-rsub="' + n + '"]'); if (nb) nb.focus(); e.preventDefault(); }); }
+  setRsub(RSUBS.includes(DL.rw) ? DL.rw : DL.tab === "status" ? "level" : ((() => { try { return sessionStorage.getItem("roru_rsub"); } catch (e) { return null; } })() || "redeem"), true);
+  function setTab(tb, keepScroll) { if (tb === "status") { tb = "rewards"; setRsub("level", true); } if (!TABS.includes(tb)) tb = "card"; $("#member").dataset.tabOn = tb; try { sessionStorage.setItem("roru_tab", tb); } catch (e) {}
+    // f38: some WebKit builds keep a stale zero-height layout for blocks that were display:none; nudge the newly shown tab once
+    document.querySelectorAll('#member > [data-tab="' + tb + '"]').forEach(el => { el.style.display = "none"; void el.offsetHeight; el.style.display = ""; });
+    document.querySelectorAll("#tabBar button[data-tab]").forEach(b => { const on = b.dataset.tab === tb; b.classList.toggle("on", on); b.setAttribute("aria-selected", on ? "true" : "false"); });
+    if (!keepScroll) window.scrollTo(0, 0); }
+  document.querySelectorAll("#tabBar button[data-tab]").forEach(b => b.onclick = () => { if (b.dataset.tab === "rewards" && $("#member").dataset.tabOn !== "rewards" && !$("#rwDot").classList.contains("hide")) setRsub("redeem", true); setTab(b.dataset.tab); }); // f51: something new to use (the orange dot) opens Redeem // f50: the centre Scan button is an action, not a tab (bound with the scan flow)
+  setTab(DL.rw ? "rewards" : (TABS.includes(DL.tab) || DL.tab === "status") ? DL.tab : ((() => { try { return sessionStorage.getItem("roru_tab"); } catch (e) { return null; } })() || "card"), true);
+  const state = { token: localStorage.getItem("roru_member_token"), me: null, phone: "", cfg: null, lastPoints: null, lastStamps: null };
+  // f39/f40: $RORU coin next to the balance + the weekly bonus banner (live: realtime, 30 s poll fallback)
+  $("#ptsCoin").innerHTML = R.coin(false);
+  function paintRw(switched) {
+    // f40: "This week: <item> = double $RORU" banner under the balance (hand-roll icon, orange border like the Monday banner); hidden when no item is set
+    const d = state.rw, el = $("#rwBanner"), escR = (x) => String(x == null ? "" : x).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); if (!el) return;
+    if (!d || !d.on) { el.classList.add("hide"); el.innerHTML = ""; return; }
+    const m = String(+d.multiplier).replace(/\.0+$/, ""), item = R.rwName(d);
+    // f43: a real photo of the week's dish when one is confirmed in R.FOOD (matched by its menu name), else the hand-roll icon
+    const ph = R.foodImg(d.name_en, "ig-photo", { sizes: "56px" });
+    el.innerHTML = (ph ? '<span class="ig-art ig-ph">' + ph + "</span>" : '<span class="ig-art ab-ic wk-ic" aria-hidden="true">' + R.HR + "</span>") + '<span class="ig-t"><b>' + escR(t("rw_bt", { item })) + "</b><small>" + escR(m === "2" ? t("rw_bs") : t("rw_bs_m", { m })) + '</small></span><span class="wk-x num" aria-hidden="true">' + m + '×</span>';
+    el.classList.remove("hide");
+    el.onclick = () => R.toast(t("rw_info", { item, m }), 4500);
+    if (switched) { R.toast("🎉 " + t("rw_now", { item, m }), 3500); el.classList.remove("wk-new"); void el.offsetWidth; el.classList.add("wk-new"); }
+  }
+  const RW = R.rollWeek((d, switched) => { state.rw = d; paintRw(switched); if (state.me) { try { renderHistory(state.me, R.lang() === "zh"); } catch (e) {} } }, () => state.token);
+  R.rpc("family_features").then(fs => { state.features = fs; render(); }).catch(() => {});
+  R.rpc("family_config").then(c => { state.cfg = c; if (state.me) render(); }).catch(() => {});
+  // f55: no code in the page any more. The server hands back a demo code only for the demo number (or a test number in preview).
+  const showDemo = (r) => { const h = $("#testHint"); if (r && r.test_code) { $("#testCode").textContent = r.test_code; h.classList.remove("hide"); } else h.classList.add("hide"); };
+
+  const deviceId = () => { let d = localStorage.getItem("roru_dev"); if (!d) { d = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now()); localStorage.setItem("roru_dev", d); } return d; };
+  // ----- sign in -----
+  // f53 (Dominic Oct 27 12:53 AM): glass verify card. Same calls as before: family_request_code, then family_verify_code.
+  // The 6th digit verifies on its own. family_verify_code checks the code before it checks consent, and a raised error rolls the
+  // whole call back (the code stays unused), so "consent_required" means the code was right and this number is new: the card
+  // turns green, then the join box (name, birthday, terms, opt-ins) opens and Join sends the same call with consent, as before.
+  // A returning member is signed in straight from the 6th digit (no join box, no tick).
+  const OTP_N = 6;
+  // f55: the server now answers a wrong code with ok:false + tries_left (so the 5-try limit really counts) and locks the code after 5.
+  const otpErrT = (e) => { const c = e && e.code;
+    if (c === "wrong_code" && e.tries_left != null) return e.tries_left === 1 ? tt("otp_wrong_1") : tt("otp_wrong_n", { n: e.tries_left });
+    if (c === "too_many_attempts") return tt("otp_locked");
+    if (c === "too_many_codes") return tt("otp_many_codes");
+    if (c === "code_busy_try_later") return tt("otp_busy");
+    return R.errText(e); };
+  const rpcErr = (r) => (r && r.ok === false) ? Object.assign(new Error(r.error), { code: r.error, tries_left: r.tries_left }) : null;
+  const otp = { busy: false, ok: false };
+  const otpG = $("#otpG"), codeEl = $("#code"), otpBoxes = [...document.querySelectorAll("#otpBoxes .otpg-box")];
+  const otpState = (s) => { otpG.dataset.state = s; };
+  const otpCard = otpG.querySelector(".otpg-card");
+  const otpHold = () => { otpCard.style.minHeight = otpCard.offsetHeight + "px"; }; // the green card keeps the same size as the code card
+  const otpMsg = (s, bad) => { const m = $("#otpMsg"); m.textContent = s || ""; m.classList.toggle("bad", !!bad); };
+  function otpPaint() {
+    const v = codeEl.value, focused = document.activeElement === codeEl;
+    otpBoxes.forEach((b, i) => {
+      const d = v[i] || "", bEl = b.firstElementChild;
+      if (bEl.textContent !== d) { bEl.textContent = d; if (d) { b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); } }
+      b.classList.toggle("fill", !!d);
+      b.classList.toggle("cur", focused && !otp.busy && !otp.ok && (i === Math.min(v.length, OTP_N - 1)) && !(v.length === OTP_N && i === OTP_N - 1 && d));
+    });
+  }
+  function otpLockUI(on) {
+    otpG.classList.toggle("locked", !!on); const nb = $("#otpNew"); if (nb) nb.classList.toggle("hide", !on);
+    const rl = otpG.querySelector(".otpg-resend"); if (rl) rl.classList.toggle("hide", !!on);
+  }
+  function otpLock(msg) {
+    otp.locked = true; codeEl.value = ""; codeEl.blur(); codeEl.disabled = true; otpState("locked"); otpPaint(); otpMsg(msg, true); otpLockUI(true);
+  }
+  function otpReset(keepFocus) {
+    try { applyF(); } catch (x) {}
+    otpCard.style.minHeight = ""; if (typeof otpUnmergeNow === "function") otpUnmergeNow();
+    otp.busy = false; otp.ok = false; otp.locked = false; codeEl.value = ""; codeEl.disabled = false; otpState("idle"); otpMsg(""); otpLockUI(false);
+    $("#joinBox").classList.add("hide"); $("#err2").classList.add("hide"); $("#consent").checked = false; $("#btnJoin").disabled = true;
+    otpPaint(); if (keepFocus) setTimeout(() => codeEl.focus(), 60);
+  }
+  // f54: the reel's success sequence, in place. 6th digit -> digits blur out and the six boxes slide into one tilted tile (~300 ms,
+  // held with a soft pulse while the server answers) -> right code: the tile turns green, rights itself, the check draws in, the card
+  // tints green and the title swaps; wrong code: the boxes spring back apart, then red + shake as before.
+  const otpRM = () => window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const otpField = otpG.querySelector(".otpg-field");
+  const otpMT = document.createElement("span"); otpMT.className = "otpg-mt"; otpMT.setAttribute("aria-hidden", "true");
+  otpMT.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path class="otpg-ck" d="M6 12.6l3.9 3.9L18 8.2"/></svg>';
+  otpField.appendChild(otpMT);
+  let otpAnims = [];
+  const otpWait = (ms) => new Promise(r => setTimeout(r, ms));
+  const otpTxt = (el, key) => { el.dataset.f = key; try { applyF(); } catch (x) {} };
+  function otpUnmergeNow() {
+    otpAnims.forEach(a => { try { a.cancel(); } catch (x) {} }); otpAnims = [];
+    otpBoxes.forEach(b => { b.style.zIndex = ""; });
+    otpMT.className = "otpg-mt"; otpMT.style.transform = ""; const ck = otpMT.querySelector(".otpg-ck"); ck.style.strokeDashoffset = "";
+    const a = otpG.querySelector(".otpg-ask"); otpTxt(a.querySelector(".otpg-t"), "otp_t"); otpTxt(a.querySelector(".otpg-s"), "otp_s");
+  }
+  async function otpMergeIn() {
+    otpState("merge");
+    if (otpRM() || !otpBoxes[0].animate) { otpMT.classList.add("on"); otpBoxes.forEach(b => b.style.opacity = ""); return; }
+    const fr = otpField.getBoundingClientRect(), cx = fr.left + fr.width / 2;
+    const tilt = [-15, -5, -12, -3, -9, -7];
+    // f55: like the reel, once the boxes have stacked into one tile the title and its line blur away (~0.4-0.7 s after the 6th digit);
+    // the new title blurs in when the server says yes, and on a wrong code the old one comes back
+    const ask0 = otpG.querySelector(".otpg-ask");
+    [ask0.querySelector(".otpg-t"), ask0.querySelector(".otpg-s"), ask0.querySelector(".otpg-to")].filter(Boolean).forEach((el, i) =>
+      otpAnims.push(el.animate([{ opacity: 1, filter: "blur(0px)" }, { opacity: 0, filter: "blur(6px)" }],
+        { duration: 260, delay: 420 + i * 20, easing: "ease-in", fill: "forwards" })));
+    otpBoxes.forEach((b, i) => {
+      const r = b.getBoundingClientRect(), dx = cx - (r.left + r.width / 2);
+      b.style.zIndex = String(10 - i);
+      otpAnims.push(b.animate([
+        { transform: "none", opacity: 1 },
+        { transform: `translateX(${dx * 0.14}px)`, opacity: 1, offset: 0.2 },
+        { transform: `translateX(${dx * 0.86}px) rotate(${tilt[i] * 0.7}deg)`, opacity: 1, offset: 0.68 },
+        { transform: `translateX(${dx * 0.99}px) rotate(-9.8deg)`, opacity: 1, offset: 0.97 },
+        { transform: `translateX(${dx}px) rotate(-10deg)`, opacity: 0 }
+      ], { duration: 300, easing: "cubic-bezier(.55, 0, .25, 1)", fill: "forwards" }));
+      otpAnims.push(b.firstElementChild.animate([
+        { opacity: 1, filter: "blur(0px)", transform: "none" },
+        { opacity: 0, filter: "blur(5px)", transform: "scale(.75)" }
+      ], { duration: 120, easing: "ease-out", fill: "forwards" }));
+    });
+    await otpWait(300);
+    otpMT.classList.add("on", "wait");
+  }
+  async function otpMergeOut() {
+    otpMT.className = "otpg-mt";
+    if (!otpAnims.length) return;
+    otpAnims.forEach(a => { try { a.playbackRate = 1.4; a.reverse(); } catch (x) {} });
+    await otpWait(240);
+    otpUnmergeNow();
+  }
+  async function otpVerified() {
+    otpMT.classList.remove("wait"); otpMT.classList.add("on"); otpState("verified");
+    const ask = otpG.querySelector(".otpg-ask"), t = ask.querySelector(".otpg-t"), s = ask.querySelector(".otpg-s"), ck = otpMT.querySelector(".otpg-ck");
+    if (otpRM() || !otpMT.animate) { ck.style.strokeDashoffset = "0"; otpTxt(t, "otp_ok_t"); otpTxt(s, "otp_ok_s"); return; }
+    otpAnims.push(otpMT.animate([{ transform: "rotate(-10deg)" }, { transform: "rotate(2deg)", offset: 0.75 }, { transform: "rotate(0deg)" }],
+      { duration: 200, easing: "cubic-bezier(.3, 1.3, .5, 1)", fill: "forwards" }));
+    await otpWait(Math.max(0, 720 - (performance.now() - otp.t6)));
+    otpTxt(t, "otp_ok_t"); otpTxt(s, "otp_ok_s");
+    [t, s].forEach((el, i) => otpAnims.push(el.animate([{ opacity: 0, filter: "blur(4px)", transform: "translateY(3px)" }, { opacity: 1, filter: "blur(0px)", transform: "none" }], { duration: 300, delay: i * 60, easing: "ease-out", fill: "forwards" })));
+  }
+  async function otpVerify() {
+    if (otp.busy || otp.ok || otp.locked || codeEl.value.length !== OTP_N) return;
+    otp.busy = true; otp.t6 = performance.now(); otpMsg(""); otpPaint();
+    const merging = otpMergeIn();
+    let r = null, err = null;
+    try { r = await R.rpc("family_verify_code", { p_phone: state.phone, p_code: codeEl.value, p_consent: false, p_name: $("#name").value, p_lang: R.lang(), p_device: deviceId() }); err = rpcErr(r); }
+    catch (e) { err = e; }
+    await merging;
+    otp.busy = false;
+    if (!err || err.code === "consent_required") {
+      otp.ok = true; otpHold(); codeEl.blur(); otpPaint(); otpMsg("");
+      otpVerified();
+      if (!err) { setTimeout(async () => { await signedIn(r, false); otpReset(false); }, 1900); return; }
+      setTimeout(() => { otpCard.style.minHeight = ""; otpUnmergeNow(); otpState("okmini"); $("#joinBox").classList.remove("hide"); $("#btnJoin").disabled = !$("#consent").checked; setTimeout(() => { $("#joinBox").scrollIntoView({ behavior: "smooth", block: "start" }); $("#name").focus({ preventScroll: true }); }, 380); }, 1900);
+      return;
+    }
+    await otpMergeOut();
+    const locked = err.code === "too_many_attempts" || err.code === "code_expired";
+    otpState("bad"); otpMsg(otpErrT(err), true); otpPaint();
+    if (navigator.vibrate) { try { navigator.vibrate([30, 40, 30]); } catch (x) {} }
+    setTimeout(() => { if (otpG.dataset.state !== "bad") return; if (locked) { otpLock(otpErrT(err)); return; } codeEl.value = ""; otpState("idle"); otpPaint(); codeEl.focus(); }, 900);
+  }
+  codeEl.addEventListener("input", () => {
+    const v = codeEl.value.replace(/\D/g, "").slice(0, OTP_N);
+    if (codeEl.value !== v) codeEl.value = v;
+    if (otpG.dataset.state === "bad") { otpState("idle"); }
+    if (v.length < OTP_N && !otp.busy) otpMsg("");
+    otpPaint(); if (v.length === OTP_N) otpVerify();
+  });
+  ["focus", "blur", "keyup", "click", "select"].forEach(ev => codeEl.addEventListener(ev, () => { try { const n = codeEl.value.length; codeEl.setSelectionRange(n, n); } catch (x) {} otpPaint(); }));
+  codeEl.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); otpVerify(); } if (otp.busy || otp.ok || otp.locked) e.preventDefault(); });
+  async function signedIn(r, joined) {
+    state.token = r.token; localStorage.setItem("roru_member_token", r.token); state.me = r.member; state.lastPoints = r.member.points; render(); if (r.is_new) R.burst();
+    if (joined) {
+      try { const c = await R.rpc("family_set_consents", { p_token: r.token, p_terms: true, p_whatsapp: $("#mktWa").checked, p_push: $("#mktPush").checked, p_version: TERMS_V, p_wording: wording() }); state.me = c.member; render(); } catch (e) { R.toast(R.errText(e)); }
+      const md = $("#bdM").value && $("#bdD").value ? $("#bdM").value + "-" + $("#bdD").value : null;
+      if (md && !(r.member.birthday || {}).md) { try { const b = await R.rpc("family_set_birthday", { p_token: r.token, p_md: md }); state.me = b.member; render(); } catch (e) {} }
+    }
+    await trySetReferrer(false);
+  }
+  $("#btnSend").onclick = async () => {
+    const ph = $("#phone").value; $("#err1").classList.add("hide"); $("#btnSend").disabled = true;
+    try { const r = await R.rpc("family_request_code", { p_phone: ph, p_lang: R.lang() }); state.phone = ph; $("#sentTo").textContent = r.phone_masked; showDemo(r); $("#step1").classList.add("hide"); $("#step2").classList.remove("hide"); $("#signin").classList.add("otp-on"); otpReset(true); return true; }
+    catch (e) { $("#err1").textContent = otpErrT(e); $("#err1").classList.remove("hide"); return false; }
+    finally { $("#btnSend").disabled = false; }
+  };
+  $("#phone").addEventListener("keydown", e => { if (e.key === "Enter") $("#btnSend").click(); });
+  $("#changeNo").onclick = (e) => { e.preventDefault(); otpReset(false); $("#step2").classList.add("hide"); $("#step1").classList.remove("hide"); $("#signin").classList.remove("otp-on"); };
+  async function otpResend(e) {
+    if (e) e.preventDefault(); if (otp.busy) return;
+    try { const r = await R.rpc("family_request_code", { p_phone: state.phone, p_lang: R.lang() }); showDemo(r); otpReset(true); otpMsg(tt("otp_resent")); }
+    catch (x) { const wasLocked = otp.locked; otpState("bad"); otpMsg(otpErrT(x), true); setTimeout(() => { if (otpG.dataset.state === "bad") otpState(wasLocked ? "locked" : "idle"); }, 900); }
+  }
+  $("#resend").onclick = otpResend;
+  $("#otpNew").onclick = otpResend;
+  $("#btnJoin").onclick = async () => {
+    $("#err2").classList.add("hide"); $("#btnJoin").disabled = true;
+    try {
+      const r = await R.rpc("family_verify_code", { p_phone: state.phone, p_code: codeEl.value.trim(), p_consent: $("#consent").checked, p_name: $("#name").value, p_lang: R.lang(), p_device: deviceId() });
+      const e2 = rpcErr(r); if (e2) throw e2;
+      await signedIn(r, true); otpReset(false);
+    } catch (e) {
+      $("#err2").textContent = otpErrT(e); $("#err2").classList.remove("hide");
+      if (e.code === "code_expired" || e.code === "too_many_attempts") { otpReset(false); $("#otpG").scrollIntoView({ behavior: "smooth", block: "center" }); otpLock(otpErrT(e)); }
+      else if (e.code === "wrong_code") { otpReset(true); $("#otpG").scrollIntoView({ behavior: "smooth", block: "center" }); otpMsg(otpErrT(e), true); }
+    }
+    $("#btnJoin").disabled = !$("#consent").checked;
+  };
+  $("#consent").addEventListener("change", () => { $("#btnJoin").disabled = !$("#consent").checked; });
+
+  // ----- member -----
+  let lastTouch = 0; ["pointerdown", "touchstart", "keydown"].forEach(ev => document.addEventListener(ev, () => { lastTouch = Date.now(); }, { capture: true, passive: true }));
+  const guestBusy = () => Date.now() - lastTouch < 8000 || !!document.querySelector(".ask-sheet") || !!document.querySelector('.scratch[data-touched="1"]') || /^(INPUT|SELECT|TEXTAREA)$/.test((document.activeElement || {}).tagName || "");
+  async function load(quiet) {
+    if (!state.token) { render(); return; }
+    try { const me = await R.rpc("family_me", { p_token: state.token });
+      // v40: the 10 s live refresh never redraws over what the guest is doing (half-scratched nori, an open sheet, a field being typed, a tap in the last 8 s) and skips the redraw when nothing changed
+      if (quiet && state.me && JSON.stringify(me) === JSON.stringify(state.me)) return;
+      if (quiet && guestBusy()) return;
+      state.me = me; render(); if (localStorage.getItem("roru_ref")) trySetReferrer(true); if (localStorage.getItem("roru_unsub")) { localStorage.removeItem("roru_unsub"); setConsents({ p_whatsapp: false, p_push: false, p_source: "unsubscribe" }, t("unsub_done")); setTab("me", true); $("#privacyCard").scrollIntoView(); } }
+    catch (e) { if (e.code === "not_signed_in") { localStorage.removeItem("roru_member_token"); state.token = null; state.me = null; render(); } else if (!quiet) R.toast(R.errText(e)); }
+  }
+  const tierName = (k) => t("tier_" + (k || "nori"));
+  const shops = () => (state.cfg && state.cfg.shops) || [{ id: "wanchai", name_en: "Wan Chai", name_zh: "灣仔" }, { id: "central", name_en: "Central", name_zh: "中環" }];
+
+  const fmtHK = (n) => "HK$" + Math.round(+n || 0).toLocaleString("en-HK");
+  const multTxt = (x) => (+x).toString().replace(/\.0+$/, "") + "×";
+  function renderStatus(me, zh) {
+    const tier = me.tier || "nori";
+    $("#tierPill").textContent = tierName(tier);
+    $("#tierBadge").className = "tierbadge t-" + tier; $("#tierBadge").textContent = tierName(tier).split(" ")[0].slice(0, 1);
+    $("#tierName").textContent = tierName(tier);
+    $("#multLine").textContent = t("mult_line", { x: multTxt(me.multiplier) });
+    $("#yearSpend").textContent = t("year_spend", { n: fmtHK(me.year_spend) });
+    const at = me.tiers_at || {}, ys = +me.year_spend || 0;
+    // v46: bar only, no "HK$X to go" number. Fill = rolling 12-month spend between this tier's threshold and the next one.
+    let pct = 100, nextTxt = "";
+    if (tier === "kama") { nextTxt = t("lad_top"); }
+    else if (me.kama_eligible) { nextTxt = "✨ " + t("kama_eligible"); }
+    else {
+      const order = ["nori", "gohan", "tobiko", "kama"], nx = order[order.indexOf(tier) + 1] || "kama";
+      const from = tier === "nori" ? 0 : (+at[tier] || 0), to = +at[nx] || (me.tier_next && me.tier_next.at) || 0;
+      pct = to > from ? Math.max(2, Math.min(100, 100 * (ys - from) / (to - from))) : 2;
+      nextTxt = nx === "kama" ? t("lad_kama") : t("lad_next", { name: tierName(nx) });
+    }
+    $("#tierFill").style.width = pct + "%"; $("#tierFill").className = "t-" + tier;
+    $("#tierNext").textContent = nextTxt;
+    $("#tierLine").textContent = t("status_line");
+    const steps = [["nori", 0], ["gohan", at.gohan], ["tobiko", at.tobiko], ["kama", at.kama]], mine = steps.findIndex(s => s[0] === tier);
+    $("#tierSteps").innerHTML = steps.map(([k, v], i) => '<div class="lad' + (i === mine ? " on" : i < mine ? " done" : "") + '" data-tier="' + k + '">' +
+      '<div class="lad-ic">' + R.tierIcon(k) + '</div><div class="lad-tx"><div class="lad-top"><b class="lad-n">' + tierName(k) + '</b>' + (zh ? '<span class="lad-en">' + R.tierName(k, "en") + '</span>' : '') +
+      (i === mine ? '<span class="lad-you">' + t("lad_you") + '</span>' : i < mine ? '<span class="lad-ok">✓</span>' : "") +
+      '<span class="lad-at">' + (k === "nori" ? t("tier_start") : fmtHK(v || 0) + t("per_year")) + " · " + t("lad_pts", { x: multTxt((me.mults || {})[k] || 1) }) + (k === "kama" ? " · " + t("invite_only_tag") : "") + '</span></div>' +
+      '<div class="lad-m">' + t("lad_m_" + k) + "</div></div></div>").join("");
+  }
+  function renderPlate(me, zh) {
+    const per = me.per_plate || 5, n = Math.min(me.stamps || 0, per), plate = me.plate || [];
+    const fresh = state.lastStamps !== undefined && state.lastStamps !== null && me.visits_total > state.lastStamps;
+    let html = "";
+    for (let i = 0; i < per; i++) {
+      const ang = -Math.PI / 2 + i * 2 * Math.PI / per, r = 78, on = i < n, gold = on && plate[i] && plate[i].gold;
+      html += '<div class="slot' + (on ? " on" : "") + (on && fresh && i === n - 1 ? " new" : "") + (R.stampStyle === "roll_logo" && i === per - 1 ? " rw-slot" : "") + '" style="--x:' + (Math.cos(ang) * r).toFixed(1) + "px;--y:" + (Math.sin(ang) * r).toFixed(1) + 'px">' + R.stamp(i, per, on, gold) + "</div>";
+    }
+    html += '<div class="count"><b>' + n + "/" + per + "</b><span>" + t("visits") + "</span></div>";
+    $("#plate").innerHTML = html; $("#plate").setAttribute("role", "img"); $("#plate").setAttribute("aria-label", n + "/" + per + " " + t("visits")); $("#plate").classList.toggle("full", n >= per);
+    const vr = me.visit_reward, rn = vr ? (zh ? vr.name_zh : vr.name_en) : "";
+    $("#plateLine").textContent = n >= per ? t("reward_unlocked") : n >= per - 1 ? (rn ? t("plate_full_soon_r", { r: rn }) : t("plate_full_soon")) : t("plate_line", { n: per - n, r: rn });
+    const rd = vr ? (zh ? vr.detail_zh : vr.detail_en) : ""; $("#plateDetail").textContent = rd && !/placeholder|佔位/i.test(rd) ? rd : "";
+    $("#plateSub").textContent = (me.visited_today ? t("visited_today") : t("stamp_rule")) + (me.plates_done ? " · " + t("plates_done_n", { n: me.plates_done }) : "");
+    if (fresh) { R.toast(t("stamp_added"), 2600); }
+  }
+
+  // ----- perks per tier -----
+  const TIERS = ["nori", "gohan", "tobiko", "kama"];
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  function renderPerks(me, zh) {
+    const perks = me.perks || [], mine = TIERS.indexOf(me.tier), kd = me.kama_dinner || {};
+    $("#perksCard").classList.toggle("hide", !perks.length); if (!perks.length) return;
+    let h = "";
+    TIERS.forEach((tr, ti) => {
+      const list = perks.filter(p => p.tier === tr); if (!list.length) return;
+      const open = ti <= mine;
+      const TN = { nori: tierName("nori"), gohan: tierName("gohan"), tobiko: tierName("tobiko"), kama: tierName("kama") };
+      h += '<div class="perkgrp' + (open ? "" : " locked") + (ti === mine ? " mine" : "") + '"><div class="perkhead"><b>' + TN[tr] + "</b>" + (ti === mine ? '<span class="perktag you">' + t("perks_you") + "</span>" : !open ? '<span class="perktag">🔒 ' + t("perks_from", { t: TN[tr] }) + "</span>" : "") + "</div>";
+      if (ti > 0) h += '<div class="perkplus">' + t("perks_plus", { t: TN[TIERS[ti - 1]] }) + "</div>";
+      list.forEach(p => {
+        const x = (me.mults && me.mults[tr]) || "", name = (zh ? p.name_zh : p.name_en).replace("{x}", x).replace("{p}", kd.passes != null ? kd.passes : 2);
+        const det = zh ? p.detail_zh : p.detail_en;
+        let extra = "";
+        const lx = open ? ((me.perk_status || {}).limited || []).find(x => x.key === p.key) : null; // v48: available / used this month / passes left
+        if (lx) extra = '<span class="perkcount' + (limOn(lx) ? "" : " used") + '">' + esc(limText(lx)) + "</span>";
+        h += '<div class="perk"><span class="perkico">' + (open ? (p.emoji || "✓") : "🔒") + '</span><span class="grow"><span class="perkname">' + esc(name) + "</span>" + (det ? '<span class="perkdet">' + esc(det) + "</span>" : "") + "</span>" + extra + "</div>";
+      });
+      h += "</div>";
+    });
+    $("#perksBody").innerHTML = h;
+  }
+  // ----- extras: bring a friend, birthday roll, gold receipts -----
+  const MONTHS_EN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const fillBday = (mSel, dSel, md) => { const zh = R.lang() === "zh"; mSel.innerHTML = '<option value="">' + t("month") + "</option>" + MONTHS_EN.map((m, i) => '<option value="' + String(i + 1).padStart(2, "0") + '">' + (zh ? (i + 1) + "月" : m) + "</option>").join(""); dSel.innerHTML = '<option value="">' + t("day") + "</option>" + Array.from({ length: 31 }, (_, i) => '<option value="' + String(i + 1).padStart(2, "0") + '">' + (i + 1) + "</option>").join(""); if (md) { mSel.value = md.slice(0, 2); dSel.value = md.slice(3, 5); } };
+  const mdText = (md) => { const m = +md.slice(0, 2), d = +md.slice(3, 5); return R.lang() === "zh" ? m + "月" + d + "日" : d + " " + MONTHS_EN[m - 1]; };
+  const inviteUrl = (code) => location.origin + "/family/?ref=" + code;
+  async function trySetReferrer(silent) {
+    const code = localStorage.getItem("roru_ref"); if (!code || !state.token || !state.me) return;
+    const ref = state.me.referral || {}; if (!ref.on || ref.invited_by || code === state.me.member_code) { localStorage.removeItem("roru_ref"); return; }
+    try { const r = await R.rpc("family_set_referrer", { p_token: state.token, p_code: code }); state.me = r.member; render(); R.toast(t("ref_linked", { n: r.member.referral.bonus }), 3500); } catch (e) { if (!silent) R.toast(R.errText(e)); }
+    localStorage.removeItem("roru_ref");
+  }
+  function renderExtras(me, zh) {
+    const ref = me.referral || {}, bd = me.birthday || {};
+    $("#friendCard").classList.toggle("hide", !ref.on);
+    if (ref.on) {
+      const v2 = me.visit2 || {}; $("#friendSub").textContent = t("friend_sub", { n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 388) }) ; // f38: the +88 come-back line has its own highlighted line (#friendV2)
+      $("#friendLink").textContent = inviteUrl(ref.code);
+      $("#invitedBy").classList.toggle("hide", !ref.invited_by); if (ref.invited_by) $("#invitedBy").textContent = (ref.my_bonus_pending ? t("invited_pending", { who: ref.invited_by, n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 388) }) : t("invited_done", { who: ref.invited_by })); if (ref.invited_by && v2.until) $("#invitedBy").textContent += " " + t("visit2_until", { v: v2.points, d: R.fmtDay(v2.until) });
+      $("#friendStats").textContent = t("friend_stats", { j: ref.joined, q: ref.pending || 0, r: ref.rewarded, p: ref.points_earned, c: ref.cap });
+    }
+    $("#bdayCard").classList.toggle("hide", !bd.on);
+    if (bd.on) {
+      let h = "";
+      if (!bd.md) h = '<p class="small muted">' + t("bday_add") + '</p><div class="row" style="gap:8px"><select id="bdM2" class="sel"></select><select id="bdD2" class="sel"></select><button class="btn sm" id="bdSave" data-t="save">' + t("save") + "</button></div>";
+      else if (bd.claimable) h = '<p><b>' + t("bday_now") + '</b></p><button class="btn" id="bdClaim">🎂 ' + t("bday_claim") + "</button>";
+      else if (bd.claimed && bd.in_window) h = '<p>' + t("bday_claimed") + "</p>";
+      else if (bd.in_window && bd.days_until_eligible > 0) h = '<p class="small muted">' + t("bday_wait", { n: bd.days_until_eligible }) + "</p>";
+      else h = '<p class="small">' + t("bday_on_file", { d: mdText(bd.md) }) + '</p><p class="small muted">' + t("bday_rule") + "</p>";
+      $("#bdayBody").innerHTML = h;
+      if (!bd.md) { fillBday($("#bdM2"), $("#bdD2")); $("#bdSave").onclick = async () => { const md = $("#bdM2").value + "-" + $("#bdD2").value; if (md.length !== 5) return R.toast(t("bday_pick")); try { const r = await R.rpc("family_set_birthday", { p_token: state.token, p_md: md }); state.me = r.member; render(); R.toast("🎂 ✓"); } catch (e) { R.toast(R.errText(e)); } }; }
+      if (bd.claimable) $("#bdClaim").onclick = async () => { $("#bdClaim").disabled = true; try { const r = await R.rpc("family_claim_birthday", { p_token: state.token }); state.me = r.member; render(); R.burst(["#E8B84A", "#F64501", "#F6F3E7"]); R.toast(t("bday_claimed_toast"), 3000); setTab("rewards", true); $("#rewards").scrollIntoView({ behavior: "smooth" }); } catch (e) { R.toast(R.errText(e)); $("#bdClaim").disabled = false; } };
+    }
+    $("#goldLine").classList.toggle("hide", !(me.gold && me.gold.on)); if (me.gold && me.gold.on) $("#goldLine").textContent = t("gold_line2", { o: Math.round(1 / Math.max(0.0001, me.gold.odds)), x: multTxt(me.gold.mult) });
+  }
+  async function shareInvite() { const u = inviteUrl(state.me.member_code); try { if (navigator.share) { await navigator.share({ title: R.prog(), text: t("share_text"), url: u }); return; } } catch (e) { return; } copyInvite(); }
+  async function copyInvite() { const u = inviteUrl(state.me.member_code); try { await navigator.clipboard.writeText(u); R.toast(t("copied")); } catch (e) { const ta = document.createElement("textarea"); ta.value = u; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); R.toast(t("copied")); } catch (e2) {} ta.remove(); } }
+  $("#friendShare").onclick = shareInvite; $("#friendCopy").onclick = copyInvite;
+
+  // ----- consents (PDPO): terms required; WhatsApp + push marketing optional, independent, logged with wording + version -----
+  const TERMS_V = "v1-draft";
+  const wording = () => ({ terms: R.t("terms_agree_a") + " " + R.t("terms_link") + " " + R.t("and") + " " + R.t("privacy_link"), whatsapp: R.t("mkt_wa"), push: R.t("mkt_push") });
+  async function setConsents(args, msg) { try { const r = await R.rpc("family_set_consents", Object.assign({ p_token: state.token, p_version: TERMS_V, p_wording: wording() }, args)); state.me = r.member; render(); if (msg) R.toast(msg, 2600); } catch (e) { R.toast(R.errText(e)); render(); } }
+  $("#pWa").onchange = () => setConsents({ p_whatsapp: $("#pWa").checked }, "✓");
+  $("#pPush").onchange = () => setConsents({ p_push: $("#pPush").checked }, "✓");
+  $("#unsubAll").onclick = () => setConsents({ p_whatsapp: false, p_push: false, p_source: "unsubscribe" }, t("unsub_done"));
+  $("#termsAccept").onclick = () => setConsents({ p_terms: true }, "✓");
+  function renderConsents(me) {
+    const c = me.consents || {};
+    $("#pWa").checked = !!c.whatsapp; $("#pPush").checked = !!c.push;
+    $("#termsNeeded").classList.toggle("hide", !!c.terms_version);
+    $("#consentMeta").textContent = (c.terms_version ? t("terms_on", { d: R.fmtDay(c.terms_at), v: c.terms_version }) : "") + (c.whatsapp ? " · WhatsApp ✓ " + R.fmtDay(c.whatsapp_at) : "") + (c.push ? " · Push ✓ " + R.fmtDay(c.push_at) : "");
+  }
+
+
+  // ----- "Suggested for you" (Oct 14): one rule-based card at the top; item-aware after 2+ scanned receipts. No numbers with a 4. -----
+  function renderSuggest(me, zh) {
+    const el = $("#suggestCard");
+    const L = zh ? { tonight: "今晚", save: "儲多少少", first: "你的第一份獎賞", ready: "{r} 已經可以換", use: "換領", useNow: "或者今晚先換 {r}", about: "大約再嚟 {v}", toNext: "大約再嚟 {v} 就有 {r}", love: "你最愛{f}", has: "{r} 包括佢", hasReady: "{r} 包括佢，今晚就可以換", k_for: "為你推介",
+        v1: "1 次", vn: "{n} 次", vfew: "幾次", box: "<b>全新系統 ✦</b> 上載幾張單據後，AI 會認識你嘅口味，下次嚟就幫你推介。", roll: "{f}手卷" }
+      : { tonight: "Tonight", save: "Save up", first: "Your first reward", ready: "{r} is ready for you", use: "Use", useNow: "Or use {r} tonight", about: "about {v} away", toNext: "About {v} to {r}", love: "You love the {f}", has: "It's part of {r}", hasReady: "It's part of {r}, ready tonight", k_for: "Suggested for you",
+        v1: "1 visit", vn: "{n} visits", vfew: "a few visits", box: "<b>New ✦</b> Brand-new system: our AI learns what you like after a couple of receipt uploads, then suggests items for you when you visit.", roll: "{f} hand roll" };
+    const F = (s, o) => s.replace(/\{(\w)\}/g, (_, k) => o[k]);
+    const nm = (r, mid) => esc(zh ? r.name_zh : (mid && /^(Any|A|An) /.test(r.name_en) ? r.name_en[0].toLowerCase() + r.name_en.slice(1) : r.name_en));
+    // the pick itself is made on the server (lf_suggest, v36) so the guest card and the staff iPad line always agree; this only words it
+    const sg = me.suggest || {}; if (!sg.on || !sg.reward) { el.innerHTML = ""; return; }
+    const visits = (n) => n === 1 ? L.v1 : /4/.test(String(n)) ? L.vfew : F(L.vn, { n });
+    const learned = !!sg.learned, fav = sg.fav, rw = sg.reward, alt = sg.alt;
+    const favName = fav ? esc(fav.kind === "roll" ? F(L.roll, { f: zh ? (fav.name_zh || fav.name_en) : fav.name_en }) : (zh ? (fav.name_zh || fav.name_en) : fav.name_en)) : "";
+    let k, h, sub = "", btn = null, btn2 = null;
+    if (sg.case === "fav_ready") { k = L.tonight; h = F(L.love, { f: favName }) + " 🥢"; sub = F(L.hasReady, { r: nm(rw, 1) }); btn = rw; }
+    else if (sg.case === "fav_save") { k = L.save; h = F(L.love, { f: favName }) + " 🥢"; sub = F(L.has, { r: nm(rw, 1) }) + (zh ? "，" : ", ") + F(L.about, { v: visits(sg.visits) }); if (alt) { sub += " · " + F(L.useNow, { r: nm(alt, 1) }); btn2 = alt; } }
+    else if (sg.case === "save_next") { k = L.save; h = F(L.toNext, { v: L.v1, r: nm(rw, 1) }); sub = F(L.useNow, { r: nm(alt, 1) }); btn2 = alt; if (fav) sub = F(L.love, { f: favName }) + " · " + sub; }
+    else if (sg.case === "ready") { k = L.tonight; h = F(L.ready, { r: nm(rw) }); btn = rw; if (fav) sub = F(L.love, { f: favName }); }
+    else { k = L.first; h = nm(rw); sub = F(L.about, { v: visits(sg.visits) }); if (fav) sub = F(L.love, { f: favName }) + " · " + sub; }
+    el.innerHTML = '<div class="card suggest" id="suggest"><div class="row" style="justify-content:space-between;align-items:center;gap:12px"><div class="grow" style="min-width:0"><div class="sg-k">✦ ' + L.k_for + " · " + k + '</div><div class="sg-h">' + h + "</div>" + (sub ? '<div class="sg-s">' + sub + "</div>" : "") + "</div>" +
+      (btn ? '<button class="btn sm" data-sg="' + btn.id + '">' + L.use + "</button>" : btn2 ? '<button class="btn sm ghost" data-sg="' + btn2.id + '">' + L.use + "</button>" : "") + "</div>" +
+      (learned ? "" : '<div class="sg-new">' + L.box + "</div>") + "</div>";
+    el.querySelectorAll("[data-sg]").forEach(b => b.onclick = () => { const x = $('#ladder [data-claim="' + b.dataset.sg + '"]'); if (x) x.click(); });
+  }
+  // ----- weekly hook banner + shared-bill split requests -----
+  function renderHookAndSplits(me, zh) {
+    const hk = me.hook_today, cfg = state.cfg || {};
+    $("#hookBar").classList.toggle("hide", !hk);
+    if (hk) $("#hookBar").innerHTML = '<b>' + t("hook_" + hk) + "</b><span>" + t("hook_" + hk + "_sub", { n: cfg.hook_mon_stamps || 2, x: (cfg.hook_tue_bonus_mult || 2) + "×", o: Math.round(1 / Math.max(0.01, cfg.hook_wed_gold_odds || 0.2)) }) + "</span>" + (cfg.upgrade_boost_today ? '<span class="hook-up">' + t("hook_upgrade_line") + "</span>" : "");
+    // f47: the old split requests / invites (f34, f35, v1 requests) are gone from the guest app; the new split lives in loyalty/split.js
+    $("#splitInbox").innerHTML = ""; $("#splitOutbox").innerHTML = ""; $("#tierPill").textContent = tierName(me.tier); return;
+    const inbox = me.split_inbox || [];
+    $("#splitInbox").innerHTML = inbox.map(q => '<div class="card splitq"><div class="row" style="justify-content:space-between"><b>🧾 ' + t("split_q", { who: (q.name ? q.name + " " : "") + q.who }) + '</b><span class="pill on">' + t("split_new") + '</span></div><p class="small muted">' + (/^Table /.test(q.receipt_no) ? "" : "#") + q.receipt_no + " · HK$" + Math.round(q.bill) + " → " + t("split_each", { n: q.people_after, s: "HK$" + Math.floor(q.bill / q.people_after) }) + '</p><div class="row" style="gap:8px"><button class="btn sm" data-split-yes="' + q.id + '">' + t("yes") + '</button><button class="btn ghost sm" data-split-no="' + q.id + '">' + t("no") + "</button></div></div>").join("");
+    $("#splitInbox").querySelectorAll("[data-split-yes],[data-split-no]").forEach(b => b.onclick = async () => { const yes = !!b.dataset.splitYes; b.disabled = true; try { const r = await R.rpc("family_answer_split", { p_token: state.token, p_request_id: +(b.dataset.splitYes || b.dataset.splitNo), p_yes: yes }); state.me = r.member; state.lastPoints = r.member.points; render(); R.toast(yes ? t("split_done", { n: r.people }) : t("split_declined"), 3000); } catch (e) { R.toast(R.errText(e)); b.disabled = false; } });
+    const out = me.split_outbox || [];
+    $("#splitOutbox").innerHTML = out.length ? '<div class="card"><h2 style="margin-top:0">🧾 ' + t("split_mine") + "</h2>" + out.map(q => '<div class="hist"><span>' + (/^Table /.test(q.receipt_no) ? "" : "#") + q.receipt_no + "</span><span>" + (q.status === "pending" ? "⏳ " + t("split_waiting") : q.status === "accepted" ? "✓ +" + (q.points || 0) + " " + t("points") : t("split_not_confirmed")) + "</span></div>").join("") + "</div>" : "";
+    // f34: split offers — a friend asked ME (confirm here), and the ones I sent (wait / cancel / result)
+    const sp = me.split || {}, offIn = sp.in || [], offOut = sp.out || [];
+    const recNo = (n) => (/^Table /.test(n || "") ? "" : "#") + escR(n || "");
+    $("#splitInbox").insertAdjacentHTML("beforeend", offIn.map(q => '<div class="card splitq split-in"><div class="row" style="justify-content:space-between;align-items:flex-start"><b>' + "🥢🥢 " + escR(t("split_in_q", { who: q.from })) + '</b><span class="pill on">' + t("split_new") + '</span></div><p class="small muted">' + escR(t("split_in_sub", { no: (/^Table /.test(q.receipt_no || "") ? "" : "#") + (q.receipt_no || ""), bill: Math.round(q.bill), p: q.points_you })) + " · ⏳ " + escR(R.fmtTime(q.expires_at)) + '</p><div class="row" style="gap:8px"><button class="btn sm" data-off-yes="' + q.id + '">' + t("yes") + '</button><button class="btn ghost sm" data-off-no="' + q.id + '">' + t("no") + "</button></div></div>").join(""));
+    $("#splitInbox").querySelectorAll("[data-off-yes],[data-off-no]").forEach(b => b.onclick = async () => { const yes = !!b.dataset.offYes; b.disabled = true;
+      try { const r = await R.rpc("family_split_answer", { p_token: state.token, p_offer_id: +(b.dataset.offYes || b.dataset.offNo), p_yes: yes }); state.me = r.member; state.lastPoints = r.member.points; render();
+        if (yes) { R.burst(); R.toast(t("split_ok_friend", { n: r.points }) + (r.visit && r.visit.added ? " · " + t("stamp_added") : "") + (r.visit && r.visit.referral_bonus ? " · 👯 +" + r.visit.referral_bonus : "") + (r.visit && r.visit.visit2_bonus ? " · 🎉 " + t("visit2_got", { n: r.visit.visit2_bonus }) : ""), 4000); } else R.toast(t("split_declined"), 2500); }
+      catch (e) { R.toast(R.errText(e), 4000); b.disabled = false; load(true); } });
+    const outTxt = (q) => q.status === "pending" ? "⏳ " + escR(t("split_wait_card", { who: q.to, t: R.fmtTime(q.expires_at) })) : q.status === "accepted" ? escR(t("split_out_accepted", { who: q.to, a: q.points_you, b: q.points_friend })) : q.status === "declined" ? escR(t("split_out_declined", { who: q.to })) : q.status === "expired" ? escR(t("split_out_expired")) : escR(t("split_out_cancelled"));
+    if (offOut.length) $("#splitOutbox").insertAdjacentHTML("afterbegin", '<div class="card split-out"><h2 style="margin-top:0">' + "🥢🥢 " + escR(t("split_title_mine")) + "</h2>" + offOut.map(q => '<div class="hist split-row' + (q.status === "pending" ? " is-wait" : "") + '"><span>' + recNo(q.receipt_no) + "</span><span>" + outTxt(q) + (q.status === "pending" ? ' <button class="linkbtn" data-off-cancel="' + q.id + '">' + escR(t("split_cancel")) + "</button>" : "") + "</span></div>").join("") + "</div>");
+    $("#splitOutbox").querySelectorAll("[data-off-cancel]").forEach(b => b.onclick = async () => { b.disabled = true; try { const r = await R.rpc("family_split_cancel", { p_token: state.token, p_offer_id: +b.dataset.offCancel }); state.me = r.member; render(); } catch (e) { R.toast(R.errText(e)); load(true); } });
+    // f35: group splits. A friend sees every split waiting for them at the top of their card (the in-app notification; no
+    // WhatsApp/push yet) with Accept / Decline each; the scanner sees each split with every friend's answer, and can cancel what's waiting.
+    const gIn = sp.gin || [], gOut = sp.gout || [];
+    if (gIn.length) $("#splitInbox").insertAdjacentHTML("afterbegin", '<div class="split-alert" role="status"><span class="sa-bell" aria-hidden="true">🔔</span><div><b>' + escR(t("gin_alert", { n: gIn.length })) + "</b><span>" + escR(t("gin_alert_sub")) + "</span></div></div>" +
+      gIn.map(q => '<div class="card splitq split-in split-g" data-gin="' + q.id + '"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:8px"><b>' + "🥢🥢 " + escR(t(+q.people > 2 ? "gin_q" : "split_in_q", { who: q.from, n: q.people })) + '</b><span class="pill on">' + t("split_new") + "</span></div>" +
+        '<div class="gin-share"><span>' + escR(t("gin_you_get")) + "</span><b>" + q.points_you + " " + escR(t("sp_pts")) + "</b><small>HK$" + escR(String(q.hkd_you).replace(/\.0+$/, "")) + " · " + escR(t("gin_of", { bill: Math.round(q.bill) })) + "</small></div>" +
+        '<p class="small muted" style="margin:6px 0 2px">' + recNo(q.receipt_no) + ((q.others || []).length ? " · " + escR(t("gin_with", { list: q.others.join(", ") })) : "") + "</p>" +
+        '<p class="small muted" style="margin:0 0 10px">⏳ ' + escR(t("gin_until", { t: R.fmtTime(q.expires_at) })) + "</p>" +
+        '<div class="row" style="gap:8px"><button class="btn sm" data-g-yes="' + q.id + '">' + escR(t("gin_yes")) + '</button><button class="btn ghost sm" data-g-no="' + q.id + '">' + escR(t("gin_no")) + "</button></div></div>").join(""));
+    $("#splitInbox").querySelectorAll("[data-g-yes],[data-g-no]").forEach(b => b.onclick = async () => { const yes = !!b.dataset.gYes; b.disabled = true;
+      try { const r = await R.rpc("family_split_group_answer", { p_token: state.token, p_invite_id: +(b.dataset.gYes || b.dataset.gNo), p_yes: yes }); state.me = r.member; state.lastPoints = r.member.points; render();
+        if (yes) { R.burst(); R.toast(t("split_ok_friend", { n: r.points }) + (r.visit && r.visit.added ? " · " + t("stamp_added") : "") + (r.visit && r.visit.referral_bonus ? " · 👯 +" + r.visit.referral_bonus : "") + (r.visit && r.visit.visit2_bonus ? " · 🎉 " + t("visit2_got", { n: r.visit.visit2_bonus }) : ""), 4000); } else R.toast(t("split_declined"), 2500); }
+      catch (e) { R.toast(R.errText(e), 4000); b.disabled = false; load(true); } });
+    const gSt = (i) => i.status === "accepted" ? '<span class="sp-ok">✓ ' + escR(t("gout_yes")) + "</span>" : i.status === "pending" ? '<span class="sp-wait">⏳ ' + escR(t("gout_wait")) + "</span>" : i.status === "declined" ? '<span class="sp-no">✕ ' + escR(t("gout_no")) + "</span>" : i.status === "expired" ? '<span class="sp-no">⌛ ' + escR(t("gout_exp")) + "</span>" : '<span class="sp-no">' + escR(t("gout_cx")) + "</span>";
+    if (gOut.length) $("#splitOutbox").insertAdjacentHTML("afterbegin", '<div class="card split-out split-gout"><h2 style="margin-top:0">' + "🥢🥢 " + escR(t("split_title_mine")) + "</h2>" + gOut.map(g => {
+      const back = (g.invites || []).filter(i => i.status !== "accepted" && i.status !== "pending").length;
+      return '<div class="gout"><div class="gout-h"><b>' + recNo(g.receipt_no) + " · HK$" + Math.round(g.bill) + '</b><span class="gout-n">' + escR(t("gout_ways", { n: g.people })) + "</span></div>" +
+        '<div class="gout-p you"><span>' + escR(t("gout_you")) + "</span><span><b>" + g.scanner_points + " " + escR(t("sp_pts")) + "</b>" + (g.open ? "" : " ✓") + "</span></div>" +
+        (g.invites || []).map(i => '<div class="gout-p"><span>' + escR(i.who) + " · " + i.points + " " + escR(t("sp_pts")) + "</span><span>" + gSt(i) + (i.status === "pending" ? ' <button class="linkbtn" data-g-cancel="' + g.id + '" data-g-inv="' + i.id + '">' + escR(t("split_cancel")) + "</button>" : "") + "</span></div>").join("") +
+        (g.open ? '<p class="small muted" style="margin:6px 0 0">⏳ ' + escR(t("gout_until", { t: R.fmtTime(g.expires_at) })) + ((g.invites || []).filter(i => i.status === "pending").length > 1 ? ' · <button class="linkbtn" data-g-cancel="' + g.id + '">' + escR(t("gout_cancel_all")) + "</button>" : "") + "</p>" :
+          '<p class="small muted" style="margin:6px 0 0">' + escR(back ? t("gout_back", { n: back }) : t("gout_done")) + "</p>") + "</div>";
+    }).join("") + "</div>");
+    // one "Receipts you're splitting" card: older one-friend splits (f34) join the group card
+    const oldOut = $("#splitOutbox").querySelector(".split-out:not(.split-gout)"), gCard = $("#splitOutbox").querySelector(".split-gout");
+    if (oldOut && gCard) { oldOut.querySelectorAll(".hist").forEach(h => { h.classList.add("gout-old"); gCard.appendChild(h); }); oldOut.remove(); }
+    $("#splitOutbox").querySelectorAll("[data-g-cancel]").forEach(b => b.onclick = async () => { b.disabled = true;
+      try { const r = await R.rpc("family_split_group_cancel", { p_token: state.token, p_group_id: +b.dataset.gCancel, p_invite_id: b.dataset.gInv ? +b.dataset.gInv : null }); state.me = r.member; render(); R.toast(t("gout_cancelled"), 2500); }
+      catch (e) { R.toast(R.errText(e)); load(true); } });
+    const badge = inbox.length + offIn.length + gIn.length; $("#tierPill").textContent = tierName(me.tier) + (badge ? " · 🔔" + badge : "");
+  }
+  function render() {
+    R.applyI18n();
+    if (!$("#bdM").options.length) fillBday($("#bdM"), $("#bdD"));
+    $("#subLine").textContent = t("p_sub", { r: (state.cfg && state.cfg.points_per_hkd) || 1 });
+    const me = state.me;
+    $("#signin").classList.toggle("hide", !!me); $("#member").classList.toggle("hide", !me);
+    if (!me) return;
+    const zh = R.lang() === "zh";
+    $("#howTxt").textContent = zh ? (R.hans() ? "怎么用" : "點樣用") : "How it works"; if (!window.__gtour) { window.__gtour = 1; setTimeout(() => guestTour(false), 1200); }
+    const nm0 = goodName(me.name); // v48: a name with no letters (e.g. "-") reads as blank
+    $("#hello").textContent = nm0 ? (zh ? nm0 + "，你好 👋" : "Hey " + nm0 + " 👋") : (zh ? "你好 👋" : "Hey there 👋");
+    renderHero(me, zh);
+    renderMe(me, zh);
+    renderStatus(me, zh);
+    renderPerks(me, zh);
+    renderPlate(me, zh);
+    renderExtras(me, zh);
+    renderConsents(me);
+    renderHookAndSplits(me, zh);
+    try { renderSuggest(me, zh); } catch (e) { console.warn(e); }
+    applyF(); renderCardTab(me, zh); renderEarn(me, zh); paintThemeSeg();
+    if (window.RORU_KAMA) { try { RORU_KAMA.guest(me); } catch (e) { console.warn(e); } } // f49
+    $("#lvlTo").textContent = $("#meProgLine").textContent;
+    $("#perksMore").textContent = $("#perksCard").classList.contains("perks-few") ? tt("perks_more") : tt("perks_less");
+    // points + next reward
+    const gained = state.lastPoints !== null && me.points > state.lastPoints;
+    $("#pts").textContent = Number(me.points || 0).toLocaleString("en-HK"); renderExpiry(me.points); fitPts();
+    const next = me.ladder.find(l => l.points_cost > me.points) || me.ladder[me.ladder.length - 1];
+    if (next) { $("#nextReward").textContent = (me.points >= next.points_cost ? "✓ " : t("need_more", { n: next.points_cost - me.points }) + " → ") + (zh ? next.name_zh : next.name_en); $("#bar").style.width = Math.min(100, 100 * me.points / next.points_cost) + "%"; }
+    $("#pendingNote").classList.toggle("hide", !me.pending_receipts); $("#pendingNote").textContent = "⏳ " + t("pending_hint", { n: me.pending_receipts });
+    if (gained) { R.toast(t("added_points", { n: me.points - state.lastPoints }), 2600); R.burst(); R.coinSpin($("#ptsCoin .roll-coin")); }
+    paintRw(false);
+    state.lastStamps = me.visits_total;
+    state.lastPoints = me.points;
+    // ladder
+    const fmt = n => Number(n).toLocaleString("en-US");
+    const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+    $("#ladder").innerHTML = me.ladder.slice().sort((a, b) => a.points_cost - b.points_cost).map(l => {
+      const ok = me.points >= l.points_cost, pct = Math.max(3, Math.min(100, Math.round(100 * me.points / Math.max(1, l.points_cost))));
+      const nm = esc(zh ? (l.name_zh || l.name_en) : l.name_en), dt = esc(zh ? (l.detail_zh || "") : (l.detail_en || ""));
+      return '<div class="lad ' + (ok ? "open" : "locked") + '" data-reward="' + l.id + '"><div class="lad-pts"><b>' + fmt(l.points_cost) + '</b><span>' + t("points") + '</span></div>' +
+        '<div class="lad-main"><div class="lad-name">' + nm + '</div>' + (dt ? '<div class="lad-detail">' + dt + '</div>' : "") +
+        (ok ? '<div class="lad-tag">✓ ' + t("lad_unlocked") + '</div>' : '<div class="lad-bar" aria-label="' + t("lad_locked") + '"><i style="width:' + pct + '%"></i></div>') + '</div>' +
+        (ok ? '<button class="btn sm lad-btn" data-claim="' + l.id + '">' + t("lad_use") + '</button>' : '<div class="lad-lock" aria-label="' + t("lad_locked") + '">🔒</div>') + '</div>';
+    }).join("");
+    $("#ladder").querySelectorAll("[data-claim]").forEach(b => b.onclick = async () => { const lr = me.ladder.find(x => x.id === +b.dataset.claim) || {}; if (!(await askConfirm(t("claim_q", { n: fmt(lr.points_cost || 0), r: zh ? (lr.name_zh || lr.name_en) : lr.name_en })))) return; b.disabled = true; try { const r = await R.rpc("family_claim_reward", { p_token: state.token, p_reward_id: +b.dataset.claim }); state.me = r.member; state.lastPoints = r.member.points; render(); R.toast(t("claimed"), 2600); setRsub("redeem", true); setTab("rewards", true); $("#rewards").scrollIntoView({ behavior: "smooth" }); } catch (e) { R.toast(R.errText(e)); b.disabled = false; } });
+    // earned / revealed / redeemed rewards
+    const box = $("#rewards"); box.innerHTML = "";
+    me.rewards.forEach(rw => {
+      const d = document.createElement("div"); d.className = "reward " + rw.status;
+      const name = zh ? rw.name_zh : rw.name_en, detail = zh ? rw.detail_zh : rw.detail_en;
+      if (rw.status === "earned") {
+        d.innerHTML = '<b>' + (rw.kind === "plate" ? t("earned") : t("claimed")) + '</b><div class="scratch"><div class="under"><b>' + name + (rw.upgraded ? " ⬆️" : "") + '</b><span class="small muted">' + (rw.upgraded ? t("upgrade") : (detail || "")) + '</span></div><canvas></canvas><div class="hint">' + t("scratch_hint") + "</div></div>";
+        box.appendChild(d); setupScratch(d.querySelector(".scratch"), rw.id); addUndo(d, rw);
+      } else if (rw.status === "revealed") {
+        // f44: the free-roll reward shows three real rolls it covers (same-angle plated set; any roll counts, Wagyu included), each labelled with its dish
+        const strip = rw.kind === "plate" ? '<div class="rw-strip">' + ["salmon", "scallop", "wagyu"].map(k => '<figure>' + R.foodImg(k, "", { sizes: "30vw" }) + "<figcaption>" + escR(zh ? R.FOOD[k].zh.replace(/手卷$/, "") : R.FOOD[k].en.replace(/ hand roll$/, "")) + "</figcaption></figure>").join("") + "</div>" : "";
+        d.innerHTML = strip + '<div class="row"><div class="grow"><b style="font-size:18px">' + name + (rw.upgraded ? " ⬆️" : "") + '</b><p class="small muted" style="margin:4px 0">' + (detail || "") + '</p><p class="small">' + t("reveal_done") + '</p><p class="code">' + rw.code + '</p></div><div class="qr qr-rw">' + R.qrSvg("RR:" + rw.code, 120) + "</div></div>";
+        box.appendChild(d); addUndo(d, rw);
+      } else {
+        d.innerHTML = '<div class="row"><span class="grow muted">' + name + "</span><span class='pill'>" + t("redeemed") + " · " + R.fmtDay(rw.redeemed_at) + "</span></div>";
+        box.appendChild(d);
+      }
+    });
+    // f38: "Ready to use" shows only what can still be used; used ones fold into "Used (n)" underneath
+    { const used = [...box.querySelectorAll(".reward.redeemed")]; if (used.length) { const dt = document.createElement("details"); dt.className = "rw-used"; dt.innerHTML = "<summary>" + escR(t("redeemed")) + " (" + used.length + ")</summary>"; used.forEach(u => dt.appendChild(u)); box.appendChild(dt); } }
+    // receipts
+    const shared = (me.split && me.split.shared) || {}, canSplit = (me.split && me.split.can) || [];
+    // f34: shared receipts say who with; a receipt that can still be split gets a Split button
+    const histSplit = (r) => { const s = shared[r.id]; if (s) return '<div class="hist-split">' + (+s.n > 2 ? escR(t("split_hist_n", { n: s.n, who: s.with || "" })) : "½ · " + escR(t("split_hist_with", { who: s.with || "" }))) + "</div>"; return canSplit.includes(r.id) ? '<div class="hist-split"><button class="linkbtn" data-split-rid="' + r.id + '" data-split-pts="' + r.points + '" data-split-bill="' + (+r.total_hkd || 0) + '">' + "🥢🥢 " + escR(t("split_link")) + "</button></div>" : ""; };
+    renderHistory(me, zh); // f38: Me › History (5 rows + See all, tap a row for split details)
+    $("#memberQr").innerHTML = R.qrSvg("RF:" + me.member_code, 180); $("#memberCode").textContent = me.member_code; $("#memberPhone").textContent = me.phone_masked;
+    $("#since").textContent = R.fmtDay(me.member_since);
+    renderShopPick();
+    renderReadyEmpty();
+    const fs = (state.features || []).filter(x => x.status === "soon"); $("#soonWrap").classList.toggle("hide", !fs.length);
+    $("#soon").innerHTML = fs.map(x => '<div class="soon-card"><div class="soon-ico">' + (x.emoji || "🔒") + '</div><div class="grow"><b>' + (zh ? x.name_zh : x.name_en) + '</b><div class="small muted">' + (zh ? x.detail_zh : x.detail_en) + '</div></div><span class="pill">' + t("soon_tag") + "</span></div>").join("");
+  }
+  // ----- receipt scan (client-side OCR, tesseract.js from a public CDN, no key) -----
+  let ocr = { conf: null, text: null, fromOcr: false, shop: localStorage.getItem("roru_shop_guess") || "wanchai" };
+  function renderShopPick() { $("#rShops").innerHTML = shops().map(s => '<button type="button" data-id="' + s.id + '" class="' + (s.id === ocr.shop ? "on" : "") + '">' + (R.lang() === "zh" ? s.name_zh : s.name_en) + "</button>").join(""); $("#rShops").querySelectorAll("button").forEach(b => b.onclick = () => { ocr.shop = b.dataset.id; localStorage.setItem("roru_shop_guess", ocr.shop); renderShopPick(); }); }
+  // f50 (Dominic Oct 25 2:41 PM "the scan function should be its own inside tab bar in the center"): the scan flow (busy -> form -> done)
+  // opens in a sheet from the centre Scan button; back at idle the sheet closes. Closing it (✕ / tap outside) cancels the scan, nothing is sent.
+  let scanSheet = null, scanTitle = "", scanGen = 0;
+  const scanReset = () => { ["scanIdle", "scanBusy", "scanForm", "scanDone"].forEach(id => $("#" + id).classList.toggle("hide", id !== "scanIdle")); $("#photo").value = ""; setSplitIntent(false); };
+  const showScan = (which) => {
+    ["scanIdle", "scanBusy", "scanForm", "scanDone"].forEach(id => $("#" + id).classList.toggle("hide", id !== which));
+    if (which === "scanIdle") { if (scanSheet) { const s = scanSheet; scanSheet = null; s.close(); } return; }
+    if (!scanSheet) {
+      const sc = $("#scanCard");
+      scanSheet = openSheet(scanTitle || t("scan"), sc, { onClose: () => { scanSheet = null; scanGen++; store().appendChild(sc); scanReset(); } });
+      scanSheet.el.classList.add("scan-sheet");
+    }
+  };
+  const openTyped = () => { ocr = { ...ocr, conf: null, text: null, fromOcr: false, p: null }; $("#rNo").value = ""; $("#rNoWrap").classList.add("hide"); $("#rTable").value = ""; $("#rTotal").value = ""; $("#rAt").value = localNow(); $("#readMsg").textContent = ""; scanTitle = t("pre_type"); showScan("scanForm"); $("#rTotal").focus(); };
+  $("#tbScan").onclick = () => preScan("camera");
+
+  // ----- f34 (Dominic Oct 17 15:02): pre-scan pop-up, EVERY time before the camera or the typed form opens (no "don't show again") -----
+  const WARN_SVG = '<svg class="ps-warn" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5.5c1.6 0 3 .8 3.8 2.2l16 27.8c1.7 3-.4 6.5-3.8 6.5H8c-3.4 0-5.5-3.5-3.8-6.5l16-27.8c.8-1.4 2.2-2.2 3.8-2.2z" fill="#F64501"/><path d="M24 5.5c1.6 0 3 .8 3.8 2.2l16 27.8c1.7 3-.4 6.5-3.8 6.5H8c-3.4 0-5.5-3.5-3.8-6.5l16-27.8c.8-1.4 2.2-2.2 3.8-2.2z" fill="none" stroke="#0b0d12" stroke-opacity=".25" stroke-width="1.5"/><rect x="21.6" y="15" width="4.8" height="15" rx="2.4" fill="#F6F3E7"/><circle cx="24" cy="35" r="2.8" fill="#F6F3E7"/></svg>';
+  const ONCE_SVG = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 3h16v26l-2.7-2-2.6 2-2.7-2-2.7 2-2.6-2L8 29z" fill="#F6F3E7" stroke="#c9c4b3" stroke-width="1"/><path d="M11 8h10M11 12h10M11 16h6" stroke="#9a9585" stroke-width="1.6" stroke-linecap="round"/><circle cx="23" cy="22" r="7" fill="#F64501"/><text x="23" y="25.8" text-anchor="middle" font-size="10" font-weight="900" fill="#fff" font-family="Geist,system-ui,sans-serif">1</text></svg>';
+  let splitIntent = false;
+  const setSplitIntent = (on) => { splitIntent = !!on; const b = $("#splitBanner"); b.textContent = t("split_banner"); b.classList.toggle("hide", !splitIntent); };
+  function preScan(mode) {
+    const old = document.getElementById("preScan"); if (old) old.remove();
+    const o = document.createElement("div"); o.className = "ask-sheet prescan"; o.id = "preScan"; o.setAttribute("role", "dialog"); o.setAttribute("aria-modal", "true"); o.setAttribute("aria-labelledby", "psT");
+    const cam = mode === "camera";
+    // camera mode: both buttons are <label for="photo"> so iPhone opens the camera straight from the tap
+    const b1 = cam ? '<label class="btn" for="photo" data-a="scan">📷 ' + escR(t("pre_scan")) + "</label>" : '<button class="btn" type="button" data-a="scan">' + escR(t("pre_type")) + "</button>";
+    const b2 = cam ? '<label class="btn ghost ps-split" for="photo" data-a="split">' + "🥢🥢 " + escR(t("pre_split")) + "</label>" : '<button class="btn ghost ps-split" type="button" data-a="split">' + "🥢🥢 " + escR(t("pre_split")) + "</button>";
+    o.innerHTML = '<div class="card ps-card"><div class="ps-head">' + WARN_SVG + '<div><h2 id="psT">' + escR(t("pre_title")) + '</h2><p class="ps-flair">' + escR(t("pre_flair")) + "</p></div></div>" +
+      '<ul class="ps-list"><li><span class="ps-ic">' + ONCE_SVG + "</span><span>" + escR(t("pre_once")) + '</span></li></ul>' +
+      '<div class="ps-btns">' + b1 + "</div>" + (cam ? '<p class="center small ps-type"><a href="#" data-a="type">' + escR(t("type_instead")) + "</a></p>" : "") + '<p class="center small" style="margin:12px 0 0"><a href="#" data-a="later">' + escR(t("pre_later")) + "</a></p></div>";
+    const close = () => setTimeout(() => o.remove(), 0);   // after the label has handed the tap to the camera input
+    o.addEventListener("click", e => {
+      const a = e.target.closest("[data-a]");
+      if (!a) { if (e.target === o) close(); return; }
+      if (a.dataset.a === "later") { e.preventDefault(); close(); return; }
+      if (a.dataset.a === "type") { e.preventDefault(); setSplitIntent(false); openTyped(); close(); return; } // f50: "Type it instead" lives inside the scan flow
+      setSplitIntent(a.dataset.a === "split");
+      if (!cam) { e.preventDefault(); openTyped(); }
+      close();
+    });
+    document.addEventListener("keydown", function esc(e) { if (e.key === "Escape") { o.remove(); document.removeEventListener("keydown", esc); } });
+    document.body.appendChild(o);
+    const f = o.querySelector('[data-a="scan"]'); if (f && f.focus) f.focus();
+    return o;
+  }
+  // f35: the split step for a whole table. "How many people?" (2-6, you included; a native picker = the iPhone scroll wheel),
+  // then one box per friend (phone number on the number pad, or tap ABC for a member code). Each box is checked as it's filled:
+  // a member shows their name, otherwise "not a member yet" (+ your invite link), "already in another box" or "that's you".
+  // Shares: each friend gets floor(points / N); the scanner keeps the rest. Same for HK$ to the cent.
+  const splitMax = () => Math.max(2, Math.min(6, +((state.me && state.me.split && state.me.split.max_people) || 6)));
+  const splitHours = () => (state.me && state.me.split && state.me.split.hours) || 12;
+  const splitPts = (p, n) => { p = +p || 0; n = Math.max(2, +n || 2); const f = Math.floor(p / n); return { friend: f, you: p - f * (n - 1) }; };
+  const hkdEach = (bill, n) => { const v = Math.floor((+bill || 0) * 100 / n) / 100; return v.toFixed(2).replace(/\.00$/, ""); };
+  // same look as the app's phone numbers: 9123 5678 (or +852 9123 5678)
+  const fmtFriendPhone = (v) => { let d = String(v || "").replace(/\D/g, ""), pre = ""; if (d.length > 8 && d.startsWith("852")) { pre = "+852 "; d = d.slice(3); } d = d.slice(0, 8); return pre + (d.length > 4 ? d.slice(0, 4) + " " + d.slice(4) : d); };
+  const boxDone = (b) => { const v = b.querySelector(".sp-friend").value; return b.dataset.mode === "code" ? v.replace(/[^0-9A-Z]/g, "").length >= 8 : v.replace(/\D/g, "").length >= 8; };
+  function splitBox(i, val, mode) {
+    const code = mode === "code";
+    return '<div class="sp-box" data-i="' + i + '" data-mode="' + (code ? "code" : "num") + '"><label class="sp-box-l" for="spf' + i + '">' + escR(t("sp_box_lbl", { i: i })) + '</label>' +
+      '<div class="sp-box-row"><input id="spf' + i + '" class="sp-friend" type="' + (code ? "text" : "tel") + '" inputmode="' + (code ? "text" : "numeric") + '" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="' + escR(code ? t("sp_code_ph") : "9123 5678") + '" value="' + escR(val || "") + '">' +
+      '<button class="sp-mode" type="button" aria-label="' + escR(t(code ? "sp_use_phone" : "sp_use_code")) + '">' + (code ? "123" : "ABC") + "</button></div>" +
+      '<div class="sp-st" aria-live="polite"></div></div>';
+  }
+  function splitForm(rid, pts, bill) {
+    const max = splitMax(); let opts = "";
+    for (let n = 2; n <= max; n++) opts += '<option value="' + n + '"' + (n === 2 ? " selected" : "") + ">" + escR(t(n === 2 ? "sp_opt_one" : "sp_opt", { n: n, f: n - 1 })) + "</option>";
+    return '<div class="split-form" data-rid="' + rid + '" data-pts="' + (+pts || 0) + '" data-bill="' + (+bill || 0) + '"><h3 style="margin:0 0 4px">' + "🥢🥢 " + escR(t("split_title")) + '</h3><p class="small muted sp-how" style="margin:0 0 10px"></p>' +
+      '<label class="field sp-people-f"><span>' + escR(t("sp_people_lbl")) + '</span><span class="sp-sel"><select class="sp-people">' + opts + "</select></span></label>" +
+      '<div class="sp-boxes"></div><div class="sp-even"></div><div class="err hide sp-err"></div><button class="btn sp-send" type="button"></button></div>';
+  }
+  function wireSplitForm(box, done) {
+    box.querySelectorAll(".split-form").forEach(fm => {
+      if (fm.dataset.wired) return; fm.dataset.wired = "1";
+      const sel = fm.querySelector(".sp-people"), wrap = fm.querySelector(".sp-boxes"), send = fm.querySelector(".sp-send"), err = fm.querySelector(".sp-err"), even = fm.querySelector(".sp-even");
+      const pts = +fm.dataset.pts, bill = +fm.dataset.bill; let seq = 0, timer = null;
+      const boxes = () => [...wrap.querySelectorAll(".sp-box")];
+      const vals = () => boxes().map(b => b.querySelector(".sp-friend").value.trim());
+      const setSt = (b, res) => {
+        const st = b.querySelector(".sp-st"); b.classList.remove("ok", "bad");
+        if (!res) { st.innerHTML = ""; return; }
+        if (res.ok) { b.classList.add("ok"); st.innerHTML = '<span class="sp-okw">✓ ' + escR(res.who || "") + "</span>"; return; }
+        if (res.err === "empty") { st.innerHTML = ""; return; }
+        b.classList.add("bad");
+        st.innerHTML = res.err === "not_member" ? '<span class="sp-badw">' + escR(t("sp_not_member")) + '</span> <button class="linkbtn sp-inv" type="button">' + escR(t("sp_invite")) + "</button>" :
+          '<span class="sp-badw">' + escR(t(res.err === "duplicate" ? "sp_dup" : res.err === "self" ? "sp_self" : "sp_not_member")) + "</span>";
+        const inv = st.querySelector(".sp-inv"); if (inv) inv.onclick = () => shareInvite();
+      };
+      const apply = (list, all) => { const bs = boxes(); (list || []).forEach(x => { const b = bs[x.i - 1]; if (b && (all || b.dataset.touched || boxDone(b))) setSt(b, x); }); };
+      const check = async (all) => {
+        const v = vals(); if (!v.some(Boolean)) return; const my = ++seq;
+        try { const r = await R.rpc("family_split_check", { p_token: state.token, p_friends: v }); if (my === seq) apply(r.boxes, all); } catch (e) { /* the send re-checks */ }
+      };
+      const upd = () => {
+        const n = +sel.value, s = splitPts(pts, n);
+        fm.querySelector(".sp-how").textContent = t("split_how", { h: splitHours() });
+        even.innerHTML = '<div class="sp-sum"><span>' + escR(t("sp_each_friend")) + "</span><b>" + s.friend + " " + escR(t("sp_pts")) + (bill ? ' <small>· HK$' + hkdEach(bill, n) + "</small>" : "") + '</b></div><div class="sp-sum"><span>' + escR(t("sp_you_keep")) + "</span><b>" + s.you + " " + escR(t("sp_pts")) + "</b></div>";
+        send.textContent = n === 2 ? t("split_send") : t("split_send_n", { n: n - 1 });
+        send.disabled = pts < n; err.classList.toggle("hide", pts >= n); if (pts < n) err.textContent = t("err_split_too_small");
+      };
+      const bindList = (list) => list.forEach(b => {
+        const inp = b.querySelector(".sp-friend"), tg = b.querySelector(".sp-mode");
+        inp.addEventListener("input", () => {
+          if (b.dataset.mode === "num") { const f = fmtFriendPhone(inp.value); if (f !== inp.value) inp.value = f; } else { const f = inp.value.toUpperCase().replace(/[^0-9A-Z]/g, "").slice(0, 10); if (f !== inp.value) inp.value = f; }
+          setSt(b, null); err.classList.add("hide"); clearTimeout(timer); timer = setTimeout(() => check(false), 400);
+        });
+        inp.addEventListener("blur", () => { if (inp.value.trim()) { b.dataset.touched = "1"; clearTimeout(timer); check(false); } });
+        inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); const nx = b.nextElementSibling && b.nextElementSibling.querySelector(".sp-friend"); if (nx) nx.focus(); else send.click(); } });
+        tg.onclick = () => { const toCode = b.dataset.mode !== "code"; const nb = document.createElement("div"); nb.innerHTML = splitBox(+b.dataset.i, "", toCode ? "code" : "num"); const n2 = nb.firstChild; b.replaceWith(n2); bindList([n2]); n2.querySelector(".sp-friend").focus(); };
+      });
+      const draw = () => {
+        const n = +sel.value, old = boxes().map(b => ({ v: b.querySelector(".sp-friend").value, m: b.dataset.mode })); let h = "";
+        for (let i = 1; i < n; i++) h += splitBox(i, (old[i - 1] || {}).v || "", (old[i - 1] || {}).m || "num");
+        wrap.innerHTML = h; bindList(boxes()); upd(); err.classList.add("hide"); if (old.some(o => o.v)) check(false);
+      };
+      sel.addEventListener("change", draw);
+      send.onclick = async () => {
+        err.classList.add("hide"); const v = vals(), n = +sel.value;
+        const empty = boxes().find(b => !b.querySelector(".sp-friend").value.trim()); if (empty) { empty.querySelector(".sp-friend").focus(); err.textContent = t("sp_fill_all"); err.classList.remove("hide"); return; }
+        send.disabled = true;
+        try {
+          const r = await R.rpc("family_split_group_offer", { p_token: state.token, p_receipt_id: +fm.dataset.rid, p_people: n, p_friends: v });
+          if (!r.ok) { apply(r.boxes, true); err.textContent = t("sp_fix_boxes"); err.classList.remove("hide"); send.disabled = false; return; }
+          state.me = r.member; setSplitIntent(false);
+          R.toast(t(n === 2 ? "split_sent_one" : "split_sent_n", { n: n - 1, h: splitHours() }), 4500); if (done) done(r); render();
+        } catch (e) { err.textContent = R.errText(e); err.classList.remove("hide"); send.disabled = false; }
+      };
+      draw();
+    });
+  }
+  function splitSheet(rid, pts, bill) {
+    const o = document.createElement("div"); o.className = "ask-sheet"; o.id = "splitSheet"; o.setAttribute("role", "dialog"); o.setAttribute("aria-modal", "true");
+    o.innerHTML = '<div class="card ps-card">' + splitForm(rid, pts, bill) + '<p class="center small" style="margin:12px 0 0"><a href="#" data-x>' + escR(t("pre_later")) + "</a></p></div>";
+    o.addEventListener("click", e => { if (e.target === o || e.target.closest("[data-x]")) { e.preventDefault(); o.remove(); } });
+    document.body.appendChild(o); wireSplitForm(o, () => o.remove()); setTimeout(() => { const i = o.querySelector(".sp-people"); if (i) i.focus(); }, 60);
+  }
+  $("#rCancel").onclick = (e) => { e.preventDefault(); showScan("scanIdle"); $("#photo").value = ""; setSplitIntent(false); preScan("camera"); }; // f50: retake = back to the pre-scan sheet
+  const localNow = () => { const d = new Date(Date.now() + 8 * 3600e3); return d.toISOString().slice(0, 16); };
+  // ----- confirm sheet + undo a reward (Oct 14: Dominic redeemed by mistake; no undo before) -----
+
+  // ----- v48 (f26): guest card "Today:" hero, limited perks, Me tab -----
+  const goodName = (n) => { const s = String(n == null ? "" : n).trim(); return /\p{L}/u.test(s) ? s : ""; };
+  function limText(x) {
+    if (x.period === "month") return x.state === "available" ? t("perk_avail") : t("perk_used_month");
+    if (x.period === "year") return x.left > 0 ? t("perks_passes_left", { n: x.left, m: x.allowed }) : t("perk_used_year", { d: x.next_reset ? R.fmtDay(x.next_reset) : "" });
+    if (x.period === "birthday") return ({ available: t("perk_bday_avail"), claimed: t("perk_bday_claimed"), used: t("perk_bday_used"), later: t("perk_bday_later"), no_birthday: t("perk_bday_none"), too_new: t("perk_bday_new", { n: x.days_until_eligible || 0 }) })[x.state] || "";
+    return "";
+  }
+  const limOn = (x) => x.state === "available" || x.state === "claimed";
+  function renderHero(me, zh) {
+    // f38: the card = level once, name, today's perks on one line, and ONE button: "Show at counter" (QR + level + today's perks for staff)
+    const ps = me.perk_status || {}, tier = ps.tier || me.tier || "nori", el = $("#perkHero");
+    el.className = "perkhero ph-compact t-" + tier; $("#walletPass").className = "wallet t-" + tier;
+    const today = ps.today || [];
+    const items = today.length ? today.map(x => esc(zh ? x.zh : x.en)).join(" · ") : esc(t("today_none"));
+    el.innerHTML = '<div class="ph-top"><span class="ph-tier">' + esc(R.tierName(tier, "en")) + '</span><span class="ph-zh">' + esc(R.tierName(tier, "zh")) + "</span>" +
+      (goodName(me.name) ? '<span class="ph-name">' + esc(goodName(me.name)) + "</span>" : "") + "</div>" +
+      '<div class="ph-today"><span class="ph-k">' + t("today_k") + (zh ? "：</span>" : ":</span> ") + items + "</div>" +
+      '<button type="button" class="ph-show" id="phShow"><span class="ph-qr" aria-hidden="true">' + QR_ICO + "</span>" + esc(tt("counter_btn")) + "</button>";
+    $("#phShow").onclick = () => showStaffFull(me);
+  }
+  const QR_ICO = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><path d="M14 14h3v3M21 14v.01M14 21h3M21 18v3"/></svg>';
+  // f38: "Show at counter" = ONE sheet for staff: level in the tier colour, the member QR (staff scan it), today's perks. Tap outside / Close to close.
+  async function showStaffFull(me) {
+    me = me || state.me; if (!me) return;
+    const ps = me.perk_status || {}, tier = ps.tier || me.tier || "nori", zh = R.lang() === "zh", today = ps.today || [];
+    const lim = (ps.limited || []).map(x => '<span class="ph-chip' + (limOn(x) ? " on" : "") + '">' + esc(zh ? x.name_zh : x.name_en) + " · " + esc(limText(x)) + "</span>").join("");
+    const o = document.createElement("div"); o.id = "staffFull"; o.className = "staff-full counter t-" + tier; o.setAttribute("role", "dialog");
+    o.innerHTML = '<div class="sf-head"><div class="sf-tier">' + esc(R.tierName(tier, "en")) + '</div><div class="sf-zh">' + esc(R.tierName(tier, "zh")) + "</div>" +
+      (goodName(me.name) ? '<div class="sf-name">' + esc(goodName(me.name)) + "</div>" : "") + "</div>" +
+      '<div class="sf-qr">' + R.qrSvg("RF:" + me.member_code, 200) + '<div class="sf-code">' + esc(me.member_code) + "</div></div>" +
+      '<div class="sf-k">' + t("today_k") + "</div>" + (today.length ? today.map(x => '<div class="sf-it">' + esc(zh ? x.zh : x.en) + (zh ? "" : '<span class="sf-zhl">' + esc(x.zh) + "</span>") + "</div>").join("") : '<div class="sf-it">' + esc(t("today_none")) + "</div>") +
+      (lim ? '<div class="sf-lim">' + lim + "</div>" : "") +
+      // f38b (Dominic Oct 18: "hard to know how to exit this full screen"): a ✕ top right + a fixed line at the bottom; tap anywhere but the QR, swipe down or Back closes it
+      '<button type="button" class="sf-x" aria-label="' + esc(t("close_x")) + '">✕</button>' +
+      '<button type="button" class="sf-close sf-hint">' + esc(t("tap_close")) + "</button>";
+    let lock = null; try { if (navigator.wakeLock) lock = await navigator.wakeLock.request("screen"); } catch (e) {}
+    let done = false;
+    const close = (viaBack) => { if (done) return; done = true; o.remove(); window.removeEventListener("popstate", onPop); try { lock && lock.release(); } catch (e) {} if (!viaBack && history.state && history.state.sf) { try { history.back(); } catch (e) {} } };
+    const onPop = () => close(true);
+    try { history.pushState({ sf: 1 }, ""); window.addEventListener("popstate", onPop); } catch (e) {}
+    o.addEventListener("click", (e) => { if (e.target.closest(".sf-qr") && !e.target.closest(".sf-x,.sf-close")) return; close(false); });
+    let y0 = null; o.addEventListener("touchstart", (e) => { y0 = e.touches.length === 1 ? e.touches[0].clientY : null; }, { passive: true });
+    o.addEventListener("touchend", (e) => { if (y0 === null) return; const dy = (e.changedTouches[0] || {}).clientY - y0; y0 = null; if (dy > 90) close(false); }, { passive: true });
+    document.body.appendChild(o);
+  }
+  function renderMe(me, zh) {
+    const inp = $("#meName"); if (document.activeElement !== inp) inp.value = goodName(me.name);
+    const bd = me.birthday || {}, box = $("#meBday");
+    if (bd.md) { if (!box.dataset.md || box.dataset.md !== bd.md + R.lang()) { box.dataset.md = bd.md + R.lang(); box.innerHTML = '<div style="font-size:17px;font-weight:700">🎂 ' + esc(mdText(bd.md)) + ' 🔒</div><p class="tiny" style="margin:4px 0 0">' + esc(t("me_bday_lock")) + "</p>"; } }
+    else if (!$("#meBdM")) { box.dataset.md = ""; box.innerHTML = '<div class="row" style="gap:8px"><select id="meBdM" class="sel"></select><select id="meBdD" class="sel"></select><button class="btn sm" id="meBdSave" type="button" style="width:auto">' + esc(t("save")) + '</button></div><p class="tiny" style="margin:4px 0 0">' + esc(t("me_bday_once")) + " " + esc(t("me_bday_lock")) + "</p>";
+      fillBday($("#meBdM"), $("#meBdD"));
+      $("#meBdSave").onclick = async () => { const md = $("#meBdM").value + "-" + $("#meBdD").value; if (md.length !== 5) return R.toast(t("bday_pick")); if (!(await askConfirm(mdText(md) + " · " + t("me_bday_once")))) return;
+        try { const r = await R.rpc("family_set_birthday", { p_token: state.token, p_md: md }); state.me = r.member; render(); R.toast("🎂 " + t("me_saved")); } catch (e) { R.toast(R.errText(e)); } }; }
+    // progress to the next tier (Kama stays by invitation)
+    const tier = me.tier || "nori", at = me.tiers_at || {}, ys = +me.year_spend || 0, order = ["nori", "gohan", "tobiko", "kama"];
+    let line, pct = 100;
+    if (tier === "kama") line = t("prog_top");
+    else if (me.kama_eligible) line = "✨ " + t("kama_eligible");
+    else { const nx = order[order.indexOf(tier) + 1] || "kama", from = tier === "nori" ? 0 : (+at[tier] || 0), to = +at[nx] || 0;
+      pct = to > from ? Math.max(2, Math.min(100, 100 * (ys - from) / (to - from))) : 2;
+      line = nx === "kama" ? t("lad_kama") : t("prog_to", { n: fmtHK(Math.max(0, to - ys)), name: tierName(nx) }); }
+    $("#meProgLine").textContent = line; $("#meProgFill").style.width = pct + "%"; $("#meProgFill").className = "t-" + tier;
+    $("#meProgSub").textContent = tierName(tier) + " · " + t("year_spend", { n: fmtHK(ys) });
+    const ref = me.referral || {};
+    $("#meInviteSub").textContent = ref.on ? t("friend_sub", { n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 388) }) : t("invite_sub");
+  }
+  $("#meInviteBtn").onclick = () => shareInvite();
+  $("#meNameSave").onclick = async () => { const v = $("#meName").value.trim(); if (!goodName(v) || v.length > 30) return R.toast(t("err_bad_name"));
+    try { const r = await R.rpc("family_update", { p_token: state.token, p_name: v }); state.me = r; $("#meName").blur(); render(); R.toast(t("me_saved")); } catch (e) { R.toast(R.errText(e)); } };
+  $("#meName").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("#meNameSave").click(); } });
+  function deleteSheet() {
+    return new Promise(res => {
+      const o = document.createElement("div"); o.className = "ask-sheet"; o.id = "delSheet"; o.setAttribute("role", "dialog");
+      o.style.cssText = "position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.66);display:flex;align-items:flex-end;justify-content:center;padding:16px";
+      o.innerHTML = '<div class="card" style="width:100%;max-width:420px;margin:0 0 env(safe-area-inset-bottom)"><h2 style="margin-top:0">🗑️ ' + escR(t("del_title")) + '</h2><p class="small" style="line-height:1.45">' + escR(t("del_body")) + '</p><p class="small"><a href="/family/privacy/">' + escR(t("privacy_link")) + '</a></p><div class="row" style="gap:10px;margin-top:12px"><button class="btn ghost" data-a="0" style="flex:1">' + escR(t("del_keep")) + '</button><button class="btn" data-a="1" style="flex:1;background:#d93a1b;color:#fff">' + escR(t("del_go")) + "</button></div></div>";
+      const done = (v) => { o.remove(); res(v); };
+      o.addEventListener("click", e => { const a = e.target.closest("[data-a]"); if (a) done(a.dataset.a === "1"); else if (e.target === o) done(false); });
+      document.body.appendChild(o); o.querySelector('[data-a="0"]').focus();
+    });
+  }
+  function goldSheet(gr) {
+    const o = document.createElement("div"); o.className = "ask-sheet goldwin"; o.id = "goldSheet"; o.setAttribute("role", "dialog");
+    o.style.cssText = "position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:20px";
+    o.innerHTML = '<div class="card center" style="width:100%;max-width:380px;background:linear-gradient(135deg,#f3d27a,#b9862a);color:#0b0d12;border:0"><div style="font-size:64px;line-height:1">✨⁠🥃</div><h2 style="margin:10px 0 6px;font-size:26px;letter-spacing:.04em">' + escR(t("gold_hit")) + '</h2><p style="font-size:17px;font-weight:700;margin:0 0 6px">' + escR(t("gold_won")) + "</p>" + (gr && gr.code ? '<p class="small" style="margin:0 0 14px;opacity:.75">' + escR(R.lang() === "zh" ? gr.name_zh : gr.name_en) + " · " + escR(gr.code) + "</p>" : "") + '<button class="btn" style="background:#0b0d12;color:#f3d27a">' + escR(t("gold_see")) + "</button></div>";
+    o.addEventListener("click", e => { if (e.target.closest("button") || e.target === o) { o.remove(); if (e.target.closest("button")) { setRsub("redeem", true); setTab("rewards"); const x = $("#rewards"); if (x) x.scrollIntoView({ behavior: "smooth" }); } } });
+    document.body.appendChild(o); R.burst(["#E8B84A", "#F3D27A", "#F6F3E7"]);
+  }
+  function askConfirm(msg) {
+    return new Promise(res => {
+      const o = document.createElement("div"); o.className = "ask-sheet"; o.setAttribute("role", "dialog");
+      o.style.cssText = "position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;padding:16px";
+      o.innerHTML = '<div class="card" style="width:100%;max-width:420px;margin:0 0 env(safe-area-inset-bottom)"><p style="font-size:18px;font-weight:700;margin:4px 0 16px">' + escR(msg) + '</p><div class="row" style="gap:10px"><button class="btn ghost" data-a="0" style="flex:1">' + t("c_cancel") + '</button><button class="btn" data-a="1" style="flex:1">' + t("c_ok") + "</button></div></div>";
+      const done = (v) => { o.remove(); res(v); };
+      o.addEventListener("click", e => { const a = e.target.closest("[data-a]"); if (a) done(a.dataset.a === "1"); else if (e.target === o) done(false); });
+      document.body.appendChild(o); o.querySelector('[data-a="1"]').focus();
+    });
+  }
+  function addUndo(d, rw) {
+    if (!(rw.points_spent > 0)) return;
+    const p = document.createElement("p"); p.className = "center small"; p.style.margin = "10px 0 0";
+    p.innerHTML = '<a href="#" class="undo-redeem" data-undo="' + rw.id + '">↩︎ ' + t("undo") + "</a>"; d.appendChild(p);
+    p.querySelector("a").onclick = async (e) => { e.preventDefault(); if (!(await askConfirm(t("undo_q", { n: Number(rw.points_spent).toLocaleString("en-US") })))) return;
+      try { const r = await R.rpc("family_undo_redeem", { p_token: state.token, p_redemption_id: rw.id }); state.me = r.member; state.lastPoints = r.member.points; render(); R.toast("↩︎ " + t("undone", { n: Number(r.refunded).toLocaleString("en-US") }), 3500); } catch (er) { R.toast(R.errText(er), 4000); } };
+  }
+  const escR = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  // ===================== f38: new layout helpers (strings, Card banner, visit row, history, sheets, theme) =====================
+  const F = {
+    en: { otp_t: "Let's verify your number", otp_s: "We've sent a code to your WhatsApp. It'll auto-verify once entered.", otp_none: "Didn't receive the code?", otp_rs: "Resend", otp_checking: "Checking…", otp_ok_t: "Verified successfully", otp_ok_s: "Your phone number has been verified", otp_resent: "New code sent", otp_wrong_n: "Wrong code · {n} tries left", otp_wrong_1: "Wrong code · 1 try left", otp_locked: "Too many wrong tries. Send a new code to try again.", otp_new: "Send a new code", otp_many_codes: "Too many codes for this number. Try again in an hour.", otp_busy: "Can't send codes right now. Try again in a few minutes.", otp_demo: "Demo code:", otp_join_h: "Almost there", otp_join_s: "Add your name and tick the box to create your account.", ready_h: "Ready to use", ready_empty: "Nothing ready yet. Codes you unlock and scratch-card prizes show up here.", ladder_h: "Use your $RORU", level_h: "Your level", earn_h: "Ways to earn more", rs_redeem: "Redeem", rs_level: "Level", rs_perks: "Perks", rs_earn: "Earn", rs_label: "Rewards sections",
+      qr_h: "My QR", qr_sub: "Show it at the counter", counter_btn: "Show at counter", hist_h: "History", hist_all: "See all ({n})", hist_less: "Show less",
+      set_h: "Settings", set_lang: "Language", set_theme: "Theme", th_dark: "Dark", th_light: "Light", help_h: "Help", rules_btn: "Rules & FAQ", close: "Close",
+      perks_more: "See every level's perks", perks_less: "Only my level", v_k: "Visits", v_more: "{n} more → {r}", v_soon: "1 more → {r}", v_ready: "{r} unlocked! It's in Rewards",
+      prog_h: "Your progress", next_k: "Next reward", b_gin1: "{who} wants to split a bill with you", b_ginn: "{n} split requests are waiting for you", b_gin_sub: "Your share {p} $RORU · tap to answer",
+      b_out: "Your split is waiting on {n} friend(s)", b_out_sub: "Tap to see who has said yes", b_sc: "You've got a scratch card!", b_sc_sub: "Tap to scratch it. Every card wins.",
+      b_pz: "Use today: {p}", b_pz_sub: "Your scratch-card prize · show staff", b_rw: "You unlocked {r}!", b_rw_sub: "Tap to scratch and see your code",
+      b_roru: "Tonight is Roru Day", b_roru_sub: "Members' first drink is on us (any drink except draft sake)",
+      e_gold: "Gold receipt", e_visits: "Visits", e_visits_t: "Every visit adds a stamp. 5 stamps = {r}.", e_pp: "Passport", e_pp_t: "A stamp for every new dish and bottle this quarter. Collect them for free food and drinks.",
+      e_days: "Mon–Wed specials", e_friend: "Bring a friend", e_friend_t: "You both get +{n} when their first receipt of {m}+ is approved. Come back within {d} days for +{v} more.",
+      e_friend_t0: "You both get +{n} when their first receipt of {m}+ is approved.", e_go_me: "Your link", e_go_pp: "Open", v2_line: "🎉 Come back within {d} days: +{v} more $RORU.",
+      info_ladder: "How $RORU works", split_req_h: "Split requests", hist_split: "Split {n} ways", hist_you: "You", hist_tap: "Details", hist_none: "No receipts yet. Tap Scan to add one.", rules_h: "Rules & FAQ" },
+    zh: { otp_t: "驗證你嘅電話號碼", otp_s: "驗證碼已經傳咗去你嘅 WhatsApp，輸入完會自動驗證。", otp_none: "收唔到驗證碼？", otp_rs: "重新發送", otp_checking: "驗證緊…", otp_ok_t: "驗證成功", otp_ok_s: "你嘅電話號碼已經驗證", otp_resent: "已經傳咗新驗證碼", otp_wrong_n: "驗證碼唔啱 · 仲可以試 {n} 次", otp_wrong_1: "驗證碼唔啱 · 仲可以試 1 次", otp_locked: "錯太多次。請傳送新驗證碼再試。", otp_new: "傳送新驗證碼", otp_many_codes: "呢個號碼要求咗太多驗證碼，請一個鐘後再試。", otp_busy: "暫時傳送唔到驗證碼，請過幾分鐘再試。", otp_demo: "示範驗證碼：", otp_join_h: "差少少就得", otp_join_s: "填你嘅名，再剔同意，就可以開戶口。", ready_h: "可以用", ready_empty: "暫時未有。解鎖咗嘅換領碼同刮刮卡獎品會喺度出現。", ladder_h: "用 RORU幣換", level_h: "你嘅等級", earn_h: "賺多啲", rs_redeem: "兌換", rs_level: "等級", rs_perks: "禮遇", rs_earn: "賺取", rs_label: "獎賞分頁",
+      qr_h: "我嘅 QR", qr_sub: "喺櫃檯俾店員掃", counter_btn: "櫃檯出示", hist_h: "紀錄", hist_all: "睇晒全部（{n}）", hist_less: "收起",
+      set_h: "設定", set_lang: "語言", set_theme: "外觀", th_dark: "深色", th_light: "淺色", help_h: "幫助", rules_btn: "規則同常見問題", close: "關閉",
+      perks_more: "睇晒每個等級嘅著數", perks_less: "只睇我嘅等級", v_k: "到訪", v_more: "再 {n} 次 → {r}", v_soon: "再 1 次 → {r}", v_ready: "{r} 已解鎖！喺「獎賞」度",
+      prog_h: "你的進度", next_k: "下一個獎賞", b_gin1: "{who} 想同你分單", b_ginn: "有 {n} 個分單邀請等緊你", b_gin_sub: "你份 {p} RORU幣 · 撳嚟回覆",
+      b_out: "你嘅分單仲等緊 {n} 位朋友", b_out_sub: "撳嚟睇邊個已經答應", b_sc: "你有一張刮刮卡！", b_sc_sub: "撳嚟刮開，每張都有獎。",
+      b_pz: "今日可以用：{p}", b_pz_sub: "你嘅刮刮卡獎品 · 俾店員睇", b_rw: "你解鎖咗 {r}！", b_rw_sub: "撳嚟刮開睇換領碼",
+      b_roru: "今晚係 Roru Day", b_roru_sub: "會員第一杯飲品我哋請（生清酒除外）",
+      e_gold: "金色收據", e_visits: "到訪", e_visits_t: "每次到訪加一個印花。集 5 個 = {r}。", e_pp: "護照", e_pp_t: "今季每款新菜式同新酒都有一個印花，集夠換免費嘢食同飲品。",
+      e_days: "星期一至三特別優惠", e_friend: "帶朋友嚟", e_friend_t: "朋友第一張 {m} 或以上嘅收據批核後，你哋各自 +{n}。佢 {d} 日內再嚟，再多 +{v}。",
+      e_friend_t0: "朋友第一張 {m} 或以上嘅收據批核後，你哋各自 +{n}。", e_go_me: "你嘅連結", e_go_pp: "打開", v2_line: "🎉 {d} 日內再嚟：再多 +{v} RORU幣。",
+      info_ladder: "RORU幣點運作", split_req_h: "分單邀請", hist_split: "{n} 人分單", hist_you: "你", hist_tap: "詳情", hist_none: "未有收據。㩒「掃描」加一張啦。", rules_h: "規則同常見問題" },
+    zhs: { otp_t: "验证你的手机号码", otp_s: "验证码已发送到你的 WhatsApp，输入后会自动验证。", otp_none: "没收到验证码？", otp_rs: "重新发送", otp_checking: "验证中…", otp_ok_t: "验证成功", otp_ok_s: "你的手机号码已验证", otp_resent: "已发送新验证码", otp_wrong_n: "验证码不对 · 还可以试 {n} 次", otp_wrong_1: "验证码不对 · 还可以试 1 次", otp_locked: "错误次数太多。请发送新验证码再试。", otp_new: "发送新验证码", otp_many_codes: "这个号码请求了太多验证码，请一小时后再试。", otp_busy: "暂时无法发送验证码，请几分钟后再试。", otp_demo: "示范验证码：", otp_join_h: "就差一步", otp_join_s: "填写你的名字并勾选同意，即可创建账户。", ready_h: "可以使用", ready_empty: "暂时还没有。解锁的兑换码和刮刮卡奖品会显示在这里。", ladder_h: "用 RORU币兑换", level_h: "你的等级", earn_h: "赚更多", rs_redeem: "兑换", rs_level: "等级", rs_perks: "礼遇", rs_earn: "赚取", rs_label: "奖赏分页",
+      qr_h: "我的二维码", qr_sub: "在柜台给店员扫", counter_btn: "柜台出示", hist_h: "记录", hist_all: "查看全部（{n}）", hist_less: "收起",
+      set_h: "设置", set_lang: "语言", set_theme: "外观", th_dark: "深色", th_light: "浅色", help_h: "帮助", rules_btn: "规则和常见问题", close: "关闭",
+      perks_more: "查看每个等级的优惠", perks_less: "只看我的等级", v_k: "到访", v_more: "再 {n} 次 → {r}", v_soon: "再 1 次 → {r}", v_ready: "{r} 已解锁！在“奖赏”里",
+      prog_h: "你的进度", next_k: "下一个奖赏", b_gin1: "{who} 想和你分单", b_ginn: "有 {n} 个分单邀请在等你", b_gin_sub: "你的份额 {p} RORU币 · 点击回复",
+      b_out: "你的分单还在等 {n} 位朋友", b_out_sub: "点击查看谁已同意", b_sc: "你有一张刮刮卡！", b_sc_sub: "点击刮开，每张都有奖。",
+      b_pz: "今天可用：{p}", b_pz_sub: "你的刮刮卡奖品 · 出示给店员", b_rw: "你解锁了 {r}！", b_rw_sub: "点击刮开查看兑换码",
+      b_roru: "今晚是 Roru Day", b_roru_sub: "会员第一杯饮品我们请（生清酒除外）",
+      e_gold: "金色收据", e_visits: "到访", e_visits_t: "每次到访加一个印花。集 5 个 = {r}。", e_pp: "护照", e_pp_t: "本季每款新菜和新酒都有一个印花，集够换免费食物和饮品。",
+      e_days: "周一至周三特别优惠", e_friend: "带朋友来", e_friend_t: "朋友第一张 {m} 或以上的收据批准后，你们各得 +{n}。对方 {d} 天内再来，再多 +{v}。",
+      e_friend_t0: "朋友第一张 {m} 或以上的收据批准后，你们各得 +{n}。", e_go_me: "你的链接", e_go_pp: "打开", v2_line: "🎉 {d} 天内再来：再多 +{v} RORU币。",
+      info_ladder: "RORU币怎么用", split_req_h: "分单邀请", hist_split: "{n} 人分单", hist_you: "你", hist_tap: "详情", hist_none: "还没有收据。点“扫描”添加一张吧。", rules_h: "规则和常见问题" }
+  };
+  const isHans = () => !!(R.hans && R.hans());
+  function tt(k, v) { const L0 = R.lang() === "zh" ? (isHans() ? F.zhs : F.zh) : F.en; let s = (L0 && L0[k] != null) ? L0[k] : (F.en[k] || k);
+    if (v) Object.keys(v).forEach(x => { s = s.split("{" + x + "}").join(v[x]); }); return s; }
+  function applyF() { document.querySelectorAll("[data-f]").forEach(e => { const s = tt(e.dataset.f); if (e.textContent !== s) e.textContent = s; }); const rt = document.getElementById("rwTabs"); if (rt) rt.setAttribute("aria-label", tt("rs_label")); }
+
+  // ---- a simple bottom sheet (used for the visit plate, split requests, rules, ⓘ) ----
+  function openSheet(title, bodyNode, opts) {
+    opts = opts || {};
+    const o = document.createElement("div"); o.className = "ask-sheet f38-sheet"; o.setAttribute("role", "dialog");
+    o.innerHTML = '<div class="card fs-card"><div class="fs-h"><h2>' + escR(title) + '</h2><button type="button" class="fs-x" aria-label="' + escR(tt("close")) + '">✕</button></div><div class="fs-b"></div></div>';
+    const b = o.querySelector(".fs-b"); if (typeof bodyNode === "string") b.innerHTML = bodyNode; else if (bodyNode) b.appendChild(bodyNode);
+    const close = () => { if (opts.onClose) opts.onClose(b); o.remove(); };
+    o.addEventListener("click", e => { if (e.target === o || e.target.closest(".fs-x")) close(); });
+    document.body.appendChild(o); return { el: o, body: b, close };
+  }
+  const store = () => $("#sheetStore");
+  function openPlate() { const pc = $("#plateCard"); openSheet(t("your_plate"), pc, { onClose: () => store().appendChild(pc) }); }
+  function openInbox() { const ib = $("#splitInbox"); const s = openSheet("🥢🥢 " + tt("split_req_h"), ib, { onClose: () => store().appendChild(ib) });
+    // closes itself once every request is answered
+    const mo = new MutationObserver(() => { if (!ib.children.length || !ib.querySelector("[data-g-yes],[data-off-yes],[data-split-yes]")) { mo.disconnect(); setTimeout(() => { if (s.el.isConnected) s.close(); }, 400); } }); mo.observe(ib, { childList: true }); }
+  function goRewards(sel) { const rs = rsubOf(sel); if (rs) setRsub(rs, true); setTab("rewards"); setTimeout(() => { const x = sel && $(sel); if (x) x.scrollIntoView({ behavior: "smooth", block: "start" }); }, 80); }
+
+  // ---- Card tab: visit row (5 logo stamps) + next reward + ONE action banner ----
+  function renderCardTab(me, zh) {
+    const per = me.per_plate || 5, n = Math.min(me.stamps || 0, per), plate = me.plate || [], vr = me.visit_reward, rn = vr ? (zh ? vr.name_zh : vr.name_en) : "";
+    let st = ""; for (let i = 0; i < per; i++) { const on = i < n; st += '<span class="vs' + (on ? " on" : "") + '">' + R.stamp(i, per, on, on && plate[i] && plate[i].gold) + "</span>"; }
+    $("#visitStamps").innerHTML = st;
+    $("#visitLine").textContent = tt("v_k") + " " + n + "/" + per;
+    // f43: the visits ring (option C): n of per, the 5 logo stamps stay under the line (Dominic likes them)
+    { const r = 21, c = 2 * Math.PI * r, f = Math.max(0, Math.min(1, n / per));
+      $("#visitRing").innerHTML = '<svg viewBox="0 0 52 52" width="52" height="52"><circle cx="26" cy="26" r="' + r + '" class="vr-bg"/><circle cx="26" cy="26" r="' + r + '" class="vr-fg" stroke-dasharray="' + (c * f).toFixed(1) + " " + c.toFixed(1) + '" transform="rotate(-90 26 26)"/></svg><b class="num">' + n + "<small>/" + per + "</small></b>"; }
+    if (!$("#nextIc").innerHTML) $("#nextIc").innerHTML = R.coin(false);
+    $("#visitSub").textContent = n >= per ? tt("v_ready", { r: rn }) : tt(per - n === 1 ? "v_soon" : "v_more", { n: per - n, r: rn });
+    $("#visitRow").setAttribute("aria-label", n + "/" + per + " " + t("visits"));
+    $("#nextCard").onclick = () => goRewards("#ladderSec");
+    renderBanner(me, zh);
+  }
+  function renderBanner(me, zh) {
+    const el = $("#actBanner"), sp = me.split || {}, gin = sp.gin || [], oin = sp.in || [], ib = me.split_inbox || [], sc = window.__scGuest || null;
+    const waiting = []; (sp.gout || []).forEach(g => { if (g.open) { const k = (g.invites || []).filter(i => i.status === "pending").length; if (k) waiting.push(k); } }); (sp.out || []).forEach(q => { if (q.status === "pending") waiting.push(1); });
+    const earned = (me.rewards || []).filter(r => r.status === "earned");
+    let b = null; const nIn = 0; waiting.length = 0; /* f47: no split request banners */
+    if (nIn) { const q = gin[0] || oin[0] || {}; b = { k: "split", ic: "🔔", t: nIn > 1 ? tt("b_ginn", { n: nIn }) : tt("b_gin1", { who: (q.from || (ib[0] && ib[0].who) || "").replace(/\s*\(test\)/, "") }), s: tt("b_gin_sub", { p: q.points_you != null ? q.points_you : "" }).replace(/ · $/, ""), go: openInbox, hot: 1 }; }
+    else if (sc && sc.fresh && sc.fresh.length) b = { k: "scratch", ic: "🎟", t: tt("b_sc"), s: tt("b_sc_sub"), go: () => { if (window.__scOpen) window.__scOpen(sc.fresh[0].id); } , hot: 1 };
+    else if (earned.length) { const r0 = earned[0]; b = { k: "reward", ic: "🎁", t: tt("b_rw", { r: zh ? r0.name_zh : r0.name_en }), s: tt("b_rw_sub"), go: () => goRewards("#readySec") }; }
+    else if (sc && sc.today && sc.today.length) b = { k: "prize", ic: "🎁", t: tt("b_pz", { p: zh ? sc.today[0].zh : sc.today[0].en }), s: tt("b_pz_sub"), go: () => goRewards("#readySec") };
+    else if (waiting.length) b = { k: "out", ic: "⏳", t: tt("b_out", { n: waiting.reduce((a, x) => a + x, 0) }), s: tt("b_out_sub"), go: () => { setTab("me"); setTimeout(() => { const x = $("#histCard"); if (x) x.scrollIntoView({ behavior: "smooth", block: "start" }); }, 80); } };
+    else if (sc && sc.roru_day) b = { k: "roru", ic: "🥢", t: tt("b_roru"), s: tt("b_roru_sub"), go: () => goRewards("#scDayHost") };
+    else if (me.hook_today) { const cfg = state.cfg || {}, hk = me.hook_today; b = { k: "hook", ic: "📅", t: t("hook_" + hk), s: t("hook_" + hk + "_sub", { n: cfg.hook_mon_stamps || 2, x: (cfg.hook_tue_bonus_mult || 2) + "×", o: Math.round(1 / Math.max(0.01, cfg.hook_wed_gold_odds || 0.2)) }), go: () => goRewards("#earnSec") }; }
+    el.classList.toggle("hide", !b); $("#member").classList.toggle("has-banner", !!b); if (!b) { el.innerHTML = ""; el.onclick = null; return; }
+    el.className = "act-banner ab-" + b.k + (b.hot ? " hot" : "");
+    el.innerHTML = '<span class="ab-ic" aria-hidden="true">' + b.ic + '</span><span class="ab-t"><b>' + escR(b.t) + "</b><small>" + escR(b.s) + '</small></span><span class="ab-go" aria-hidden="true">›</span>';
+    el.onclick = b.go; el.setAttribute("role", "button"); el.tabIndex = 0;
+  }
+  document.addEventListener("roru:scratch", () => { if (state.me) { renderBanner(state.me, R.lang() === "zh"); renderReadyEmpty(); } });
+  function renderReadyEmpty() { const any = !!$("#rewards").querySelector(".reward:not(.redeemed)") || !!($("#scWrap") && $("#scWrap").innerHTML.trim()); $("#readyEmpty").classList.toggle("hide", any); const sc = window.__scGuest; $("#rwDot").classList.toggle("hide", !(((state.me && state.me.rewards) || []).some(r => r.status === "earned") || (sc && sc.fresh && sc.fresh.length))); $("#rsDot").classList.toggle("hide", $("#rwDot").classList.contains("hide")); }
+
+  // f48: drawn icons in the custom-emoji sticker style (cream fill, ink line, orange rim) for the Ways-to-earn block
+  const DRAWN = (() => { const S = (b) => '<svg class="hr-emoji dr-ic" viewBox="0 0 64 64" aria-hidden="true"><g stroke-linejoin="round" stroke-linecap="round">' + b + "</g></svg>";
+    return {
+      calendar: S('<rect x="9" y="12" width="46" height="44" rx="7" fill="none" stroke="#F64501" stroke-width="9"/><rect x="9" y="12" width="46" height="44" rx="7" fill="#F6F3E7" stroke="#16181F" stroke-width="3.2"/><path d="M9 19a7 7 0 0 1 7-7h32a7 7 0 0 1 7 7v7H9z" fill="#F64501" stroke="#16181F" stroke-width="3.2"/><path d="M21 7v10M43 7v10" stroke="#16181F" stroke-width="4"/><rect x="17" y="33" width="8" height="7" rx="1.5" fill="#16181F" opacity=".22"/><rect x="28" y="33" width="8" height="7" rx="1.5" fill="#16181F" opacity=".22"/><rect x="39" y="33" width="8" height="7" rx="1.5" fill="#F64501" stroke="#16181F" stroke-width="2"/><rect x="17" y="44" width="8" height="7" rx="1.5" fill="#16181F" opacity=".22"/><rect x="28" y="44" width="8" height="7" rx="1.5" fill="#16181F" opacity=".22"/>'),
+      friends: S('<circle cx="22" cy="22" r="9" fill="none" stroke="#F64501" stroke-width="8"/><circle cx="42" cy="22" r="9" fill="none" stroke="#F64501" stroke-width="8"/><path d="M6 54c0-10 7-17 16-17s16 7 16 17zM26 54c0-10 7-17 16-17s16 7 16 17z" fill="none" stroke="#F64501" stroke-width="8"/><path d="M26 54c0-10 7-17 16-17s16 7 16 17z" fill="#F6F3E7" stroke="#16181F" stroke-width="3.2"/><circle cx="42" cy="22" r="9" fill="#F6F3E7" stroke="#16181F" stroke-width="3.2"/><path d="M6 54c0-10 7-17 16-17s16 7 16 17z" fill="#F6F3E7" stroke="#16181F" stroke-width="3.2"/><circle cx="22" cy="22" r="9" fill="#F6F3E7" stroke="#16181F" stroke-width="3.2"/>'),
+      sparkle: S('<path d="M30 6l5 15 15 5-15 5-5 15-5-15-15-5 15-5z" fill="#F2C14E" stroke="#16181F" stroke-width="3.2"/><path d="M50 40l2.4 6.6L59 49l-6.6 2.4L50 58l-2.4-6.6L41 49l6.6-2.4z" fill="#F64501" stroke="#16181F" stroke-width="2.6"/>')
+    }; })();
+  // ---- Rewards › Ways to earn more ----
+  function renderEarn(me, zh) {
+    const cfg = state.cfg || {}, ref = me.referral || {}, v2 = me.visit2 || {}, vr = me.visit_reward, rn = vr ? (zh ? vr.name_zh : vr.name_en) : "";
+    const row = (ic, h, tx, btn) => '<div class="earn-r"><span class="earn-ic">' + ic + '</span><div class="grow"><b>' + escR(h) + "</b><span>" + tx + "</span></div>" + (btn || "") + "</div>";
+    let h = "";
+    if (me.gold && me.gold.on) h += row("✨\u2060", tt("e_gold"), escR(t("gold_line2", { o: Math.round(1 / Math.max(0.0001, me.gold.odds)), x: multTxt(me.gold.mult) }).replace(/^✨\u2060\s*/, "")));
+    h += row("🥢", tt("e_visits"), escR(tt("e_visits_t", { r: rn })));
+    if (!$('#tabBar [data-tab="passport"]').classList.contains("hide")) h += row("🍽️", tt("e_pp"), escR(tt("e_pp_t")), '<button type="button" class="btn ghost sm earn-b" data-go-tab="passport">' + escR(tt("e_go_pp")) + "</button>");
+    // f48 (Dominic Oct 21 6:32 PM "dummy-proof"): today's night carries a TODAY pill (Hong Kong time, Mon–Wed only; none Thu–Sun),
+    // and this block's stock emoji (calendar, people, plain sparkle) are drawn icons. The custom roll / gold-receipt emoji stay.
+    const hkDow = new Date(Date.now() + 8 * 3600e3).getUTCDay(), hkKey = ({ 1: "mon_double", 2: "tue_friends", 3: "wed_gold" })[hkDow] || null;
+    const todayWord = zh ? (R.hans && R.hans() ? "今天" : "今日") : "TODAY";
+    const dTxt = (s) => escR(s).replace(/👯\uFE0F?/g, DRAWN.friends).replace(/^✨(?!\u2060)\s*/, DRAWN.sparkle + " ");
+    const days = ["mon_double", "tue_friends", "wed_gold"].map(k => { const on = k === hkKey && me.hook_today === k; return '<span class="earn-d' + (on ? " on" : "") + '">' + (on ? '<span class="today-pill">' + todayWord + "</span>" : "") + "<b>" + dTxt(t("hook_" + k)) + "</b> " + escR(t("hook_" + k + "_sub", { n: cfg.hook_mon_stamps || 2, x: (cfg.hook_tue_bonus_mult || 2) + "×", o: Math.round(1 / Math.max(0.01, cfg.hook_wed_gold_odds || 0.2)) })) + "</span>"; }).join("");
+    h += row(DRAWN.calendar, tt("e_days"), days + (cfg.upgrade_boost_today || true ? '<span class="earn-d">' + dTxt(t("hook_upgrade_line")) + "</span>" : ""));
+    if (ref.on) h += row(DRAWN.friends, tt("e_friend"), escR(v2.points > 0 ? tt("e_friend_t", { n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 388), d: v2.days, v: v2.points }) : tt("e_friend_t0", { n: ref.bonus, m: "HK$" + Math.round(ref.min_spend || 388) })), '<button type="button" class="btn ghost sm earn-b" data-go-tab="me" data-go-sel="#friendWrap">' + escR(tt("e_go_me")) + "</button>");
+    $("#earnList").innerHTML = h;
+    $("#earnList").querySelectorAll("[data-go-tab]").forEach(b => b.onclick = () => { setTab(b.dataset.goTab); const s = b.dataset.goSel; if (s) setTimeout(() => { const x = $(s); if (x) x.scrollIntoView({ behavior: "smooth", block: "start" }); }, 80); });
+    // Me › Bring a friend: the +88 come-back line, said before it happens
+    $("#friendV2").classList.toggle("hide", !(v2.points > 0)); if (v2.points > 0) $("#friendV2").textContent = tt("v2_line", { d: v2.days, v: v2.points });
+    $("#meInvite").classList.toggle("hide", !!ref.on);
+  }
+
+  // ---- Me › History: 5 rows + See all; tap a row for its details (split: who, each share, answers) ----
+  let histAll = false; const histOpen = new Set();
+  function renderHistory(me, zh) {
+    const sp = me.split || {}, shared = sp.shared || {}, canSplit = sp.can || [], gout = sp.gout || [], out = sp.out || [];
+    const rows = me.receipts || [], list = histAll ? rows : rows.slice(0, 5);
+    const pts = (n) => n + " " + t("sp_pts");
+    const det = (r) => {
+      const s = shared[r.id], g = gout.find(x => +x.receipt_id === +r.id), o1 = out.filter(x => +x.receipt_id === +r.id);
+      let h = '<div class="hx-l"><span>' + escR(R.fmtTime ? R.fmtTime(r.at) : R.fmtDay(r.at)) + "</span><span>" + escR(zh ? (r.shop_zh || "") : (r.shop || "")) + "</span></div>" +
+        '<div class="hx-l"><span>' + escR(/^STAFF-/.test(r.receipt_no) ? "(staff)" : r.receipt_no) + "</span><span>HK$" + (+r.total_hkd).toFixed(0) + "</span></div>";
+      if (r.status === "approved") h += '<div class="hx-l"><span>' + escR(t("points")) + "</span><span>+" + r.points + (r.multiplier && +r.multiplier !== 1 ? " (" + multTxt(r.multiplier) + ")" : "") + (r.stamped ? " · 🥢" : "") + (r.gold ? " · ✨\u2060" : "") + "</span></div>";
+      const rwb = state.rw && (state.rw.mine || []).find(x => +x.receipt_id === +r.id);
+      if (rwb) h += '<div class="hx-l"><span><span class="rw-tag">' + R.coin(false) + escR(t("rw_short", { m: String(+rwb.multiplier).replace(/\.0+$/, "") })) + "</span> " + escR(R.rwName(rwb)) + (rwb.qty > 1 ? " ×" + rwb.qty : "") + "</span><span>+" + rwb.points + "</span></div>";
+      // f47: a shared receipt says who with (no emoji); the payer's own approved receipt offers "Send a share" (B) or shows the shares sent
+      const lk = window.RORU_SPLIT && RORU_SPLIT.linkFor(r.id);
+      if (s && !lk) h += '<div class="hx-sp"><b>' + escR(+s.n > 2 ? t("split_hist_n", { n: s.n, who: s.with || "" }) : t("split_hist_with", { who: s.with || "" })) + "</b></div>";
+      if (window.RORU_SPLIT) { RORU_SPLIT._receipts[r.id] = r; const hb = RORU_SPLIT.historyButton(Object.assign({}, r, { source: s && s.role === "friend" ? "split" : r.source, base_key: s ? "x" : null })); if (hb) h += '<div class="hist-split">' + hb + "</div>"; }
+      return h;
+    };
+    $("#history").innerHTML = list.length ? list.map(r => { const s = shared[r.id], open = histOpen.has(r.id);
+      const tag = s ? '<span class="hr-tag">' + escR(tt("hist_split", { n: s.n })) + "</span>" : "";
+      return '<div class="hrow' + (open ? " open" : "") + '" data-rid="' + r.id + '"><button type="button" class="hr-h" aria-expanded="' + open + '"><span class="hr-l"><b>' + escR(R.fmtDay(r.at)) + "</b> · HK$" + (+r.total_hkd).toFixed(0) + (tag ? "<br>" + tag : "") + '</span><span class="hr-r">' +
+        (r.status === "approved" ? "+" + r.points + (r.gold ? " ✨\u2060" : "") : r.status === "pending" ? "⏳" : "✕") + '<i class="hr-chev">›</i></span></button><div class="hr-x">' + (open ? det(r) : "") + "</div></div>"; }).join("") : '<p class="muted small">' + escR(tt("hist_none")) + "</p>";
+    $("#history").querySelectorAll(".hrow .hr-h").forEach(b => b.onclick = () => { const row = b.closest(".hrow"), id = +row.dataset.rid, r = rows.find(x => x.id === id); if (histOpen.has(id)) histOpen.delete(id); else histOpen.add(id); row.classList.toggle("open"); b.setAttribute("aria-expanded", row.classList.contains("open")); row.querySelector(".hr-x").innerHTML = row.classList.contains("open") ? det(r) : ""; wireSplitBtns(row); });
+    wireSplitBtns($("#history"));
+    const all = $("#histAll"); all.classList.toggle("hide", rows.length <= 5); all.textContent = histAll ? tt("hist_less") : tt("hist_all", { n: rows.length }); all.onclick = () => { histAll = !histAll; renderHistory(state.me, R.lang() === "zh"); };
+    // "Receipts you're splitting" (in History): only splits still waiting on someone; finished ones are in each row's details
+    const so = $("#splitOutbox"); so.querySelectorAll(".gout").forEach((d, i) => { const g = gout[i]; if (g && !g.open) d.remove(); });
+    so.querySelectorAll(".split-row:not(.is-wait), .gout-old:not(.is-wait)").forEach(d => d.remove());
+    so.querySelectorAll(".card").forEach(c => { if (!c.querySelector(".gout, .split-row, .gout-old")) c.remove(); });
+  }
+  function wireSplitBtns(root) { /* f47: the old split sheet is gone; History buttons are wired by loyalty/split.js */ }
+
+  // ---- theme (dark / light), shared with the staff app: localStorage roru_theme, follows the phone until the guest picks ----
+  function paintThemeSeg() { const th = R.theme ? R.theme.get() : "A"; document.querySelectorAll("#themeSeg [data-th]").forEach(b => b.classList.toggle("on", b.dataset.th === th)); }
+  document.querySelectorAll("#themeSeg [data-th]").forEach(b => b.onclick = () => { if (R.theme) R.theme.set(b.dataset.th, true); paintThemeSeg(); });
+  document.addEventListener("roru:theme", paintThemeSeg);
+
+  // ---- Rules & FAQ (Me › Help) and the ⓘ on Rewards ----
+  function rulesHtml() {
+    const zh = R.lang() === "zh", hs = isHans(), me = state.me || {}, ppd = (state.cfg && state.cfg.points_per_hkd) || me.points_per_hkd || 1, vr = me.visit_reward, rn = vr ? (zh ? vr.name_zh : vr.name_en) : "";
+    const Q = zh ? (hs ? [
+      ["RORU币", "每消费 HK$1 得 " + ppd + " RORU币（等级越高越多）。RORU币每年 12 月 31 日到期。"], ["收据", "每张收据只可扫描一次。读不到？请店员帮你加。每天最多 3 张。"],
+      ["分单", "扫描收据后点「和朋友分单」：2 到 4 人，朋友扫二维码或用 WhatsApp 链接领取，马上到账。未领取的份数 7 天后退回给你。"], ["到访", "每次到访一个印花。集 5 个 = " + rn + "。"],
+      ["护照", "食物和饮品分开收集。季度结束（第四季：12 月 31 日）后印花重新开始，不会累积。酒瓶印花归扫描收据的人，每张单最多 6 个。"],
+      ["等级", "等级看过去 12 个月的消费，越高每 HK$1 RORU币越多，优惠越多。"], ["刮刮卡", "Roru Day 扫描 HK$388 或以上的收据，就有刮刮卡，每张都有奖。"]] : [
+      ["RORU幣", "每消費 HK$1 有 " + ppd + " RORU幣（等級越高越多）。RORU幣每年 12 月 31 日到期。"], ["收據", "每張收據只可以掃一次。讀唔到？叫店員幫你加。每日最多 3 張。"],
+      ["分單", "掃描收據後㩒「同朋友分單」：2 至 4 人，朋友掃 QR 或者用 WhatsApp 連結領取，即刻到賬。未領取嘅份數 7 日後退返俾你。"], ["到訪", "每次到訪一個印花。集 5 個 = " + rn + "。"],
+      ["護照", "食物同飲品分開集。季度完咗（第四季：12 月 31 日）印花重新開始，唔會累積。酒樽印花歸掃描收據嗰位，每張單最多 6 個。"],
+      ["等級", "等級睇過去 12 個月嘅消費，越高每 HK$1 RORU幣越多，著數越多。"], ["刮刮卡", "Roru Day 掃描 HK$388 或以上嘅收據，就有刮刮卡，每張都有獎。"]]) : [
+      ["$RORU", "Every HK$1 earns " + ppd + " $RORU, more at higher levels. $RORU expires on 31 Dec each year."], ["Receipts", "Each receipt scans once. Won't read? Ask staff to add it. Up to 3 a day."],
+      ["Splitting", "After a scan, tap Split with friends: 2 to 4 people, friends scan your QR or open a WhatsApp link and get their share at once. Shares nobody collects come back to you after 7 days."], ["Visits", "One stamp per visit. 5 stamps = " + rn + "."],
+      ["Passport", "Food and Drinks are collected separately. When the quarter ends (Q4: 31 Dec) stamps start again; they don't carry over. Bottle stamps go to whoever scans the receipt, max 6 a bill."],
+      ["Levels", "Your level follows what you spent in the last 12 months. Higher levels earn more $RORU per HK$1 and get more perks."], ["Scratch cards", "On Roru Day, scan a receipt of HK$388 or more and you get a scratch card. Every card wins."]];
+    return '<div class="rules">' + Q.map(q => "<details><summary>" + escR(q[0]) + "</summary><p>" + escR(q[1]) + "</p></details>").join("") + "</div>";
+  }
+  $("#rulesBtn").onclick = () => openSheet(tt("rules_h"), rulesHtml());
+  document.querySelectorAll("[data-info]").forEach(b => b.onclick = () => openSheet(tt("info_ladder"), '<p class="small" style="line-height:1.5">' + escR(t("ladder_sub")) + "</p>" + rulesHtml()));
+  $("#visitRow").onclick = openPlate;
+  $("#meQrBig").onclick = () => showStaffFull(state.me);
+  $("#memberQr").onclick = () => showStaffFull(state.me);
+  $("#perksMore").onclick = () => { const c = $("#perksCard"); c.classList.toggle("perks-few"); $("#perksMore").textContent = c.classList.contains("perks-few") ? tt("perks_more") : tt("perks_less"); };
+  // receipt photo -> OCR-ready canvas, all on the phone: find the paper, crop, scale to ~1100 px wide, local-mean threshold (shadows, blue tint, dark table edge)
+  async function prepReceipt(file) {
+    const bmp = await createImageBitmap(file);
+    // 1) find the paper: small grey copy, bright columns/rows
+    const sw = 240, sk = sw / bmp.width, shh = Math.round(bmp.height * sk);
+    const s = document.createElement("canvas"); s.width = sw; s.height = shh; const sx = s.getContext("2d"); sx.drawImage(bmp, 0, 0, sw, shh);
+    const sd = sx.getImageData(0, 0, sw, shh).data; const L = new Float32Array(sw * shh);
+    for (let i = 0, j = 0; i < sd.length; i += 4, j++) L[j] = 0.299 * sd[i] + 0.587 * sd[i + 1] + 0.114 * sd[i + 2];
+    const sorted = Float32Array.from(L).sort(); const lo = sorted[Math.floor(L.length * 0.1)], hi = sorted[Math.floor(L.length * 0.9)], cut = (lo + hi) / 2;
+    const colF = new Float32Array(sw), rowF = new Float32Array(shh);
+    for (let y = 0; y < shh; y++) for (let x = 0; x < sw; x++) if (L[y * sw + x] > cut) { colF[x]++; rowF[y]++; }
+    const span = (arr, n, frac) => { let a = 0, b = arr.length - 1; while (a < b && arr[a] / n < frac) a++; while (b > a && arr[b] / n < frac) b--; return [a, b]; };
+    let [x0, x1] = span(colF, shh, 0.25), [y0, y1] = span(rowF, sw, 0.15);
+    if (hi - lo < 40 || (x1 - x0) < sw * 0.2 || (y1 - y0) < shh * 0.2) { x0 = 0; x1 = sw - 1; y0 = 0; y1 = shh - 1; }
+    const pad = 4; x0 = Math.max(0, x0 - pad); y0 = Math.max(0, y0 - pad); x1 = Math.min(sw - 1, x1 + pad); y1 = Math.min(shh - 1, y1 + pad);
+    const cx = x0 / sk, cy = y0 / sk, cw = (x1 - x0 + 1) / sk, ch = (y1 - y0 + 1) / sk;
+    // 2) crop + scale: paper width ~1100 px, capped by total pixels
+    let k = Math.min(1, 1100 / cw); if (cw * k * ch * k > 4.2e6) k = Math.sqrt(4.2e6 / (cw * ch));
+    const W = Math.round(cw * k), H = Math.round(ch * k);
+    const c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d"); x.drawImage(bmp, cx, cy, cw, ch, 0, 0, W, H);
+    const d = x.getImageData(0, 0, W, H), p = d.data; const g = new Float32Array(W * H);
+    for (let i = 0, j = 0; i < p.length; i += 4, j++) g[j] = 0.299 * p[i] + 0.587 * p[i + 1] + 0.114 * p[i + 2];
+    // 3) adaptive threshold (local mean, integral image) -> clean black text on white
+    const I = new Float64Array((W + 1) * (H + 1));
+    for (let yy = 0; yy < H; yy++) { let row = 0; for (let xx = 0; xx < W; xx++) { row += g[yy * W + xx]; I[(yy + 1) * (W + 1) + xx + 1] = I[yy * (W + 1) + xx + 1] + row; } }
+    const bg = cut * 1.1; const r = Math.max(8, Math.round(W / 40));
+    for (let yy = 0; yy < H; yy++) for (let xx = 0; xx < W; xx++) {
+      const xa = Math.max(0, xx - r), xb = Math.min(W, xx + r + 1), ya = Math.max(0, yy - r), yb = Math.min(H, yy + r + 1);
+      const m = (I[yb * (W + 1) + xb] - I[ya * (W + 1) + xb] - I[yb * (W + 1) + xa] + I[ya * (W + 1) + xa]) / ((xb - xa) * (yb - ya));
+      const v = (g[yy * W + xx] < m * 0.82 && m > bg) ? 0 : 255; const o = (yy * W + xx) * 4; p[o] = p[o + 1] = p[o + 2] = v;
+    }
+    x.putImageData(d, 0, 0); return c;
+  }
+  function parseReceipt(text, now) {
+    now = now || new Date();
+    const lines = text.split(/\n/).map(l => l.trim()).filter(Boolean); const out = { no: "", total: "", at: "", table: "", server: "", seats: "", sub: "", svc: "", check: null, timeRead: false };
+    // amounts: $1,280.40 · $1280 40 · $128040 (point lost) · $000
+    const amt = (s) => { const r = []; const re = /[\$£S§]\s?(\d{1,3}(?:,\d{3})+|\d+)(?:[.,\s](\d{2}))?(?!\d)/g; let m; while ((m = re.exec(s))) { let v; const a = m[1].replace(/,/g, ""); if (m[2] !== undefined) v = parseFloat(a + "." + m[2]); else if (/^0+$/.test(a)) v = 0; else if (a.length >= 3 && !/[.,]/.test(m[0])) v = parseFloat(a.slice(0, -2) + "." + a.slice(-2)); else v = parseFloat(a); if (v >= 0 && v < 100000) r.push(v); } return r; };
+    const last = (s) => { const m = amt(s); return m.length ? m[m.length - 1] : null; };
+    const isTotal = (l) => /^\W{0,3}(grand\s*)?t[o0a]t[ae]l\b|^\W{0,3}t[o0a]t[ae][lni1]\W*[:;]|amount\s*due|合計|總計|總額|應付|實付|实付/i.test(l) && !/item|count|tax|sub|小計/i.test(l);
+    for (let i = 0; i < lines.length; i++) {
+      const l = lines[i];
+      if (isTotal(l)) { const v = last(l); if (v) out.total = v.toFixed(2); }
+      else if (/sub\s*-?\s*t[o0]tal|小計/i.test(l)) { const v = last(l); if (v) out.sub = v.toFixed(2); }
+      else if (/s[ae]r?v[il1]?[ce][ec]?\s*charge|服務費/i.test(l)) { const v = last(l); if (v) out.svc = v.toFixed(2); }
+      let m;
+      if (!out.table && (m = /\bt[ae]b[l1i]e?\s*(?:no\.?)?\s*[:;.=#]?\s*([A-Z]?\d{1,3}[A-Z]?)\b/i.exec(l) || /(?:枱|檯|台)號?\s*[:：]?\s*(\d{1,3})/.exec(l))) out.table = m[1].toUpperCase();
+      if (!out.server && (m = /\bs[ae]r[vu][ae]r\s*[:;.=]?\s*([A-Za-z][A-Za-z .'-]{1,24})/i.exec(l))) out.server = m[1].replace(/\s+/g, " ").trim();
+      if (!out.seats && (m = /\bs[ea]{1,2}t\s*(?:count|s)?\s*\W{0,2}\s*(\d{1,2})\b/i.exec(l) || /\b(?:pax|guests?|covers?)\s*\W{0,2}\s*(\d{1,2})\b/i.exec(l) || /人數\s*[:：=]?\s*(\d{1,2})/.exec(l))) out.seats = m[1];
+    }
+    // no "Total:" read (bold line): this POS prints Subtotal = Total when tax is 0
+    if (!out.total && out.sub) out.total = out.sub;
+    if (!out.total) { const all = []; lines.forEach(l => { if (/item|count|each/i.test(l)) return; amt(l).forEach(v => all.push(v)); }); if (all.length) out.total = Math.max(...all).toFixed(2); }
+    // cross-check: item lines + service charge = total (lines with "each" are unit prices)
+    let sum = 0, n = 0; lines.forEach(l => { if (isTotal(l) || /sub\s*-?\s*t[o0]tal|小計|s[ae]r?v[il1]?[ce][ec]?\s*charge|服務費|tax|each|count|change|cash|visa|master|card|octopus|tender|paid/i.test(l) || /^\W*[\$£S§]\s?\d/.test(l)) return; const v = last(l); if (v !== null) { sum += v; n++; } });
+    if (n && out.total) out.check = Math.abs(sum + (+out.svc || 0) - +out.total) < 0.06;
+    // receipt / invoice number, only when the receipt prints one with its label
+    const nm = /(receipt|rcpt|invoice|inv|bill|order|check|chk|ticket|trans|txn)\s*(no\.?|number|#)?\s*[:#：]?\s*([A-Z0-9][A-Z0-9\-\/]{2,})/i.exec(text); if (nm && /\d/.test(nm[3])) out.no = nm[3].toUpperCase();
+    // date & time (HK: DD/MM/YYYY)
+    let dm = /(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/.exec(text), d = null;
+    if (dm) d = { y: +dm[1], m: +dm[2], d: +dm[3] }; else { dm = /(\d{1,2})\s?[\/\-.]\s?(\d{1,2})\s?[\/\-.]\s?(\d{2,4})/.exec(text); if (dm) d = { d: +dm[1], m: +dm[2], y: +dm[3] < 100 ? 2000 + +dm[3] : +dm[3] }; }
+    // time: hh:mm with a colon, on the date's line first (an amount like 0.00 is never a time)
+    const tre = /(?:^|[^\d$.])([01]?\d|2[0-3])\s?[:;]\s?([0-5]\d)(?![\d.])/; const dl = dm ? (text.slice(dm.index).split("\n")[0] || "") : "";
+    const tm = tre.exec(dl) || (dm ? tre.exec(text.slice(dm.index)) : tre.exec(text));
+    if (d && d.m >= 1 && d.m <= 12 && d.d >= 1 && d.d <= 31) {
+      // a misread year digit (2026 read as 2028): receipts only count for a few days, so take this year when that fits
+      const hk = new Date(now.getTime() + 8 * 3600e3), yNow = hk.getUTCFullYear();
+      if (d.y !== yNow) { const tryD = Date.UTC(yNow, d.m - 1, d.d), diff = (hk.getTime() - tryD) / 864e5; if (diff > -2 && diff < 30) d.y = yNow; else if (Math.abs(Date.UTC(yNow - 1, d.m - 1, d.d) - hk.getTime()) / 864e5 < 30) d.y = yNow - 1; }
+      out.timeRead = !!tm;
+      out.at = d.y + "-" + String(d.m).padStart(2, "0") + "-" + String(d.d).padStart(2, "0") + "T" + (tm ? String(+tm[1]).padStart(2, "0") + ":" + tm[2] : "12:00");
+    }
+    return out;
+  }
+  $("#photo").addEventListener("change", async () => {
+    const f = $("#photo").files[0]; if (!f) return;
+    scanTitle = t("scan"); showScan("scanBusy"); const gen = scanGen; $("#ocrBar").style.width = "5%";
+    // one-way fingerprint of the photo (the photo itself never leaves the phone): catches the same photo sent twice
+    state.imgHash = null; try { const hb = await crypto.subtle.digest("SHA-256", await f.arrayBuffer()); state.imgHash = [...new Uint8Array(hb)].map(b => b.toString(16).padStart(2, "0")).join(""); } catch (e) {}
+    try {
+      const cv = await prepReceipt(f); $("#thumb").src = cv.toDataURL("image/jpeg", 0.6); $("#thumb").style.display = "block";
+      if (!window.Tesseract) await new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+      const withTimeout = (pr, ms) => Promise.race([pr, new Promise((_, rej) => setTimeout(() => rej(new Error("ocr_timeout")), ms))]);
+      const logger = (m) => { if (m.status === "recognizing text") $("#ocrBar").style.width = (10 + 90 * m.progress) + "%"; else $("#ocrBar").style.width = "10%"; };
+      let data = null, worker = null;
+      for (const opts of [{ logger }, { logger, corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.0/tesseract-core-lstm.wasm.js" }]) {
+        try { worker = await withTimeout(Tesseract.createWorker("eng", 1, opts), 40000); data = (await withTimeout(worker.recognize(cv), 60000)).data; await worker.terminate(); break; }
+        catch (e) { try { if (worker) await worker.terminate(); } catch (e2) {} worker = null; }
+      }
+      if (!data) throw new Error("ocr_failed");
+      const p = parseReceipt(data.text || ""); ocr = { ...ocr, conf: Math.round(data.confidence || 0), text: (data.text || "").slice(0, 2000), fromOcr: true, p };
+      $("#rNo").value = p.no; $("#rNoWrap").classList.toggle("hide", !p.no); $("#rTable").value = p.table; $("#rTotal").value = p.total; $("#rAt").value = p.at || localNow();
+      const good = p.total && p.at && p.timeRead && (p.table || p.no) && (ocr.conf >= 60 || p.check);
+      const bits = [p.server ? t("r_server") + " " + escR(p.server) : "", p.seats ? t(+p.seats === 1 ? "seat_1" : "seats_n", { n: p.seats }) : "", p.check ? "✓ " + t("r_adds") : ""].filter(Boolean).join(" · ");
+      $("#readMsg").innerHTML = (good ? "✓ " + t("read_ok") : "⚠️ " + t("read_fail")) + " (" + ocr.conf + "%)" + (bits ? '<br><span class="muted">' + bits + "</span>" : "");
+      if (gen === scanGen) showScan("scanForm"); // f50: closed while reading = cancelled
+    } catch (e) { ocr = { ...ocr, conf: null, text: null, fromOcr: false, p: null }; $("#rNo").value = ""; $("#rTable").value = ""; $("#rTotal").value = ""; $("#rAt").value = localNow(); $("#readMsg").textContent = "⚠️ " + t("read_fail"); if (gen === scanGen) showScan("scanForm"); }
+    $("#photo").value = "";
+  });
+  // f47: the one split entry after a scan (mock A1): add the receipt, then pick people -> QR
+  let splitAfter = false;
+  $("#rSplit").onclick = () => { splitAfter = true; $("#rSubmit").click(); };
+  $("#rSubmit").onclick = async () => {
+    $("#rErr").classList.add("hide"); $("#rSubmit").disabled = true;
+    const total = parseFloat(String($("#rTotal").value).replace(/[^0-9.]/g, "")); const at = $("#rAt").value ? new Date($("#rAt").value + ":00+08:00").toISOString() : null;
+    const p = ocr.p || {}; const table = $("#rTable").value.trim().toUpperCase();
+    // anything the guest changed from what the phone read goes to staff to check
+    const edited = !ocr.fromOcr || $("#rTotal").value !== p.total || $("#rAt").value !== p.at || table !== (p.table || "") || $("#rNo").value.trim().toUpperCase() !== (p.no || "");
+    try {
+      const r = await R.rpc("family_submit_receipt", { p_token: state.token, p_receipt_no: $("#rNo").value.trim(), p_total_hkd: total, p_receipt_at: at, p_shop: ocr.shop, p_source: ocr.fromOcr && !edited && p.timeRead ? "ocr" : "manual", p_ocr_confidence: ocr.conf, p_ocr_text: ocr.text, p_image_hash: ocr.fromOcr ? state.imgHash : null, p_table: table || null, p_server: ocr.fromOcr ? (p.server || null) : null, p_seats: ocr.fromOcr && p.seats ? +p.seats : null });
+      state.me = r.member;
+      if (r.status === "split_requested") { showScan("scanIdle"); R.toast(t("split_waiting"), 4000); }
+      else {
+        const zh = R.lang() === "zh", rd = r.read || {}, g = r.visit && r.visit.gold;
+        const head = r.status === "approved" ? (g ? "✨⁠ " + t("gold_hit") + " " : "") + t("added_points", { n: Number(r.points || 0).toLocaleString("en-US") }) + (r.visit && r.visit.added ? " · " + t("stamp_added") : "") : "⏳ " + t("r_pending");
+        const meta = [rd.table ? t("table").replace(/\s*[（(].*$/, "") + " " + escR(rd.table) : "", rd.at ? escR(rd.at.slice(8, 10) + "/" + rd.at.slice(5, 7) + " " + rd.at.slice(11)) : "", rd.total ? "HK$" + Number(rd.total).toLocaleString("en-US", { minimumFractionDigits: 2 }) : "", rd.server ? t("r_server") + " " + escR(rd.server) : "", rd.seats ? t(+rd.seats === 1 ? "seat_1" : "seats_n", { n: rd.seats }) : ""].filter(Boolean).join(" · ");
+        const items = (r.items || []).map(x => '<span class="pill">' + (x.qty > 1 ? x.qty + "× " : "") + escR(zh && x.zh ? x.zh : String(x.en).replace(/\s*\((per person|(19|20)\d\d)\)$/i, "")) + "</span>").join(" ");
+        $("#splitBanner").classList.add("hide"); /* f46: one split message only (the banner is for the scan step) */ $("#scanDone").innerHTML = '<h2 style="margin-top:0">' + head + '</h2><p class="small muted" style="margin:4px 0 10px">' + t("r_read") + ": " + meta + "</p>" + (items ? '<p class="small" style="margin:0 0 6px"><b>' + t("r_items") + '</b></p><div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:12px">' + items + "</div>" : "") + (r.status === "approved" ? "" : '<p class="small muted">' + t("queued") + "</p>") +
+          '<button class="btn" id="rDone">' + t("r_done") + "</button>";
+        const gr = g && r.visit ? r.visit.gold_reward : null; // v48: gold receipt = 2x points + a free highball
+        if (gr && r.status === "approved") $("#scanDone").insertAdjacentHTML("afterbegin", '<div class="notice" style="background:linear-gradient(135deg,#f3d27a,#b9862a);color:#0b0d12;font-weight:800">✨⁠🥃 ' + escR(t("gold_won")) + "</div>");
+        const rwk = r.visit && r.visit.roll_week;
+        if (rwk && r.status === "approved") { $("#scanDone").querySelector("h2").insertAdjacentHTML("afterend", '<div class="notice" style="display:flex;align-items:center;gap:8px;font-weight:800;border-color:rgba(232,184,74,.6)">' + R.coin(true) + escR(t("rw_earned", { n: rwk.points, item: R.rwName(rwk) + (rwk.qty > 1 ? " ×" + rwk.qty : ""), m: String(+rwk.multiplier).replace(/\.0+$/, "") })) + "</div>"); RW.refresh(); }
+        showScan("scanDone"); $("#rDone").onclick = () => { showScan("scanIdle"); setSplitIntent(false); };
+        // f47: "Split with friends" was tapped on the receipt: straight to the people picker (A), the QR comes next
+        if (splitAfter) { splitAfter = false; const rno = $("#rNo").value.trim() || (rd.table ? t("table").replace(/\s*[（(].*$/, "") + " " + rd.table : ""); if (r.status === "approved" && window.RORU_SPLIT) setTimeout(() => RORU_SPLIT.start({ id: r.id, points: r.points, total_hkd: total, receipt_no: rno }), 450); else if (r.status !== "approved" && window.RORU_SPLIT) R.toast(RORU_SPLIT.tx("e_split_wait_approval"), 4500); }
+        if (gr && r.status === "approved") setTimeout(() => goldSheet(gr), 400);
+        // f31: the server checked this receipt for a Roru Day scratch card; if it earned one, say so right here
+        if (r.status === "approved" && window.RORU_SC && RORU_SC.afterReceipt) RORU_SC.afterReceipt(r.id).then(c => { if (c && c.state === "new" && !$("#scanDone").classList.contains("hide")) RORU_SC.scanWin($("#scanDone"), c); });
+        if (r.status === "approved") { R.burst(g ? ["#E8B84A", "#F3D27A", "#F6F3E7"] : undefined); R.toast((g ? "✨⁠ " + t("gold_hit") + " " : "") + t("added_points", { n: r.points }) + (r.visit && r.visit.referral_bonus ? " · 👯 +" + r.visit.referral_bonus : "") + (r.visit && r.visit.visit2_bonus ? " · 🎉 " + t("visit2_got", { n: r.visit.visit2_bonus }) : ""), 3500); state.lastPoints = r.member.points; state.lastStamps = r.member.visits_total; }
+      }
+      render();
+    } catch (e) { splitAfter = false; $("#rErr").textContent = R.errText(e); $("#rErr").classList.remove("hide"); }
+    $("#rSubmit").disabled = false;
+  };
+
+  function setupScratch(el, id) {
+    const c = el.querySelector("canvas"), ctx = c.getContext("2d");
+    const size = () => { const r = el.getBoundingClientRect(); c.width = r.width * devicePixelRatio; c.height = r.height * devicePixelRatio; paint(); };
+    const paint = () => { ctx.fillStyle = "#1d2a1c"; ctx.fillRect(0, 0, c.width, c.height); for (let i = 0; i < 700; i++) { ctx.fillStyle = "rgba(" + (10 + Math.random() * 30) + "," + (30 + Math.random() * 40) + "," + (15 + Math.random() * 25) + ",.6)"; ctx.fillRect(Math.random() * c.width, Math.random() * c.height, 4 * devicePixelRatio, 4 * devicePixelRatio); } ctx.fillStyle = "rgba(246,243,231,.85)"; ctx.font = "900 " + (16 * devicePixelRatio) + "px Geist, sans-serif"; ctx.textAlign = "center"; ctx.fillText(t("scratch"), c.width / 2, c.height / 2 + 6 * devicePixelRatio); };
+    let down = false, cleared = 0, done = false;
+    const pt = (e) => { const r = c.getBoundingClientRect(); const p = e.touches ? e.touches[0] : e; return [(p.clientX - r.left) * devicePixelRatio, (p.clientY - r.top) * devicePixelRatio]; };
+    const scratch = (e) => { if (!down || done) return; e.preventDefault(); el.dataset.touched = "1"; const [x, y] = pt(e); ctx.globalCompositeOperation = "destination-out"; ctx.beginPath(); ctx.arc(x, y, 26 * devicePixelRatio, 0, Math.PI * 2); ctx.fill(); ctx.globalCompositeOperation = "source-over"; if (++cleared % 12 === 0) check(); };
+    const check = () => { const d = ctx.getImageData(0, 0, c.width, c.height).data; let clear = 0; for (let i = 3; i < d.length; i += 16 * 4) if (d[i] === 0) clear++; if (clear / (d.length / 64) > 0.45) reveal(); };
+    const reveal = async () => { if (done) return; done = true; c.style.transition = "opacity .5s"; c.style.opacity = 0; R.burst(); try { state.me = await R.rpc("family_reveal", { p_token: state.token, p_redemption_id: id }); setTimeout(render, 900); } catch (e) { R.toast(R.errText(e)); } };
+    c.addEventListener("pointerdown", e => { down = true; scratch(e); }); c.addEventListener("pointermove", scratch); window.addEventListener("pointerup", () => down = false);
+    c.addEventListener("touchstart", e => { down = true; scratch(e); }, { passive: false }); c.addEventListener("touchmove", scratch, { passive: false }); c.addEventListener("touchend", () => down = false);
+    size();
+  }
+  const resetSignin = () => { $("#step1").classList.remove("hide"); $("#step2").classList.add("hide"); $("#signin").classList.remove("otp-on"); otpReset(false); };
+  $("#signout").onclick = async () => { try { await R.rpc("family_signout", { p_token: state.token }); } catch (e) {} localStorage.removeItem("roru_member_token"); state.token = null; state.me = null; state.lastPoints = null; resetSignin(); render(); };
+  $("#delete").onclick = async () => { if (!(await deleteSheet())) return; let dr = null; try { dr = await R.rpc("family_delete_me", { p_token: state.token }); } catch (e) { R.toast(R.errText(e)); return; } localStorage.removeItem("roru_member_token"); state.token = null; state.me = null; resetSignin(); render(); R.toast(t("deleted_rejoin", { d: dr && dr.rejoin_after ? R.fmtDay(dr.rejoin_after) : "" }), 4000); };
+  document.addEventListener("roru:lang", render);
+  render(); await load();
+  // f47: guest-first split (A: QR at the table, B: WhatsApp link from History) and the friend's link page (loyalty/split.js)
+  if (window.RORU_SPLIT) {
+    const sxLabels = () => { $("#rSplit").textContent = RORU_SPLIT.tx("split_btn"); $("#rOnce").textContent = RORU_SPLIT.tx("once"); };
+    sxLabels(); document.addEventListener("roru:lang", sxLabels);
+    document.addEventListener("roru:member", (e) => { if (e.detail && state.token) { state.me = e.detail; state.lastPoints = e.detail.points; render(); } });
+    document.addEventListener("roru:splits", () => { if (state.me) renderHistory(state.me, R.lang() === "zh"); });
+    document.addEventListener("roru:open-card", () => { if (state.token) { load(true); setTab("card", true); window.scrollTo(0, 0); } });
+    RORU_SPLIT.boot(state.me);
+  }
+  // live refresh so the plate animates when staff add a roll
+  setInterval(() => { if (document.visibilityState === "visible" && state.token && $("#scanForm").classList.contains("hide")) load(true); }, 10000);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") load(true); });
+})();
+</script>
+</body>
+</html>
