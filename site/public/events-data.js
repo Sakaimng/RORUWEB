@@ -10,6 +10,11 @@ export default [{"title": "Delia x Rorubaru", "date": "April 2026", "images": ["
 // Trick or Temaki × Six Pack Chef, Sat 31 Oct 2026: facts from our own poster and @rorubaru IG post DetRWGfO_dn (20 Oct: Wallace Wong + Joey Chan, from 6pm, one night only); "sold out" from Dominic, 30 Oct; gone after 23:59 HK on 31 Oct.
 // "seatings" (optional): one line each under "seatingsLabel". "barTime" (optional): shorter time/place for the banner.
 // Every English line here has its zh / ja line in i18n-dict.js.
+// RORU × POOL – Four Hands Dinner, Sat 28 Nov 2026: facts from our own Tock listing (event 630785) and Dominic (Nov 11:
+// HK$688 + 10% service; Tock takes a 50% deposit, HK$344 + HK$18 booking fee). Seatings are Tock's slots.
+// The second seating is not confirmed yet: change it here only (its zh/ja line in i18n-dict.js is optional; without one it shows as written).
+const POOL_SECOND_SEATING = "8:30pm";
+
 export const upcoming = [{
   id: "celosa-2026-10-15",
   title: "RORUBARU × Celosa Rosé Tequila",
@@ -52,4 +57,19 @@ export const upcoming = [{
   bar: false,
   image: "events/trick-or-temaki/01.jpg",
   poster: "events/trick-or-temaki/poster.jpg"
+}, {
+  id: "roru-x-pool-2026-11-28",
+  title: "RORU × POOL – Four Hands Dinner",
+  date: "2026-11-28",
+  day: "Sat 28 Nov",
+  time: "from 6pm",
+  kind: "One night only",
+  where: "At RORUBARU, G/F, 100–102 Queen’s Road East, Wan Chai",
+  text: "Chef Soon (formerly of Hangsikgoo, the chef behind Pool in Seoul) joins Chef Joey Chan for a one-off menu bringing together Japan and Korea, with Taiko Sake pouring throughout the evening. The chefs wear custom Washi aprons made for the night, and a limited run of 50 tote bags is on sale.",
+  seatingsLabel: "Two seatings",
+  seatings: ["6:00pm", POOL_SECOND_SEATING],
+  book: "https://www.exploretock.com/roru-baru/event/630785/roru-x-pool-four-hands-dinner",
+  booking: "HK$688 per person + 10% service charge. Book with a 50% deposit on Tock (HK$344 + HK$18 booking fee); the balance and service charge are paid on the night.",
+  image: "events/roru-x-pool/01.webp",
+  poster: "events/roru-x-pool/banner.webp"
 }];

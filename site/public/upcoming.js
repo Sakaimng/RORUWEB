@@ -3,7 +3,7 @@
 // "Tonight" on its day(s), "Tomorrow" the day before, otherwise the date; gone after 23:59 local on its last day
 // (ev.until, else ev.end, else ev.date). Test any day with ?seasondate=YYYY-MM-DD.
 // Booking = the site's own Book link (read from the header), or the event's own link, or none yet (ev.book === false).
-import { upcoming } from './events-data.js?v=ev3';
+import { upcoming } from './events-data.js?v=ev4';
 
 // × hides the banner for this page view only: every load/refresh shows it again.
 const LS = 'roru-evbar-x'; // old "dismissed forever" key: cleared, no longer read

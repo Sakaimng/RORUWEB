@@ -3,6 +3,15 @@
 // zh dish names are his own (menu.json nameZh); the rest is ours. ui.js swaps text nodes by these.
 export default {
 "zh": {
+// RORU × POOL – Four Hands Dinner, Sat 28 Nov 2026 (Events panel card + banner, gone after 28 Nov HK)
+"Sat 28 Nov": "11月28日（六）",
+"One night only": "一晚限定",
+"At RORUBARU, G/F, 100–102 Queen’s Road East, Wan Chai": "RORUBARU，灣仔皇后大道東 100–102 號地下",
+"Chef Soon (formerly of Hangsikgoo, the chef behind Pool in Seoul) joins Chef Joey Chan for a one-off menu bringing together Japan and Korea, with Taiko Sake pouring throughout the evening. The chefs wear custom Washi aprons made for the night, and a limited run of 50 tote bags is on sale.": "前 Hangsikgoo 主廚、首爾 Pool 主理人 Soon 主廚，同 Joey Chan 主廚聯手炮製一晚限定菜單，融合日本同韓國風味，Taiko Sake 全晚供應。兩位主廚會穿上為今晚特製嘅 Washi 圍裙，現場仲有限量 50 個 tote bag 發售。",
+"Two seatings": "兩輪入座",
+"6:00pm": "晚上6:00",
+"8:30pm": "晚上8:30",
+"HK$688 per person + 10% service charge. Book with a 50% deposit on Tock (HK$344 + HK$18 booking fee); the balance and service charge are paid on the night.": "每位 HK$688，另加一服務費。經 Tock 預付 50% 訂金（HK$344 + HK$18 預約手續費）即可訂位，餘額及服務費當晚結算。",
 // Trick or Temaki × Six Pack Chef, Sat 31 Oct 2026 (Events panel card, gone after 31 Oct HK)
 "Sat 31 Oct": "10月31日（六）",
 "Halloween hand roll night · Sold out": "萬聖節手卷之夜 · 已滿座",
@@ -277,6 +286,15 @@ export default {
 "Book": "預約"
 },
 "ja": {
+// RORU × POOL – Four Hands Dinner, Sat 28 Nov 2026 (Events panel card + banner, gone after 28 Nov HK)
+"Sat 28 Nov": "11月28日（土）",
+"One night only": "一夜限り",
+"At RORUBARU, G/F, 100–102 Queen’s Road East, Wan Chai": "RORUBARU（ワンチャイ、クイーンズロード・イースト 100–102 1階）",
+"Chef Soon (formerly of Hangsikgoo, the chef behind Pool in Seoul) joins Chef Joey Chan for a one-off menu bringing together Japan and Korea, with Taiko Sake pouring throughout the evening. The chefs wear custom Washi aprons made for the night, and a limited run of 50 tote bags is on sale.": "Hangsikgoo 出身、ソウル「Pool」のスンシェフがジョーイ・チャンシェフと共演。日本と韓国の味を合わせた一夜限りの特別メニューに、Taiko Sake を一晩中ご用意します。シェフはこの夜のための特製 Washi エプロンを着用。限定50個のトートバッグも当日販売します。",
+"Two seatings": "2部制",
+"6:00pm": "18:00",
+"8:30pm": "20:30",
+"HK$688 per person + 10% service charge. Book with a 50% deposit on Tock (HK$344 + HK$18 booking fee); the balance and service charge are paid on the night.": "お一人様 HK$688（別途サービス料10%）。Tock で50%のデポジット（HK$344＋予約手数料 HK$18）をお支払いいただくとご予約完了です。残額とサービス料は当日お支払いください。",
 // Trick or Temaki × Six Pack Chef, Sat 31 Oct 2026 (Events panel card, gone after 31 Oct HK)
 "Sat 31 Oct": "10月31日（土）",
 "Halloween hand roll night · Sold out": "ハロウィン手巻きナイト · 満席",
