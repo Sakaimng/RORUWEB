@@ -248,3 +248,5 @@ body.lt .otpg-new { background: rgba(0, 0, 0, .06); border-color: rgba(0, 0, 0, 
 .otpg-paste:active { transform: scale(.98); background: #efe9d6; }
 .otpg-paste.hide { display: none; }
 .otpg[data-state="merge"] .otpg-paste, .otpg[data-state="verified"] .otpg-paste, .otpg.locked .otpg-paste { opacity: .45; pointer-events: none; }
+/* Nov 12 2026: Join looks disabled until name, birthday and terms are filled; a tap anyway shows what is missing (family/index.html joinPaint). */
+#btnJoin.is-off { opacity: .45; cursor: default; }

@@ -14,12 +14,12 @@
 <link rel="stylesheet" href="/loyalty/scratch.css?v=f55">
 <link rel="stylesheet" href="/loyalty/split.css?v=f55">
 <link rel="stylesheet" href="/loyalty/kama.css?v=f55">
-<link rel="stylesheet" href="/loyalty/otp.css?v=n12c">
+<link rel="stylesheet" href="/loyalty/otp.css?v=l4">
 <link rel="stylesheet" href="/loyalty/calm.css?v=n12c">
 <link rel="stylesheet" href="/loyalty/seasonal.css?v=s4">
 <script defer src="/loyalty/seasonal.js?v=s4" data-season-buttons=".btn:not(.ghost)" data-season-full=".btn:not(.ghost):not(.sm)" data-season-wash="off" data-season-pad="on"></script>
 <script src="/loyalty/vendor/qrcode.js"></script>
-<script src="/loyalty/loyalty.js?v=l3"></script>
+<script src="/loyalty/loyalty.js?v=l4"></script>
 <script src="/loyalty/split.js?v=f55"></script>
 <script src="/loyalty/passport.js?v=f55"></script>
 <script src="/loyalty/scratch.js?v=f55"></script>
@@ -73,8 +73,8 @@
         <div id="joinBox" class="hide">
           <h2 class="otpg-jh" data-f="otp_join_h"></h2>
           <p class="small muted" data-f="otp_join_s"></p>
-          <label class="field" id="nameField"><span data-t="name"></span><input id="name" type="text" autocomplete="given-name" data-tp="name_ph"></label>
-          <label class="field" id="bdayField"><span data-t="bday_opt"></span><div class="row" style="gap:8px"><select id="bdM" class="sel"></select><select id="bdD" class="sel"></select></div></label>
+          <label class="field" id="nameField"><span><span data-t="name" style="display:inline"></span> <span class="req" style="display:inline;color:var(--orange);font-weight:900;margin:0">*</span></span><input id="name" type="text" maxlength="30" autocomplete="given-name" data-tp="name_ph" required aria-required="true"></label>
+          <label class="field" id="bdayField"><span><span data-t="bday_opt" style="display:inline"></span> <span class="req" style="display:inline;color:var(--orange);font-weight:900;margin:0">*</span></span><div class="row" style="gap:8px"><select id="bdM" class="sel" required aria-required="true"></select><select id="bdD" class="sel" required aria-required="true"></select></div></label>
           <label class="check" id="consentRow"><input type="checkbox" id="consent"><span><span data-t="terms_agree_a"></span> <a href="/family/terms/" target="_blank" data-t="terms_link"></a> <span data-t="and"></span> <a href="/family/privacy/" target="_blank" data-t="privacy_link"></a> <span class="req">*</span></span></label>
           <div class="optbox">
             <div class="tiny" style="margin:0 0 6px" data-t="optional_title"></div>
@@ -266,6 +266,7 @@
     </div>
     <div data-tab="me" class="card" id="meProfile">
       <h2 style="margin-top:0" data-t="me_profile"></h2>
+      <p class="small hide" id="meMissing" data-f="me_missing" style="margin:-4px 0 6px;color:var(--orange)"></p>
       <label class="field"><span data-t="me_name"></span><div class="row" style="gap:8px"><input id="meName" type="text" maxlength="30" autocomplete="given-name" data-tp="me_name_ph" style="flex:1;min-width:0"><button class="btn sm" id="meNameSave" type="button" data-t="save" style="width:auto"></button></div></label>
       <div class="field"><span data-t="me_bday"></span><div id="meBday"></div></div>
     </div>
@@ -468,7 +469,7 @@
     try { applyF(); } catch (x) {}
     otpCard.style.minHeight = ""; if (typeof otpUnmergeNow === "function") otpUnmergeNow();
     otp.busy = false; otp.ok = false; otp.locked = false; codeEl.value = ""; codeEl.disabled = false; otpState("idle"); otpMsg(""); otpLockUI(false);
-    $("#joinBox").classList.add("hide"); $("#err2").classList.add("hide"); $("#consent").checked = false; $("#btnJoin").disabled = true;
+    $("#joinBox").classList.add("hide"); $("#err2").classList.add("hide"); $("#consent").checked = false; joinPaint();
     otpPaint(); if (keepFocus) setTimeout(() => codeEl.focus(), 60);
   }
   // f54: the reel's success sequence, in place. 6th digit -> digits blur out and the six boxes slide into one tilted tile (~300 ms,
@@ -547,7 +548,7 @@
       otp.ok = true; otpHold(); codeEl.blur(); otpPaint(); otpMsg("");
       otpVerified();
       if (!err) { setTimeout(async () => { await signedIn(r, false); otpReset(false); }, 1900); return; }
-      setTimeout(() => { otpCard.style.minHeight = ""; otpUnmergeNow(); otpState("okmini"); $("#joinBox").classList.remove("hide"); $("#btnJoin").disabled = !$("#consent").checked; setTimeout(() => { $("#joinBox").scrollIntoView({ behavior: "smooth", block: "start" }); $("#name").focus({ preventScroll: true }); }, 380); }, 1900);
+      setTimeout(() => { otpCard.style.minHeight = ""; otpUnmergeNow(); otpState("okmini"); $("#joinBox").classList.remove("hide"); joinPaint(); setTimeout(() => { $("#joinBox").scrollIntoView({ behavior: "smooth", block: "start" }); $("#name").focus({ preventScroll: true }); }, 380); }, 1900);
       return;
     }
     await otpMergeOut();
@@ -605,10 +606,22 @@
   }
   $("#resend").onclick = otpResend;
   $("#otpNew").onclick = otpResend;
+  // Nov 12 2026 (Dominic 18:03 "all the information are non-negotiable"): name + birthday are required to join, like the terms box.
+  // The button looks disabled (aria-disabled) until all three are filled; a tap anyway shows what is missing, inline. Marketing ticks stay optional (PDPO).
+  // Only NEW joins see this box; returning members sign in on the 6th digit and are never blocked (family_verify_code checks new joins only).
+  function joinMd() { return ($("#bdM").value && $("#bdD").value) ? $("#bdM").value + "-" + $("#bdD").value : null; }
+  function joinMissing() { const m = []; if (!$("#name").value.trim()) m.push("join_need_name"); if (!joinMd()) m.push("join_need_bday"); if (!$("#consent").checked) m.push("join_need_terms"); return m; }
+  var joinBusy = false;
+  function joinPaint() { const b = $("#btnJoin"), off = joinMissing().length > 0; b.disabled = joinBusy; b.classList.toggle("is-off", off); b.setAttribute("aria-disabled", off || joinBusy ? "true" : "false");
+    const e = $("#err2"); if (e.dataset.need) { if (off) e.textContent = joinMissing().map(k => tt(k)).join(" "); else { e.classList.add("hide"); delete e.dataset.need; } } }
+  function joinShowMissing(m) { const e = $("#err2"); e.textContent = m.map(k => tt(k)).join(" "); e.dataset.need = "1"; e.classList.remove("hide");
+    const first = m[0] === "join_need_name" ? $("#name") : m[0] === "join_need_bday" ? (!$("#bdM").value ? $("#bdM") : $("#bdD")) : $("#consent"); try { first.focus({ preventScroll: true }); } catch (x) {} }
   $("#btnJoin").onclick = async () => {
-    $("#err2").classList.add("hide"); $("#btnJoin").disabled = true;
+    if (joinBusy) return;
+    const miss = joinMissing(); if (miss.length) { joinShowMissing(miss); return; }
+    $("#err2").classList.add("hide"); delete $("#err2").dataset.need; joinBusy = true; joinPaint();
     try {
-      const r = await R.rpc("family_verify_code", { p_phone: state.phone, p_code: codeEl.value.trim(), p_consent: $("#consent").checked, p_name: $("#name").value, p_lang: R.lang(), p_device: deviceId() });
+      const r = await R.rpc("family_verify_code", { p_phone: state.phone, p_code: codeEl.value.trim(), p_consent: $("#consent").checked, p_name: $("#name").value.trim(), p_lang: R.lang(), p_device: deviceId(), p_bday: joinMd() });
       const e2 = rpcErr(r); if (e2) throw e2;
       await signedIn(r, true); otpReset(false);
     } catch (e) {
@@ -616,9 +629,10 @@
       if (e.code === "code_expired" || e.code === "too_many_attempts") { otpReset(false); $("#otpG").scrollIntoView({ behavior: "smooth", block: "center" }); otpLock(otpErrT(e)); }
       else if (e.code === "wrong_code") { otpReset(true); $("#otpG").scrollIntoView({ behavior: "smooth", block: "center" }); otpMsg(otpErrT(e), true); }
     }
-    $("#btnJoin").disabled = !$("#consent").checked;
+    joinBusy = false; joinPaint();
   };
-  $("#consent").addEventListener("change", () => { $("#btnJoin").disabled = !$("#consent").checked; });
+  ["#consent", "#bdM", "#bdD"].forEach(s => $(s).addEventListener("change", joinPaint));
+  $("#name").addEventListener("input", joinPaint);
 
   // ----- member -----
   let lastTouch = 0; ["pointerdown", "touchstart", "keydown"].forEach(ev => document.addEventListener(ev, () => { lastTouch = Date.now(); }, { capture: true, passive: true }));
@@ -1108,6 +1122,7 @@
   }
   function renderMe(me, zh) {
     const inp = $("#meName"); if (document.activeElement !== inp) inp.value = goodName(me.name);
+    { const mm = $("#meMissing"); if (mm) mm.classList.toggle("hide", !!(goodName(me.name) && (me.birthday || {}).md)); }
     const bd = me.birthday || {}, box = $("#meBday");
     if (bd.md) { if (!box.dataset.md || box.dataset.md !== bd.md + R.lang()) { box.dataset.md = bd.md + R.lang(); box.innerHTML = '<div style="font-size:17px;font-weight:700">🎂 ' + esc(mdText(bd.md)) + ' 🔒</div><p class="tiny" style="margin:4px 0 0">' + esc(t("me_bday_lock")) + "</p>"; } }
     else if (!$("#meBdM")) { box.dataset.md = ""; box.innerHTML = '<div class="row" style="gap:8px"><select id="meBdM" class="sel"></select><select id="meBdD" class="sel"></select><button class="btn sm" id="meBdSave" type="button" style="width:auto">' + esc(t("save")) + '</button></div><p class="tiny" style="margin:4px 0 0">' + esc(t("me_bday_once")) + " " + esc(t("me_bday_lock")) + "</p>";
@@ -1169,7 +1184,7 @@
 
   // ===================== f38: new layout helpers (strings, Card banner, visit row, history, sheets, theme) =====================
   const F = {
-    en: { otp_paste: "Paste code", otp_paste_hint: "Copy the code in WhatsApp, then tap Paste", otp_rs_in: "Resend in {s}s", otp_new_in: "Send a new code in {s}s", otp_max: "Still nothing? Check WhatsApp is set up on this number, or ask our staff at the counter.", otp_err: "Couldn't send the code. Try again in a moment.", otp_t: "Let's verify your number", otp_s: "We've sent a 6-digit code to your WhatsApp. Enter the code from WhatsApp and it'll verify on its own.", otp_none: "Nothing on WhatsApp?", otp_rs: "Resend code", otp_checking: "Checking…", otp_ok_t: "Verified successfully", otp_ok_s: "Your phone number has been verified", otp_resent: "New code sent to your WhatsApp", otp_wrong_n: "Wrong code · {n} tries left", otp_wrong_1: "Wrong code · 1 try left", otp_locked: "Too many wrong tries. Send a new code to try again.", otp_new: "Send a new code", otp_many_codes: "Too many codes for this number. Try again in an hour.", otp_busy: "Lots of codes going out right now. Try Resend again in a minute.", otp_demo: "Demo code:", otp_join_h: "Almost there", otp_join_s: "Add your name and tick the box to create your account.", ready_h: "Ready to use", ready_empty: "Nothing ready yet. Codes you unlock and scratch-card prizes show up here.", ladder_h: "Use your $RORU", level_h: "Your level", earn_h: "Ways to earn more", rs_redeem: "Redeem", rs_level: "Level", rs_perks: "Perks", rs_earn: "Earn", rs_label: "Rewards sections",
+    en: { otp_paste: "Paste code", otp_paste_hint: "Copy the code in WhatsApp, then tap Paste", otp_rs_in: "Resend in {s}s", otp_new_in: "Send a new code in {s}s", otp_max: "Still nothing? Check WhatsApp is set up on this number, or ask our staff at the counter.", otp_err: "Couldn't send the code. Try again in a moment.", otp_t: "Let's verify your number", otp_s: "We've sent a 6-digit code to your WhatsApp. Enter the code from WhatsApp and it'll verify on its own.", otp_none: "Nothing on WhatsApp?", otp_rs: "Resend code", otp_checking: "Checking…", otp_ok_t: "Verified successfully", otp_ok_s: "Your phone number has been verified", otp_resent: "New code sent to your WhatsApp", otp_wrong_n: "Wrong code · {n} tries left", otp_wrong_1: "Wrong code · 1 try left", otp_locked: "Too many wrong tries. Send a new code to try again.", otp_new: "Send a new code", otp_many_codes: "Too many codes for this number. Try again in an hour.", otp_busy: "Lots of codes going out right now. Try Resend again in a minute.", otp_demo: "Demo code:", otp_join_h: "Almost there", otp_join_s: "Add your name and birthday, then tick the box to create your account.", join_need_name: "Please add your name.", join_need_bday: "Please pick your birthday month and day.", join_need_terms: "Please tick the box to agree to the Terms and Privacy Policy.", me_missing: "Add your name and birthday below to complete your card.", ready_h: "Ready to use", ready_empty: "Nothing ready yet. Codes you unlock and scratch-card prizes show up here.", ladder_h: "Use your $RORU", level_h: "Your level", earn_h: "Ways to earn more", rs_redeem: "Redeem", rs_level: "Level", rs_perks: "Perks", rs_earn: "Earn", rs_label: "Rewards sections",
       qr_h: "My QR", qr_sub: "Show it at the counter", counter_btn: "Show at counter", hist_h: "History", hist_all: "See all ({n})", hist_less: "Show less",
       set_h: "Settings", set_lang: "Language", set_theme: "Theme", th_dark: "Dark", th_light: "Light", help_h: "Help", rules_btn: "Rules & FAQ", close: "Close",
       perks_more: "See every level's perks", perks_less: "Only my level", v_k: "Visits", v_more: "{n} more → {r}", v_soon: "1 more → {r}", v_ready: "{r} unlocked! It's in Rewards",
@@ -1181,7 +1196,7 @@
       e_days: "Mon–Wed specials", e_friend: "Bring a friend", e_friend_t: "You both get +{n} when their first receipt of {m}+ is approved. Come back within {d} days for +{v} more.",
       e_friend_t0: "You both get +{n} when their first receipt of {m}+ is approved.", e_go_me: "Your link", e_go_pp: "Open", v2_line: "🎉 Come back within {d} days: +{v} more $RORU.",
       info_ladder: "How $RORU works", split_req_h: "Split requests", hist_split: "Split {n} ways", hist_you: "You", hist_tap: "Details", hist_none: "No receipts yet. Tap Scan to add one.", rules_h: "Rules & FAQ" },
-    zh: { otp_paste: "貼上驗證碼", otp_paste_hint: "喺 WhatsApp 複製驗證碼，再撳「貼上驗證碼」", otp_rs_in: "{s} 秒後可以重新發送", otp_new_in: "{s} 秒後可以傳送新驗證碼", otp_max: "仲係收唔到？請確認呢個號碼有用 WhatsApp，或者搵櫃檯店員幫手。", otp_err: "傳送唔到驗證碼，請稍後再試。", otp_t: "驗證你嘅電話號碼", otp_s: "6 位驗證碼已經傳咗去你嘅 WhatsApp。輸入 WhatsApp 收到嘅驗證碼，會自動驗證。", otp_none: "WhatsApp 收唔到？", otp_rs: "重新發送驗證碼", otp_checking: "驗證緊…", otp_ok_t: "驗證成功", otp_ok_s: "你嘅電話號碼已經驗證", otp_resent: "新驗證碼已經傳咗去你嘅 WhatsApp", otp_wrong_n: "驗證碼唔啱 · 仲可以試 {n} 次", otp_wrong_1: "驗證碼唔啱 · 仲可以試 1 次", otp_locked: "錯太多次。請傳送新驗證碼再試。", otp_new: "傳送新驗證碼", otp_many_codes: "呢個號碼要求咗太多驗證碼，請一個鐘後再試。", otp_busy: "而家好多人攞緊驗證碼，請等一分鐘再撳重新發送。", otp_demo: "示範驗證碼：", otp_join_h: "差少少就得", otp_join_s: "填你嘅名，再剔同意，就可以開戶口。", ready_h: "可以用", ready_empty: "暫時未有。解鎖咗嘅換領碼同刮刮卡獎品會喺度出現。", ladder_h: "用 RORU幣換", level_h: "你嘅等級", earn_h: "賺多啲", rs_redeem: "兌換", rs_level: "等級", rs_perks: "禮遇", rs_earn: "賺取", rs_label: "獎賞分頁",
+    zh: { otp_paste: "貼上驗證碼", otp_paste_hint: "喺 WhatsApp 複製驗證碼，再撳「貼上驗證碼」", otp_rs_in: "{s} 秒後可以重新發送", otp_new_in: "{s} 秒後可以傳送新驗證碼", otp_max: "仲係收唔到？請確認呢個號碼有用 WhatsApp，或者搵櫃檯店員幫手。", otp_err: "傳送唔到驗證碼，請稍後再試。", otp_t: "驗證你嘅電話號碼", otp_s: "6 位驗證碼已經傳咗去你嘅 WhatsApp。輸入 WhatsApp 收到嘅驗證碼，會自動驗證。", otp_none: "WhatsApp 收唔到？", otp_rs: "重新發送驗證碼", otp_checking: "驗證緊…", otp_ok_t: "驗證成功", otp_ok_s: "你嘅電話號碼已經驗證", otp_resent: "新驗證碼已經傳咗去你嘅 WhatsApp", otp_wrong_n: "驗證碼唔啱 · 仲可以試 {n} 次", otp_wrong_1: "驗證碼唔啱 · 仲可以試 1 次", otp_locked: "錯太多次。請傳送新驗證碼再試。", otp_new: "傳送新驗證碼", otp_many_codes: "呢個號碼要求咗太多驗證碼，請一個鐘後再試。", otp_busy: "而家好多人攞緊驗證碼，請等一分鐘再撳重新發送。", otp_demo: "示範驗證碼：", otp_join_h: "差少少就得", otp_join_s: "填你嘅名同生日，再剔同意，就可以開戶口。", join_need_name: "請填寫你的名字。", join_need_bday: "請選擇你的生日月份及日子。", join_need_terms: "請剔選同意條款及細則和私隱政策。", me_missing: "喺下面填寫你的名字同生日，完成你的會員卡。", ready_h: "可以用", ready_empty: "暫時未有。解鎖咗嘅換領碼同刮刮卡獎品會喺度出現。", ladder_h: "用 RORU幣換", level_h: "你嘅等級", earn_h: "賺多啲", rs_redeem: "兌換", rs_level: "等級", rs_perks: "禮遇", rs_earn: "賺取", rs_label: "獎賞分頁",
       qr_h: "我嘅 QR", qr_sub: "喺櫃檯俾店員掃", counter_btn: "櫃檯出示", hist_h: "紀錄", hist_all: "睇晒全部（{n}）", hist_less: "收起",
       set_h: "設定", set_lang: "語言", set_theme: "外觀", th_dark: "深色", th_light: "淺色", help_h: "幫助", rules_btn: "規則同常見問題", close: "關閉",
       perks_more: "睇晒每個等級嘅著數", perks_less: "只睇我嘅等級", v_k: "到訪", v_more: "再 {n} 次 → {r}", v_soon: "再 1 次 → {r}", v_ready: "{r} 已解鎖！喺「獎賞」度",
@@ -1193,7 +1208,7 @@
       e_days: "星期一至三特別優惠", e_friend: "帶朋友嚟", e_friend_t: "朋友第一張 {m} 或以上嘅收據批核後，你哋各自 +{n}。佢 {d} 日內再嚟，再多 +{v}。",
       e_friend_t0: "朋友第一張 {m} 或以上嘅收據批核後，你哋各自 +{n}。", e_go_me: "你嘅連結", e_go_pp: "打開", v2_line: "🎉 {d} 日內再嚟：再多 +{v} RORU幣。",
       info_ladder: "RORU幣點運作", split_req_h: "分單邀請", hist_split: "{n} 人分單", hist_you: "你", hist_tap: "詳情", hist_none: "未有收據。㩒「掃描」加一張啦。", rules_h: "規則同常見問題" },
-    zhs: { otp_paste: "粘贴验证码", otp_paste_hint: "在 WhatsApp 复制验证码，再点“粘贴验证码”", otp_rs_in: "{s} 秒后可重新发送", otp_new_in: "{s} 秒后可发送新验证码", otp_max: "还是没收到？请确认这个号码已开通 WhatsApp，或请柜台店员帮忙。", otp_err: "无法发送验证码，请稍后再试。", otp_t: "验证你的手机号码", otp_s: "6 位验证码已发送到你的 WhatsApp。输入 WhatsApp 收到的验证码，会自动验证。", otp_none: "WhatsApp 没收到？", otp_rs: "重新发送验证码", otp_checking: "验证中…", otp_ok_t: "验证成功", otp_ok_s: "你的手机号码已验证", otp_resent: "新验证码已发送到你的 WhatsApp", otp_wrong_n: "验证码不对 · 还可以试 {n} 次", otp_wrong_1: "验证码不对 · 还可以试 1 次", otp_locked: "错误次数太多。请发送新验证码再试。", otp_new: "发送新验证码", otp_many_codes: "这个号码请求了太多验证码，请一小时后再试。", otp_busy: "现在请求验证码的人很多，请等一分钟再点重新发送。", otp_demo: "示范验证码：", otp_join_h: "就差一步", otp_join_s: "填写你的名字并勾选同意，即可创建账户。", ready_h: "可以使用", ready_empty: "暂时还没有。解锁的兑换码和刮刮卡奖品会显示在这里。", ladder_h: "用 RORU币兑换", level_h: "你的等级", earn_h: "赚更多", rs_redeem: "兑换", rs_level: "等级", rs_perks: "礼遇", rs_earn: "赚取", rs_label: "奖赏分页",
+    zhs: { otp_paste: "粘贴验证码", otp_paste_hint: "在 WhatsApp 复制验证码，再点“粘贴验证码”", otp_rs_in: "{s} 秒后可重新发送", otp_new_in: "{s} 秒后可发送新验证码", otp_max: "还是没收到？请确认这个号码已开通 WhatsApp，或请柜台店员帮忙。", otp_err: "无法发送验证码，请稍后再试。", otp_t: "验证你的手机号码", otp_s: "6 位验证码已发送到你的 WhatsApp。输入 WhatsApp 收到的验证码，会自动验证。", otp_none: "WhatsApp 没收到？", otp_rs: "重新发送验证码", otp_checking: "验证中…", otp_ok_t: "验证成功", otp_ok_s: "你的手机号码已验证", otp_resent: "新验证码已发送到你的 WhatsApp", otp_wrong_n: "验证码不对 · 还可以试 {n} 次", otp_wrong_1: "验证码不对 · 还可以试 1 次", otp_locked: "错误次数太多。请发送新验证码再试。", otp_new: "发送新验证码", otp_many_codes: "这个号码请求了太多验证码，请一小时后再试。", otp_busy: "现在请求验证码的人很多，请等一分钟再点重新发送。", otp_demo: "示范验证码：", otp_join_h: "就差一步", otp_join_s: "填写你的名字和生日，并勾选同意，即可创建账户。", join_need_name: "请填写你的名字。", join_need_bday: "请选择你的生日月份和日期。", join_need_terms: "请勾选同意条款及细则和隐私政策。", me_missing: "请在下面填写你的名字和生日，完成你的会员卡。", ready_h: "可以使用", ready_empty: "暂时还没有。解锁的兑换码和刮刮卡奖品会显示在这里。", ladder_h: "用 RORU币兑换", level_h: "你的等级", earn_h: "赚更多", rs_redeem: "兑换", rs_level: "等级", rs_perks: "礼遇", rs_earn: "赚取", rs_label: "奖赏分页",
       qr_h: "我的二维码", qr_sub: "在柜台给店员扫", counter_btn: "柜台出示", hist_h: "记录", hist_all: "查看全部（{n}）", hist_less: "收起",
       set_h: "设置", set_lang: "语言", set_theme: "外观", th_dark: "深色", th_light: "浅色", help_h: "帮助", rules_btn: "规则和常见问题", close: "关闭",
       perks_more: "查看每个等级的优惠", perks_less: "只看我的等级", v_k: "到访", v_more: "再 {n} 次 → {r}", v_soon: "再 1 次 → {r}", v_ready: "{r} 已解锁！在“奖赏”里",
