@@ -1,0 +1,231 @@
+/* RORUBARU seasonal themes v1. Every rule is scoped to body.season-* or .ssn-* elements,
+   so with no active season this file changes nothing. */
+
+/* ---------- shared ---------- */
+.season-on .ssn-b{transition:background .3s,box-shadow .3s,transform .2s,color .3s}
+.season-on .ssn-full{position:relative;overflow:visible;isolation:isolate}
+.ssn-art,.ssn-cap,.ssn-drips{pointer-events:none}
+.ssn-art{position:absolute;inset:0;border-radius:inherit;overflow:hidden;z-index:-1}
+.season-on .ssn-full>*:not(.ssn-art):not(.ssn-cap):not(.ssn-drips){position:relative;z-index:1}
+
+/* hanging decoration under the top bar */
+.ssn-hang{position:fixed;top:var(--top,0px);right:74px;z-index:29;width:34px;pointer-events:none;transform-origin:50% 0;animation:ssn-sway 4.6s ease-in-out infinite}
+.ssn-thread{display:block;width:2px;height:22px;margin:0 auto;background:linear-gradient(rgba(140,128,112,.0),rgba(140,128,112,.85))}
+.ssn-ico{display:block;width:34px;height:34px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.45))}
+.ssn-ico svg{width:100%;height:100%;display:block}
+.ssn-emo{display:block;font-size:28px;line-height:34px;text-align:center}
+@keyframes ssn-sway{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+
+/* round season button (in the map controls column); tap toggles effects */
+.ssn-chip{position:relative;width:44px;height:44px;border-radius:50%;background:rgba(16,18,26,.8);border:1px solid var(--ssn-accent,rgba(246,243,231,.3));display:grid;place-items:center;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);cursor:pointer;padding:0;color:inherit}
+.ssn-chip svg{width:26px;height:26px}
+.ssn-chip .ssn-emo{font-size:22px;line-height:26px}
+.ssn-chip[aria-pressed="false"]{opacity:.55}
+.ssn-chip-float{position:fixed;right:12px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:40}
+.ssn-tip{position:absolute;right:52px;top:50%;transform:translateY(-50%);white-space:nowrap;padding:7px 12px;border-radius:999px;background:rgba(11,13,18,.88);border:1px solid var(--ssn-accent,#F54500);color:#F6F3E8;font-size:12px;font-weight:700;letter-spacing:.01em;pointer-events:none;opacity:0;animation:ssn-tip 6s ease .8s 1 both}
+@keyframes ssn-tip{0%{opacity:0;transform:translate(8px,-50%)}8%,85%{opacity:1;transform:translate(0,-50%)}100%{opacity:0;transform:translate(0,-50%)}}
+@media (hover:hover){.ssn-chip:hover .ssn-tip{animation:none;opacity:1}}
+
+/* particles */
+.ssn-fx{position:fixed;inset:0;z-index:19;pointer-events:none;overflow:hidden}
+.season-fx-off .ssn-fx,.season-fx-off .ssn-hang{display:none}
+.ssn-fx i{position:absolute;top:-8%;display:block;width:9px;height:9px;transform:scale(var(--s,1));animation-name:ssn-fall;animation-timing-function:linear;animation-iteration-count:infinite;will-change:transform}
+@keyframes ssn-fall{0%{transform:translate3d(0,0,0) rotate(0) scale(var(--s,1))}100%{transform:translate3d(var(--x,0),115vh,0) rotate(320deg) scale(var(--s,1))}}
+.ssn-fx-snow i{border-radius:50%;background:rgba(255,255,255,.9);box-shadow:0 0 6px rgba(255,255,255,.6)}
+.ssn-fx-snow i svg{width:14px;height:14px;margin:-2px 0 0 -2px;opacity:.9}
+.ssn-fx-snow i:has(svg){background:none;box-shadow:none}
+.ssn-fx-petals i{width:11px;height:8px;border-radius:80% 0 80% 0;background:#f7b6c8;opacity:.9}
+.ssn-fx-leaves i{width:11px;height:11px;border-radius:0 70% 0 70%;background:#d9692b;opacity:.85}
+.ssn-fx-hearts i{width:9px;height:9px;background:#ff5d8f;transform:rotate(45deg);border-radius:2px 50% 2px 50%;opacity:.8}
+.ssn-fx-gold i{width:8px;height:8px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff3b0,#e2b33c 55%,#a87a12);box-shadow:0 0 6px rgba(255,210,90,.6)}
+.ssn-fx-sparks i,.ssn-fx-stars i{width:6px;height:6px;border-radius:50%;background:#ffd76a;box-shadow:0 0 8px 2px rgba(255,200,80,.55)}
+.ssn-fx-eggs i{width:9px;height:12px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:#c7a6f2}
+.ssn-fx-eggs i:nth-child(3n){background:#9fdcc4}.ssn-fx-eggs i:nth-child(3n+1){background:#ffd98a}
+.ssn-fx-bats i{left:-14% !important;width:46px;height:23px;animation-name:ssn-bat;animation-timing-function:ease-in-out;opacity:.9}
+.ssn-fx-bats i svg{width:100%;height:100%;display:block;animation:ssn-flap .28s ease-in-out infinite alternate;transform-origin:50% 40%}
+@keyframes ssn-bat{0%{transform:translate3d(0,0,0) scale(var(--s,1))}25%{transform:translate3d(32vw,-28px,0) scale(var(--s,1))}50%{transform:translate3d(64vw,18px,0) scale(var(--s,1))}75%{transform:translate3d(96vw,-20px,0) scale(var(--s,1))}100%{transform:translate3d(132vw,6px,0) scale(var(--s,1))}}
+@keyframes ssn-flap{from{transform:scaleY(1)}to{transform:scaleY(.45)}}
+
+/* ---------- HALLOWEEN: glossy liquid pills that drip slime ---------- */
+.season-halloween{--ssn-accent:#F54500}
+.season-halloween .ssn-b{background:radial-gradient(120% 90% at 30% 12%,rgba(255,255,255,.5) 0,rgba(255,255,255,0) 40%),linear-gradient(180deg,#ff7a2e 0%,#F54500 48%,#b83200 100%);color:#fff;box-shadow:inset 0 2px 0 rgba(255,255,255,.45),inset 0 -6px 12px rgba(90,20,0,.5),0 8px 22px rgba(245,69,0,.45);text-shadow:0 1px 0 rgba(0,0,0,.25)}
+.season-halloween .dock .walk-btn.ssn-b{background:radial-gradient(120% 90% at 30% 12%,rgba(255,255,255,.32) 0,rgba(255,255,255,0) 42%),linear-gradient(180deg,#3a3036 0%,#151012 55%,#050304 100%);color:#ff8a3d;box-shadow:inset 0 2px 0 rgba(255,255,255,.22),inset 0 -6px 12px rgba(0,0,0,.6),0 6px 18px rgba(0,0,0,.5);--goo:#0a0607}
+.season-halloween .dock .walk-btn.ssn-b svg{fill:#ff8a3d}
+.season-halloween .dock .walk-btn[aria-pressed="true"].ssn-b{color:#fff}
+.season-halloween .ssn-full{--goo:#b83200}
+.ssn-drips{position:absolute;left:10%;right:10%;top:calc(100% - 7px);height:1px;z-index:-1}
+.ssn-drips::before{content:"";position:absolute;left:-2%;right:-2%;top:2px;height:7px;border-radius:0 0 10px 10px/0 0 7px 7px;background:var(--goo,#b83200)}
+.ssn-drips i{position:absolute;top:0;display:block;width:var(--wd,6px);height:3px;margin-left:calc(var(--wd,6px) / -2);border-radius:0 0 99px 99px;background:var(--goo,#b83200);transition:height .9s cubic-bezier(.3,.75,.25,1) var(--dl,0ms)}
+.ssn-drips i::after{content:"";position:absolute;left:50%;bottom:-3px;width:calc(var(--wd,6px) + 4px);height:calc(var(--wd,6px) + 5px);transform:translateX(-50%);border-radius:50% 50% 50% 50%/40% 40% 60% 60%;background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.35) 0 1.5px,transparent 2.5px),var(--goo,#b83200);opacity:0;transition:opacity .25s var(--dl,0ms)}
+.ssn-on .ssn-drips i::after{opacity:1}
+@media (hover:hover){.ssn-full:hover .ssn-drips i::after{opacity:1}}
+.ssn-on .ssn-drips i{height:var(--h,22px)}
+@media (hover:hover){.season-halloween .ssn-full:hover .ssn-drips i{height:var(--h,22px)}}
+.season-halloween .ssn-full:active{transform:scale(.97)}
+.season-halloween .hint{border-color:rgba(245,69,0,.8)}
+
+/* ---------- CHRISTMAS: red gloss, snow cap, candy-cane sweep ---------- */
+.season-christmas{--ssn-accent:#d4af37}
+.season-christmas .ssn-b{background:radial-gradient(120% 90% at 30% 12%,rgba(255,255,255,.4) 0,rgba(255,255,255,0) 40%),linear-gradient(180deg,#e0263f 0%,#C8102E 50%,#8e0b20 100%);color:#fff;box-shadow:inset 0 2px 0 rgba(255,255,255,.35),inset 0 -5px 10px rgba(60,0,10,.45),0 8px 22px rgba(200,16,46,.4)}
+.season-christmas .dock .walk-btn.ssn-b{background:linear-gradient(180deg,#1f6b45,#0f4a2e);color:#fff}
+.season-christmas .dock .walk-btn.ssn-b svg{fill:#fff}
+.season-christmas .ssn-art::before{content:"";position:absolute;top:0;bottom:0;left:-120%;width:120%;background:repeating-linear-gradient(-45deg,rgba(255,255,255,.0) 0 7px,rgba(255,255,255,.55) 7px 13px);transition:left .9s ease}
+.season-christmas .ssn-on .ssn-art::before{left:100%}
+@media (hover:hover){.season-christmas .ssn-full:hover .ssn-art::before{left:100%}}
+.season-christmas .ssn-cap{position:absolute;left:12px;right:12px;top:-5px;height:11px;z-index:2;border-radius:6px 6px 3px 3px;background:radial-gradient(circle at 4% 75%,#fff 0 4px,transparent 4.5px),radial-gradient(circle at 17% 50%,#fff 0 5.5px,transparent 6px),radial-gradient(circle at 32% 62%,#fff 0 5px,transparent 5.5px),radial-gradient(circle at 47% 42%,#fff 0 6px,transparent 6.5px),radial-gradient(circle at 62% 60%,#fff 0 5px,transparent 5.5px),radial-gradient(circle at 78% 45%,#fff 0 5.5px,transparent 6px),radial-gradient(circle at 95% 75%,#fff 0 4px,transparent 4.5px),linear-gradient(#fff,#fff) 0 100%/100% 5px no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.18))}
+.season-christmas .hint{border-color:rgba(212,175,55,.8)}
+
+/* ---------- CHINESE NEW YEAR: red lacquer, gold rim, gold shimmer + coin ---------- */
+.season-cny{--ssn-accent:#f5c542}
+.season-cny .ssn-b{background:radial-gradient(120% 90% at 30% 12%,rgba(255,240,200,.35) 0,rgba(255,255,255,0) 42%),linear-gradient(180deg,#ef2b22 0%,#D7141A 50%,#9c0c10 100%);color:#ffe08a;box-shadow:inset 0 0 0 1.5px #f5c542,inset 0 -5px 10px rgba(80,0,0,.4),0 8px 22px rgba(215,20,26,.42)}
+.season-cny .dock .walk-btn.ssn-b svg{fill:#ffe08a}
+.season-cny .ssn-art::before{content:"";position:absolute;top:-20%;bottom:-20%;left:-60%;width:40%;transform:skewX(-20deg);background:linear-gradient(90deg,rgba(255,215,106,0),rgba(255,236,170,.75),rgba(255,215,106,0));transition:left .8s ease}
+.season-cny .ssn-on .ssn-art::before{left:120%}
+@media (hover:hover){.season-cny .ssn-full:hover .ssn-art::before{left:120%}}
+.season-cny .ssn-cap{position:absolute;left:12px;top:-6px;width:16px;height:16px;z-index:2;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3b0,#e2b33c 55%,#a87a12);box-shadow:0 2px 4px rgba(0,0,0,.35);transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+.season-cny .ssn-cap::after{content:"";position:absolute;left:5px;top:5px;width:6px;height:6px;background:#9c0c10;border-radius:1px}
+.season-cny .ssn-on .ssn-cap{transform:translateY(-6px) rotate(25deg) scale(1.15)}
+@media (hover:hover){.season-cny .ssn-full:hover .ssn-cap{transform:translateY(-6px) rotate(25deg) scale(1.15)}}
+.season-cny .hint{border-color:rgba(245,197,66,.85)}
+
+/* ---------- EASTER: pastel egg, bunny ears, egg crack on hover ---------- */
+.season-easter{--ssn-accent:#c7a6f2}
+.season-easter .ssn-b{background:radial-gradient(circle at 18% 70%,rgba(255,255,255,.55) 0 2px,transparent 2.5px),radial-gradient(circle at 70% 30%,rgba(255,255,255,.55) 0 2px,transparent 2.5px),radial-gradient(circle at 86% 72%,rgba(255,255,255,.5) 0 1.5px,transparent 2px),linear-gradient(135deg,#b9ead6 0%,#d9c6f7 55%,#ffe2a6 100%);color:#2a2622;text-shadow:none;box-shadow:inset 0 2px 0 rgba(255,255,255,.6),inset 0 -4px 8px rgba(120,90,160,.25),0 8px 20px rgba(199,166,242,.45)}
+.season-easter .dock .walk-btn.ssn-b svg{fill:#2a2622}
+.season-easter .ssn-art::before{content:"";position:absolute;left:0;right:0;top:50%;height:12px;margin-top:-6px;opacity:0;mix-blend-mode:soft-light;transform:scaleX(.2);transition:opacity .25s,transform .45s cubic-bezier(.3,1.5,.5,1);background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 12'%3E%3Cpath d='M0 6l5-5 5 10 5-10 5 10 5-10 5 10 5-10 5 5' stroke='%23fff' stroke-width='2' fill='none'/%3E%3C/svg%3E") repeat-x center/40px 12px}
+.season-easter .ssn-on .ssn-art::before{opacity:.95;transform:scaleX(1)}
+@media (hover:hover){.season-easter .ssn-full:hover .ssn-art::before{opacity:.95;transform:scaleX(1)}}
+.season-easter .ssn-cap{position:absolute;right:14px;top:-13px;width:22px;height:16px;z-index:-1;transform-origin:50% 100%;transition:transform .35s}
+.season-easter .ssn-cap::before,.season-easter .ssn-cap::after{content:"";position:absolute;bottom:0;width:8px;height:16px;border-radius:50% 50% 40% 40%;background:#fff;box-shadow:inset 0 -3px 0 2px #f7b6c8}
+.season-easter .ssn-cap::before{left:1px;transform:rotate(-12deg)}.season-easter .ssn-cap::after{right:1px;transform:rotate(12deg)}
+.season-easter .ssn-on .ssn-cap{transform:translateY(-3px) rotate(-6deg)}
+@media (hover:hover){.season-easter .ssn-full:hover .ssn-cap{transform:translateY(-3px) rotate(-6deg)}}
+.season-easter .hint{border-color:rgba(199,166,242,.85)}
+
+/* ---------- light themes: palette + glow ---------- */
+.season-light .ssn-b{background:var(--ssn-a);color:var(--ssn-ink,#fff);box-shadow:0 6px 20px var(--ssn-glow,rgba(0,0,0,.3))}
+.season-light .dock .walk-btn.ssn-b svg{fill:currentColor}
+.season-light .hint{border-color:var(--ssn-accent)}
+@media (hover:hover){.season-light .ssn-b:hover{filter:brightness(1.08);box-shadow:0 6px 26px var(--ssn-glow,rgba(0,0,0,.3)),0 0 0 3px var(--ssn-accent)}}
+.season-diwali{--ssn-a:linear-gradient(180deg,#f2b632,#c47f00);--ssn-ink:#3a0a2a;--ssn-glow:rgba(242,182,50,.5);--ssn-accent:#c2185b}
+.season-thanksgiving{--ssn-a:linear-gradient(180deg,#d9692b,#9c3d12);--ssn-glow:rgba(217,105,43,.45);--ssn-accent:#e8a33d}
+.season-newyear{--ssn-a:linear-gradient(180deg,#1b1b1b,#000);--ssn-ink:#f2c94c;--ssn-glow:rgba(242,201,76,.35);--ssn-accent:#f2c94c}
+.season-setsubun{--ssn-a:linear-gradient(180deg,#e53935,#a51d1a);--ssn-glow:rgba(30,90,200,.45);--ssn-accent:#1e5ac8}
+.season-valentines{--ssn-a:linear-gradient(180deg,#ff6b95,#e0245e);--ssn-glow:rgba(255,93,143,.5);--ssn-accent:#ffb3c8}
+.season-whiteday{--ssn-a:linear-gradient(180deg,#ffffff,#dfeaf7);--ssn-ink:#1d2a3a;--ssn-glow:rgba(170,200,240,.5);--ssn-accent:#a9c8ef}
+.season-sakura{--ssn-a:linear-gradient(180deg,#f9c3d3,#ee8fac);--ssn-ink:#3a1520;--ssn-glow:rgba(247,182,200,.55);--ssn-accent:#f7b6c8}
+.season-sevens{--ssn-a:linear-gradient(180deg,#2e9e5b,#1b6b3a);--ssn-glow:rgba(46,158,91,.45);--ssn-accent:#ffffff}
+.season-kodomo{--ssn-a:linear-gradient(180deg,#4aa3f0,#1f6fc1);--ssn-glow:rgba(74,163,240,.45);--ssn-accent:#e53935}
+.season-tuenng{--ssn-a:linear-gradient(180deg,#1aa58a,#0c6b5a);--ssn-glow:rgba(26,165,138,.45);--ssn-accent:#e53935}
+.season-tanabata{--ssn-a:linear-gradient(180deg,#24357a,#121c4a);--ssn-ink:#ffd76a;--ssn-glow:rgba(255,215,106,.35);--ssn-accent:#ffd76a}
+.season-natsu{--ssn-a:linear-gradient(180deg,#2b3a8c,#151f55);--ssn-ink:#ffb347;--ssn-glow:rgba(255,140,40,.4);--ssn-accent:#F54500}
+.season-midautumn{--ssn-a:linear-gradient(180deg,#2a2f6b,#141838);--ssn-ink:#ffd76a;--ssn-glow:rgba(255,215,106,.4);--ssn-accent:#ffd76a}
+
+/* ---------- reduced motion: no movement, effects stay static ---------- */
+@media (prefers-reduced-motion: reduce){
+  .ssn-hang,.ssn-tip,.ssn-fx i,.ssn-fx i svg{animation:none !important}
+  .ssn-fx{display:none}
+  .ssn-drips i,.ssn-art::before,.ssn-cap,.season-on .ssn-b{transition:none !important}
+  .ssn-tip{opacity:0}
+}
+
+/* ================= v2: obvious at first glance ================= */
+/* page wash over the room, under the controls */
+.ssn-wash{position:fixed;inset:0;z-index:18;pointer-events:none}
+.season-halloween .ssn-wash{background:radial-gradient(circle at 82% 16%,rgba(255,226,160,.42) 0,rgba(255,190,90,.16) 11%,transparent 26%),radial-gradient(120% 80% at 50% 110%,rgba(245,69,0,.32),transparent 60%),linear-gradient(180deg,rgba(58,16,84,.42),rgba(30,8,44,.18) 45%,rgba(20,5,30,.5))}
+.season-christmas .ssn-wash{background:radial-gradient(120% 70% at 50% 115%,rgba(212,175,55,.28),transparent 60%),linear-gradient(180deg,rgba(10,40,80,.42),rgba(10,30,60,.12) 50%,rgba(120,10,25,.32))}
+.season-cny .ssn-wash{background:radial-gradient(130% 80% at 50% 0%,rgba(215,20,26,.38),transparent 55%),radial-gradient(120% 70% at 50% 115%,rgba(245,197,66,.3),transparent 60%),linear-gradient(180deg,rgba(120,0,0,.15),rgba(80,0,0,.28))}
+.season-easter .ssn-wash{background:radial-gradient(circle at 20% 10%,rgba(199,166,242,.35),transparent 40%),radial-gradient(circle at 85% 90%,rgba(159,220,196,.35),transparent 45%),linear-gradient(180deg,rgba(255,240,250,.14),rgba(255,226,166,.16))}
+.season-light .ssn-wash{background:radial-gradient(120% 70% at 50% 115%,var(--ssn-glow,rgba(0,0,0,.2)),transparent 60%)}
+
+/* announcement banner under the top bar */
+.ssn-banner{position:fixed;left:0;right:0;top:var(--top,0px);z-index:29;height:30px;display:flex;align-items:center;justify-content:center;gap:9px;padding:0 10px;font-weight:900;font-size:12px;line-height:1;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;overflow:hidden;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.ssn-bi{display:inline-block;width:20px;height:20px;flex:none}
+.ssn-bi svg{width:100%;height:100%;display:block}
+.ssn-bi .ssn-emo{font-size:15px;line-height:20px}
+.ssn-bt{overflow:hidden;text-overflow:ellipsis}
+.ssn-banner::after{content:"";position:absolute;top:0;bottom:0;left:-40%;width:30%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);transform:skewX(-20deg);animation:ssn-shine 4.5s ease-in-out infinite}
+@keyframes ssn-shine{0%,55%{left:-40%}100%{left:130%}}
+.season-halloween .ssn-banner{background:repeating-linear-gradient(-45deg,#F54500 0 14px,#e03d00 14px 28px);color:#1b1310;border-bottom:2px solid #1b1310}
+.season-christmas .ssn-banner{background:linear-gradient(90deg,#8e0b20,#C8102E 50%,#8e0b20);color:#fff;border-bottom:2px solid #d4af37}
+.season-cny .ssn-banner{background:linear-gradient(90deg,#9c0c10,#D7141A 50%,#9c0c10);color:#ffe08a;border-bottom:2px solid #f5c542;letter-spacing:.1em}
+.season-easter .ssn-banner{background:linear-gradient(90deg,#b9ead6,#d9c6f7 50%,#ffe2a6);color:#2a2622;border-bottom:2px solid #fff}
+.season-light .ssn-banner{background:var(--ssn-a);color:var(--ssn-ink,#fff)}
+.panel-open .ssn-banner{opacity:0}
+.season-banner .hkclock{top:calc(var(--top) + 38px)}
+.season-banner .mapctl{top:calc(var(--top) + 80px)}
+.season-banner .ssn-hang{top:calc(var(--top,0px) + 30px)}
+
+/* logo decoration */
+.ssn-brand{position:relative}
+.ssn-hat{position:absolute;pointer-events:none;z-index:2;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
+.ssn-hat svg{width:100%;height:100%;display:block}
+.ssn-hat-witch{left:-7px;top:-1px;width:30px;height:25px;transform:rotate(-18deg)}
+.ssn-hat-santa{left:-8px;top:-1px;width:31px;height:26px;transform:rotate(-16deg)}
+.ssn-hat-seal{right:-14px;top:1px;width:22px;height:22px}
+.ssn-hat-ears{left:2px;top:-7px;width:24px;height:24px;transform:rotate(-8deg)}
+
+/* corner decor */
+.ssn-corner{position:fixed;pointer-events:none;z-index:19}
+.ssn-corner-web{left:0;top:calc(var(--top,0px) + 30px);width:118px;height:118px;opacity:.9}
+.ssn-corner-web svg{width:100%;height:100%;display:block}
+.ssn-corner-lights{left:0;right:0;top:calc(var(--top,0px) + 30px);height:22px;display:flex;justify-content:space-around;align-items:flex-start;background:radial-gradient(60% 18px at 50% 0,transparent 96%,rgba(30,30,30,.0) 100%)}
+.ssn-corner-lights::before{content:"";position:absolute;left:0;right:0;top:-6px;height:16px;border-bottom:1.5px solid rgba(30,40,30,.85);border-radius:0 0 50% 50%/0 0 100% 100%}
+.ssn-corner-lights i{position:relative;top:5px;width:8px;height:12px;border-radius:50% 50% 50% 50%/40% 40% 60% 60%;background:#ffd76a;box-shadow:0 0 10px 3px rgba(255,215,106,.7);animation:ssn-twinkle 1.6s ease-in-out infinite}
+.ssn-corner-lights i:nth-child(4n+1){background:#ff4b5c;box-shadow:0 0 10px 3px rgba(255,75,92,.7);animation-delay:-.4s}
+.ssn-corner-lights i:nth-child(4n+2){background:#4be08a;box-shadow:0 0 10px 3px rgba(75,224,138,.7);animation-delay:-.8s}
+.ssn-corner-lights i:nth-child(4n+3){background:#5cb8ff;box-shadow:0 0 10px 3px rgba(92,184,255,.7);animation-delay:-1.2s}
+.ssn-corner-lights i:nth-child(odd){top:9px}
+@keyframes ssn-twinkle{0%,100%{opacity:1}50%{opacity:.45}}
+.season-fx-off .ssn-corner-lights i{animation:none}
+
+/* more hanging pieces */
+.ssn-hang-1{right:auto;left:calc(50% + 40px)}
+.season-cny .ssn-hang-0{right:72px}.season-cny .ssn-hang-1{left:auto;right:126px;animation-delay:-1.3s}
+.season-cny .ssn-hang .ssn-ico{width:38px;height:44px}
+.season-cny .ssn-hang-0 .ssn-thread{height:44px}.season-cny .ssn-hang-1 .ssn-thread{height:62px}
+.season-christmas.season-banner .hkclock{top:calc(var(--top) + 54px)}
+.season-christmas.season-banner .mapctl{top:calc(var(--top) + 96px)}
+.season-christmas .ssn-hang .ssn-thread{height:40px}.season-christmas .ssn-hang-1 .ssn-thread{height:58px}
+.season-christmas .ssn-hang-1{left:auto;right:124px;animation-delay:-2s}
+.ssn-spider{z-index:20;right:auto;left:60px;animation:ssn-bob 3.8s ease-in-out infinite;transform-origin:50% 0}
+.ssn-spider .ssn-thread{height:56px;background:rgba(246,243,231,.7);width:1px}
+.ssn-spider .ssn-ico{width:30px;height:28px}
+@keyframes ssn-bob{0%,100%{transform:translateY(-10px)}50%{transform:translateY(16px)}}
+
+/* first-visit splash */
+.ssn-splash{position:fixed;inset:0;z-index:60;display:grid;place-items:center;pointer-events:none;background:rgba(11,13,18,.55);animation:ssn-sp-in .3s ease both}
+.ssn-sp-out{opacity:0;transition:opacity .6s ease}
+.ssn-sp-in{position:relative;display:flex;flex-direction:column;align-items:center;gap:12px}
+.ssn-sp-ico{width:96px;height:96px;animation:ssn-pop .7s cubic-bezier(.3,1.6,.5,1) both}
+.ssn-sp-ico svg{width:100%;height:100%}
+.ssn-sp-ico .ssn-emo{font-size:76px;line-height:96px}
+.ssn-sp-t{font-weight:900;font-size:17px;letter-spacing:.14em;text-transform:uppercase;color:#F6F3E8;text-shadow:0 2px 12px rgba(0,0,0,.6);animation:ssn-pop .7s .15s cubic-bezier(.3,1.6,.5,1) both}
+.ssn-sp-in i{position:absolute;left:50%;top:40%;width:9px;height:13px;border-radius:2px;opacity:0;animation:ssn-burst 1.3s .1s cubic-bezier(.2,.8,.3,1) both}
+@keyframes ssn-sp-in{from{opacity:0}to{opacity:1}}
+@keyframes ssn-pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes ssn-burst{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--dx),calc(var(--dy) + 60px)) rotate(var(--r))}}
+
+/* whole-page accents: bottom tabs, dock, map controls */
+.season-halloween .tabs,.season-halloween .dock{border-color:rgba(245,69,0,.7);box-shadow:0 0 18px rgba(245,69,0,.35)}
+.season-christmas .tabs,.season-christmas .dock{border-color:rgba(212,175,55,.75);box-shadow:0 0 18px rgba(212,175,55,.3)}
+.season-cny .tabs,.season-cny .dock{border-color:rgba(245,197,66,.8);box-shadow:0 0 18px rgba(215,20,26,.4)}
+.season-easter .tabs,.season-easter .dock{border-color:rgba(199,166,242,.85);box-shadow:0 0 18px rgba(199,166,242,.4)}
+.season-light .tabs,.season-light .dock{border-color:var(--ssn-accent)}
+.season-full .mapctl button:not(.ssn-chip){border-color:var(--ssn-accent)}
+
+/* app pages (no wash): fewer, softer particles over content */
+.season-under .ssn-fx i:nth-child(2n){display:none}
+.season-under .ssn-fx{opacity:.75}
+
+/* bigger particles */
+.ssn-fx i{width:11px;height:11px}
+.ssn-fx-bats i{width:58px;height:29px}
+.ssn-fx-gold i{width:11px;height:11px}
+.ssn-fx-eggs i{width:12px;height:16px}
+.ssn-fx-petals i{width:14px;height:10px}
+
+@media (prefers-reduced-motion: reduce){
+  .ssn-banner::after,.ssn-corner-lights i,.ssn-spider{animation:none !important}
+  .ssn-splash{display:none}
+}

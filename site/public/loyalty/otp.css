@@ -1,0 +1,250 @@
+/* f53 (Dominic Oct 27 2026 12:53 AM, reel "Glassy OTP V2"): frosted-glass verify card for the guest sign-up / sign-in code.
+   One glass card over a dark textured backdrop, grab bar on top, one box per digit (6), glowing orange active box with a blinking caret,
+   filled boxes keep the glow, digits pop in, wrong code = red + shake, right code = the card turns green with a glowing check tile.
+   Light mode (body.lt) keeps the same shapes on a warm cream glass. Uses the brand orange (--orange) in place of the reel's red. */
+#signin.otp-on > h1, #signin.otp-on > #subLine { display: none; }
+#signin.otp-on > .card { background: transparent; border: 0; box-shadow: none; padding: 0; margin: clamp(10px, 7vh, 64px) 0 12px; }
+#signin.otp-on { position: relative; isolation: isolate; }
+#signin.otp-on::before { content: ""; position: absolute; z-index: -1; left: -18px; right: -18px; top: -70px; height: 640px; pointer-events: none;
+  background:
+    radial-gradient(60% 34% at 18% 24%, rgba(246, 69, 1, .30), transparent 70%),
+    radial-gradient(48% 30% at 86% 58%, rgba(246, 69, 1, .20), transparent 72%),
+    radial-gradient(40% 26% at 40% 86%, rgba(232, 184, 74, .12), transparent 70%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .07 0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>"),
+    repeating-linear-gradient(135deg, rgba(246, 243, 231, .028) 0 2px, transparent 2px 14px);
+  -webkit-mask-image: linear-gradient(#000 70%, transparent); mask-image: linear-gradient(#000 70%, transparent); }
+
+.otpg { --acc: var(--orange); --acc-rgb: 246, 69, 1; --ok: #3ccf8e; --ok-rgb: 60, 207, 142; --bad: #ff5a4e; --bad-rgb: 255, 90, 78; perspective: 900px; }
+.otpg-card { position: relative; overflow: hidden; border-radius: 28px; padding: 30px 20px 22px; text-align: center;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .10), rgba(255, 255, 255, .035) 46%, rgba(255, 255, 255, .06));
+  border: 1px solid rgba(255, 255, 255, .14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16), inset 0 -1px 0 rgba(255, 255, 255, .04), 0 24px 60px -24px rgba(0, 0, 0, .75), 0 2px 10px rgba(0, 0, 0, .25);
+  -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%);
+  transition: background .5s ease, border-color .5s ease, box-shadow .5s ease, padding .45s ease;
+  animation: otpgIn .55s cubic-bezier(.2, .9, .25, 1.1) both; }
+.otpg-card::before { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background: radial-gradient(120% 60% at 50% -10%, rgba(255, 255, 255, .14), transparent 60%); }
+.otpg-card::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; opacity: 0; transition: opacity .5s ease;
+  background: radial-gradient(90% 70% at 50% 30%, rgba(var(--ok-rgb), .28), rgba(var(--ok-rgb), .08) 60%, transparent 85%); }
+.otpg-grab { position: absolute; top: 10px; left: 50%; width: 40px; height: 5px; margin-left: -20px; border-radius: 99px; background: rgba(246, 243, 231, .28); }
+.otpg-t { font-size: 23px; line-height: 1.15; font-weight: 900; margin: 6px 0 8px; letter-spacing: -.01em; }
+.otpg-s { margin: 0 auto; max-width: 300px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+.otpg-to { margin: 10px 0 0; font-size: 13px; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.otpg-to #sentTo { color: var(--cream); font-weight: 900; letter-spacing: .02em; }
+.otpg-dot { width: 3px; height: 3px; border-radius: 50%; background: currentColor; opacity: .6; }
+.otpg-to a { text-decoration: none; font-weight: 900; }
+
+.otpg-field { position: relative; margin: 22px auto 0; max-width: 360px; }
+.otpg-boxes { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: clamp(6px, 2.2vw, 10px); }
+.otpg-box { position: relative; display: flex; align-items: center; justify-content: center; aspect-ratio: .84; max-height: 68px; border-radius: 15px;
+  background: rgba(10, 12, 18, .42); border: 1.5px solid rgba(255, 255, 255, .13);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .35), inset 0 -1px 0 rgba(255, 255, 255, .04);
+  transition: border-color .2s ease, box-shadow .25s ease, background .25s ease, transform .2s ease; }
+.otpg-box b { font-size: clamp(22px, 6.6vw, 28px); font-weight: 900; line-height: 1; color: var(--cream); font-variant-numeric: tabular-nums; }
+.otpg-box.fill { border-color: rgba(var(--acc-rgb), .7); background: rgba(var(--acc-rgb), .08);
+  box-shadow: 0 0 0 1px rgba(var(--acc-rgb), .25), 0 0 16px -2px rgba(var(--acc-rgb), .45), inset 0 1px 2px rgba(0, 0, 0, .3); }
+.otpg-box.cur { border-color: var(--acc); background: rgba(var(--acc-rgb), .10);
+  box-shadow: 0 0 0 3px rgba(var(--acc-rgb), .20), 0 0 22px rgba(var(--acc-rgb), .55), inset 0 1px 2px rgba(0, 0, 0, .3); transform: translateY(-1px); }
+.otpg-box.cur::after { content: ""; position: absolute; left: 50%; top: 26%; bottom: 26%; width: 2px; margin-left: -1px; border-radius: 2px; background: var(--acc);
+  box-shadow: 0 0 8px rgba(var(--acc-rgb), .9); animation: otpgCaret 1.05s steps(1) infinite; }
+.otpg-box.fill.cur::after { display: none; }
+.otpg-box.pop b { animation: otpgPop .32s cubic-bezier(.2, 1.4, .4, 1) both; }
+.otpg-input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; outline: 0; background: transparent;
+  color: transparent; caret-color: transparent; -webkit-text-fill-color: transparent; font-size: 16px; letter-spacing: 1em; text-indent: -999px;
+  opacity: .011; cursor: pointer; z-index: 2; -webkit-user-select: none; user-select: none; }
+.otpg-input::selection { background: transparent; }
+
+.otpg-msg { min-height: 20px; margin: 12px 0 0; font-size: 13px; color: var(--muted); transition: color .2s; }
+.otpg-msg.bad { color: var(--bad); font-weight: 700; }
+.otpg-resend { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
+.otpg-resend a { font-weight: 900; text-decoration: none; }
+
+/* busy: a soft glow runs across the boxes while the code is checked */
+.otpg[data-state="busy"] .otpg-box { animation: otpgWave 1s ease-in-out infinite; }
+.otpg[data-state="busy"] .otpg-box:nth-child(2) { animation-delay: .08s; } .otpg[data-state="busy"] .otpg-box:nth-child(3) { animation-delay: .16s; }
+.otpg[data-state="busy"] .otpg-box:nth-child(4) { animation-delay: .24s; } .otpg[data-state="busy"] .otpg-box:nth-child(5) { animation-delay: .32s; }
+.otpg[data-state="busy"] .otpg-box:nth-child(6) { animation-delay: .40s; }
+/* wrong code: red + shake */
+.otpg[data-state="bad"] .otpg-boxes { animation: otpgShake .5s cubic-bezier(.36, .07, .19, .97) both; }
+.otpg[data-state="bad"] .otpg-box { border-color: var(--bad); background: rgba(var(--bad-rgb), .10); box-shadow: 0 0 0 1px rgba(var(--bad-rgb), .3), 0 0 18px -2px rgba(var(--bad-rgb), .55); }
+.otpg[data-state="bad"] .otpg-box b { color: var(--bad); }
+.otpg[data-state="bad"] .otpg-box::after { display: none; }
+
+/* verified: card turns green, check tile glows, text swaps */
+.otpg-done { display: none; padding: 4px 0 6px; }
+.otpg-tile { display: inline-flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 22px; margin: 6px 0 10px; color: #fff;
+  background: linear-gradient(160deg, #5be3a6, #1fae6c); border: 1px solid rgba(255, 255, 255, .35);
+  box-shadow: 0 0 0 6px rgba(var(--ok-rgb), .14), 0 0 34px rgba(var(--ok-rgb), .7), 0 12px 24px -10px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .45); }
+.otpg-tile svg { width: 38px; height: 38px; }
+.otpg-ck { stroke-dasharray: 22; stroke-dashoffset: 22; }
+.otpg[data-state="ok"] .otpg-card, .otpg[data-state="okmini"] .otpg-card { border-color: rgba(var(--ok-rgb), .55);
+  background: linear-gradient(160deg, rgba(var(--ok-rgb), .20), rgba(var(--ok-rgb), .07) 50%, rgba(var(--ok-rgb), .12));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), 0 0 0 1px rgba(var(--ok-rgb), .15), 0 24px 60px -24px rgba(0, 0, 0, .7), 0 0 50px -16px rgba(var(--ok-rgb), .6); }
+.otpg[data-state="ok"] .otpg-card::after, .otpg[data-state="okmini"] .otpg-card::after { opacity: 1; }
+.otpg[data-state="ok"] .otpg-ask, .otpg[data-state="okmini"] .otpg-ask { display: none; }
+.otpg[data-state="ok"] .otpg-card { display: flex; flex-direction: column; justify-content: center; }
+.otpg[data-state="ok"] .otpg-done, .otpg[data-state="okmini"] .otpg-done { display: block; animation: otpgFade .4s ease both; }
+.otpg[data-state="ok"] .otpg-tile, .otpg[data-state="okmini"] .otpg-tile { animation: otpgTile .6s cubic-bezier(.2, 1.3, .4, 1) both; }
+.otpg[data-state="ok"] .otpg-ck, .otpg[data-state="okmini"] .otpg-ck { animation: otpgDraw .45s .25s ease-out forwards; }
+.otpg[data-state="ok"] .otpg-done .otpg-t, .otpg[data-state="okmini"] .otpg-done .otpg-t { color: var(--ok); }
+/* new member: the green card folds into a slim "verified" row above the join box */
+.otpg[data-state="okmini"] .otpg-card { padding: 14px 16px; text-align: left; }
+.otpg[data-state="okmini"] .otpg-grab { display: none; }
+.otpg[data-state="okmini"] .otpg-done { display: grid; grid-template-columns: auto 1fr; column-gap: 12px; align-items: center; padding: 0; }
+.otpg[data-state="okmini"] .otpg-tile { grid-row: span 2; width: 40px; height: 40px; border-radius: 12px; margin: 0; animation: none;
+  box-shadow: 0 0 0 4px rgba(var(--ok-rgb), .12), 0 0 18px rgba(var(--ok-rgb), .55), inset 0 1px 0 rgba(255, 255, 255, .45); }
+.otpg[data-state="okmini"] .otpg-tile svg { width: 22px; height: 22px; }
+.otpg[data-state="okmini"] .otpg-ck { animation: none; stroke-dashoffset: 0; }
+.otpg[data-state="okmini"] .otpg-done .otpg-t { font-size: 16px; margin: 0; }
+.otpg[data-state="okmini"] .otpg-done .otpg-s { font-size: 13px; margin: 0; max-width: none; }
+
+#signin.otp-on #testHint { margin: 0 0 4px; text-align: center; background: rgba(246, 69, 1, .10); }
+#joinBox { animation: otpgUp .45s cubic-bezier(.2, .9, .25, 1) both; margin-top: 14px; padding: 18px 16px 16px; border-radius: 22px;
+  background: rgba(255, 255, 255, .045); border: 1px solid rgba(255, 255, 255, .12); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+.otpg-jh { margin: 0 0 4px; font-size: 19px; }
+
+@keyframes otpgIn { from { opacity: 0; transform: translateY(18px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes otpgCaret { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+@keyframes otpgPop { 0% { opacity: 0; transform: translateY(6px) scale(.55); } 70% { opacity: 1; transform: scale(1.12); } 100% { transform: none; } }
+@keyframes otpgWave { 0%, 100% { box-shadow: 0 0 0 1px rgba(var(--acc-rgb), .25), 0 0 12px -2px rgba(var(--acc-rgb), .35); } 50% { box-shadow: 0 0 0 2px rgba(var(--acc-rgb), .4), 0 0 24px rgba(var(--acc-rgb), .75); transform: translateY(-2px); } }
+@keyframes otpgShake { 10%, 90% { transform: translateX(-2px); } 20%, 80% { transform: translateX(4px); } 30%, 50%, 70% { transform: translateX(-8px); } 40%, 60% { transform: translateX(8px); } }
+@keyframes otpgFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes otpgTile { 0% { opacity: 0; transform: scale(.4) rotate(-12deg); } 60% { opacity: 1; transform: scale(1.12) rotate(3deg); } 100% { transform: none; } }
+@keyframes otpgDraw { to { stroke-dashoffset: 0; } }
+@keyframes otpgUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* light mode: warm cream glass, same shapes */
+body.lt #signin.otp-on::before { background:
+    radial-gradient(60% 34% at 18% 24%, rgba(246, 69, 1, .20), transparent 70%),
+    radial-gradient(48% 30% at 86% 58%, rgba(246, 69, 1, .13), transparent 72%),
+    radial-gradient(40% 26% at 40% 86%, rgba(232, 184, 74, .18), transparent 70%),
+    repeating-linear-gradient(135deg, rgba(22, 24, 31, .035) 0 2px, transparent 2px 14px); }
+body.lt .otpg { --ok: #1f9d64; --ok-rgb: 31, 157, 100; --bad: #d93a2b; --bad-rgb: 217, 58, 43; }
+body.lt .otpg-card { background: linear-gradient(160deg, rgba(255, 255, 255, .78), rgba(255, 255, 255, .52) 50%, rgba(255, 255, 255, .66));
+  border-color: rgba(255, 255, 255, .9); box-shadow: inset 0 1px 0 #fff, 0 0 0 1px rgba(22, 24, 31, .06), 0 24px 50px -26px rgba(60, 40, 20, .45); }
+body.lt .otpg-card::before { background: radial-gradient(120% 60% at 50% -10%, rgba(255, 255, 255, .7), transparent 60%); }
+body.lt .otpg-grab { background: rgba(22, 24, 31, .18); }
+body.lt .otpg-box { background: rgba(255, 255, 255, .75); border-color: rgba(22, 24, 31, .13); box-shadow: inset 0 1px 2px rgba(22, 24, 31, .08); }
+body.lt .otpg-box.fill { background: rgba(246, 69, 1, .06); box-shadow: 0 0 0 1px rgba(246, 69, 1, .18), 0 0 14px -3px rgba(246, 69, 1, .45); }
+body.lt .otpg-box.cur { background: #fff; box-shadow: 0 0 0 3px rgba(246, 69, 1, .16), 0 0 18px rgba(246, 69, 1, .40); }
+body.lt .otpg[data-state="ok"] .otpg-card, body.lt .otpg[data-state="okmini"] .otpg-card { background: linear-gradient(160deg, rgba(225, 248, 236, .9), rgba(240, 252, 245, .75) 50%, rgba(220, 245, 232, .85));
+  border-color: rgba(31, 157, 100, .45); box-shadow: inset 0 1px 0 #fff, 0 0 40px -16px rgba(31, 157, 100, .55), 0 24px 50px -26px rgba(60, 40, 20, .4); }
+body.lt .otpg-tile { background: linear-gradient(160deg, #3fd08f, #17935a); }
+body.lt #joinBox { background: rgba(255, 255, 255, .7); border-color: rgba(22, 24, 31, .08); }
+
+@media (prefers-reduced-motion: reduce) {
+  .otpg-card, .otpg-box b, .otpg-tile, .otpg-done, #joinBox, .otpg[data-state] .otpg-box, .otpg[data-state="bad"] .otpg-boxes { animation: none !important; }
+  .otpg-ck { stroke-dashoffset: 0 !important; }
+  .otpg-box.cur::after { animation: none; }
+}
+@media (min-width: 700px) { .otpg-card { padding: 36px 32px 26px; } .otpg-t { font-size: 26px; } }
+
+/* f54 (Dominic Oct 27 2026 1:24-1:25 AM: "the numbers animation merges before the check mark appears" / "not the same as the reel").
+   Re-matched frame by frame to the reel: a smaller centred glass card on a dark faceted backdrop, medium-weight title, small dark
+   square boxes (only the active box glows), and the success sequence in place: on the 6th digit the digits blur out and the six
+   boxes slide together into one tile (tilting like a stack of cards, ~300 ms), the tile turns green and rights itself, the check
+   draws in, the card tints green and the title swaps. Wrong code: the stack springs back apart, then red + shake as before. */
+#signin.otp-on::before { position: fixed; left: 0; right: 0; top: 0; bottom: 0; height: auto; -webkit-mask-image: none; mask-image: none;
+  background: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 700' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='%23fff' stroke='%23fff' stroke-opacity='0.07' stroke-width='0.8'%3E%3Cpath d='M0 0L57 0L44 78' fill-opacity='0.125'/%3E%3Cpath d='M0 0L44 78L0 69' fill-opacity='0.171'/%3E%3Cpath d='M57 0L115 0L110 73' fill-opacity='0.171'/%3E%3Cpath d='M57 0L110 73L44 78' fill-opacity='0.090'/%3E%3Cpath d='M115 0L207 0L110 73' fill-opacity='0.217'/%3E%3Cpath d='M207 0L178 53L110 73' fill-opacity='0.171'/%3E%3Cpath d='M207 0L245 0L178 53' fill-opacity='0.217'/%3E%3Cpath d='M245 0L262 97L178 53' fill-opacity='0.217'/%3E%3Cpath d='M245 0L335 0L262 97' fill-opacity='0.125'/%3E%3Cpath d='M335 0L314 61L262 97' fill-opacity='0.217'/%3E%3Cpath d='M335 0L400 0L314 61' fill-opacity='0.125'/%3E%3Cpath d='M400 0L400 85L314 61' fill-opacity='0.125'/%3E%3Cpath d='M0 69L70 149L0 182' fill-opacity='0.125'/%3E%3Cpath d='M110 73L157 128L70 149' fill-opacity='0.056'/%3E%3Cpath d='M110 73L178 53L217 142' fill-opacity='0.056'/%3E%3Cpath d='M110 73L217 142L157 128' fill-opacity='0.125'/%3E%3Cpath d='M178 53L262 97L248 132' fill-opacity='0.090'/%3E%3Cpath d='M178 53L248 132L217 142' fill-opacity='0.171'/%3E%3Cpath d='M262 97L323 174L248 132' fill-opacity='0.171'/%3E%3Cpath d='M314 61L400 136L323 174' fill-opacity='0.090'/%3E%3Cpath d='M70 149L73 225L0 238' fill-opacity='0.056'/%3E%3Cpath d='M70 149L157 128L73 225' fill-opacity='0.056'/%3E%3Cpath d='M157 128L135 207L73 225' fill-opacity='0.217'/%3E%3Cpath d='M157 128L217 142L177 215' fill-opacity='0.090'/%3E%3Cpath d='M157 128L177 215L135 207' fill-opacity='0.171'/%3E%3Cpath d='M248 132L323 174L275 228' fill-opacity='0.125'/%3E%3Cpath d='M323 174L324 238L275 228' fill-opacity='0.125'/%3E%3Cpath d='M323 174L400 230L324 238' fill-opacity='0.056'/%3E%3Cpath d='M0 238L73 225L81 323' fill-opacity='0.090'/%3E%3Cpath d='M0 238L81 323L0 299' fill-opacity='0.217'/%3E%3Cpath d='M73 225L135 207L120 315' fill-opacity='0.217'/%3E%3Cpath d='M73 225L120 315L81 323' fill-opacity='0.056'/%3E%3Cpath d='M135 207L177 215L120 315' fill-opacity='0.056'/%3E%3Cpath d='M177 215L201 333L120 315' fill-opacity='0.171'/%3E%3Cpath d='M177 215L275 228L278 298' fill-opacity='0.217'/%3E%3Cpath d='M177 215L278 298L201 333' fill-opacity='0.171'/%3E%3Cpath d='M275 228L324 238L278 298' fill-opacity='0.171'/%3E%3Cpath d='M324 238L357 288L278 298' fill-opacity='0.090'/%3E%3Cpath d='M400 230L400 306L357 288' fill-opacity='0.217'/%3E%3Cpath d='M0 299L81 323L0 404' fill-opacity='0.171'/%3E%3Cpath d='M81 323L49 388L0 404' fill-opacity='0.090'/%3E%3Cpath d='M81 323L120 315L49 388' fill-opacity='0.090'/%3E%3Cpath d='M120 315L110 398L49 388' fill-opacity='0.056'/%3E%3Cpath d='M120 315L201 333L110 398' fill-opacity='0.171'/%3E%3Cpath d='M201 333L213 393L110 398' fill-opacity='0.090'/%3E%3Cpath d='M201 333L278 298L213 393' fill-opacity='0.171'/%3E%3Cpath d='M278 298L285 377L213 393' fill-opacity='0.056'/%3E%3Cpath d='M278 298L357 288L285 377' fill-opacity='0.125'/%3E%3Cpath d='M357 288L343 394L285 377' fill-opacity='0.217'/%3E%3Cpath d='M357 288L400 306L343 394' fill-opacity='0.056'/%3E%3Cpath d='M400 306L400 393L343 394' fill-opacity='0.171'/%3E%3Cpath d='M0 404L49 388L83 493' fill-opacity='0.217'/%3E%3Cpath d='M49 388L110 398L83 493' fill-opacity='0.090'/%3E%3Cpath d='M110 398L132 476L83 493' fill-opacity='0.125'/%3E%3Cpath d='M110 398L213 393L178 478' fill-opacity='0.217'/%3E%3Cpath d='M110 398L178 478L132 476' fill-opacity='0.171'/%3E%3Cpath d='M213 393L285 377L178 478' fill-opacity='0.125'/%3E%3Cpath d='M285 377L274 496L178 478' fill-opacity='0.217'/%3E%3Cpath d='M285 377L343 394L274 496' fill-opacity='0.090'/%3E%3Cpath d='M343 394L400 393L400 459' fill-opacity='0.056'/%3E%3Cpath d='M343 394L400 459L349 453' fill-opacity='0.125'/%3E%3Cpath d='M0 464L83 493L42 542' fill-opacity='0.056'/%3E%3Cpath d='M0 464L42 542L0 554' fill-opacity='0.125'/%3E%3Cpath d='M83 493L132 476L42 542' fill-opacity='0.171'/%3E%3Cpath d='M132 476L178 478L177 560' fill-opacity='0.217'/%3E%3Cpath d='M132 476L177 560L116 521' fill-opacity='0.090'/%3E%3Cpath d='M274 496L248 529L177 560' fill-opacity='0.217'/%3E%3Cpath d='M274 496L349 453L327 566' fill-opacity='0.125'/%3E%3Cpath d='M274 496L327 566L248 529' fill-opacity='0.217'/%3E%3Cpath d='M349 453L400 459L327 566' fill-opacity='0.125'/%3E%3Cpath d='M400 459L400 519L327 566' fill-opacity='0.056'/%3E%3Cpath d='M0 554L42 542L69 645' fill-opacity='0.217'/%3E%3Cpath d='M0 554L69 645L0 619' fill-opacity='0.090'/%3E%3Cpath d='M42 542L116 521L149 644' fill-opacity='0.217'/%3E%3Cpath d='M42 542L149 644L69 645' fill-opacity='0.125'/%3E%3Cpath d='M116 521L177 560L188 617' fill-opacity='0.217'/%3E%3Cpath d='M177 560L248 529L188 617' fill-opacity='0.056'/%3E%3Cpath d='M248 529L259 645L188 617' fill-opacity='0.056'/%3E%3Cpath d='M248 529L327 566L356 601' fill-opacity='0.171'/%3E%3Cpath d='M248 529L356 601L259 645' fill-opacity='0.125'/%3E%3Cpath d='M327 566L400 519L356 601' fill-opacity='0.056'/%3E%3Cpath d='M400 519L400 602L356 601' fill-opacity='0.171'/%3E%3Cpath d='M0 619L69 645L0 700' fill-opacity='0.125'/%3E%3Cpath d='M69 645L53 700L0 700' fill-opacity='0.217'/%3E%3Cpath d='M69 645L149 644L53 700' fill-opacity='0.056'/%3E%3Cpath d='M149 644L120 700L53 700' fill-opacity='0.171'/%3E%3Cpath d='M188 617L259 645L199 700' fill-opacity='0.217'/%3E%3Cpath d='M259 645L271 700L199 700' fill-opacity='0.217'/%3E%3Cpath d='M259 645L356 601L321 700' fill-opacity='0.217'/%3E%3Cpath d='M259 645L321 700L271 700' fill-opacity='0.056'/%3E%3Cpath d='M356 601L400 602L400 700' fill-opacity='0.056'/%3E%3Cpath d='M356 601L400 700L321 700' fill-opacity='0.056'/%3E%3C/g%3E%3C/svg%3E") center / cover no-repeat,
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .06 0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>"),
+    radial-gradient(80% 60% at 50% 40%, #1d1d21, #0b0b0d 75%); }
+#signin.otp-on > .card { min-height: calc(100svh - 150px); display: flex; flex-direction: column; justify-content: center; margin: 0; }
+.otpg { --acc-rgb: 246, 69, 1; }
+.otpg-card { width: 100%; max-width: 344px; margin: 0 auto; border-radius: 22px; padding: 30px 18px 18px;
+  background: linear-gradient(170deg, rgba(58, 58, 64, .55), rgba(30, 30, 34, .55)); border: 1px solid rgba(255, 255, 255, .11);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .10), 0 30px 60px -20px rgba(0, 0, 0, .8);
+  -webkit-backdrop-filter: blur(24px) saturate(140%); backdrop-filter: blur(24px) saturate(140%); }
+.otpg-card::before { background: radial-gradient(120% 50% at 50% -10%, rgba(255, 255, 255, .08), transparent 60%); }
+.otpg-card::after { background: radial-gradient(100% 80% at 50% 45%, rgba(var(--ok-rgb), .22), rgba(var(--ok-rgb), .10) 60%, rgba(var(--ok-rgb), .05)); transition: opacity .45s ease .15s; }
+.otpg-grab { top: 9px; width: 34px; height: 4px; margin-left: -17px; background: rgba(255, 255, 255, .22); }
+.otpg-t { font-size: 20px; font-weight: 600; letter-spacing: -.01em; margin: 4px 0 6px; }
+.otpg-s { max-width: 260px; font-size: 13px; line-height: 1.45; }
+.otpg-to { margin: 6px 0 0; font-size: 12px; }
+.otpg-to #sentTo, .otpg-to a { font-weight: 700; }
+.otpg-field { margin: 20px auto 0; width: max-content; max-width: 100%; }
+.otpg-boxes { grid-template-columns: repeat(6, 44px); gap: 8px; }
+.otpg-box { width: 44px; height: 48px; aspect-ratio: auto; border-radius: 11px; background: rgba(16, 16, 19, .78); border: 1px solid rgba(255, 255, 255, .12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04); will-change: transform; }
+.otpg-box b { font-size: 21px; font-weight: 500; }
+.otpg-box.fill { border-color: rgba(255, 255, 255, .16); background: rgba(16, 16, 19, .78); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04); }
+.otpg-box.cur { border-color: var(--acc); background: rgba(16, 16, 19, .82); transform: none;
+  box-shadow: 0 0 0 3px rgba(var(--acc-rgb), .16), 0 0 14px rgba(var(--acc-rgb), .45); }
+.otpg-box.cur::after { top: 30%; bottom: 30%; width: 1.5px; margin-left: -.75px; background: var(--cream); box-shadow: none; }
+.otpg-box.pop b { animation: otpgPop2 .22s cubic-bezier(.2, 1.2, .4, 1) both; }
+@keyframes otpgPop2 { 0% { opacity: 0; transform: translateY(4px) scale(.7); } 100% { opacity: 1; transform: none; } }
+.otpg-msg { min-height: 16px; margin: 10px 0 0; font-size: 12px; }
+.otpg-resend { margin: 4px 0 0; font-size: 13px; }
+.otpg-resend a { color: var(--cream); font-weight: 700; }
+/* merge: every box turns accent, digits blur out, boxes slide into one stack (JS moves them) */
+.otpg[data-state="merge"] .otpg-box, .otpg[data-state="verified"] .otpg-box { border-color: var(--acc); box-shadow: 0 0 12px -2px rgba(var(--acc-rgb), .45); }
+.otpg[data-state="merge"] .otpg-box::after, .otpg[data-state="verified"] .otpg-box::after { display: none; }
+.otpg-mt { position: absolute; left: 50%; top: 0; width: 44px; height: 48px; margin-left: -22px; border-radius: 11px; display: flex; align-items: center; justify-content: center;
+  background: rgba(16, 16, 19, .9); border: 1px solid var(--acc); box-shadow: 0 0 14px -2px rgba(var(--acc-rgb), .5); color: #fff;
+  opacity: 0; visibility: hidden; transform: rotate(-10deg); pointer-events: none; z-index: 3; transition: border-color .18s ease, box-shadow .3s ease; }
+.otpg-mt.on { opacity: 1; visibility: visible; }
+.otpg-mt.wait { animation: otpgMtWait 1s ease-in-out infinite; }
+@keyframes otpgMtWait { 50% { box-shadow: 0 0 22px 1px rgba(var(--acc-rgb), .65); } }
+.otpg-mt svg { width: 24px; height: 24px; }
+.otpg-mt .otpg-ck { stroke-dasharray: 20; stroke-dashoffset: 20; animation: none; }
+.otpg[data-state="verified"] .otpg-mt .otpg-ck { stroke-dashoffset: 0; transition: stroke-dashoffset .3s cubic-bezier(.6, 0, .3, 1) .2s; }
+.otpg[data-state="verified"] .otpg-box { opacity: 0; }
+.otpg[data-state="verified"] .otpg-mt { border-color: var(--ok); background: rgba(14, 26, 20, .92); animation: none;
+  box-shadow: 0 0 0 3px rgba(var(--ok-rgb), .14), 0 0 22px rgba(var(--ok-rgb), .6); }
+.otpg[data-state="verified"] .otpg-card { border-color: rgba(var(--ok-rgb), .38); transition-delay: .15s;
+  background: linear-gradient(170deg, rgba(48, 80, 64, .55), rgba(24, 40, 32, .55));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .10), 0 0 46px -18px rgba(var(--ok-rgb), .55), 0 30px 60px -20px rgba(0, 0, 0, .8); }
+.otpg[data-state="verified"] .otpg-card::after { opacity: 1; }
+.otpg[data-state="verified"] .otpg-to, .otpg[data-state="verified"] .otpg-msg { visibility: hidden; }
+.otpg[data-state="verified"] .otpg-resend, .otpg[data-state="merge"] .otpg-resend { pointer-events: none; }
+.otpg[data-state="verified"] .otpg-input, .otpg[data-state="merge"] .otpg-input { pointer-events: none; }
+.otpg[data-state="busy"] .otpg-box { animation: none; }
+body.lt #signin.otp-on::before { background: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 700' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='%2316181f'%3E%3Cpath d='M0 0L57 0L44 78' fill-opacity='0.050'/%3E%3Cpath d='M0 0L44 78L0 69' fill-opacity='0.070'/%3E%3Cpath d='M57 0L115 0L110 73' fill-opacity='0.070'/%3E%3Cpath d='M57 0L110 73L44 78' fill-opacity='0.035'/%3E%3Cpath d='M115 0L207 0L110 73' fill-opacity='0.090'/%3E%3Cpath d='M207 0L178 53L110 73' fill-opacity='0.070'/%3E%3Cpath d='M207 0L245 0L178 53' fill-opacity='0.090'/%3E%3Cpath d='M245 0L262 97L178 53' fill-opacity='0.090'/%3E%3Cpath d='M245 0L335 0L262 97' fill-opacity='0.050'/%3E%3Cpath d='M335 0L314 61L262 97' fill-opacity='0.090'/%3E%3Cpath d='M335 0L400 0L314 61' fill-opacity='0.050'/%3E%3Cpath d='M400 0L400 85L314 61' fill-opacity='0.050'/%3E%3Cpath d='M0 69L70 149L0 182' fill-opacity='0.050'/%3E%3Cpath d='M110 73L157 128L70 149' fill-opacity='0.020'/%3E%3Cpath d='M110 73L178 53L217 142' fill-opacity='0.020'/%3E%3Cpath d='M110 73L217 142L157 128' fill-opacity='0.050'/%3E%3Cpath d='M178 53L262 97L248 132' fill-opacity='0.035'/%3E%3Cpath d='M178 53L248 132L217 142' fill-opacity='0.070'/%3E%3Cpath d='M262 97L323 174L248 132' fill-opacity='0.070'/%3E%3Cpath d='M314 61L400 136L323 174' fill-opacity='0.035'/%3E%3Cpath d='M70 149L73 225L0 238' fill-opacity='0.020'/%3E%3Cpath d='M70 149L157 128L73 225' fill-opacity='0.020'/%3E%3Cpath d='M157 128L135 207L73 225' fill-opacity='0.090'/%3E%3Cpath d='M157 128L217 142L177 215' fill-opacity='0.035'/%3E%3Cpath d='M157 128L177 215L135 207' fill-opacity='0.070'/%3E%3Cpath d='M248 132L323 174L275 228' fill-opacity='0.050'/%3E%3Cpath d='M323 174L324 238L275 228' fill-opacity='0.050'/%3E%3Cpath d='M323 174L400 230L324 238' fill-opacity='0.020'/%3E%3Cpath d='M0 238L73 225L81 323' fill-opacity='0.035'/%3E%3Cpath d='M0 238L81 323L0 299' fill-opacity='0.090'/%3E%3Cpath d='M73 225L135 207L120 315' fill-opacity='0.090'/%3E%3Cpath d='M73 225L120 315L81 323' fill-opacity='0.020'/%3E%3Cpath d='M135 207L177 215L120 315' fill-opacity='0.020'/%3E%3Cpath d='M177 215L201 333L120 315' fill-opacity='0.070'/%3E%3Cpath d='M177 215L275 228L278 298' fill-opacity='0.090'/%3E%3Cpath d='M177 215L278 298L201 333' fill-opacity='0.070'/%3E%3Cpath d='M275 228L324 238L278 298' fill-opacity='0.070'/%3E%3Cpath d='M324 238L357 288L278 298' fill-opacity='0.035'/%3E%3Cpath d='M400 230L400 306L357 288' fill-opacity='0.090'/%3E%3Cpath d='M0 299L81 323L0 404' fill-opacity='0.070'/%3E%3Cpath d='M81 323L49 388L0 404' fill-opacity='0.035'/%3E%3Cpath d='M81 323L120 315L49 388' fill-opacity='0.035'/%3E%3Cpath d='M120 315L110 398L49 388' fill-opacity='0.020'/%3E%3Cpath d='M120 315L201 333L110 398' fill-opacity='0.070'/%3E%3Cpath d='M201 333L213 393L110 398' fill-opacity='0.035'/%3E%3Cpath d='M201 333L278 298L213 393' fill-opacity='0.070'/%3E%3Cpath d='M278 298L285 377L213 393' fill-opacity='0.020'/%3E%3Cpath d='M278 298L357 288L285 377' fill-opacity='0.050'/%3E%3Cpath d='M357 288L343 394L285 377' fill-opacity='0.090'/%3E%3Cpath d='M357 288L400 306L343 394' fill-opacity='0.020'/%3E%3Cpath d='M400 306L400 393L343 394' fill-opacity='0.070'/%3E%3Cpath d='M0 404L49 388L83 493' fill-opacity='0.090'/%3E%3Cpath d='M49 388L110 398L83 493' fill-opacity='0.035'/%3E%3Cpath d='M110 398L132 476L83 493' fill-opacity='0.050'/%3E%3Cpath d='M110 398L213 393L178 478' fill-opacity='0.090'/%3E%3Cpath d='M110 398L178 478L132 476' fill-opacity='0.070'/%3E%3Cpath d='M213 393L285 377L178 478' fill-opacity='0.050'/%3E%3Cpath d='M285 377L274 496L178 478' fill-opacity='0.090'/%3E%3Cpath d='M285 377L343 394L274 496' fill-opacity='0.035'/%3E%3Cpath d='M343 394L400 393L400 459' fill-opacity='0.020'/%3E%3Cpath d='M343 394L400 459L349 453' fill-opacity='0.050'/%3E%3Cpath d='M0 464L83 493L42 542' fill-opacity='0.020'/%3E%3Cpath d='M0 464L42 542L0 554' fill-opacity='0.050'/%3E%3Cpath d='M83 493L132 476L42 542' fill-opacity='0.070'/%3E%3Cpath d='M132 476L178 478L177 560' fill-opacity='0.090'/%3E%3Cpath d='M132 476L177 560L116 521' fill-opacity='0.035'/%3E%3Cpath d='M274 496L248 529L177 560' fill-opacity='0.090'/%3E%3Cpath d='M274 496L349 453L327 566' fill-opacity='0.050'/%3E%3Cpath d='M274 496L327 566L248 529' fill-opacity='0.090'/%3E%3Cpath d='M349 453L400 459L327 566' fill-opacity='0.050'/%3E%3Cpath d='M400 459L400 519L327 566' fill-opacity='0.020'/%3E%3Cpath d='M0 554L42 542L69 645' fill-opacity='0.090'/%3E%3Cpath d='M0 554L69 645L0 619' fill-opacity='0.035'/%3E%3Cpath d='M42 542L116 521L149 644' fill-opacity='0.090'/%3E%3Cpath d='M42 542L149 644L69 645' fill-opacity='0.050'/%3E%3Cpath d='M116 521L177 560L188 617' fill-opacity='0.090'/%3E%3Cpath d='M177 560L248 529L188 617' fill-opacity='0.020'/%3E%3Cpath d='M248 529L259 645L188 617' fill-opacity='0.020'/%3E%3Cpath d='M248 529L327 566L356 601' fill-opacity='0.070'/%3E%3Cpath d='M248 529L356 601L259 645' fill-opacity='0.050'/%3E%3Cpath d='M327 566L400 519L356 601' fill-opacity='0.020'/%3E%3Cpath d='M400 519L400 602L356 601' fill-opacity='0.070'/%3E%3Cpath d='M0 619L69 645L0 700' fill-opacity='0.050'/%3E%3Cpath d='M69 645L53 700L0 700' fill-opacity='0.090'/%3E%3Cpath d='M69 645L149 644L53 700' fill-opacity='0.020'/%3E%3Cpath d='M149 644L120 700L53 700' fill-opacity='0.070'/%3E%3Cpath d='M188 617L259 645L199 700' fill-opacity='0.090'/%3E%3Cpath d='M259 645L271 700L199 700' fill-opacity='0.090'/%3E%3Cpath d='M259 645L356 601L321 700' fill-opacity='0.090'/%3E%3Cpath d='M259 645L321 700L271 700' fill-opacity='0.020'/%3E%3Cpath d='M356 601L400 602L400 700' fill-opacity='0.020'/%3E%3Cpath d='M356 601L400 700L321 700' fill-opacity='0.020'/%3E%3C/g%3E%3C/svg%3E") center / cover no-repeat, radial-gradient(80% 60% at 50% 40%, #f4f1ea, #ddd8cd 80%); }
+body.lt .otpg-card { background: linear-gradient(170deg, rgba(255, 255, 255, .72), rgba(250, 248, 243, .55)); border-color: rgba(255, 255, 255, .9);
+  box-shadow: inset 0 1px 0 #fff, 0 0 0 1px rgba(22, 24, 31, .05), 0 30px 50px -24px rgba(40, 30, 20, .4); }
+body.lt .otpg-box, body.lt .otpg-box.fill, body.lt .otpg-mt { background: rgba(255, 255, 255, .9); border-color: rgba(22, 24, 31, .14); box-shadow: inset 0 1px 2px rgba(22, 24, 31, .06); }
+body.lt .otpg-box.cur { border-color: var(--acc); box-shadow: 0 0 0 3px rgba(var(--acc-rgb), .14), 0 0 12px rgba(var(--acc-rgb), .35); }
+body.lt .otpg-mt { color: var(--ok); border-color: var(--acc); }
+body.lt .otpg[data-state="merge"] .otpg-box { border-color: var(--acc); }
+body.lt .otpg-resend a, body.lt .otpg-box b { color: #16181f; }
+body.lt .otpg-box.cur::after { background: #16181f; }
+body.lt .otpg[data-state="verified"] .otpg-mt { background: #fff; border-color: var(--ok); color: var(--ok); }
+body.lt .otpg[data-state="verified"] .otpg-card { background: linear-gradient(170deg, rgba(228, 248, 237, .85), rgba(240, 251, 245, .7)); border-color: rgba(31, 157, 100, .4);
+  box-shadow: inset 0 1px 0 #fff, 0 0 40px -16px rgba(31, 157, 100, .5), 0 30px 50px -24px rgba(40, 30, 20, .35); }
+@media (prefers-reduced-motion: reduce) {
+  .otpg-mt, .otpg[data-state="verified"] .otpg-mt { transform: none !important; animation: none !important; }
+  .otpg-mt .otpg-ck { stroke-dashoffset: 0 !important; }
+}
+@media (min-width: 700px) { .otpg-card { padding: 32px 22px 20px; } .otpg-t { font-size: 21px; } }
+
+/* f55 (Dominic Oct 27 2026 9:36 AM, "fix all of it": the 3 gaps vs the reel + the 5-tries lock-out).
+   1) the title fades out while the boxes stack (JS), 2) a narrower card closer to the reel's proportions (smaller boxes),
+   3) bolder backdrop shards (brighter facets + light edges, above), 4) a clear locked state after 5 wrong tries: boxes dim,
+   the message says why and one button sends a new code. */
+.otpg-card { max-width: 296px; padding: 26px 16px 16px; border-radius: 20px; }
+.otpg-t { font-size: 18px; }
+.otpg-s { max-width: 256px; font-size: 12.5px; }
+.otpg-field { margin-top: 16px; }
+.otpg-boxes { grid-template-columns: repeat(6, 36px); gap: 6px; }
+.otpg-box { width: 36px; height: 42px; border-radius: 10px; }
+.otpg-box b { font-size: 19px; }
+.otpg-mt { width: 36px; height: 42px; margin-left: -18px; }
+.otpg.locked .otpg-boxes { opacity: .38; filter: saturate(.4); pointer-events: none; }
+.otpg.locked .otpg-msg { color: var(--bad); font-weight: 600; }
+.otpg-new { display: block; margin: 10px auto 0; padding: 10px 18px; border-radius: 99px; border: 1px solid rgba(255, 255, 255, .18);
+  background: rgba(255, 255, 255, .10); color: var(--cream); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.otpg-new.hide { display: none; }
+body.lt .otpg-new { background: rgba(0, 0, 0, .06); border-color: rgba(0, 0, 0, .14); color: inherit; }
+@media (min-width: 700px) { .otpg-card { max-width: 320px; padding: 30px 22px 20px; } .otpg-t { font-size: 20px; } }
+
+/* f60c: Resend countdown + max-resends note (Nov 12 2026) */
+.otpg-resend a { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.otpg-resend a.wait { opacity: .55; font-weight: 600; cursor: default; pointer-events: none; font-variant-numeric: tabular-nums; }
+.otpg-new:disabled { opacity: .55; cursor: default; font-variant-numeric: tabular-nums; }
+.otpg-max { margin: 10px auto 0; max-width: 250px; font-size: 13px; line-height: 1.45; color: var(--muted); }
+.otpg-max.hide { display: none; }
+.otpg-resend.hide { display: none; }
+/* Nov 12: "Paste code" — full-width secondary button, brand outline on cream */
+.otpg-paste { display: block; width: 100%; min-height: 48px; margin: 12px 0 2px; padding: 12px 16px; border-radius: 14px; border: 2px solid #F64501; background: #F6F3E7; color: #16181f; font: inherit; font-size: 16px; font-weight: 900; letter-spacing: .01em; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.otpg-paste:active { transform: scale(.98); background: #efe9d6; }
+.otpg-paste.hide { display: none; }
+.otpg[data-state="merge"] .otpg-paste, .otpg[data-state="verified"] .otpg-paste, .otpg.locked .otpg-paste { opacity: .45; pointer-events: none; }

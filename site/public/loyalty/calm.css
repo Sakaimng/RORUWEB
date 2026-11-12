@@ -1,0 +1,28 @@
+/* f55 (Dominic Oct 27 2026 9:36 AM "fix all of it", impeccable review #1): calmer orange. Solid orange stays only on the one main action
+   of a screen (Scan, Send request, Book, Use on a ready reward); things you picked are an orange outline + soft tint; info boxes, tags,
+   rings and secondary buttons go neutral. Dark + light. Loaded last. */
+.notice{background:rgba(246,243,231,.06);border-color:rgba(246,243,231,.16)}
+body.lt .notice,body.thB .notice{background:rgba(22,24,31,.04);border-color:rgba(22,24,31,.14)}
+.act-banner:not(.hot){background:linear-gradient(90deg,rgba(246,243,231,.07),rgba(232,184,74,.10));border-color:rgba(246,243,231,.14)}
+body.lt .act-banner:not(.hot),body.thB .act-banner:not(.hot){background:linear-gradient(90deg,rgba(22,24,31,.04),rgba(232,184,74,.12));border-color:rgba(22,24,31,.12)}
+.vring .vr-fg{stroke:var(--gold,#E8B84A)}
+.sc-chip.on{background:rgba(246,69,1,.10);border-color:rgba(246,69,1,.7);color:var(--cream)}
+body.lt .sc-chip.on,body.thB .sc-chip.on{color:#16181F}
+.lad-btn,body .lad-btn{background:rgba(246,243,231,.10);color:var(--cream);box-shadow:inset 0 0 0 1px rgba(246,243,231,.16)}
+body.lt .lad-btn,body.thB .lad-btn{background:rgba(22,24,31,.06);color:#16181F;box-shadow:inset 0 0 0 1px rgba(22,24,31,.14)}
+.lad-tag,.lad-ok{color:#5fd39c}
+body.lt .lad-tag,body.lt .lad-ok,body.thB .lad-tag,body.thB .lad-ok{color:#1d7f52}
+.lad.open .lad-pts b{color:inherit}
+.lad.open{border-color:rgba(246,243,231,.22);box-shadow:none}
+body.lt .lad.open,body.thB .lad.open{border-color:rgba(22,24,31,.18)}
+#perksCard .perktag.you{background:transparent;color:inherit;box-shadow:inset 0 0 0 1.5px var(--orange)}
+.perks-more,.linkbtn.perks-more{color:inherit;text-decoration:underline;text-underline-offset:3px}
+.sc-next{border-color:rgba(246,243,231,.22)}
+body.lt .sc-next,body.thB .sc-next{border-color:rgba(22,24,31,.2)}
+
+/* Nov 12 (Dominic 16:07): sign-in headline and sub never touch; the sub is 3 short, spaced lines */
+#signin > h1{line-height:1.22;margin:10px 0 18px}
+html[lang^="zh"] #signin > h1{line-height:1.3}
+#signin > #subLine{margin:0 0 20px;line-height:1.4;font-size:15px}
+#signin > #subLine .sub-l{display:block;text-wrap:balance}
+#signin > #subLine .sub-l + .sub-l{margin-top:9px}
