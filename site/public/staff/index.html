@@ -26,6 +26,7 @@
 <script src="/loyalty/scratch.js?v=f55"></script>
 <script src="/loyalty/kama.js?v=f55"></script>
 <script src="/loyalty/monthend.js?v=f55"></script>
+<script src="/loyalty/enquiries.js?v=e1"></script>
 <style>body{overscroll-behavior:none}
 .gcard{border:1px solid var(--line);background:var(--ink2);border-radius:18px;padding:14px 16px;margin:0 0 12px}
 .gcard .gh{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
@@ -121,7 +122,7 @@
           <div id="pending" class="members" hidden></div>
         </div>
         <div id="lists">
-          <div class="ltabs" id="listTabs" role="tablist"><button type="button" data-list="pos" class="on">🧾 POS <b class="badge hide" id="posN"></b></button><button type="button" data-list="today"><span data-t="s_today"></span></button><button type="button" data-list="splits"><span data-f="s_splits"></span> <b class="badge hide" id="splitN"></b></button><button type="button" data-list="kama"><span id="kamaTabT">Bookings</span> <b class="badge hide" id="kamaN"></b></button></div>
+          <div class="ltabs" id="listTabs" role="tablist"><button type="button" data-list="pos" class="on">🧾 POS <b class="badge hide" id="posN"></b></button><button type="button" data-list="today"><span data-t="s_today"></span></button><button type="button" data-list="splits"><span data-f="s_splits"></span> <b class="badge hide" id="splitN"></b></button><button type="button" data-list="kama"><span id="kamaTabT">Bookings</span> <b class="badge hide" id="kamaN"></b></button><button type="button" data-list="enq" id="enqTab">📨 <span>Enquiries</span> <b class="badge hide" id="enqN"></b></button></div>
           <div class="card pos lpanel" data-panel="pos" id="posCard"><div class="row" style="align-items:center"><h2 style="margin:0" class="grow">🧾 <span data-t="s_pos"></span></h2><span class="muted small" data-t="s_pos_sub"></span></div><div id="posList"></div></div>
           <div class="log card lpanel hide" data-panel="today" id="logCard">
             <div class="row"><h2 style="margin:0" class="grow"><span data-t="s_today"></span> · <span id="shopName"></span></h2><span class="muted small" id="todayNums"></span></div>
@@ -129,6 +130,7 @@
           </div>
           <div class="card split-staff lpanel hide" data-panel="splits" id="splitCard"><div id="splitList"></div></div>
           <div class="card lpanel hide" data-panel="kama" id="kamaCard"><div id="kamaList"></div></div><!-- f49: Kama Dinner bookings (loyalty/kama.js) -->
+          <div class="card lpanel hide" data-panel="enq" id="enqCard"><h2 style="margin:0 0 4px">📨 Enquiries</h2><p class="muted small" style="margin:0 0 10px">Website event &amp; catering enquiries. Preview build: sample + this-browser submissions only. "Agreed" is enquiry tracking, not a reservation.</p><div id="enqList"></div></div>
           <div class="card hide" id="monthCard"></div>
         </div>
       </div>
@@ -504,7 +506,18 @@
   $("#rOk").onclick = () => $("#result").classList.remove("show"); $("#result").onclick = (e) => { if (e.target === $("#result")) $("#result").classList.remove("show"); };
 
   // ---- today log ----
-  async function loadToday() { if (!st.sess) return; loadPos(); loadUi(); kamaInit(); try { st.today = await R.rpc("staff_today", { p_token: st.sess.token }); } catch (e) { return; } try { st.sx = await R.rpc("staff_split_list", { p_token: st.sess.token }); } catch (e) { st.sx = null; } renderToday(); }
+  async function loadToday() { if (!st.sess) return; loadPos(); loadUi(); kamaInit(); enqRefresh(); try { st.today = await R.rpc("staff_today", { p_token: st.sess.token }); } catch (e) { return; } try { st.sx = await R.rpc("staff_split_list", { p_token: st.sess.token }); } catch (e) { st.sx = null; } renderToday(); }
+  // ---- enquiries (manager/owner only; preview: synthetic pipeline from /loyalty/enquiries.js) ----
+  let enqView = null;
+  function enqBadge() { const n = window.RORU_ENQUIRIES ? RORU_ENQUIRIES.countNew() : 0; const b = $("#enqN"); if (b) { b.textContent = n; b.classList.toggle("hide", !n); } }
+  function enqRefresh() {
+    const mgr = isMgr(); const tab = $("#enqTab"); if (tab) tab.classList.toggle("hide", !mgr);
+    if (!mgr) { if (st.list === "enq") setList("pos"); return; }
+    if (!window.RORU_ENQUIRIES) return;
+    if (!enqView && $("#enqList")) enqView = RORU_ENQUIRIES.mountView($("#enqList"), { toast: (m) => R.toast(m), onChange: enqBadge });
+    else if (enqView) enqView.refresh();
+    enqBadge();
+  }
   function renderToday() { if (!st.today) return; $("#shopName").textContent = shopName(st.shop); $("#todayNums").textContent = st.today.receipts + " 🧾 · " + (st.today.visits || 0) + " 🥢 · " + st.today.points + " " + t("s_pts") + " · " + st.today.redeemed + " 🎁"; $("#queueN").textContent = (st.today.pending + (st.today.pending_bonuses || 0)) || ""; $("#log").innerHTML = st.today.log.slice(0, st.todayAll ? 60 : 5).map(l => '<div class="hist"><span>' + R.fmtTime(l.at) + " · " + l.who + (l.reward ? " · " + (R.lang() === "zh" && l.reward_zh ? l.reward_zh : l.reward) : "") + (l.amount ? " · HK$" + (+l.amount).toFixed(0) : "") + "</span><span>" + (l.type === "points" ? "+" + l.points + " " + t("s_pts") + (l.stamped ? " + 🥢" : "") + (l.source === "staff" ? " " + t("s_log_staff") : "") + (l.split_role ? ' <b class="split-tag">' + (+l.split_n > 2 ? t("s_split_n_with", { n: l.split_n, who: esc(l.split_with || "") }) : "½ " + t("s_split_with", { who: esc(l.split_with || "") })) + "</b>" : "") : l.type === "visit" ? "🥢 " + t("s_visit_log") : l.type === "redeem" ? "🎁 " + t("s_log_redeem") : l.type === "rejected" ? "✕ " + t("s_log_rejected") : l.type) + "</span></div>").join("") + seeAll(Math.min(st.today.log.length, 60), st.todayAll, "todayAll") || '<p class="muted small">—</p>';  renderSplitsF47(); }
 
   // ---- f47 (Dominic Oct 21 2:28 PM: "the system should just do an auto approval once it goes through its own parameters"):
