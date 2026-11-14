@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
           })),
         ),
         /** Roru Family loyalty app (static, in public/family, public/staff, public/loyalty): clean URLs serve each page's index.html. */
-        ...["/family", "/family/privacy", "/family/terms", "/staff", "/staff/owner"].map((p) => ({ source: p, destination: `${p}/index.html` })),
+        ...["/family", "/family/privacy", "/family/terms", "/staff", "/staff/owner", "/owner"].map((p) => ({ source: p, destination: `${p}/index.html` })),
         { source: "/ja", destination: "/rorubaru-3d.html" },
         { source: "/zh-Hant", destination: "/rorubaru-3d.html" },
         /** The two largest story videos are served from the site's mirror (too big for the repo upload path). */
