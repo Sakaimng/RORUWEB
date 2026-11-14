@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Events at RORU · RORUBARU</title>
+<meta name="description" content="Takeovers, collaborations and private nights at RORUBARU, Hong Kong's hand roll bar in Wan Chai. Private dinners, buyouts and brand events - tell us what you're planning.">
+<meta name="theme-color" content="#0b0d12">
+<link rel="icon" href="/icons/icon-512.png">
+<style>
+@font-face{font-family:Geist;src:url(/fonts/geist-300.woff2) format("woff2");font-weight:300;font-display:swap}
+@font-face{font-family:Geist;src:url(/fonts/geist-500.woff2) format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:Geist;src:url(/fonts/geist-900.woff2) format("woff2");font-weight:900;font-display:swap}
+:root{--orange:#F64501;--cream:#F6F3E7;--ink:#0b0d12;--ink2:#14161d;--line:rgba(246,243,231,.14);--muted:rgba(246,243,231,.62)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--ink);color:var(--cream);font-family:Geist,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+:lang(zh-Hant){font-family:Geist,"PingFang HK","PingFang TC","Noto Sans CJK HK","Noto Sans CJK TC","Microsoft JhengHei",system-ui,sans-serif}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+body{min-height:100vh}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px calc(80px + env(safe-area-inset-bottom))}
+.preview-bar{position:sticky;top:0;z-index:50;background:var(--orange);color:#fff;font-size:12px;font-weight:700;letter-spacing:.04em;text-align:center;padding:7px 12px}
+.top{display:flex;align-items:center;gap:14px;padding:18px 0 6px}
+.top .home{display:flex;align-items:center;gap:10px;text-decoration:none}
+.top .home img{height:26px;width:auto}
+.top .lang{margin-left:auto;display:flex;gap:4px;font-size:12px}
+.top .lang a{padding:5px 10px;border:1px solid var(--line);border-radius:99px;text-decoration:none;color:var(--muted)}
+.top .lang a.on{color:var(--cream);border-color:var(--cream);font-weight:700}
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);font-weight:700;margin:26px 0 6px}
+h1{font-weight:900;font-size:clamp(30px,6vw,44px);line-height:1.08;letter-spacing:-.01em}
+h2{font-weight:900;font-size:22px;margin:34px 0 8px}
+.lede{color:var(--muted);font-size:16px;line-height:1.55;margin-top:10px;max-width:56ch}
+.card{background:var(--ink2);border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:16px}
+.ev-up{display:flex;gap:14px;align-items:flex-start}
+.ev-up img{width:86px;height:86px;object-fit:cover;border-radius:12px;flex:none}
+.ev-up h3{font-size:17px;font-weight:900}
+.ev-up .when{color:var(--orange);font-size:13px;font-weight:700;margin-top:2px}
+.ev-up p{color:var(--muted);font-size:14px;line-height:1.5;margin-top:6px}
+.ev-up .book{display:inline-block;margin-top:10px;font-size:13px;font-weight:700;color:var(--cream);border:1px solid var(--line);border-radius:99px;padding:7px 14px;text-decoration:none}
+.ev-up .book:hover{border-color:var(--orange);color:var(--orange)}
+.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.strip img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;display:block}
+.gal h3{font-size:15px;font-weight:900}
+.gal h3 span{color:var(--muted);font-weight:500;font-size:13px;margin-left:8px}
+form{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+form p{display:flex;flex-direction:column;gap:6px}
+form p.wide{grid-column:1/-1}
+label{font-size:13px;font-weight:700}
+label .opt{color:var(--muted);font-weight:500}
+input,select,textarea{appearance:none;background:rgba(246,243,231,.05);border:1px solid var(--line);border-radius:12px;color:var(--cream);font:inherit;font-size:15px;padding:11px 13px;width:100%}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23F6F3E7' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+input:focus,select:focus,textarea:focus{border-color:var(--orange);outline:none}
+textarea{min-height:96px;resize:vertical}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.btn{appearance:none;border:0;background:var(--orange);color:#fff;font:inherit;font-weight:800;font-size:15px;padding:13px 22px;border-radius:99px;cursor:pointer}
+.btn:disabled{opacity:.55;cursor:default}
+.ghostbtn{background:transparent;color:var(--cream);border:1px solid var(--line)}
+.actions{display:flex;gap:10px;grid-column:1/-1;align-items:center;flex-wrap:wrap}
+.err{color:#ff9a7a;font-size:13px;grid-column:1/-1}
+.done{display:none;text-align:center;padding:34px 10px}
+.done.on{display:block}
+.done .tick{font-size:40px}
+.done h3{font-size:20px;font-weight:900;margin:10px 0 6px}
+.done p{color:var(--muted);font-size:14px;line-height:1.6;max-width:44ch;margin:0 auto}
+.pv-note{font-size:12px;color:var(--muted);margin-top:10px;grid-column:1/-1}
+.facts{margin-top:40px;border-top:1px solid var(--line);padding-top:22px;display:grid;gap:10px;font-size:14px}
+.facts div{display:flex;gap:10px}
+.facts dt{color:var(--muted);min-width:86px;font-weight:500}
+.facts dd{margin:0}
+.fineprint{margin-top:26px;color:var(--muted);font-size:12px;line-height:1.6}
+[hidden]{display:none!important}
+@media (max-width:560px){form{grid-template-columns:1fr}.strip{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="preview-bar" id="pvBar">PREVIEW — this page is not live yet; enquiries are stored only in this browser.</div>
+<div class="wrap">
+  <header class="top">
+    <a class="home" href="/" aria-label="RORUBARU home"><img src="/logo-line.svg" alt="RORUBARU"></a>
+    <nav class="lang" aria-label="Language">
+      <a href="/events" id="lEn">EN</a>
+      <a href="/zh-Hant/events" id="lZh" lang="zh-Hant">繁中</a>
+    </nav>
+  </header>
+
+  <p class="eyebrow" data-en="Events at RORU" data-zh="RORU 活動">Events at RORU</p>
+  <h1 data-en="Nights at the counter, yours for the taking." data-zh="吧檯之夜，由你包場。">Nights at the counter, yours for the taking.</h1>
+  <p class="lede" data-en="Takeovers, collaborations and private hire at Hong Kong's original hand roll bar. See what's coming up, then tell us what you're planning." data-zh="香港手卷吧嘅聯乘、包場同私人晚宴。睇吓有咩即將舉行，再話我哋知你嘅計劃。">Takeovers, collaborations and private hire at Hong Kong's original hand roll bar. See what's coming up, then tell us what you're planning.</p>
+
+  <h2 data-en="Coming up" data-zh="即將舉行">Coming up</h2>
+  <div id="upcoming"></div>
+
+  <h2 data-en="Private events" data-zh="私人活動">Private events</h2>
+  <p class="lede" data-en="Private dinners, full buyouts and brand collaborations. Tell us the date, the headcount and what you have in mind — a real person from the team replies with options and a quote. This is an enquiry, not an automatic booking." data-zh="私人晚宴、全場包場、品牌聯乘。話我哋知日期、人數同想法，我哋嘅團隊會親自回覆，提供方案同報價。呢度係查詢，唔係自動訂座。">Private dinners, full buyouts and brand collaborations. Tell us the date, the headcount and what you have in mind — a real person from the team replies with options and a quote. This is an enquiry, not an automatic booking.</p>
+
+  <div class="card">
+    <form id="enqForm" novalidate>
+      <p><label for="fName" data-en="Name" data-zh="姓名">Name</label><input id="fName" name="name" autocomplete="name" required maxlength="200"></p>
+      <p><label for="fEmail" data-en="Email" data-zh="電郵">Email</label><input id="fEmail" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="254"></p>
+      <p><label for="fPhone"><span data-en="Phone / WhatsApp" data-zh="電話 / WhatsApp">Phone / WhatsApp</span> <span class="opt" data-en="(optional)" data-zh="（選填）">(optional)</span></label><input id="fPhone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="40"></p>
+      <p><label for="fDate"><span data-en="Preferred date" data-zh="首選日期">Preferred date</span> <span class="opt" data-en="(flexible is fine)" data-zh="（有彈性都得）">(flexible is fine)</span></label><input id="fDate" name="event_date" type="date"></p>
+      <p><label for="fHead" data-en="Headcount" data-zh="人數">Headcount</label><input id="fHead" name="headcount" type="number" min="1" max="500" inputmode="numeric" placeholder="e.g. 20"></p>
+      <p><label for="fBudget" data-en="Your budget" data-zh="預算">Your budget</label><select id="fBudget" name="budget">
+        <option value="Not sure" data-en="Not sure yet" data-zh="未定">Not sure yet</option>
+        <option value="Under HK$10,000" data-en="Under HK$10,000" data-zh="HK$10,000 以下">Under HK$10,000</option>
+        <option value="HK$10,000–30,000" data-en="HK$10,000–30,000" data-zh="HK$10,000–30,000">HK$10,000–30,000</option>
+        <option value="Over HK$30,000" data-en="Over HK$30,000" data-zh="HK$30,000 以上">Over HK$30,000</option>
+      </select></p>
+      <p class="wide"><label for="fMsg" data-en="What are you planning?" data-zh="你計劃緊咩？">What are you planning?</label><textarea id="fMsg" name="message" required minlength="8" maxlength="5000" data-en-ph="Occasion, style of event, anything else we should know" data-zh-ph="場合、活動形式、其他想我哋知道嘅嘢"></textarea></p>
+      <p class="hp" aria-hidden="true"><label>Company <input name="company" tabindex="-1" autocomplete="off"></label></p>
+      <p class="err" id="enqErr" role="alert" hidden></p>
+      <div class="actions"><button class="btn" type="submit" id="enqSend" data-en="Send enquiry" data-zh="送出查詢">Send enquiry</button></div>
+      <p class="pv-note" data-en="Preview build: your enquiry is saved only in this browser so the flow can be reviewed. Nothing is sent yet." data-zh="預覽版本：你嘅查詢只會儲存喺呢個瀏覽器，方便檢視流程，暫時唔會送出。">Preview build: your enquiry is saved only in this browser so the flow can be reviewed. Nothing is sent yet.</p>
+    </form>
+    <div class="done" id="enqDone" role="status">
+      <div class="tick">🎉</div>
+      <h3 data-en="Enquiry noted" data-zh="已記低你嘅查詢">Enquiry noted</h3>
+      <p data-en="Thanks — the team will be in touch. (Preview: saved in this browser only.)" data-zh="多謝 — 團隊會盡快聯絡你。（預覽版本：只儲存喺呢個瀏覽器。）">Thanks — the team will be in touch. (Preview: saved in this browser only.)</p>
+    </div>
+  </div>
+
+  <h2 data-en="Past nights" data-zh="過往活動">Past nights</h2>
+  <div id="past"></div>
+
+  <dl class="facts">
+    <div><dt data-en="Email" data-zh="電郵">Email</dt><dd><a href="mailto:hello@rorubaru.com">hello@rorubaru.com</a></dd></div>
+    <div><dt data-en="Phone" data-zh="電話">Phone</dt><dd><a href="tel:+85263175675">+852 6317 5675</a></dd></div>
+    <div><dt data-en="Find us" data-zh="地址">Find us</dt><dd>G/F, 100–102 Queen's Road East, Wan Chai</dd></div>
+  </dl>
+  <p class="fineprint" data-en="RORUBARU · Hong Kong's original hand roll bar · Enquiries are answered by the team, usually within a day." data-zh="RORUBARU · 香港手卷吧 · 所有查詢均由團隊親自回覆，通常一日內回覆。">RORUBARU · Hong Kong's original hand roll bar · Enquiries are answered by the team, usually within a day.</p>
+</div>
+
+<script src="/loyalty/enquiries.js"></script>
+<script type="module">
+import PAST from "/events-data.js";
+import { upcoming } from "/events-data.js";
+
+const zh = location.pathname.indexOf("/zh-Hant") === 0;
+document.documentElement.lang = zh ? "zh-Hant" : "en";
+document.querySelectorAll("[data-en]").forEach(el => { const v = el.getAttribute(zh ? "data-zh" : "data-en"); if (v) el.textContent = v; });
+document.querySelectorAll("[data-en-ph]").forEach(el => { el.placeholder = el.getAttribute(zh ? "data-zh-ph" : "data-en-ph") || ""; });
+document.getElementById("lEn").classList.toggle("on", !zh);
+document.getElementById("lZh").classList.toggle("on", zh);
+document.getElementById("pvBar").textContent = zh
+  ? "預覽 — 呢版未正式推出；查詢只會儲存喺呢個瀏覽器。"
+  : "PREVIEW — this page is not live yet; enquiries are stored only in this browser.";
+document.title = zh ? "RORU 活動 · RORUBARU" : "Events at RORU · RORUBARU";
+
+// ---- upcoming events (from the site's shared events-data.js; entries drop off after their last day) ----
+function hkToday() { const n = new Date(Date.now() + (8 * 60 + new Date().getTimezoneOffset()) * 60000); return n.toISOString().slice(0, 10); }
+const today = hkToday();
+const up = (upcoming || []).filter(e => (e.end || e.date) >= today);
+const upEl = document.getElementById("upcoming");
+if (!up.length) {
+  upEl.innerHTML = '<p class="lede">' + (zh ? "而家冇公佈咗嘅活動 — 新活動會喺度公佈。" : "Nothing announced right now — new nights land here first.") + "</p>";
+} else {
+  upEl.innerHTML = up.map(e => {
+    const when = [e.day, e.time].filter(Boolean).join(" · ");
+    const book = e.book && typeof e.book === "string"
+      ? '<a class="book" href="' + e.book + '" target="_blank" rel="noopener">' + (zh ? "訂座" : "Book") + "</a>"
+      : (e.book !== false ? '<a class="book" href="/reserve">' + (zh ? "訂座" : "Book") + "</a>" : "");
+    return '<div class="card ev-up">' + (e.image ? '<img src="/' + e.image + '" alt="" loading="lazy">' : "")
+      + '<div><h3>' + e.title + '</h3><div class="when">' + when + "</div>"
+      + (e.kind ? '<p><b style="color:var(--cream)">' + e.kind + ".</b> " : "<p>") + (e.text || "") + "</p>" + book + "</div></div>";
+  }).join("");
+}
+
+// ---- past galleries (shared data; thumbnails from the room's own events panel) ----
+document.getElementById("past").innerHTML = (PAST || []).map(g => {
+  const thumbs = g.images.slice(0, 4).map(src => '<img src="/' + src.replace(/(\.\w+)$/, "-t$1") + '" alt="' + g.title + '" loading="lazy" decoding="async">').join("");
+  return '<div class="card gal"><h3>' + g.title + "<span>" + g.date + '</span></h3><div class="strip">' + thumbs + "</div></div>";
+}).join("");
+
+// ---- enquiry form (preview: local storage only, via /loyalty/enquiries.js) ----
+const form = document.getElementById("enqForm");
+const err = document.getElementById("enqErr");
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+form.addEventListener("submit", ev => {
+  ev.preventDefault();
+  err.hidden = true;
+  const d = new FormData(form);
+  const get = k => (d.get(k) || "").toString().trim();
+  if (get("company")) return; // honeypot
+  const fail = m => { err.textContent = m; err.hidden = false; };
+  if (!get("name")) return fail(zh ? "請填姓名" : "Please add your name");
+  if (!EMAIL_RE.test(get("email"))) return fail(zh ? "請填正確電郵" : "Please add a valid email");
+  if (get("message").length < 8) return fail(zh ? "講多少少你嘅計劃" : "Tell us a little about what you're planning");
+  const btn = document.getElementById("enqSend");
+  btn.disabled = true;
+  RORU_ENQUIRIES.submitLocal({
+    kind: "event",
+    name: get("name"), email: get("email"), phone: get("phone"),
+    event_date: get("event_date"), headcount: +get("headcount") || null,
+    budget: get("budget"), message: get("message"), lang: zh ? "zh" : "en"
+  });
+  form.style.display = "none";
+  document.getElementById("enqDone").classList.add("on");
+});
+</script>
+</body>
+</html>

@@ -13,13 +13,16 @@ const nextConfig: NextConfig = {
          * The address stays the same, so links and Google results keep working.
          */
         ...["", "/ja", "/zh-Hant"].flatMap((lang) =>
-          ["menu", "about", "story", "events", "reserve", "delivery", "order"].map((page) => ({
+          ["menu", "about", "story", "reserve", "delivery", "order"].map((page) => ({
             source: `${lang}/${page}`,
             destination: "/rorubaru-3d.html",
           })),
         ),
         /** Roru Family loyalty app (static, in public/family, public/staff, public/loyalty): clean URLs serve each page's index.html. */
         ...["/family", "/family/privacy", "/family/terms", "/staff", "/staff/owner", "/owner"].map((p) => ({ source: p, destination: `${p}/index.html` })),
+        /** Events & catering pages (static, in public/events, public/catering): clean URLs serve each page's index.html.
+            The page itself picks EN / 繁中 from the path; /ja falls back to EN for now. */
+        ...["/events", "/catering", "/zh-Hant/events", "/zh-Hant/catering", "/ja/events", "/ja/catering"].map((p) => ({ source: p, destination: `${p.replace(/^\/(ja|zh-Hant)/, "")}/index.html` })),
         { source: "/ja", destination: "/rorubaru-3d.html" },
         { source: "/zh-Hant", destination: "/rorubaru-3d.html" },
         /** The two largest story videos are served from the site's mirror (too big for the repo upload path). */
