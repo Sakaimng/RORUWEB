@@ -61,7 +61,8 @@ window.RORU_BADGES = (function () {
   function img(id) { return IMGS[id] || ""; }
 
   const CSS = `
-.shelf{font:inherit}
+.shelf{font:inherit;padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+.shelf-sample{background:var(--cream,#f6f3e7);color:var(--ink,#16181f);font-size:11px;font-weight:800;letter-spacing:.04em;border-radius:12px;padding:9px 12px;margin-bottom:14px;line-height:1.45}
 .shelf-hero{background:var(--orange,#F64501);border-radius:20px;padding:18px;display:flex;gap:14px;align-items:center;color:#fff;box-shadow:0 10px 24px rgba(246,69,1,.25)}
 .shelf-hero img{width:104px;height:104px;object-fit:contain;flex:0 0 auto;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
 .shelf-hero .sh-new{display:inline-block;background:#fff;color:var(--orange,#F64501);font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:99px}
@@ -96,11 +97,11 @@ window.RORU_BADGES = (function () {
     const got = earned();
     const fresh = BADGES.find(b => got[b.id] && got[b.id].fresh);
     const n = BADGES.filter(b => got[b.id]).length;
-    let html = '<div class="shelf">';
+    let html = '<div class="shelf"><div class="shelf-sample">Sample preview - every badge, date and count below is example data for design review, not a real guest record or a live award rule.</div>';
     if (fresh) {
       const g = got[fresh.id];
       html += '<div class="shelf-hero"><img src="' + img(fresh.id) + '" alt="' + esc(fresh.name) + ' badge">'
-        + '<div><span class="sh-new">New badge</span><h3>' + esc(fresh.name) + '</h3>'
+        + '<div><span class="sh-new">Sample badge</span><h3>' + esc(fresh.name) + '</h3>'
         + '<p>' + esc(fresh.rule) + '</p>'
         + '<div class="sh-when">Earned ' + esc(fmtOn(g.on)) + ' 2026' + (g.at ? ' · ' + esc(g.at) : '') + '</div></div></div>';
     }
