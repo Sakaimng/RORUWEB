@@ -52,7 +52,7 @@ textarea{min-height:96px;resize:vertical}
 .err{color:#ff9a7a;font-size:13px;grid-column:1/-1}
 .done{display:none;text-align:center;padding:34px 10px}
 .done.on{display:block}
-.done .tick{font-size:40px}
+.done .tick{width:48px;height:48px;margin:0 auto}.done .tick svg{width:100%;height:100%;display:block}
 .done h3{font-size:20px;font-weight:900;margin:10px 0 6px}
 .done p{color:var(--muted);font-size:14px;line-height:1.6;max-width:44ch;margin:0 auto}
 .pv-note{font-size:12px;color:var(--muted);margin-top:10px;grid-column:1/-1}
@@ -82,7 +82,7 @@ textarea{min-height:96px;resize:vertical}
 
   <div class="steps">
     <div class="step"><b class="n">1</b><p data-en="&lt;b&gt;Tell us what you need&lt;/b&gt; — date, headcount, delivery or pickup." data-zh="&lt;b&gt;話我哋知你需要咩&lt;/b&gt; — 日期、人數、送貨定自取。"><b>Tell us what you need</b> — date, headcount, delivery or pickup.</p></div>
-    <div class="step"><b class="n">2</b><p data-en="&lt;b&gt;We reply with options and a quote&lt;/b&gt; — a real person, usually within a day." data-zh="&lt;b&gt;我哋回覆方案同報價&lt;/b&gt; — 真人回覆，通常一日內。"><b>We reply with options and a quote</b> — a real person, usually within a day.</p></div>
+    <div class="step"><b class="n">2</b><p data-en="&lt;b&gt;We reply with options and a quote&lt;/b&gt; — a real person." data-zh="&lt;b&gt;我哋回覆方案同報價&lt;/b&gt; — 真人回覆。"><b>We reply with options and a quote</b> — a real person.</p></div>
     <div class="step"><b class="n">3</b><p data-en="&lt;b&gt;We make it happen&lt;/b&gt; — fresh hand rolls, ready when you are." data-zh="&lt;b&gt;我哋準備好一切&lt;/b&gt; — 新鮮手卷，準時交到。"><b>We make it happen</b> — fresh hand rolls, ready when you are.</p></div>
   </div>
 
@@ -113,9 +113,9 @@ textarea{min-height:96px;resize:vertical}
       <p class="pv-note" data-en="Preview build: your enquiry is saved only in this browser so the flow can be reviewed. Nothing is sent yet." data-zh="預覽版本：你嘅查詢只會儲存喺呢個瀏覽器，方便檢視流程，暫時唔會送出。">Preview build: your enquiry is saved only in this browser so the flow can be reviewed. Nothing is sent yet.</p>
     </form>
     <div class="done" id="enqDone" role="status">
-      <div class="tick">🎉</div>
+      <div class="tick"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10.5" stroke="var(--orange)" stroke-width="1.5"/><path d="M7.5 12.3l3 3 6-6.6" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <h3 data-en="Enquiry noted" data-zh="已記低你嘅查詢">Enquiry noted</h3>
-      <p data-en="Thanks — the team will be in touch. (Preview: saved in this browser only.)" data-zh="多謝 — 團隊會盡快聯絡你。（預覽版本：只儲存喺呢個瀏覽器。）">Thanks — the team will be in touch. (Preview: saved in this browser only.)</p>
+      <p data-en="Thanks — the team will be in touch. (Preview: saved in this browser only.)" data-zh="多謝 — 團隊會聯絡你。（預覽版本：只儲存喺呢個瀏覽器。）">Thanks — the team will be in touch. (Preview: saved in this browser only.)</p>
     </div>
   </div>
 
@@ -124,7 +124,7 @@ textarea{min-height:96px;resize:vertical}
     <div><dt data-en="Phone" data-zh="電話">Phone</dt><dd><a href="tel:+85263175675">+852 6317 5675</a></dd></div>
     <div><dt data-en="Pickup" data-zh="自取">Pickup</dt><dd>G/F, 100–102 Queen's Road East, Wan Chai</dd></div>
   </dl>
-  <p class="fineprint" data-en="RORUBARU · Hong Kong's original hand roll bar · Enquiries are answered by the team, usually within a day." data-zh="RORUBARU · 香港手卷吧 · 所有查詢均由團隊親自回覆，通常一日內回覆。">RORUBARU · Hong Kong's original hand roll bar · Enquiries are answered by the team, usually within a day.</p>
+  <p class="fineprint" data-en="RORUBARU · Hong Kong's original hand roll bar · Enquiries are answered by the team." data-zh="RORUBARU · 香港手卷吧 · 所有查詢均由團隊親自回覆。">RORUBARU · Hong Kong's original hand roll bar · Enquiries are answered by the team.</p>
 </div>
 
 <script src="/loyalty/enquiries.js"></script>
