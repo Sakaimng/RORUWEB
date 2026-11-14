@@ -1,0 +1,1113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net; worker-src 'self' blob: https://cdn.jsdelivr.net; child-src 'self' blob:; connect-src 'self' https://gpudggbdwghzsanyvvgt.supabase.co wss://gpudggbdwghzsanyvvgt.supabase.co https://cdn.jsdelivr.net https://tessdata.projectnaptha.com data: blob:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; media-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="theme-color" content="#0b0d12">
+<title data-tt="{prog} — Owner">High Rollers — Owner</title>
+<link rel="icon" href="/icon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-icon.png">
+<link rel="stylesheet" href="/loyalty/loyalty.css?v=f55">
+<link rel="stylesheet" href="/loyalty/passport.css?v=f55">
+<link rel="stylesheet" href="/loyalty/redesign.css?v=f55">
+<link rel="stylesheet" href="/loyalty/scratch.css?v=f55">
+<link rel="stylesheet" href="/loyalty/owner-glass.css?v=f57">
+<script src="/loyalty/vendor/qrcode.js"></script>
+<script src="/loyalty/loyalty.js?v=l4"></script>
+<script src="/loyalty/passport.js?v=f55"></script>
+<script src="/loyalty/scratch.js?v=f55"></script>
+<script src="/loyalty/monthend.js?v=f55"></script>
+<style>
+/* v36 owner dashboard */
+.dash{margin:16px 0 18px}
+.dash h3{margin:0;font-size:15px;font-weight:600;color:var(--cream)}
+.dash .sub{font-size:13px;color:var(--muted);margin:2px 0 0}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0 4px}
+.kpi{background:var(--ink2);border:1px solid var(--line);border-radius:18px;padding:16px 16px 14px;min-width:0}
+.kpi .lbl{font-size:13px;color:var(--muted)}
+.kpi .val small{font-size:.6em;font-weight:600;margin-right:2px;color:var(--muted)}
+.kpi .val{font-size:26px;font-weight:700;line-height:1.15;margin:6px 0 8px;letter-spacing:-.01em;white-space:nowrap;overflow:visible;text-overflow:clip}
+/* v43: values auto-shrink to fit the card (fitKpis); 6+ digit values switch to a compact form (HK$209.5k) only if the full figure cannot fit */
+.kpi .chg{font-size:12px;color:var(--muted)}
+.kpi .chg b{font-weight:700;margin-right:4px}
+.chg .up{color:var(--green)} .chg .down{color:#ff7a59} .chg .flat{color:var(--muted)}
+.dcard{background:var(--ink2);border:1px solid var(--line);border-radius:18px;padding:18px 16px;margin:14px 0}
+.dhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.seg{display:inline-flex;background:rgba(246,243,231,.06);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;color:var(--muted);font-size:13px;padding:6px 12px;border-radius:999px;cursor:pointer}
+.seg button.on{background:var(--cream);color:var(--ink);font-weight:600}
+.chart{margin-top:14px;width:100%}
+.chart svg{display:block;width:100%;height:auto}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:10px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.dtot{font-size:13px;color:var(--muted);margin-top:6px}
+.minis{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}
+.minis .dcard{margin:0}
+.donut{display:flex;align-items:center;gap:18px}
+.donut ul,.bars{list-style:none;margin:0;padding:0;font-size:13px}
+.donut li{display:flex;align-items:center;gap:8px;margin:5px 0;color:var(--cream)}
+.donut li span{color:var(--muted);margin-left:auto;padding-left:10px}
+.bars li{margin:10px 0}
+.bars .bl{display:flex;justify-content:space-between;gap:10px;color:var(--cream)}
+.bars .bl span{color:var(--muted)}
+.bars .bt{height:8px;background:rgba(246,243,231,.08);border-radius:6px;margin-top:5px;overflow:hidden}
+.bars .bt i{display:block;height:100%;background:var(--orange);border-radius:6px}
+.posbar{display:flex;height:12px;border-radius:8px;overflow:hidden;background:rgba(246,243,231,.08);margin:14px 0 10px}
+.posbar i{display:block;height:100%}
+.pbig{font-size:26px;font-weight:700;margin-top:10px}
+.dash details{background:var(--ink2);border:1px solid var(--line);border-radius:18px;margin:14px 0;padding:0 16px}
+.dash summary{cursor:pointer;padding:16px 0;font-size:15px;font-weight:600;list-style:none;display:flex;justify-content:space-between}
+.dash summary::-webkit-details-marker{display:none}
+.dash summary::after{content:"Show";font-weight:400;font-size:13px;color:var(--muted)}
+.dash details[open] summary::after{content:"Hide"}
+.dash details .in{padding:0 0 16px}
+.nums{display:grid;grid-template-columns:1fr;gap:0}
+.nums div{display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
+.nums div span{color:var(--muted);min-width:0}
+.nums div{gap:10px}.nums div b,.nums div strong{white-space:nowrap}
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dash table{width:100%;border-collapse:collapse;font-size:13px}
+.dash th{text-align:left;color:var(--muted);font-weight:500;padding:8px 10px 8px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+.dash td{padding:8px 10px 8px 0;border-bottom:1px solid rgba(246,243,231,.06);white-space:nowrap}
+.dash td.n,.dash th.n{text-align:right}
+@media (min-width:700px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.kpi .val{font-size:30px}.minis{grid-template-columns:repeat(3,minmax(0,1fr))}.nums{grid-template-columns:1fr 1fr;column-gap:28px}}
+
+/* ===== f27 owner: two layouts on one URL (phone < 900px: bottom tabs + cards; desktop >= 900px: side menu + wide tables) ===== */
+body.own{overflow-x:hidden}
+.own .staff{max-width:none;padding:0;min-height:100svh}
+.oh{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;background:rgba(11,13,18,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.oh .brand{min-width:0;gap:8px}
+.oh .brand img{height:22px;flex:none}
+.oh .brand .fam{font-size:13px;white-space:normal;line-height:1.05;min-width:0} /* f46: wraps to 2 lines instead of "HIGH…"; f47: two-line logo beside it */
+.oh .brand img.logo-2l{height:38px;flex:none}
+.oh .acts{display:flex;gap:8px;flex:none}
+.icb{appearance:none;-webkit-appearance:none;border:1px solid var(--line);background:var(--ink2);color:var(--cream);border-radius:12px;min-width:44px;height:44px;padding:0 12px;font-size:20px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.icb span{font-size:14px;font-weight:700}
+#login{padding:20px 16px}
+.oshell{display:block}
+.views{padding:14px 16px calc(96px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto;min-width:0}
+.view{display:none}.view.on{display:block}
+.vh{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin:4px 0 12px}
+.vh h1{font-size:26px;margin:0}
+.vh .sub{font-size:14px;color:var(--muted);margin:2px 0 0}
+.sec{margin:22px 0 10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sec h2{margin:0;font-size:18px}
+.sec .lnk{background:none;border:0;color:var(--orange);font-size:15px;font-weight:700;cursor:pointer;padding:8px 0}
+.side{display:none}
+.otabs{position:fixed;left:0;right:0;bottom:0;z-index:45;display:grid;grid-template-columns:repeat(3,1fr);background:rgba(11,13,18,.96);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:4px max(8px,env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+.otabs button{appearance:none;-webkit-appearance:none;background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:inherit;font-size:12px;font-weight:700;min-height:56px;cursor:pointer}
+.otabs button svg{width:25px;height:25px}
+.otabs button.on{color:var(--orange)}
+.otabs .badge,.side .badge{display:inline-block;min-width:18px;padding:1px 5px;border-radius:99px;background:var(--orange);color:#fff;font-size:11px;line-height:16px;text-align:center}
+.otabs button{position:relative}.otabs .badge{position:absolute;top:4px;left:calc(50% + 6px)}
+/* quick actions */
+.qa{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.qa button{appearance:none;-webkit-appearance:none;border:1px solid var(--line);background:var(--ink2);color:var(--cream);border-radius:16px;padding:16px 14px;min-height:76px;text-align:left;font:inherit;font-size:16px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;gap:4px;justify-content:center}
+.qa button i{font-style:normal;font-size:22px}
+.qa button small{font-size:13px;font-weight:500;color:var(--muted)}
+.qa button.hot{border-color:var(--orange);background:rgba(246,69,1,.12)}
+/* list items (cards on phone) */
+.li{display:flex;align-items:center;gap:12px;background:var(--ink2);border:1px solid var(--line);border-radius:16px;padding:14px;margin:0 0 10px;min-width:0}
+.li.tap{cursor:pointer}
+.li .bd{flex:1;min-width:0}
+.li .t1{font-size:16px;font-weight:900;overflow-wrap:anywhere}
+.li .t2{font-size:14px;color:var(--muted);margin-top:3px;overflow-wrap:anywhere}
+.li .t3{font-size:14px;margin-top:6px;display:flex;flex-wrap:wrap;gap:6px 14px}
+.li .t3 b{font-weight:900}
+.li .chev{color:var(--muted);font-size:22px;flex:none}
+.li .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.li.off{opacity:.55}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none;border:1px solid rgba(0,0,0,.3)}
+.tchip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(246,243,231,.08)}
+.opill{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(76,195,138,.16);color:#7fe0ad}
+.opill.no{background:rgba(246,243,231,.08);color:var(--muted)}
+.opill.warn{background:rgba(232,184,74,.16);color:var(--gold)}
+.bigbtn{display:flex;gap:10px}
+.bigbtn .btn{flex:1;padding:14px;font-size:16px}
+.own .btn.sm{min-height:44px;font-size:15px}
+.empty{color:var(--muted);font-size:15px;padding:6px 2px 10px}
+/* search */
+.search{position:relative;margin:4px 0 14px}
+.search input{width:100%;font-size:17px;padding:15px 16px 15px 44px;border-radius:14px;border:1px solid rgba(246,243,231,.28);background:#1b1e27;color:var(--cream);outline:none}
+.search input:focus{border-color:var(--orange)}
+.search:before{content:"🔎";position:absolute;left:15px;top:50%;transform:translateY(-50%);font-size:17px;opacity:.8}
+/* help "?" */
+details.help{margin:0 0 12px}
+details.help summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:14px;padding:6px 0}
+details.help summary::-webkit-details-marker{display:none}
+details.help summary:before{content:"?";display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);font-weight:900;color:var(--cream);font-size:13px}
+details.help p{font-size:15px;line-height:1.5;color:var(--cream);opacity:.85;background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 0}
+/* settings groups */
+details.grp{background:var(--ink2);border:1px solid var(--line);border-radius:16px;margin:0 0 10px;padding:0 14px}
+details.grp>summary{list-style:none;cursor:pointer;padding:16px 0;font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:space-between;gap:10px}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary:after{content:"›";font-size:22px;color:var(--muted);transition:transform .2s}
+/* f38b: the title sits in one span, so a swapped-in custom emoji (🥢 → hand-roll image) can't split it into separate flex items (Kama Dinner header looked centred, Dominic Oct 18) */
+details.grp>summary>.gt{flex:1;min-width:0;text-align:left}
+details.grp>summary:after{margin-left:auto;flex:none}
+details.grp>summary .hr-emoji{height:1.4em;width:1.25em;margin:-.2em .08em 0 0;vertical-align:middle;object-fit:contain}
+details.grp[open]>summary:after{transform:rotate(90deg)}
+details.grp>.in{padding:0 0 14px}
+/* fields: label above, full width, 16px+ */
+.fl{display:block;margin:0 0 14px;min-width:0}
+.fl>span{display:block;font-size:14px;color:var(--muted);margin:0 0 6px;font-weight:700}
+.fl>em{display:block;font-style:normal;font-size:13px;color:var(--muted);margin-top:5px}
+.fin,.own select.fin{width:100%;min-width:0;font-size:17px;padding:13px 14px;border-radius:12px;border:1px solid rgba(246,243,231,.28);background:#1b1e27;color:var(--cream);outline:none}
+.fin:focus{border-color:var(--orange)}
+.own select.fin{-webkit-appearance:none;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--cream) 50%),linear-gradient(135deg,var(--cream) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat;padding-right:36px}
+.own select.fin option{color:#0b0d12;background:#fff}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line);font-size:16px}
+.tog:first-child{border-top:0}
+.tog .lb{min-width:0}.tog .lb small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.sw{position:relative;width:52px;height:32px;flex:none}
+.sw input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;z-index:1}
+.sw i{position:absolute;inset:0;border-radius:99px;background:rgba(246,243,231,.18);transition:background .2s}
+.sw i:after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:transform .2s}
+.sw input:checked+i{background:var(--green)}
+.sw input:checked+i:after{transform:translateX(20px)}
+.setrow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;padding:12px 0;border-top:1px solid var(--line)}
+.setrow:first-child{border-top:0}
+.setrow .fl{margin:0}
+/* responsive tables: real tables on desktop, stacked cards on phone */
+.rt td,.rt th{font-size:14px}
+/* full-screen sheet (phone) / dialog (desktop) */
+.sheet{position:fixed;inset:0;z-index:60;display:none;background:var(--ink)}
+.sheet.show{display:flex;flex-direction:column}
+.sheet .sh{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 12px 10px;border-bottom:1px solid var(--line)}
+.sheet .sh h2{margin:0;font-size:18px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sheet .sb{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px}
+.sheet .sf{padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;gap:10px;background:var(--ink)}
+.sheet .sf .btn{flex:1}
+.sheet .sf:empty{display:none}
+body.noscroll{overflow:hidden}
+/* ☰ menu */
+.menu{position:fixed;inset:0;z-index:58;display:none;background:rgba(0,0,0,.55)}
+.menu.show{display:block}
+.menu .mp{position:absolute;right:0;top:0;bottom:0;width:min(340px,88vw);background:var(--ink2);border-left:1px solid var(--line);padding:calc(14px + env(safe-area-inset-top)) 14px 20px;overflow-y:auto}
+.menu .mp h3{margin:4px 4px 14px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.mi{display:flex;align-items:center;gap:14px;width:100%;appearance:none;-webkit-appearance:none;border:0;background:none;color:var(--cream);font:inherit;font-size:17px;font-weight:700;text-align:left;padding:15px 8px;border-bottom:1px solid var(--line);cursor:pointer}
+.mi i{font-style:normal;font-size:22px;width:28px;text-align:center}
+.mi small{display:block;font-size:13px;color:var(--muted);font-weight:500;margin-top:2px}
+.mi.dim{color:var(--muted)}
+@media (max-width:899px){
+  .rt,.rt tbody,.rt tr,.rt td{display:block;width:100%}
+  .rt tr.rh,.rt thead{display:none}
+  .rt tr{background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin:0 0 10px}
+  .rt td{border:0;padding:5px 0;display:flex;justify-content:space-between;align-items:baseline;gap:14px;font-size:15px;text-align:right;overflow-wrap:anywhere;min-width:0}
+  .rt td::before{content:attr(data-label);color:var(--muted);font-size:13px;text-align:left;flex:none;max-width:45%}
+  .rt td.t{display:block;text-align:left;font-size:16px;font-weight:900}
+  .rt td.t::before,.rt td[data-label=""]::before{display:none}
+  .rt td:empty{display:none}
+  .rt td .btn{width:100%}
+  .dash table{white-space:normal}.dash th,.dash td{white-space:normal}
+  .desk{display:none!important}
+  #meMonth{width:100%}
+  #v-reports .row{flex-wrap:wrap}
+}
+@media (min-width:900px){
+  .oh{padding:12px 24px}
+  .oh .brand img{height:26px}.oh .brand img.logo-2l{height:42px}.oh .brand .fam{font-size:15px}
+  .phone{display:none!important}
+  .oshell{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:calc(100svh - 69px)}
+  .side{display:block;position:sticky;top:69px;align-self:start;height:calc(100svh - 69px);overflow-y:auto;border-right:1px solid var(--line);padding:18px 12px}
+  .side button{display:flex;align-items:center;gap:12px;width:100%;appearance:none;-webkit-appearance:none;border:0;background:none;color:var(--muted);font:inherit;font-size:15px;font-weight:700;text-align:left;padding:12px 12px;border-radius:12px;cursor:pointer}
+  .side button i{font-style:normal;width:22px;text-align:center}
+  .side button:hover{background:rgba(246,243,231,.05);color:var(--cream)}
+  .side button.on{background:rgba(246,69,1,.14);color:var(--cream)}
+  .side hr{border:0;border-top:1px solid var(--line);margin:12px 6px}
+  .side .badge{margin-left:auto}
+  .otabs{display:none}
+  .views{max-width:1180px;padding:24px 32px 60px;margin:0}
+  .qa{grid-template-columns:repeat(4,1fr)}
+  .cols2{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  .rt tr[data-open]{cursor:pointer}.rt tr[data-open]:hover td{background:rgba(246,243,231,.04)}
+  .rt th,.rt td{padding:10px 10px;font-size:14px}
+  .rt td.t{font-weight:900}
+  .sheet{background:rgba(0,0,0,.6);align-items:center;justify-content:center}
+  .sheet.show{display:flex}
+  .sheet .sw0{width:min(620px,92vw);max-height:88vh;background:var(--ink2);border:1px solid var(--line);border-radius:20px;display:flex;flex-direction:column;overflow:hidden}
+  .menu .mp{width:340px}
+  .lilist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}
+}
+@media (max-width:899px){.sheet .sw0{display:flex;flex-direction:column;height:100%;width:100%}}
+
+/* ===== f28 look: shared polish + two themes (A dark sleek, B light premium) ===== */
+.purpose{font-size:14px;color:var(--muted);margin:-4px 0 14px;line-height:1.45}
+.hint{font-size:13px;color:var(--muted);margin:-4px 0 10px;line-height:1.4}
+.kpi{position:relative;overflow:hidden}
+.kpi .lbl{font-size:14px;font-weight:600;color:var(--cream);opacity:.88;line-height:1.25}
+.kpi .val{font-size:34px;font-weight:900;letter-spacing:-.02em;margin:8px 0 4px}
+.kpi .kx{font-size:12.5px;color:var(--muted);line-height:1.35;margin-top:4px}
+.kpi .kt{font-size:12.5px;font-weight:700;margin:0 0 2px}
+.kpi .kt .up{color:var(--green)}.kpi .kt .down{color:#ff7a59}.kpi .kt .flat{color:var(--muted)}
+.kpi .spark{display:block;width:100%;height:34px;margin:6px 0 2px}
+.kpi::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:var(--acc,var(--orange));opacity:.9}
+.k-nori{--acc:#4CC38A}.k-gohan{--acc:#F6F3E7}.k-tobiko{--acc:#F64501}.k-kama{--acc:#E8B84A}
+.li .amt{font-weight:900;color:var(--orange);white-space:nowrap}
+.li .idc{display:inline-block;font-size:11.5px;font-weight:500;opacity:.55;margin-left:4px;letter-spacing:.02em}
+.li .why{color:var(--gold)}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.view.on>*{animation:fu .38s cubic-bezier(.2,.7,.2,1) backwards}
+.view.on>*:nth-child(2){animation-delay:.03s}.view.on>*:nth-child(3){animation-delay:.06s}.view.on>*:nth-child(4){animation-delay:.09s}.view.on>*:nth-child(5){animation-delay:.12s}.view.on>*:nth-child(n+6){animation-delay:.15s}
+.qa button,.li.tap,.kpi,.otabs button,.side button{transition:transform .18s ease,background-color .2s ease,border-color .2s ease,box-shadow .2s ease}
+.qa button:active,.li.tap:active{transform:scale(.98)}
+@media (prefers-reduced-motion:reduce){.view.on>*{animation:none}.qa button,.li.tap,.kpi,.otabs button,.side button{transition:none}}
+
+/* ---- A: dark sleek ---- */
+body.thA{background:#07080c radial-gradient(1100px 520px at 12% -8%,rgba(246,69,1,.16),transparent 60%) fixed,#07080c radial-gradient(800px 600px at 110% 30%,rgba(232,184,74,.07),transparent 60%) fixed;background-color:#07080c}
+.thA .oh{background:rgba(7,8,12,.9);border-bottom-color:rgba(255,255,255,.06)}
+.thA .kpi,.thA .li,.thA .qa button,.thA .dcard,.thA .dash details,.thA details.grp,.thA .card{background:linear-gradient(160deg,rgba(255,255,255,.065),rgba(255,255,255,.018));border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 30px -12px rgba(0,0,0,.6);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.thA .kpi{border-radius:20px;padding:18px 16px 14px}
+.thA .kpi .val{background:linear-gradient(180deg,#fff,#f6f3e7 60%,rgba(246,243,231,.75));-webkit-background-clip:text;background-clip:text;color:transparent}
+.thA .qa button{border-radius:18px}
+.thA .qa button i{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.07);font-size:19px;margin-bottom:4px}
+.thA .qa button.hot{background:linear-gradient(160deg,rgba(246,69,1,.28),rgba(246,69,1,.08));border-color:rgba(246,69,1,.6);box-shadow:0 0 0 1px rgba(246,69,1,.25),0 12px 34px -12px rgba(246,69,1,.55)}
+.thA .vh h1{font-size:32px;letter-spacing:-.02em}
+.thA .sec h2{font-size:19px;letter-spacing:-.01em}
+.thA .otabs{background:rgba(7,8,12,.78);border-top-color:rgba(255,255,255,.07)}
+.thA .otabs button.on{color:#fff}
+.thA .otabs button.on svg{color:var(--orange);filter:drop-shadow(0 0 8px rgba(246,69,1,.7))}
+.thA .side{background:rgba(255,255,255,.02)!important;border-right-color:rgba(255,255,255,.06)!important}
+.thA .side button.on{background:linear-gradient(90deg,rgba(246,69,1,.22),rgba(246,69,1,.04))!important;box-shadow:inset 3px 0 0 var(--orange)}
+
+/* ---- B: light premium (rice paper, ink, Roru orange) ---- */
+body.thB{--ink:#F4F0E4;--ink2:#FFFFFF;--cream:#16181F;--line:rgba(22,24,31,.10);--muted:rgba(22,24,31,.56);--glass:rgba(255,255,255,.8);--green:#1F9D64;--gold:#B7861C;background:#F4F0E4 radial-gradient(900px 500px at 100% -10%,rgba(246,69,1,.10),transparent 60%) fixed;color:#16181F}
+.thB .oh{background:rgba(244,240,228,.82);border-bottom-color:rgba(22,24,31,.08)}
+.thB .oh .brand img{filter:invert(1) hue-rotate(180deg) brightness(.25)}
+.thB .kpi,.thB .li,.thB .qa button,.thB .dcard,.thB .dash details,.thB details.grp,.thB .card{background:#fff;border:1px solid rgba(22,24,31,.06);box-shadow:0 1px 2px rgba(22,24,31,.04),0 12px 30px -16px rgba(22,24,31,.22)}
+.thB .kpi{border-radius:20px;padding:18px 16px 14px}
+.thB .kpi::before{height:4px}
+.thB .k-gohan{--acc:#16181F}
+.thB .kpi .val{color:#0d0f14}
+.thB .qa button i{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#F4F0E4;font-size:19px;margin-bottom:4px}
+.thB .qa button.hot{background:#FFF3EC;border-color:rgba(246,69,1,.5)}
+.thB .vh h1{font-size:32px;letter-spacing:-.02em;font-weight:900}
+.thB .otabs{background:rgba(255,255,255,.9);border-top-color:rgba(22,24,31,.08)}
+.thB .otabs button.on{color:var(--orange)}
+.thB .icb{background:#fff;color:#16181F;border-color:rgba(22,24,31,.12)}
+.thB .tchip,.thB .seg,.thB .opill.no{background:rgba(22,24,31,.06)}
+.thB .opill{background:rgba(31,157,100,.12);color:#16784c}
+.thB .opill.warn{background:rgba(183,134,28,.14);color:#8a6410}
+.thB .search input,.thB .fin{background:#fff;color:#16181F;border-color:rgba(22,24,31,.18)}
+.thB .btn.ghost{color:#16181F;border-color:rgba(22,24,31,.18)}
+.thB .side{background:#fff!important;border-right-color:rgba(22,24,31,.07)!important}
+.thB .side button{color:#16181F}
+.thB .side button.on{background:#FFF1E8!important;color:var(--orange)!important;box-shadow:inset 3px 0 0 var(--orange)}
+.thB .chart text,.thB .dash svg text{fill:rgba(22,24,31,.6)}
+.thB .dot.t-gohan{background:#e9e4d4!important}
+.thB .menu .mp,.thB .sheet .sw0{background:#fff;color:#16181F}
+
+.thB .opill.no{background:rgba(22,24,31,.06);color:rgba(22,24,31,.6)}
+.thA .otabs{background:rgba(7,8,12,.92)}.thB .otabs{background:rgba(255,255,255,.96)}
+@media (max-width:899px){.qa button{flex-direction:row;align-items:center;gap:10px;min-height:64px;padding:12px;font-size:15px;line-height:1.2}.qa button>small{display:none}.qa button i{margin:0!important;flex:none}
+ .kpi .val{font-size:32px}}
+@media (min-width:900px){.kpi .val{font-size:40px}}
+.gsee{font-size:15px;line-height:1.4;padding:12px 14px;border-radius:14px;margin:0 0 16px;background:rgba(246,69,1,.08);border:1px dashed rgba(246,69,1,.45)}
+.gsee b{font-weight:900}
+.fl em{font-style:normal}
+
+/* f28 theme toggle + light-theme fixes */
+.thbtn i,.thside i{font-style:normal}
+.thbtn{font-size:18px}
+.side .thside span{flex:1}
+body.thB{--muted:rgba(22,24,31,.64)}
+.thB .sw i{background:rgba(22,24,31,.18)}
+.thB .side button:hover{background:rgba(22,24,31,.05);color:#16181F}
+.thB .chart line,.thB .chart path[stroke^="rgba(246"]{stroke:rgba(22,24,31,.12)}
+.thB .chart [stroke="#E8B84A"]{stroke:#C48A12}.thB .chart [fill="#E8B84A"]{fill:#C48A12}
+.thB .donut svg circle:first-child{stroke:rgba(22,24,31,.08)}
+.thB .donut svg text:first-of-type{fill:#16181F}
+.thB .bars .bt,.thB .posbar{background:rgba(22,24,31,.08)}
+.thB .rt tr[data-open]:hover td{background:rgba(22,24,31,.03)}
+.thB details.help p{background:#FBF9F3}
+.thB .k-gohan .spark path,.thB .k-gohan .spark circle{stroke:#16181F}
+.thB .sheet .sh,.thB .sheet .sf{border-color:rgba(22,24,31,.08)}
+.thB .menu{background:rgba(22,24,31,.35)}
+.thB .gsee{background:#FFF3EC}
+.thB .own select.fin,.thB select.fin{background-color:#fff}
+.thB .search:before{opacity:.6}
+.thB #login .pad button{background:#fff;color:#16181F;border-color:rgba(22,24,31,.1)}
+.thB .tiny{opacity:.7}
+.thA .sheet .sw0{background:#0e1016}
+@media (max-width:899px){.thA .rt tr{background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.015));border-color:rgba(255,255,255,.08)}.thB .rt tr{background:#fff;border-color:rgba(22,24,31,.06);box-shadow:0 8px 24px -16px rgba(22,24,31,.25)}}
+</style>
+</head>
+<body class="own owner-glass">
+<div class="staff" id="app" style="visibility:hidden">
+  <header class="oh">
+    <div class="brand"><img class="logo-2l" src="/logo-2l.png?v=f47" alt="RORUBARU" width="73" height="38"><span class="fam"><span data-prog="en">High Rollers</span> · Owner</span></div>
+    <div class="acts"><button class="icb phone thbtn" id="themeBtn" data-theme aria-label="Switch light/dark"><i>☀️</i></button><button class="icb hide desk" id="refresh" title="Refresh" aria-label="Refresh"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-.12em"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg></button><button class="icb hide phone" id="menuBtn" aria-label="Menu">☰</button><button class="icb hide desk" id="logout"><span>Sign out</span></button></div>
+  </header>
+  <section id="login" class="pin" style="max-width:420px;margin:0 auto">
+    <h1>Owner PIN</h1>
+    <p class="muted small">Dominic only — 6 digits, separate from the 4-digit staff PINs.</p>
+    <div class="display" id="pinDisp"><span class="ph">PIN</span></div>
+    <div class="err hide" id="pinErr"></div>
+    <div class="pad" id="pinPad"></div>
+  </section>
+  <div id="main" class="oshell hide">
+    <nav class="side" id="side">
+      <button data-go="today"><i>🏠</i>Today<span class="badge hide" data-badge></span></button>
+      <button data-go="guests"><i>👥</i>Guests</button>
+      <button data-go="rewards"><i>🎁</i>Rewards</button>
+      <button data-go="passport"><i><img src="/loyalty/img/stampcard_64.png" alt="" style="width:1.3em;height:1.3em;vertical-align:-.3em"></i>Passport</button>
+      <button data-go="scratch"><i><svg viewBox="0 0 32 32" aria-hidden="true" style="width:1.3em;height:1.3em;vertical-align:-.3em"><path d="M4 9.5a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2V13a3 3 0 0 0 0 6v3.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V19a3 3 0 0 0 0-6z" fill="#F64501" stroke="currentColor" stroke-width="1.6"/><path d="M11 10v12" stroke="#fff" stroke-width="1.8" stroke-dasharray="2 2.2"/><path d="M18.6 10.6l1.3 3.6 3.6 1.3-3.6 1.3-1.3 3.6-1.3-3.6-3.6-1.3 3.6-1.3z" fill="#fff"/></svg></i>Scratch card</button>
+      <hr>
+      <button data-go="staff"><i>🔑</i>Staff &amp; PINs</button>
+      <button data-go="reports"><i>📄</i>Reports</button>
+      <button data-go="settings"><i>⚙️</i>Settings</button>
+      <hr>
+      <button data-help><i>❓</i>How it works</button>
+      <div class="tlang" aria-label="Guide language"><button type="button" data-tl="en">EN</button><button type="button" data-tl="zh">繁中</button><button type="button" data-tl="zhs">简中</button></div>
+      <button data-theme class="thside"><i>☀️</i><span>Light mode</span></button>
+    </nav>
+    <main class="views">
+      <section class="view" id="v-today"></section>
+      <section class="view" id="v-guests"></section>
+      <section class="view" id="v-rewards"></section>
+      <section class="view" id="v-passport"></section>
+      <section class="view" id="v-scratch"></section>
+      <section class="view" id="v-staff"></section>
+      <section class="view" id="v-reports"></section>
+      <section class="view" id="v-settings"></section>
+      <div id="dashHome" class="hide"><div class="sec"><h2>Last 30 days</h2></div><div id="dash" class="dash"></div></div>
+    </main>
+    <nav class="otabs" id="otabs">
+      <button data-go="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>Today</span><span class="badge hide" data-badge></span></button>
+      <button data-go="guests"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16.5 14.6c2.6.2 4.4 1.9 5 5.4"/></svg><span>Guests</span></button>
+      <button data-go="rewards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="9" width="17" height="11" rx="1.5"/><path d="M2.5 9h19v-3h-19zM12 6v14M12 6c-2-3.5-6-3-5 0M12 6c2-3.5 6-3 5 0"/></svg><span>Rewards</span></button>
+    </nav>
+  </div>
+  <div class="menu" id="menu"><div class="mp">
+    <h3>Menu</h3>
+    <button class="mi" data-go="passport"><i><img src="/loyalty/img/stampcard_64.png" alt="" style="width:1.3em;height:1.3em;vertical-align:-.3em"></i><span>Menu Passport<small>Who's playing, most and least tried dishes, quarter &amp; prizes</small></span></button>
+    <button class="mi" data-go="scratch"><i><svg viewBox="0 0 32 32" aria-hidden="true" style="width:1.3em;height:1.3em;vertical-align:-.3em"><path d="M4 9.5a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2V13a3 3 0 0 0 0 6v3.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V19a3 3 0 0 0 0-6z" fill="#F64501" stroke="currentColor" stroke-width="1.6"/><path d="M11 10v12" stroke="#fff" stroke-width="1.8" stroke-dasharray="2 2.2"/><path d="M18.6 10.6l1.3 3.6 3.6 1.3-3.6 1.3-1.3 3.6-1.3-3.6-3.6-1.3 3.6-1.3z" fill="#fff"/></svg></i><span>Roru Day scratch card<small>Cards given, prizes won, cost, minimum bill &amp; odds</small></span></button>
+    <button class="mi" data-go="staff"><i>🔑</i><span>Staff &amp; PINs<small>Who can sign in, PINs, who looked at what</small></span></button>
+    <button class="mi" data-go="reports"><i>📄</i><span>Reports<small>Month-end report, downloads, charts</small></span></button>
+    <button class="mi" data-go="settings"><i>⚙️</i><span>Settings<small>$RORU, levels, special nights, extras</small></span></button>
+    <button class="mi" data-help><i>❓</i><span>How it works<small>Show the quick tour again</small></span></button>
+    <button class="mi" data-refresh><i><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-.12em"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg></i><span>Refresh</span></button>
+    <button class="mi dim" data-logout><i>🚪</i><span>Sign out</span></button>
+  </div></div>
+  <div class="sheet" id="sheet"><div class="sw0">
+    <div class="sh"><button class="icb" id="sheetX" aria-label="Back">‹</button><h2 id="sheetT"></h2></div>
+    <div class="sb" id="sheetB"></div>
+    <div class="sf" id="sheetF"></div>
+  </div></div>
+</div>
+<script>
+(async function () {
+  const R = window.RORU, $ = (s) => document.querySelector(s), $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+  await R.gate(); $("#app").style.visibility = "visible";
+  // f28 look: A = dark sleek (default), B = light premium. ?theme=B or localStorage roru_owner_theme switches it.
+  // First visit follows the phone/computer's light or dark setting; after a tap on ☀️/🌙 his choice is remembered.
+  const qTh = new URLSearchParams(location.search).get("theme");
+  const savedTh = localStorage.getItem("roru_owner_theme");
+  const sysLight = () => window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+  function setTheme(t, save) {
+    t = t === "B" ? "B" : "A"; document.body.classList.toggle("thA", t === "A"); document.body.classList.toggle("thB", t === "B");
+    if (save) { try { localStorage.setItem("roru_owner_theme", t); } catch (e) {} }
+    const dark = t === "A", ico = dark ? "☀️" : "🌙", lbl = dark ? "Switch to light" : "Switch to dark";
+    document.querySelectorAll("[data-theme]").forEach(b => { b.setAttribute("aria-label", lbl); b.title = lbl; const i = b.querySelector("i"); if (i) i.textContent = ico; const s = b.querySelector("span"); if (s) s.textContent = dark ? "Light mode" : "Dark mode"; });
+    const mc = document.querySelector('meta[name="theme-color"]'); if (mc) mc.setAttribute("content", dark ? "#07080c" : "#F4F0E4");
+    document.documentElement.style.colorScheme = dark ? "dark" : "light";
+    if (window.__ownerRedraw) window.__ownerRedraw();
+  }
+  setTheme(qTh ? String(qTh).toUpperCase() : savedTh ? savedTh : (sysLight() ? "B" : "A"), false);
+  document.querySelectorAll("[data-theme]").forEach(b => b.onclick = () => setTheme(document.body.classList.contains("thA") ? "B" : "A", true));
+  if (window.matchMedia) window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", () => { if (!localStorage.getItem("roru_owner_theme")) setTheme(sysLight() ? "B" : "A", false); });
+  const st = { sess: JSON.parse(localStorage.getItem("roru_owner") || "null"), data: null, pin: "", view: "today", open: {} };
+  const isDesk = () => window.matchMedia("(min-width:900px)").matches;
+  const pad = (el, onKey) => { el.innerHTML = ""; ["1","2","3","4","5","6","7","8","9","C","0","⌫"].forEach(k => { const b = document.createElement("button"); if (k === "⌫") { b.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M17 9.5l-5 5M12 9.5l5 5"/></svg>'; b.setAttribute("aria-label", "Delete"); } else b.textContent = k; if (k === "C" || k === "⌫") b.className = "alt"; b.onclick = () => onKey(k); el.appendChild(b); }); };
+  pad($("#pinPad"), async (k) => {
+    if (k === "C") st.pin = ""; else if (k === "⌫") st.pin = st.pin.slice(0, -1); else if (st.pin.length < 6) st.pin += k;
+    $("#pinDisp").innerHTML = st.pin ? "•".repeat(st.pin.length) : '<span class="ph">PIN</span>'; $("#pinErr").classList.add("hide");
+    if (st.pin.length === 6) { const pin = st.pin; st.pin = "";
+      try { let d = localStorage.getItem("roru_staff_dev"); if (!d) { d = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now()); localStorage.setItem("roru_staff_dev", d); }
+        const r = await R.rpc("staff_login", { p_pin: pin, p_device: d });
+        if (r && r.ok === false) throw Object.assign(new Error(r.error), { code: r.error, tries_left: r.tries_left }); // f55: wrong PINs are counted
+        if (r.staff.role !== "owner") throw Object.assign(new Error("owner_only"), { code: "owner_only" }); st.sess = { token: r.token, staff: r.staff }; localStorage.setItem("roru_owner", JSON.stringify(st.sess)); render(); load(); }
+      catch (e) { $("#pinDisp").innerHTML = '<span class="ph">PIN</span>'; $("#pinErr").textContent = e.code === "owner_only" ? "That is a staff PIN, not the owner PIN" : (e.code === "wrong_pin" ? "Wrong PIN" + (e.tries_left != null && e.tries_left <= 3 ? " · " + e.tries_left + (e.tries_left === 1 ? " try left" : " tries left") : "") : e.code === "locked_try_later" ? "Too many wrong PINs on this device — wait 15 min" : e.code === "locked_new_device" ? "Too many wrong PINs today on new devices. Use a device you've signed in on before." : R.errText(e)); $("#pinErr").classList.remove("hide"); } }
+  });
+  const logout = () => { st.sess = null; st.data = null; localStorage.removeItem("roru_owner"); closeMenu(); closeSheet(); render(); };
+  $("#logout").onclick = logout;
+  $("#refresh").onclick = () => load();
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const fmt = (n) => Math.round(+n || 0).toLocaleString("en-US");
+  const hkd2 = (n) => "HK$" + (+n || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const hkd = (n) => "HK$" + fmt(n), hkdK = (n) => '<small>HK$</small>' + fmt(n);
+  const when = (x) => x ? new Date(x).toLocaleString("en-GB", { timeZone: "Asia/Hong_Kong", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
+  const shopNm = (id) => id === "wanchai" ? "Wan Chai" : id === "central" ? "Central" : (id || "");
+  const TN = (k) => R.tierName(k || "nori", "en");
+  // {x} / {p} tokens in perk text -> the real number for that level, so the owner reads what the guest reads
+  const tok = (s, tier) => { const S0 = (st.data && st.data.settings) || {}; return String(s == null ? "" : s).replace(/\{x\}/g, String(S0["tier_mult_" + (tier || "nori")] || "1")).replace(/\{p\}/g, S0.kama_dinner_passes != null ? S0.kama_dinner_passes : "?"); };
+  const tchip = (k) => '<span class="tchip"><span class="dot t-' + esc(k || "nori") + '"></span>' + esc(TN(k)) + "</span>";
+  const help = (txt) => '<details class="help"><summary>How this works</summary><p>' + txt + "</p></details>";
+  const sec = (title, right) => '<div class="sec"><h2>' + title + "</h2>" + (right || "") + "</div>";
+  const vh = (title, sub, right) => '<div class="vh"><div><h1>' + title + "</h1>" + (sub ? '<p class="sub">' + sub + "</p>" : "") + "</div>" + (right || "") + "</div>";
+  const fld = (label, inner, hint) => '<label class="fl"><span>' + label + "</span>" + inner + (hint ? "<em>" + hint + "</em>" : "") + "</label>";
+  const inp = (name, val, extra) => '<input class="fin" name="' + name + '" value="' + esc(val) + '" ' + (extra || "") + ">";
+  const area = (name, val) => '<textarea class="fin" name="' + name + '" rows="2">' + esc(val) + "</textarea>";
+  const swt = (attrs, on) => '<span class="sw"><input type="checkbox" ' + attrs + (on ? " checked" : "") + "><i></i></span>";
+  const tog = (label, sub, attrs, on) => '<div class="tog"><div class="lb">' + label + (sub ? "<small>" + sub + "</small>" : "") + "</div>" + swt(attrs, on) + "</div>";
+  // Responsive table: real table on desktop; on phone each row becomes a stacked card (labels from the header row).
+  function rt(cols, rows, opts) {
+    opts = opts || {};
+    return '<table class="rt"><tr class="rh">' + cols.map(c => '<th class="' + (c.c || "") + '">' + c.h + "</th>").join("") + "</tr>" +
+      rows.map(r => "<tr" + (r.attrs ? " " + r.attrs : "") + ">" + r.cells.map((v, i) => '<td class="' + (cols[i].c || "") + (i === 0 && !cols[i].nt ? " t" : "") + '" data-label="' + esc(cols[i].l != null ? cols[i].l : cols[i].h.replace(/<[^>]+>/g, "")) + '">' + (v == null ? "" : v) + "</td>").join("") + "</tr>").join("") + "</table>";
+  }
+  function labelTables(root) { $$("table.rt", root).forEach(t => { const hr = t.querySelector("tr"); if (!hr || !hr.querySelector("th")) return; hr.classList.add("rh"); const hs = $$("th", hr).map(th => th.textContent.trim()); $$("tr", t).forEach(tr => { if (tr === hr) return; $$("td", tr).forEach((td, i) => { if (!td.hasAttribute("data-label")) td.setAttribute("data-label", hs[i] || ""); }); }); }); }
+  // ----- sheet (full screen on phone, dialog on desktop) -----
+  function openSheet(title, body, foot, mount) { $("#sheetB").oninput = null; $("#sheetB").onchange = null; $("#sheetT").textContent = title; $("#sheetB").innerHTML = body; $("#sheetF").className = "sf"; $("#sheetF").innerHTML = foot || ""; $("#sheet").classList.add("show"); document.body.classList.add("noscroll"); $("#sheetB").scrollTop = 0; if (mount) mount($("#sheetB"), $("#sheetF")); }
+  function closeSheet() { $("#sheet").classList.remove("show"); document.body.classList.remove("noscroll"); }
+  $("#sheetX").onclick = closeSheet; $("#sheet").onclick = (e) => { if (e.target === $("#sheet")) closeSheet(); };
+  // ----- ☰ menu + navigation (3 tabs: Today / Guests / Rewards; the rest behind ☰) -----
+  function openMenu() { $("#menu").classList.add("show"); } function closeMenu() { $("#menu").classList.remove("show"); }
+  $("#menuBtn").onclick = openMenu; $("#menu").onclick = (e) => { if (e.target === $("#menu")) closeMenu(); };
+  $$("[data-logout]").forEach(b => b.onclick = logout);
+  $$("[data-refresh]").forEach(b => b.onclick = () => { closeMenu(); load(); });
+  $$("[data-help]").forEach(b => b.onclick = () => { closeMenu(); tour(true); });
+  function go(v, keep) {
+    st.view = v; window.__ppOwner = st.sess; closeMenu();
+    $$(".view").forEach(x => x.classList.toggle("on", x.id === "v-" + v));
+    $$("[data-go]").forEach(b => b.classList.toggle("on", b.dataset.go === v));
+    placeDash(); if (!keep) window.scrollTo(0, 0);
+    if (v === "today" || v === "reports") requestAnimationFrame(() => { drawChart(); fitKpis(); });
+  }
+  $$("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));
+  // The full charts dashboard sits on Today on desktop and under Reports on the phone (phone Today stays quick).
+  function placeDash() { const h = $("#dashHome"), tgt = isDesk() ? $("#v-today") : $("#v-reports"); if (h.parentElement !== tgt) tgt.appendChild(h); h.classList.toggle("hide", !st.data); }
+  window.matchMedia("(min-width:900px)").addEventListener("change", () => { placeDash(); requestAnimationFrame(() => { drawChart(); fitKpis(); }); });
+  st.shopSel = st.shopSel || "all";
+  const badge = (n) => $$("[data-badge]").forEach(b => { b.textContent = n; b.classList.toggle("hide", !n); });
+
+  // ----- data -----
+  async function load() {
+    if (!st.sess) return;
+    const tk = { p_token: st.sess.token }, soft = (p) => p.catch(() => null);
+    try {
+      const r = await Promise.all([R.rpc("owner_stats", tk), soft(R.rpc("owner_dashboard", tk)), soft(R.rpc("staff_today", tk)), soft(R.rpc("staff_queue", tk)), soft(R.rpc("staff_bonus_queue", tk)), soft(R.rpc("staff_pos_queue", tk)),
+        soft(R.rpc("owner_perks", tk)), soft(R.rpc("owner_upgrade_log", tk)), soft(R.rpc("owner_extras", tk)), soft(R.rpc("owner_features", tk)), soft(R.rpc("owner_access_log", { p_token: st.sess.token, p_limit: 30 })), soft(R.rpc("staff_splits", { p_token: st.sess.token, p_days: 30 })), soft(R.rpc("owner_roll_week", tk))]);
+      [st.data, st.dash, st.today, st.queue, st.bq, st.pos, st.perks, st.ulog, st.extras, st.features, st.alog, st.splits, st.rw] = r;
+    } catch (e) { if (e.code === "staff_not_signed_in" || e.code === "owner_only") { logout(); return; } R.toast(R.errText(e)); return; }
+    $$("details[id]").forEach(x => st.open[x.id] = x.open);
+    $(".views").appendChild($("#dashHome"));
+    renderDash(); renderToday(); renderGuests(); renderRewards(); renderStaff(); renderReports(); renderSettings();
+    $$("details[id]").forEach(x => { if (st.open[x.id]) x.open = true; });
+    labelTables(document); go(st.view, true);
+    if (!st.toured) { st.toured = true; setTimeout(() => tour(false), 600); }
+  }
+  const saveSet = async (k, v, el) => { if (el) el.disabled = true; try { await R.rpc("owner_save_setting", { p_token: st.sess.token, p_key: k, p_value: String(v) }); R.toast("Saved ✓"); load(); } catch (e) { R.toast(e.code === "bad_value" ? "That value isn't allowed" : R.errText(e)); if (el) el.disabled = false; } };
+
+  // ===== TODAY =====
+  // f28: plain-language Today. Big numbers, a grey line under each saying what it means, a 14-day sparkline where the data allows.
+  function spark(vals, col, id) {
+    const W = 120, Hh = 34, n = vals.length; if (n < 2) return "";
+    const mx = Math.max(1, ...vals), pts = vals.map((v, i) => [(i / (n - 1)) * W, Hh - 3 - (v / mx) * (Hh - 8)]);
+    const d = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ");
+    return '<svg class="spark" viewBox="0 0 ' + W + " " + Hh + '" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="sg' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + col + '" stop-opacity=".35"/><stop offset="1" stop-color="' + col + '" stop-opacity="0"/></linearGradient></defs>' +
+      '<path d="' + d + " L" + W + " " + Hh + " L0 " + Hh + ' Z" fill="url(#sg' + id + ')"/><path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>' +
+      '<circle cx="' + pts[n - 1][0].toFixed(1) + '" cy="' + pts[n - 1][1].toFixed(1) + '" r="2.6" fill="' + col + '"/></svg>';
+  }
+  function trendTxt(cur, prev, what) {
+    cur = +cur || 0; prev = +prev || 0;
+    if (!prev && !cur) return '<span class="flat">— same as ' + what + "</span>";
+    if (!prev) return '<span class="up">▲ new vs ' + what + "</span>";
+    const p = Math.round((cur - prev) / prev * 100);
+    return p > 0 ? '<span class="up">▲ ' + p + "% vs " + what + "</span>" : p < 0 ? '<span class="down">▼ ' + Math.abs(p) + "% vs " + what + "</span>" : '<span class="flat">— same as ' + what + "</span>";
+  }
+  const hkTime = (x) => x ? new Date(x).toLocaleString("en-GB", { timeZone: "Asia/Hong_Kong", day: "numeric", month: "short", hour: "numeric", minute: "2-digit", hour12: true }).replace(/ (am|pm)$/i, (m) => m.toLowerCase()) : "";
+  // f35: split receipts. One row per bill: "split N ways", then each person's share (scanner first) and each friend's answer.
+  // f34 one-friend offers come through as 2-way rows.
+  function splitRows(list) {
+    const pst = (i) => i.status === "accepted" ? '<span class="sp-ok">✓</span>' : i.status === "pending" ? '<span class="sp-wait">⏳ waiting</span>' : i.status === "declined" ? '<span class="sp-no">said no</span>' : i.status === "expired" ? '<span class="sp-no">no answer</span>' : '<span class="sp-no">cancelled</span>';
+    const gst = (g) => g.open ? '<span class="sp-wait">⏳ Waiting for answers</span>' : (+g.accepted || 0) > 0 ? '<span class="sp-ok">✓ ' + ((+g.accepted || 0) + 1) + " of " + g.people + " sharing</span>" : '<span class="sp-no">Nobody said yes · all $RORU stayed with scanner</span>';
+    const money = (v) => hkd(+v);
+    return rt([{ h: "Bill" }, { h: "Split" }, { h: "Each person's share" }, { h: "Status" }, { h: "When" }],
+      list.map(g => ({ cells: [((/^Table /.test(g.receipt_no || "") ? "" : "#") + esc(g.receipt_no || "")) + " · " + hkd(g.bill) + (g.is_test ? ' <small class="muted">test</small>' : ""),
+        '<b class="sp-tag">split ' + g.people + " ways</b>",
+        '<div class="sp-plist"><div><b>' + esc(g.scanner) + "</b> (scanned) · " + fmt(g.scanner_points) + " $RORU · " + money(g.scanner_hkd) + "</div>" +
+          (g.invites || []).map(i => "<div>" + esc(i.who) + " · " + (i.status === "accepted" ? fmt(i.points) + " $RORU · " + money(i.hkd) + " " : '<small class="muted">' + fmt(i.points) + " $RORU offered</small> ") + pst(i) + "</div>").join("") + "</div>",
+        gst(g), hkTime(g.created_at)] })));
+  }
+  function splitBox(limit, withCounts) {
+    const sp = st.splits || {}, gs = sp.groups || [], c = sp.counts || {};
+    return (withCounts ? '<div class="stats">' + [["Bills split", sp.bills], ["Friends who said yes", c.accepted], ["Waiting for a friend", c.pending], ["Friend said no", c.declined], ["No answer (share stayed)", c.expired], ["$RORU moved to friends", c.points_moved]].map(y => '<div class="stat"><b>' + fmt(y[1] || 0) + "</b><span>" + y[0] + "</span></div>").join("") + "</div>" : "") +
+      (gs.length ? splitRows(gs.slice(0, limit)) : '<p class="empty">No split receipts yet.</p>');
+  }
+  function splitLine() {
+    const sp = st.splits || {}, gs = sp.groups || [], today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Hong_Kong" });
+    const td = gs.filter(g => new Date(g.created_at).toLocaleDateString("en-CA", { timeZone: "Asia/Hong_Kong" }) === today), open = gs.filter(g => g.open).length;
+    return '<button type="button" class="split-line" data-go2="reports"><span class="sl-ic">🥢🥢</span><span class="sl-t"><b>Split receipts: ' + td.length + " today" + (open ? " · " + open + " waiting for friends" : "") + "</b><small>" + fmt(gs.length) + " in the last 30 days · see them all in Reports</small></span><span class=\'sl-go\'>›</span></button>";
+  }
+  // f38: long lists show 5 rows + "See all (n)" (Today, Staff & PINs, Reports). Remembers what was opened until the page reloads.
+  const clampOpen = new Set();
+  function clampLists() {
+    ["today", "staff", "reports"].forEach(v => { const root = $("#v-" + v); if (!root || !root.firstChild) return;
+      const lists = [...root.querySelectorAll("table.rt")].map(tb => ({ el: tb, rows: [...tb.querySelectorAll("tr")].filter(r => !r.classList.contains("rh") && !r.querySelector("th")) }))
+        .concat([...root.querySelectorAll("div")].filter(d => d.children.length > 6 && !d.querySelector(":scope > .more") && !d.closest(".dash,.kpis,svg,table") && !d.matches(".dash,.kpis,.stats,.qa,#quick") && (() => { const k = [...d.children].map(c => String(c.className).split(" ")[0]).filter(Boolean); const top = k.sort((a, b) => k.filter(x => x === b).length - k.filter(x => x === a).length)[0]; return top && k.filter(x => x === top).length >= d.children.length * .8; })()).map(d => ({ el: d, rows: [...d.children].filter(c => !c.classList.contains("see-all")) })));
+      lists.forEach((L, i) => { const key = v + ":" + i, n = L.rows.length, nx = L.el.nextElementSibling, has = nx && nx.classList.contains("see-all-o");
+        if (L.el.querySelector(":scope > .more, :scope > tbody > .more")) return; // this list already has its own "show more"
+        if (n <= 6) { if (has) nx.remove(); return; }
+        const open = clampOpen.has(key); L.rows.forEach((r, j) => r.classList.toggle("clamp-x", !open && j >= 5));
+        const label = open ? "Show less" : "See all (" + n + ")";
+        if (has) { if (nx.textContent !== label) nx.textContent = label; nx.dataset.key = key; return; }
+        const b = document.createElement("button"); b.type = "button"; b.className = "btn ghost sm see-all-o"; b.dataset.key = key; b.textContent = label; L.el.after(b); }); });
+  }
+  document.addEventListener("click", e => { const b = e.target.closest(".see-all-o"); if (!b) return; const k = b.dataset.key; if (clampOpen.has(k)) clampOpen.delete(k); else clampOpen.add(k); clampLists(); });
+  { let tm = null; const vs = document.querySelector("main.views"); if (vs) new MutationObserver(() => { clearTimeout(tm); tm = setTimeout(clampLists, 60); }).observe(vs, { childList: true, subtree: true }); }
+  $$("[data-tl]").forEach(b => b.onclick = () => { R.setLang(b.dataset.tl); closeMenu(); tour(true); });
+  // f43: one icon style for owner quick actions (line icons, no emoji)
+  const OSV = (d) => '<span class="ig-art o-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + d + "</svg></span>";
+  const OI = { ok: OSV('<path d="M4 12.5l5 5L20 6.5"/>'), find: OSV('<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>'), gift: OSV('<rect x="3.5" y="9" width="17" height="11" rx="2"/><path d="M12 9v11M3.5 13h17M12 9c-1.5-3.5-5.5-3.5-5.5-1S10 9 12 9zm0 0c1.5-3.5 5.5-3.5 5.5-1S14 9 12 9z"/>'), doc: OSV('<path d="M7 3.5h7l4 4V20a.5.5 0 01-.5.5h-10.5A.5.5 0 016.5 20V4a.5.5 0 01.5-.5z"/><path d="M14 3.5V8h4M9.5 12.5h5M9.5 16h5"/>') };
+  function renderToday() {
+    const t = st.today || {}, d = st.data, q = st.queue || [], bq = st.bq || [], pos = ((st.pos && st.pos.items) || []).slice().sort((a, b) => String(b.redeemed_at).localeCompare(String(a.redeemed_at)));
+    const waiting = q.length + bq.length; badge(waiting);
+    const day = new Date().toLocaleDateString("en-GB", { timeZone: "Asia/Hong_Kong", weekday: "long", day: "numeric", month: "short", year: "numeric" });
+    let ser = []; try { ser = series(d).slice(-14); } catch (e) { ser = []; }
+    const visitsToday = t.visits != null ? t.visits : d.visits_today, lastWk = ser.length >= 8 ? ser[ser.length - 8].v : null;
+    const oRow = (l, v, sub, cls) => '<div class="ig-row o-row' + (cls ? " " + cls : "") + '"><span class="ig-t"><b>' + l + "</b><small>" + sub + '</small></span><span class="o-v num">' + fmt(v) + "</span></div>";
+    const tile = (acc, l, v, sub, extra, id) => '<div class="kpi k-' + acc + '"' + (id ? ' id="' + id + '"' : "") + '><div class="lbl">' + l + '</div><div class="val" data-f="' + fmt(v) + '" data-s="' + fmt(v) + '">' + fmt(v) + "</div>" + (extra || "") + '<div class="kx">' + sub + "</div></div>";
+    const top = d.top.slice(0, 5);
+    const srcNm = (s) => s === "manual" ? "typed in by guest" : s === "ocr" ? "scanned by guest" : s === "staff" ? "added by staff" : (s || "");
+    $("#v-today").innerHTML = vh("Today", day + (t.shop ? " · " + shopNm(t.shop) : "")) +
+      '<p class="purpose">What happened at the counter today, and anything that needs your OK.</p>' +
+      // f43 (option A, Dominic Oct 21): ONE hero number (visits today, with its trend), the other three as a quiet list; quick actions as a list with one icon style, orange only when bills wait
+      '<div id="todayKpis"><div class="o-hero">' +
+        tile("nori", "Guest visits today", visitsToday, "members who checked in · higher is better", '<div class="kt">' + (lastWk != null ? trendTxt(visitsToday, lastWk, "last " + new Date().toLocaleDateString("en-GB", { timeZone: "Asia/Hong_Kong", weekday: "short" })) : "") + "</div>" + spark(ser.map(s => s.v), "#4CC38A", "v")) + "</div>" +
+        '<div class="ig o-list">' + oRow("$RORU given out today", t.points || 0, "1 $RORU per HK$1, more for higher levels") + oRow("Free items claimed today", t.redeemed || 0, "rewards guests used at the counter") +
+        oRow("Bills waiting for your OK", waiting, waiting ? "check them below" : "all clear", waiting ? "warn" : "") + "</div></div>" +
+      '<div class="ig qa o-qa" id="quick"><button data-q="approve"' + (waiting ? ' class="hot"' : "") + '>' + OI.ok + '<span class="ig-t"><b>Approve bills' + (waiting ? " (" + waiting + ")" : "") + '</b><small>' + (waiting ? waiting + (waiting === 1 ? " bill needs" : " bills need") + " a check" : "Nothing waiting") + '</small></span><span class="c-go">›</span></button>' +
+        '<button data-q="find">' + OI.find + '<span class="ig-t"><b>Find a guest</b><small>By name or last 4 digits</small></span><span class="c-go">›</span></button>' +
+        '<button data-q="rewards">' + OI.gift + '<span class="ig-t"><b>Change rewards</b><small>Names, $RORU, on/off</small></span><span class="c-go">›</span></button>' +
+        '<button data-q="month">' + OI.doc + '<span class="ig-t"><b>Month-end report</b><small>PDF for Florencia</small></span><span class="c-go">›</span></button></div>' +
+      '<div class="cols2"><div>' +
+      sec("Bills waiting for your OK", waiting ? '<span class="opill warn">' + waiting + "</span>" : "") + '<p class="hint">Big bills or unclear receipts stop here. Approve gives the guest their $RORU; Reject gives none.</p><div id="apList">' +
+        (waiting ? q.map(r => '<div class="li" data-rid="' + r.id + '"><div class="bd"><div class="t1">' + esc(r.who || "Guest") + ' <span class="amt">' + hkd2(r.total_hkd) + '</span></div><div class="t2">' + [r.at ? hkTime(r.at) : "", r.shop ? shopNm(r.shop) : "", srcNm(r.source)].filter(Boolean).map(esc).join(" · ") + (r.receipt_no ? ' <span class="idc">receipt ' + esc(r.receipt_no) + "</span>" : "") + "</div>" +
+            (r.reason ? '<div class="t2 why">⚠️ ' + esc(r.reason) + "</div>" : "") + '<div class="fl" style="margin:12px 0 0"><span>Bill total in HK$ (change it if the receipt shows a different amount)</span><input class="fin" inputmode="decimal" value="' + (+r.total_hkd).toFixed(2) + '"></div>' +
+            '<div class="bigbtn" style="margin-top:10px"><button class="btn" data-ok="' + r.id + '">✓ Approve</button><button class="btn ghost" data-no="' + r.id + '">✕ Reject</button></div></div></div>').join("") +
+          bq.map(b => '<div class="li"><div class="bd"><div class="t1">👯 Bring-a-friend bonus · ' + fmt(b.points) + ' $RORU each</div><div class="t2">' + esc(b.member || "A member") + " brought " + esc(b.friend || "a friend") + (b.created_at ? " · " + hkTime(b.created_at) : "") + "</div>" + (b.reason ? '<div class="t2 why">⚠️ ' + esc(b.reason) + "</div>" : "") +
+            '<div class="bigbtn" style="margin-top:10px"><button class="btn" data-bok="' + b.receipt_id + '">✓ Approve</button><button class="btn ghost" data-bno="' + b.receipt_id + '">✕ Reject</button></div></div></div>').join("")
+        : '<p class="empty">✓ Nothing waiting. Staff can approve bills at the counter too.</p>') + "</div>" +
+      "</div><div>" +
+      sec("Free items handed over", pos.length > 5 ? '<button class="lnk" id="posMore">See all ' + pos.length + "</button>" : "") + '<p class="hint">Rewards guests claimed. Undo gives the $RORU back if one was a mistake.</p><div id="posList">' + (pos.length ? pos.map((p, i) => '<div class="li' + (i >= 5 ? " more hide" : "") + '"><div class="bd"><div class="t1">' + esc(p.give_en || "Reward") + '</div><div class="t2">' + [p.who || "", p.redeemed_at ? hkTime(p.redeemed_at) : "", p.redeemed_by ? "handed over by " + p.redeemed_by : ""].filter(Boolean).map(esc).join(" · ") + (p.is_test ? " · test" : "") + ' <span class="idc">code ' + esc(p.code) + "</span></div>" +
+          '<div class="t3">' + (p.upgraded ? '<span class="opill warn">⬆️ swapped up from ' + esc(p.from_en || "") + "</span>" : "") + (p.logged_at ? '<span class="opill">Rung up on the POS</span>' : '<span class="opill no">Not rung up on the POS yet</span>') + (p.pos_item ? '<span class="muted">POS button: ' + esc(p.pos_item) + "</span>" : "") + "</div>" +
+          '<div class="acts"><button class="btn ghost sm" data-undo="' + esc(p.code) + '" data-nm="' + esc(p.give_en || "") + '">↩︎ Undo</button></div></div></div>').join("") : '<p class="empty">No free items claimed yet.</p>') + "</div>" +
+      "</div></div>" +
+      splitLine() + // f38: splits live in Reports only; Today shows the count and a link
+
+      sec("Best guests", '<button class="lnk" data-go2="guests">All guests ›</button>') + '<p class="hint">Who spent the most with you in the last 12 months.</p><div class="lilist">' + (top.length ? top.map((m, i) => guestLi(m, i)).join("") : '<p class="empty">No members yet.</p>') + "</div>" +
+      '<details class="grp" id="todayLog" style="margin-top:16px"><summary>Everything that happened today (' + ((t.log || []).length) + ')</summary><div class="in">' + ((t.log || []).length ? rt([{ h: "What happened" }, { h: "Guest" }, { h: "Time" }, { h: "Done by" }],
+        t.log.map(l => ({ cells: [l.type === "redeem" ? "🎁 Claimed: " + esc(l.reward || "") : l.type === "visit" ? "🥢 Visit stamped" : "🧾 " + hkd(l.amount) + " bill → " + fmt(l.points) + " $RORU" + (l.source === "ocr" ? " (scanned)" : l.source === "staff" ? " (by staff)" : "") + (l.split_role ? ' · <b class="sp-tag">' + (+l.split_n > 2 ? "split " + l.split_n + " ways with " : "½ split with ") + esc(l.split_with || "") + "</b>" : ""), esc(l.who || "—"), hkTime(l.at), esc(l.by || "Guest, on their phone")] }))) : '<p class="empty">Nothing yet today.</p>') + "</div></details>";
+    const T = $("#v-today");
+    T.querySelector('[data-q="find"]').onclick = () => { go("guests"); setTimeout(() => $("#gq") && $("#gq").focus(), 50); };
+    T.querySelector('[data-q="approve"]').onclick = () => { const a = $("#apList"); a.scrollIntoView({ behavior: "smooth", block: "start" }); };
+    T.querySelector('[data-q="rewards"]').onclick = () => go("rewards");
+    T.querySelector('[data-q="month"]').onclick = () => { go("reports"); };
+    $$("[data-go2]", T).forEach(b => b.onclick = () => go(b.dataset.go2));
+    if ($("#posMore")) $("#posMore").onclick = (e) => { $$("#posList .more").forEach(x => x.classList.remove("hide")); e.currentTarget.remove(); };
+    $$("[data-ok]", T).forEach(b => b.onclick = async () => { const tot = parseFloat(b.closest(".li").querySelector("input").value); if (!(tot > 0)) { R.toast("Type the bill total first"); return; } b.disabled = true; try { const r = await R.rpc("staff_review", { p_token: st.sess.token, p_receipt_id: +b.dataset.ok, p_approve: true, p_total_hkd: tot }); R.toast("Approved ✓ " + fmt(r.points) + " $RORU given"); } catch (e) { R.toast(R.errText(e)); } load(); });
+    $$("[data-no]", T).forEach(b => b.onclick = async () => { if (!confirm("Reject this receipt? The guest gets no $RORU for it.")) return; b.disabled = true; try { await R.rpc("staff_review", { p_token: st.sess.token, p_receipt_id: +b.dataset.no, p_approve: false }); R.toast("Rejected"); } catch (e) { R.toast(R.errText(e)); } load(); });
+    $$("[data-bok],[data-bno]", T).forEach(b => b.onclick = async () => { b.disabled = true; try { await R.rpc("staff_review_bonus", { p_token: st.sess.token, p_receipt_id: +(b.dataset.bok || b.dataset.bno), p_approve: !!b.dataset.bok }); R.toast(b.dataset.bok ? "Approved ✓" : "Rejected"); } catch (e) { R.toast(R.errText(e)); } load(); });
+    $$("[data-undo]", T).forEach(b => b.onclick = () => undoSheet(b.dataset.undo, b.dataset.nm));
+    $$("[data-guest]", T).forEach(el => el.onclick = () => guestSheet(st.data.top[+el.dataset.guest]));
+  }
+  function undoSheet(code, nm) {
+    openSheet("Undo a used reward", '<p style="font-size:16px;margin:0 0 14px"><b>' + esc(nm || code) + '</b><br><span class="muted">Code ' + esc(code) + "</span></p>" +
+      '<p class="muted" style="font-size:15px">The guest gets the $RORU back (or the reward back to use again). It is recorded in the access log under your name.</p>' +
+      fld("Why? (shown in the log)", '<input class="fin" id="undoWhy" placeholder="e.g. rang up by mistake">'),
+      '<button class="btn ghost" id="undoNo">Cancel</button><button class="btn" id="undoGo">↩︎ Undo it</button>', (b, f) => {
+        f.querySelector("#undoNo").onclick = closeSheet;
+        f.querySelector("#undoGo").onclick = async (e) => { const btn = e.currentTarget; btn.disabled = true;
+          try { const r = await R.rpc("staff_reverse_redeem", { p_token: st.sess.token, p_reward_code: code, p_reason: $("#undoWhy").value }); closeSheet(); R.toast("Undone ✓" + (r && r.refunded ? " · " + fmt(r.refunded) + " $RORU back" : ""), 3500); load(); }
+          catch (er) { R.toast(R.errText(er), 3500); btn.disabled = false; } };
+      });
+  }
+  function guestLi(m, i) {
+    return '<div class="li tap" data-guest="' + i + '"><div class="bd"><div class="t1">' + esc(m.name || "—") + '</div><div class="t3">' + tchip(m.tier) + "<span>Spent <b>" + hkd(m.year_spend) + "</b></span><span><b>" + fmt(m.points) + "</b> $RORU</span></div></div><span class=\"chev\">›</span></div>";
+  }
+
+  // ===== GUESTS =====
+  function renderGuests() {
+    const d = st.data, S0 = d.settings, x = st.extras;
+    const statusHelp = "Guests move up a level by themselves, based on what they spent in the last " + (S0.tier_window_months || 12) + " months: " + TN("nori") + " to start, " + TN("gohan") + " from HK$" + fmt(S0.tier_gohan_hkd) + ", " + TN("tobiko") + " from HK$" + fmt(S0.tier_tobiko_hkd) + ". " + TN("kama") + " is invite only: anyone who spends HK$" + fmt(S0.kama_eligible_hkd) + "+ shows up under Kama below, and you tap Invite.<br>Higher levels earn more $RORU for each HK$1: Nori " + S0.tier_mult_nori + "×, Gohan " + S0.tier_mult_gohan + "×, Tobiko " + S0.tier_mult_tobiko + "×, Kama " + S0.tier_mult_kama + "× (change it in ☰ Settings). Looking a guest up by phone number is noted in the staff access log.";
+    $("#v-guests").innerHTML = vh("Guests", fmt(d.members) + " members") + '<p class="purpose">Look up any member, see your best guests, and invite top spenders to Kama.</p>' +
+      '<div class="search"><input id="gq" type="search" placeholder="Name or last 4 digits of phone" autocomplete="off" enterkeyhint="search"></div><div id="gres"></div>' +
+      sec("Best guests · last 12 months") + help(statusHelp) +
+      (d.top.length ? rt([{ h: "Name" }, { h: "Level" }, { h: "Spent (12 months)", c: "n" }, { h: "$RORU balance", c: "n" }, { h: "Visits", c: "n" }, { h: "Visit stamps", c: "desk" }, { h: "Bills scanned", c: "desk n" }, { h: "Last visit" }, { h: "Phone", c: "desk" }, { h: "", c: "desk", l: "" }],
+        d.top.map((m, i) => ({ attrs: 'data-open="' + i + '"', cells: [esc(m.name || "—"), tchip(m.tier), hkd(m.year_spend), fmt(m.points), fmt(m.visits), m.stamps + " of " + (S0.rolls_per_plate || 5) + (m.plates ? " (+" + m.plates + " earned)" : ""), fmt(m.receipts), m.last ? R.fmtDay(m.last) : "", esc(m.phone_masked), '<span class="muted">›</span>'] }))) : '<p class="empty">No members yet.</p>') +
+      sec("Kama · the invite-only top level") +
+      '<p class="muted" style="font-size:14px;margin:0 0 10px">Can be invited: spent HK$' + fmt(S0.kama_eligible_hkd) + "+ in the last 12 months</p>" +
+      (d.kama_eligible.length ? d.kama_eligible.map(m => '<div class="li"><div class="bd"><div class="t1">' + esc(m.name || "—") + '</div><div class="t2">' + esc(m.phone_masked) + " · spent " + hkd(m.year_spend) + '</div></div><button class="btn sm" data-kama="' + esc(m.phone) + '" data-on="1">Invite</button></div>').join("") : '<p class="empty">Nobody yet.</p>') +
+      '<p class="muted" style="font-size:14px;margin:14px 0 10px">Already Kama</p>' +
+      (d.kama_members.length ? d.kama_members.map(m => '<div class="li"><div class="bd"><div class="t1">' + esc(m.name || "—") + '</div><div class="t2">' + esc(m.phone_masked) + " · spent " + hkd(m.year_spend) + '</div></div><button class="btn ghost sm" data-kama="' + esc(m.phone) + '" data-on="0">Remove</button></div>').join("") : '<p class="empty">None yet.</p>') +
+      (x ? sec("Birthdays this week 🎂") + (x.birthdays_this_week.length ? x.birthdays_this_week.map(b => '<div class="li"><div class="bd"><div class="t1">' + esc(b.name || "—") + '</div><div class="t2">' + esc(b.phone_masked) + " · " + esc(b.md) + '</div></div><button class="btn ghost sm" data-clearbd="' + esc(b.phone) + '">Clear date</button></div>').join("") : '<p class="empty">None this week.</p>') : "");
+    const G = $("#v-guests");
+    $$("tr[data-open]", G).forEach(tr => tr.onclick = () => guestSheet(d.top[+tr.dataset.open]));
+    $$("[data-kama]", G).forEach(b => b.onclick = async () => { if (b.dataset.on === "0" && !confirm("Remove from Kama?")) return; b.disabled = true; try { await R.rpc("owner_set_kama", { p_token: st.sess.token, p_phone: b.dataset.kama, p_on: b.dataset.on === "1" }); R.toast(b.dataset.on === "1" ? "Invited to Kama ✓" : "Removed ✓"); load(); } catch (e) { R.toast(R.errText(e)); b.disabled = false; } });
+    $$("[data-clearbd]", G).forEach(b => b.onclick = async () => { if (!confirm("Reset this guest's birthday? They can set it again.")) return; b.disabled = true; try { await R.rpc("owner_clear_birthday", { p_token: st.sess.token, p_phone: b.dataset.clearbd }); R.toast("Reset ✓"); load(); } catch (e) { R.toast(R.errText(e)); } });
+    let tq = null; const q = $("#gq"); if (st.gq) { q.value = st.gq; search(st.gq); }
+    q.oninput = () => { clearTimeout(tq); tq = setTimeout(() => search(q.value), 350); };
+  }
+  async function search(raw) {
+    const s = String(raw || "").trim(); st.gq = s; const box = $("#gres"); if (!box) return;
+    if (!s) { box.innerHTML = ""; return; }
+    const low = s.toLowerCase(), dig = s.replace(/\D/g, "");
+    const local = st.data.top.map((m, i) => [m, i]).filter(([m]) => (m.name || "").toLowerCase().includes(low) || (dig.length >= 2 && String(m.phone_masked || "").replace(/\D/g, "").endsWith(dig.slice(-4))));
+    let found = [];
+    if (dig.length >= 4 || /^[A-Z0-9]{8}$/i.test(s)) { try { found = await R.rpc("staff_lookup", { p_token: st.sess.token, p_query: /^[A-Z0-9]{8}$/i.test(s) && dig.length < 4 ? s.toUpperCase() : s }); } catch (e) { found = []; } }
+    if (st.gq !== s) return;
+    const seen = new Set(); const rows = [];
+    found.forEach(f => { const i = st.data.top.findIndex(m => m.phone_masked === f.phone_masked && (m.name || "") === (f.name || "")); seen.add(i); rows.push({ m: Object.assign({}, i >= 0 ? st.data.top[i] : {}, f), i }); });
+    local.forEach(([m, i]) => { if (!seen.has(i)) rows.push({ m, i }); });
+    box.innerHTML = '<div class="sec" style="margin-top:4px"><h2>' + (rows.length ? rows.length + (rows.length === 1 ? " guest found" : " guests found") : "No match") + "</h2></div>" +
+      (rows.length ? rows.map((r, k) => '<div class="li tap" data-res="' + k + '"><div class="bd"><div class="t1">' + esc(r.m.name || "—") + '</div><div class="t2">' + esc(r.m.phone_masked || "") + (r.m.member_code ? ' <span class="idc">member ID ' + esc(r.m.member_code) + "</span>" : "") + '</div><div class="t3">' + tchip(r.m.tier) + (r.m.year_spend != null ? "<span>Spent <b>" + hkd(r.m.year_spend) + "</b></span>" : "") + "<span><b>" + fmt(r.m.points) + '</b> $RORU</span></div></div><span class="chev">›</span></div>').join("") : '<p class="empty">Try the last 4 digits of their phone number.</p>');
+    $$("[data-res]", box).forEach(el => el.onclick = () => guestSheet(rows[+el.dataset.res].m));
+  }
+  function guestSheet(m) {
+    if (!m) return; const S0 = st.data.settings;
+    const row = (l, v) => v === undefined || v === null || v === "" ? "" : '<div><span>' + l + "</span><b>" + v + "</b></div>";
+    openSheet(m.name || "Guest", '<div style="margin:0 0 14px">' + tchip(m.tier) + "</div>" +
+      '<div class="nums">' + row("Phone", esc(m.phone_masked)) + row("Spent in the last 12 months", m.year_spend != null ? hkd(m.year_spend) : null) + row("$RORU balance", fmt(m.points)) +
+        row("Visits", m.visits != null ? fmt(m.visits) : null) + row("Visit stamps toward the next free item", m.stamps != null ? m.stamps + " of " + (S0.rolls_per_plate || 5) + (m.plates ? " · " + m.plates + " earned so far" : "") : null) + row("Bills scanned", m.receipts != null ? fmt(m.receipts) : null) +
+        row("Rewards ready to use", m.pending_rewards != null ? fmt(m.pending_rewards) : null) + row("Bills waiting for approval", m.pending_receipts ? fmt(m.pending_receipts) : null) + row("Last visit", m.last ? R.fmtDay(m.last) : null) + row("Here today", m.visited_today ? "Yes" : null) + row('<span class="idc" style="margin:0">Member ID</span>', m.member_code ? '<span class="idc" style="margin:0">' + esc(m.member_code) + "</span>" : null) + "</div>" +
+      '<p class="muted" style="font-size:14px;margin-top:16px">To add a bill, stamp a visit or hand over a reward, use the staff iPad (it shows the full number, birthday and history, and logs who looked).</p>', '<button class="btn ghost" id="gClose">Close</button>', (b, f) => { f.querySelector("#gClose").onclick = closeSheet; });
+  }
+
+  // ===== REWARDS =====
+  const KIND = { plate: "🥢 Free after visits", ladder: "★ Swap for $RORU", birthday: "🎂 Birthday treat", gold: "✨⁠ Gold receipt" };
+  // f38b: one span per label, so the swapped-in hand-roll image stays inline with its words in the phone table (cells are flex there)
+  Object.keys(KIND).forEach(k => { KIND[k] = '<span class="knd">' + KIND[k] + "</span>"; });
+  function renderRewards() {
+    const d = st.data, S0 = d.settings, pk = st.perks;
+    $("#v-rewards").innerHTML = vh("Rewards", d.rewards.filter(r => r.active).length + " shown to guests · tap one to change it") + '<p class="purpose">What guests can get for their $RORU and visits, and the extra benefits each level gets.</p>' + rwCard() +
+      help("Guests earn " + S0.points_per_hkd + " $RORU for every HK$1 they spend (more at higher levels) and swap $RORU for the ★ items. They only see the name and the $RORU, never menu prices. $RORU comes off when the guest taps Use; staff just check the code.<br>The 🥢 item is free after every " + (S0.rolls_per_plate || 5) + " visits (change the number in ☰ Settings). <b>POS button</b> is the button staff press on the POS when they hand it over. Changes go live straight away.") +
+      rt([{ h: "Free item" }, { h: "How guests get it" }, { h: "$RORU needed", c: "n" }, { h: "Chinese name" }, { h: "POS button" }, { h: "Guests see it" }, { h: "", l: "", c: "desk" }],
+        d.rewards.map((r, i) => ({ attrs: 'data-rw="' + i + '"' + (r.active ? "" : ' style="opacity:.6"'), cells: [esc(r.name_en), KIND[r.kind] || esc(r.kind), r.kind === "plate" ? "none · free every " + (S0.rolls_per_plate || 5) + " visits" : r.kind === "ladder" ? fmt(r.points_cost) + " $RORU" : (+r.points_cost ? fmt(r.points_cost) + " $RORU" : "—"), esc(r.name_zh), esc(r.pos_item || "—"), r.active ? '<span class="opill">Yes</span>' : '<span class="opill no">No, hidden</span>', '<button class="btn ghost sm">Change</button>'] }))) +
+      (pk ? sec("What each level gets") + '<p class="hint">Extra benefits by level. Higher levels also get everything below them.</p>' + help("Guests see the benefits that are switched on; benefits for a level they haven't reached show greyed out with the level they need. \"Not confirmed yet\" means it is still a proposal. Numbers like the $RORU bonus fill themselves in from ☰ Settings, so you never need to retype them.") +
+        '<div class="phone">' + ["nori", "gohan", "tobiko", "kama"].map(tk => { const ps = pk.perks.map((p, i) => [p, i]).filter(([p]) => p.tier === tk); return ps.length ? '<p class="muted" style="font-size:14px;margin:14px 0 8px;display:flex;gap:8px;align-items:center">' + tchip(tk) + "</p>" + ps.map(([p, i]) => '<div class="li tap' + (p.status === "on" ? "" : " off") + '" data-pk="' + i + '"><div class="bd"><div class="t1">' + esc((p.emoji ? p.emoji + " " : "") + tok(p.name_en, p.tier)) + '</div><div class="t2">' + esc(tok(p.name_zh, p.tier)) + " · " + (p.status === "on" ? "guests see it" : "hidden") + (p.confirmed ? "" : " · not confirmed yet") + '</div></div><span class="chev">›</span></div>').join("") : ""; }).join("") + "</div>" +
+        '<div class="desk">' + rt([{ h: "Benefit" }, { h: "Level" }, { h: "Chinese" }, { h: "Guests see it" }, { h: "", l: "", c: "desk" }],
+          pk.perks.map((p, i) => ({ attrs: 'data-pk="' + i + '"' + (p.status === "on" ? "" : ' style="opacity:.6"'), cells: [esc((p.emoji ? p.emoji + " " : "") + tok(p.name_en, p.tier)), esc(TN(p.tier)) + (p.confirmed ? "" : ' <span class="opill warn">Not confirmed yet</span>'), esc(tok(p.name_zh, p.tier)), p.status === "on" ? '<span class="opill">Yes</span>' : '<span class="opill no">No, hidden</span>', '<button class="btn ghost sm">Change</button>'] }))) + "</div>" : "");
+    $$("tr[data-rw]", $("#v-rewards")).forEach(tr => tr.onclick = () => rewardSheet(d.rewards[+tr.dataset.rw]));
+    if ($("#rwPick")) $("#rwPick").onclick = () => rwSheet();
+    rwQueueWire();
+    if ($("#rwStop")) $("#rwStop").onclick = async (e) => { if (!confirm("Stop the $RORU of the week? Guests stop seeing it, the Up next list is cleared, and nothing earns 2x until you pick again.")) return; e.currentTarget.disabled = true;
+      try { await R.rpc("owner_set_roll_week", { p_token: st.sess.token, p_item_id: null }); R.toast("Stopped ✓"); load(); } catch (er) { R.toast(R.errText(er)); e.currentTarget.disabled = false; } };
+    $$("[data-pk]", $("#v-rewards")).forEach(tr => tr.onclick = () => perkSheet(pk.perks[+tr.dataset.pk]));
+  }
+
+  // ----- f39 $RORU of the week (Rewards tab, top): the owner picks one menu item; ordering it earns 2x $RORU until changed -----
+  const RW_KIND = [["roll", "Hand rolls"], ["set", "Roll sets"], ["food", "Small plates"], ["dessert", "Desserts"], ["drink", "Drinks"]];
+  const mx = (m) => String(+m || 2).replace(/\.0+$/, "") + "x";
+  function rwCard() {
+    const w = st.rw || {}, c = w.current || {}, tw = w.this_week || {};
+    if (!c.on) return '<div class="card rw-own" id="rwOwn"><div class="rw-own-h">' + R.coin(false) + '<div class="rw-own-t"><small>$RORU of the week</small><b>Off</b><small>Pick one dish or drink. Ordering it earns 2x $RORU until you change it.</small></div></div><div class="rw-own-b"><button class="btn" id="rwPick">Pick this week’s item</button></div></div>';
+    return '<div class="card rw-own on" id="rwOwn"><div class="rw-own-h">' + R.coin(false, "idle") + '<div class="rw-own-t"><small>$RORU of the week · since ' + esc(R.fmtDay(c.starts_on)) + '</small><b>' + esc(c.name_en) + ' <span class="rw-tag">' + mx(c.multiplier) + "</span></b>" +
+      (c.name_zh ? '<small>' + esc(c.name_zh) + "</small>" : "") + '<small>HK$' + fmt(c.price_hkd) + " each · " + fmt(tw.qty || 0) + " ordered on " + fmt(tw.bills || 0) + (+tw.bills === 1 ? " bill" : " bills") + " · +" + fmt(tw.extra || 0) + " extra $RORU so far</small></div></div>" +
+      '<div class="rw-own-b"><button class="btn" id="rwPick">Change item</button><button class="btn ghost" id="rwStop">Stop</button></div>' +
+      rwQueueHtml(w, c) +
+      '<p class="hint" style="margin:10px 0 0">Guests see it on their Card tab within seconds. Scanned receipts get the 2x by themselves when the item is on the bill; on “Add bill” staff tick it.</p></div>';
+  }
+  // ----- f41 "Up next": queued weeks. Each starts Monday 00:00 Hong Kong time; the database works out which week is on from the
+  // stored dates (no timer job), and a bill gets the item that was on when it was paid. Guests never see the queue. Max 8 weeks.
+  const hkDay = (iso) => { try { return new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Hong_Kong" }).format(new Date(iso)).replace(",", ""); } catch (e) { return R.fmtDay(iso); } };
+  function rwNextStart(w) { const q = w.queue || []; return q.length ? new Date(new Date(q[q.length - 1].starts_at).getTime() + 7 * 864e5).toISOString() : (w.next_monday || new Date(Date.now() + R.msToMondayHK()).toISOString()); }
+  function rwQueueHtml(w, c) {
+    const q = w.queue || [], max = w.queue_max || 8;
+    return '<div class="rw-q" id="rwQueue"><div class="rw-qh"><b>Up next</b><small>Switches by itself every Monday 00:00</small></div>' +
+      (q.length ? q.map((x, i) => '<div class="rw-qi" data-qi="' + i + '"><span class="rw-qd">' + esc(hkDay(x.starts_at)) + '</span><span class="rw-qn"><b>' + esc(x.name_en) + "</b>" + (x.name_zh ? "<small>" + esc(x.name_zh) + "</small>" : "") + "</span>" +
+          '<span class="rw-qa"><button type="button" class="rw-qb" data-qmv="-1" aria-label="Move up"' + (i ? "" : " disabled") + '>↑</button><button type="button" class="rw-qb" data-qmv="1" aria-label="Move down"' + (i < q.length - 1 ? "" : " disabled") + '>↓</button><button type="button" class="rw-qb x" data-qrm="1" aria-label="Remove">✕</button></span></div>').join("")
+        : '<p class="rw-qe">Nothing lined up. ' + esc(c.name_en) + " stays until you change it.</p>") +
+      (q.length && q.length <= 2 ? '<p class="rw-qw">' + q.length + (q.length === 1 ? " week" : " weeks") + " left in the queue. After that, " + esc(q[q.length - 1].name_en) + " stays.</p>" : "") +
+      (q.length < max ? '<button type="button" class="btn ghost rw-qadd" id="rwQAdd">+ Add ' + esc(hkDay(rwNextStart(w))) + "</button>" : '<p class="rw-qe">Queue is full (' + max + " weeks).</p>") + "</div>";
+  }
+  async function rwQueueSave(items, msg) {
+    $$("#rwQueue button").forEach(b => b.disabled = true);
+    try {
+      const r = await R.rpc("owner_set_roll_week_queue", { p_token: st.sess.token, p_items: items.map(x => ({ item_id: x.item_id, price_hkd: +x.price_hkd || null })) });
+      st.rw = Object.assign({}, st.rw, { queue: r.queue || [], current: r.current || (st.rw || {}).current }); renderRewards(); R.toast(msg);
+    } catch (er) { R.toast(er.code === "queue_full" ? "Up to 8 weeks" : R.errText(er)); renderRewards(); }
+  }
+  // at Monday 00:00 HK the queued week becomes current by itself: refresh the card right then
+  (function armRwMonday() { setTimeout(async () => { try { if (st.sess && st.data) { st.rw = await R.rpc("owner_roll_week", { p_token: st.sess.token }); renderRewards(); } } catch (e) {} armRwMonday(); }, Math.min(R.msToMondayHK() + 2000, 2147000000)); })();
+  function rwQueueWire() {
+    const q = (st.rw || {}).queue || [];
+    if ($("#rwQAdd")) $("#rwQAdd").onclick = () => rwSheet("queue");
+    $$("#rwQueue [data-qi]").forEach(row => {
+      const i = +row.dataset.qi;
+      row.querySelectorAll("[data-qmv]").forEach(b => b.onclick = () => { const j = i + +b.dataset.qmv; if (j < 0 || j >= q.length) return; const a = q.slice(); [a[i], a[j]] = [a[j], a[i]]; rwQueueSave(a, "Moved ✓"); });
+      const rm = row.querySelector("[data-qrm]"); if (rm) rm.onclick = () => rwQueueSave(q.filter((_, k) => k !== i), "Removed ✓");
+    });
+  }
+  function rwSheet(mode) {
+    const w = st.rw || {}, c = w.current || {}, menu = (w.menu || []).slice(), isQ = mode === "queue", qDay = isQ ? hkDay(rwNextStart(w)) : "";
+    let sel = !isQ && c.on ? c.item_id : null;
+    const row = (it) => '<label class="rw-it' + (sel === it.id ? " on" : "") + '" data-kind="' + esc(it.kind) + '" data-q="' + esc((it.name_en + " " + (it.name_zh || "")).toLowerCase()) + '"><input type="radio" name="rwItem" value="' + it.id + '"' + (sel === it.id ? " checked" : "") + '><span class="rw-it-n"><b>' + esc(it.name_en) + "</b>" + (it.name_zh ? "<small>" + esc(it.name_zh) + "</small>" : "") + '</span><span class="rw-it-p">' + (it.price_hkd ? "HK$" + fmt(it.price_hkd) : '<em>no price</em>') + "</span></label>";
+    const body = (isQ ? '<p class="muted" style="font-size:15px;margin:0 0 12px">Pick the item for the week of <b>' + esc(qDay) + '</b>. From Monday 00:00 that week, ordering it earns <b>2x $RORU</b>. Guests only see it once its week starts.</p>'
+        : '<p class="muted" style="font-size:15px;margin:0 0 12px">Pick one item. From now on, ordering it earns <b>2x $RORU</b> on its price, until you change or stop it' + ((w.queue || []).length ? " or the next week in Up next starts (Up next stays as it is)" : "") + '. Use it to push slow movers or high-margin dishes.</p>') +
+      '<input class="fin" id="rwQ" type="search" placeholder="Search the menu" autocomplete="off" style="margin-bottom:10px">' +
+      '<div id="rwList">' + RW_KIND.map(([k, lbl]) => { const its = menu.filter(x => x.kind === k); return its.length ? '<div class="rw-grp" data-grp="' + k + '"><p class="rw-gh">' + lbl + "</p>" + its.map(row).join("") + "</div>" : ""; }).join("") + "</div>" +
+      "";
+    // f42 (Dominic Oct 21: the inline preview box blocked the item list): the list keeps the whole sheet; the pick is one slim bar pinned above the buttons; tap it (or ✎) to change the price.
+    let price = sel && c.price_hkd ? +c.price_hkd : null, editing = false;
+    openSheet(isQ ? "Up next · " + qDay : "$RORU of the week", body, '<div id="rwBar" class="rw-bar hide"></div><button class="btn ghost" id="rwNo">Cancel</button><button class="btn" id="rwSave" disabled>' + (isQ ? "Add to " + esc(qDay) : "Make it $RORU of the week") + "</button>", (b, f) => {
+      f.classList.add("rw-sf");
+      const bar = f.querySelector("#rwBar"), save = f.querySelector("#rwSave");
+      const sumTxt = (it) => '<b>' + esc(it.name_en) + "</b> · " + (+price > 0 ? "2x on HK$" + fmt(+price) : '<em>set a price</em>');
+      const okp = () => { save.disabled = !(+price > 0); };
+      const paint = () => {
+        const it = menu.find(x => x.id === sel); $$(".rw-it", b).forEach(l => l.classList.toggle("on", +l.querySelector("input").value === sel));
+        if (!it) { bar.classList.add("hide"); save.disabled = true; return; }
+        bar.classList.remove("hide"); bar.classList.toggle("ed", editing);
+        bar.innerHTML = '<button type="button" class="rw-bar-m" id="rwBarM" aria-expanded="' + editing + '" aria-label="Change the price">' + R.coin(false) + '<span class="rw-bar-t" id="rwBarT">' + sumTxt(it) + '</span><span class="rw-bar-e" aria-hidden="true">' + (editing ? "✕" : "✎") + "</span></button>" +
+          (editing ? '<div class="rw-bar-ed"><label for="rwPrice">Price used for the 2x (HK$)</label><div class="rw-bar-row"><input class="fin" id="rwPrice" type="number" min="1" inputmode="decimal" value="' + esc(price || "") + '"><button type="button" class="btn ghost" id="rwPrDone">Done</button></div>' +
+            '<small>' + (it.price_hkd ? "Menu price HK$" + fmt(it.price_hkd) + ". " : "") + (isQ ? "From " + esc(qDay) + ", guests" : "Guests") + " see “This week: " + esc(it.name_en) + " = double $RORU”.</small></div>" : "");
+        bar.querySelector("#rwBarM").onclick = () => { editing = !editing; paint(); if (editing) { const x = $("#rwPrice"); if (x) { x.focus(); x.select && x.select(); } } };
+        const pr = $("#rwPrice");
+        if (pr) {
+          pr.oninput = () => { price = +pr.value > 0 ? +pr.value : null; $("#rwBarT").innerHTML = sumTxt(it); okp(); };
+          pr.onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); if (+price > 0) { editing = false; paint(); } } else if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); editing = false; paint(); } };
+          bar.querySelector("#rwPrDone").onclick = () => { editing = false; paint(); };
+        }
+        okp();
+      };
+      b.onchange = (e) => { if (e.target.name === "rwItem") { sel = +e.target.value; const it = menu.find(x => x.id === sel); price = it && it.price_hkd ? +it.price_hkd : null; editing = !(+price > 0); paint(); } };
+      $("#rwQ").oninput = () => { const q = $("#rwQ").value.trim().toLowerCase(); $$(".rw-it", b).forEach(l => l.classList.toggle("hide", !!q && !l.dataset.q.includes(q))); $$(".rw-grp", b).forEach(g => g.classList.toggle("hide", !g.querySelector(".rw-it:not(.hide)"))); };
+      if (sel && !(+price > 0)) { const it0 = menu.find(x => x.id === sel); price = it0 && it0.price_hkd ? +it0.price_hkd : null; }
+      paint();
+      if (sel) setTimeout(() => { const l = b.querySelector(".rw-it.on"); if (l) l.scrollIntoView({ block: "center" }); }, 30);
+      f.querySelector("#rwNo").onclick = closeSheet;
+      save.onclick = async (e) => { const btn = e.currentTarget; if (!(+price > 0)) { editing = true; paint(); return; } btn.disabled = true;
+        if (isQ) { const it = menu.find(x => x.id === sel); closeSheet(); rwQueueSave(((st.rw || {}).queue || []).concat([{ item_id: sel, price_hkd: +price, name_en: it.name_en }]), "Added for " + qDay + " ✓"); return; }
+        try { await R.rpc("owner_set_roll_week", { p_token: st.sess.token, p_item_id: sel, p_price_hkd: +price, p_multiplier: 2 }); closeSheet(); R.toast("Saved ✓ · guests see it now"); load(); }
+        catch (er) { R.toast(er.code === "price_required" ? "Type the price first" : R.errText(er)); btn.disabled = false; } };
+    });
+  }
+  function rewardSheet(r) {
+    const S0 = st.data.settings;
+    openSheet("Change reward", '<p class="muted" style="margin:0 0 6px;font-size:15px">' + (KIND[r.kind] || esc(r.kind)) + ' <span class="idc">ID ' + esc(r.code) + "</span></p>" +
+      '<div class="gsee" id="rwPrev"></div>' +
+      fld("Name guests see (English)", inp("name_en", r.name_en), "e.g. Any highball, on us") + fld("Name guests see (Chinese)", inp("name_zh", r.name_zh), "Shown when a guest switches to 中文") +
+      fld("Small print (English)", area("detail_en", r.detail_en), "e.g. One per visit. Show the code to staff.") + fld("Small print (Chinese)", area("detail_zh", r.detail_zh)) +
+      (r.kind === "plate" ? '<p class="muted" style="font-size:15px;margin:0 0 14px">Unlocks after ' + (S0.rolls_per_plate || 5) + ' visit stamps (change the number under ☰ Settings).</p><input type="hidden" name="points_cost" value="0">'
+        : fld("$RORU needed", inp("points_cost", r.points_cost, 'type="number" min="0" inputmode="numeric"'), "e.g. 588 · avoid the number 4")) +
+      fld("POS button staff press", inp("pos", r.pos_item || "", 'placeholder="e.g. HIGHBALL"'), "Shown on the staff iPad when it's handed over, and in the month-end report.") +
+      tog("Show to guests", "Off hides it from the guest page", 'name="active"', r.active),
+      '<button class="btn ghost" id="rwNo">Cancel</button><button class="btn" id="rwSave">Save</button>', (b, f) => {
+        const g = (n) => b.querySelector("[name=" + n + "]");
+        const prev = () => { const pts = r.kind === "plate" ? "free after " + (S0.rolls_per_plate || 5) + " visits" : fmt(g("points_cost").value) + " $RORU"; $("#rwPrev").innerHTML = 'Guests see: <b>“' + esc(g("name_en").value || "…") + '”</b> · ' + pts + (g("active").checked ? "" : ' <span class="muted">(hidden right now)</span>'); };
+        b.oninput = prev; b.onchange = prev; prev();
+        f.querySelector("#rwNo").onclick = closeSheet;
+        f.querySelector("#rwSave").onclick = async (e) => { const btn = e.currentTarget; btn.disabled = true;
+          try { await R.rpc("owner_save_reward", { p_token: st.sess.token, p_id: r.id, p_name_en: g("name_en").value, p_name_zh: g("name_zh").value, p_detail_en: g("detail_en").value, p_detail_zh: g("detail_zh").value, p_weight: null, p_points_cost: +g("points_cost").value, p_active: g("active").checked });
+            if ((g("pos").value || "") !== (r.pos_item || "")) await R.rpc("owner_save_pos_item", { p_token: st.sess.token, p_id: r.id, p_pos: g("pos").value });
+            closeSheet(); R.toast("Saved ✓"); load(); }
+          catch (er) { R.toast(R.errText(er)); btn.disabled = false; } };
+      });
+  }
+  function perkSheet(p) {
+    openSheet("Change benefit · " + TN(p.tier), (p.confirmed ? "" : '<p style="margin:0 0 12px"><span class="opill warn">Not confirmed yet (still a proposal)</span></p>') +
+      '<div class="gsee" id="pkPrev"></div>' +
+      fld("Benefit name (English)", inp("name_en", p.name_en), "e.g. Birthday hand roll on us") + fld("Benefit name (Chinese)", inp("name_zh", p.name_zh)) +
+      fld("Small print (English)", area("detail_en", p.detail_en || "")) + fld("Small print (Chinese)", area("detail_zh", p.detail_zh || ""), "Tip: typing {x} shows this level's $RORU bonus (" + tok("{x}", p.tier) + "×) and {p} shows the Kama Dinner passes (" + tok("{p}", p.tier) + "). The preview above shows exactly what guests read.") +
+      tog("Show on the guest page", "Off hides it", 'name="on"', p.status === "on"),
+      '<button class="btn ghost" id="pkNo">Cancel</button><button class="btn" id="pkSave">Save</button>', (b, f) => {
+        const g = (n) => b.querySelector("[name=" + n + "]");
+        const prev = () => { $("#pkPrev").innerHTML = 'Guests see: <b>“' + esc(tok(g("name_en").value, p.tier) || "…") + '”</b>' + (g("detail_en").value ? '<br><span class="muted">' + esc(tok(g("detail_en").value, p.tier)) + "</span>" : ""); };
+        b.oninput = prev; prev();
+        f.querySelector("#pkNo").onclick = closeSheet;
+        f.querySelector("#pkSave").onclick = async (e) => { const btn = e.currentTarget; btn.disabled = true;
+          try { await R.rpc("owner_save_perk", { p_token: st.sess.token, p_key: p.key, p_status: g("on").checked ? "on" : "off", p_name_en: g("name_en").value, p_name_zh: g("name_zh").value, p_detail_en: g("detail_en").value, p_detail_zh: g("detail_zh").value }); closeSheet(); R.toast("Saved ✓"); load(); }
+          catch (er) { R.toast(R.errText(er)); btn.disabled = false; } };
+      });
+  }
+
+  // ===== STAFF & PINs (☰) =====
+  const ROLES = [["staff", "Staff"], ["manager", "Manager"], ["owner", "Owner"]], RN = { staff: "Staff", manager: "Manager", owner: "Owner" };
+  const roleSel = (cur) => '<select class="fin" name="role">' + ROLES.map(r => '<option value="' + r[0] + '"' + (cur === r[0] ? " selected" : "") + ">" + r[1] + "</option>").join("") + "</select>";
+  const shopSel = (cur) => '<select class="fin" name="shop"><option value="wanchai"' + (cur === "wanchai" ? " selected" : "") + '>Wan Chai</option><option value="central"' + (cur === "central" ? " selected" : "") + ">Central</option></select>";
+  const ACT = { lookup: "Looked up a phone number", scan: "Scanned a guest's QR code", view: "Opened a guest's card", reverse_redeem: "↩︎ Undid a claimed reward", perk_use: "✅ Marked a benefit as used", perk_undo: "↩︎ Undid a used benefit", passport_stamp: "🎫 Stamped a guest's passport", passport_undo: "↩︎ Undid a passport stamp", passport_prize: "✅ Marked a passport prize as used", passport_prize_undo: "↩︎ Undid a passport prize", passport_settings: "⚙️ Changed the passport quarter or prizes", scratch_give: "🎟 Gave a Roru Day scratch card", scratch_fallback: "🔑 Gave a scratch card by hand (scan failed, manager OK)", scratch_undo: "↩︎ Cancelled a scratch card", scratch_reveal: "🎟 Revealed a scratch card on the iPad", scratch_use: "✅ Marked a scratch card prize as used", scratch_use_undo: "↩︎ Undid a used scratch card prize", scratch_settings: "⚙️ Changed the scratch card rules or odds", scratch_prize: "⚙️ Changed a scratch card prize" };
+  function renderStaff() {
+    const d = st.data, al = st.alog;
+    $("#v-staff").innerHTML = vh("Staff & PINs", d.staff.filter(s => s.active).length + " people can sign in", '<button class="btn sm" id="stAdd">+ Add a person</button>') + '<p class="purpose">Who can sign in to the staff iPad and with which PIN, plus a record of every time staff look at a guest\'s details.</p>' +
+      help("<b>Staff</b>: add bills and visits, hand over rewards, mark them as rung up on the POS. <b>Manager</b>: the same, plus the month-end report and downloads. <b>Owner</b>: everything, including this page.<br>Everyone gets their own 6-digit PIN (no 4 in it), and everything they do is saved under their name. To change someone's PIN, tap them, type a new one and Save. The old shared counter PIN still works as a basic Staff login.") +
+      '<div class="phone">' + d.staff.map((s, i) => '<div class="li tap' + (s.active ? "" : " off") + '" data-st="' + i + '"><div class="bd"><div class="t1">' + esc(s.name) + '</div><div class="t2">' + (RN[s.role] || esc(s.role)) + " · " + shopNm(s.shop) + (s.active ? "" : " · removed, PIN switched off") + '</div></div><span class="chev">›</span></div>').join("") + "</div>" +
+      '<div class="desk">' + rt([{ h: "Name" }, { h: "Role" }, { h: "Shop" }, { h: "Can sign in?" }, { h: "", l: "", c: "desk" }],
+        d.staff.map((s, i) => ({ attrs: 'data-st="' + i + '"' + (s.active ? "" : ' style="opacity:.55"'), cells: [esc(s.name), RN[s.role] || esc(s.role), shopNm(s.shop), s.active ? '<span class="opill">Yes</span>' : '<span class="opill no">No, removed</span>', '<button class="btn ghost sm">Change</button>'] }))) + "</div>" +
+      sec("🔒 Who looked at guest details", '<button class="lnk" id="alRefresh">Refresh</button>') +
+      help("Staff can see a guest's full phone number, birthday and spending, so every look is written down here with who and when: phone lookups, QR scans, opened guest cards, benefits marked as used and undone rewards. The same look repeated within 2 minutes counts as one line. Hong Kong privacy law expects this kind of record.") +
+      '<p class="muted" style="font-size:14px;margin:0 0 10px">Last 7 days: staff opened guest details <b>' + (al ? fmt(al.total_7d) : "—") + "</b> times</p>" +
+      (al && al.rows.length ? rt([{ h: "What they did" }, { h: "Time" }, { h: "Staff member" }, { h: "Guest" }],
+        al.rows.map(x => ({ cells: [(ACT[x.action] || esc(x.action)) + (x.hits > 1 ? " · " + x.hits + " times" : "") + (x.detail ? '<div class="muted" style="font-size:13px;font-weight:500">' + esc(x.detail) + "</div>" : ""), hkTime(x.last_at), esc(x.staff_name || "—") + (x.staff_role && x.staff_role !== "staff" ? " · " + esc(RN[x.staff_role] || x.staff_role) : ""), esc(x.member_name || "Guest") + (x.is_test ? " · test" : "") + (x.member_code ? ' <span class="idc">ID ' + esc(x.member_code) + "</span>" : "")] }))) : '<p class="empty">' + (al ? "Staff haven't opened any guest details yet." : "Couldn't load the record. Tap Refresh.") + "</p>");
+    $("#stAdd").onclick = () => staffSheet(null);
+    $$("[data-st]", $("#v-staff")).forEach(tr => tr.onclick = () => staffSheet(d.staff[+tr.dataset.st]));
+    $("#alRefresh").onclick = async () => { try { st.alog = await R.rpc("owner_access_log", { p_token: st.sess.token, p_limit: 30 }); renderStaff(); labelTables($("#v-staff")); R.toast("Updated"); } catch (e) { R.toast(R.errText(e)); } };
+  }
+  const staffErr = (e) => ({ pin_must_be_6_digits_no_4: "The PIN needs 6 digits, with no 4 in it", pin_already_used: "Someone already has that PIN", pin_required: "Type a PIN for the new person", cannot_demote_self: "You can't remove or demote yourself" }[e.code] || R.errText(e));
+  function staffSheet(s) {
+    const isNew = !s; s = s || { name: "", role: "staff", shop: "wanchai", active: true };
+    openSheet(isNew ? "Add a person" : s.name, fld("Name", inp("name", s.name, isNew ? 'placeholder="e.g. Florencia"' : ""), "How it shows in the records") +
+      '<div class="f2">' + fld("Role", roleSel(s.role)) + fld("Shop", shopSel(s.shop)) + "</div>" +
+      '<p class="hint" style="margin:-2px 0 14px">Staff: counter work · Manager: + month-end report · Owner: everything</p>' +
+      fld(isNew ? "PIN (6 digits, no 4)" : "New PIN", '<input class="fin" name="pin" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="' + (isNew ? "e.g. 135790" : "leave empty to keep the current PIN") + '">', isNew ? "Tell them the PIN in person. Everything they do is saved under their name." : "Only type one if you want to change their PIN.") +
+      (isNew ? "" : tog("Can sign in", "Off = their PIN stops working; their history stays", 'name="active"', s.active)),
+      (isNew ? "" : (s.active ? '<button class="btn ghost" id="stRm" style="color:#ff8a6a">Remove</button>' : "")) + '<button class="btn" id="stSave">' + (isNew ? "Add" : "Save") + "</button>", (b, f) => {
+        const g = (n) => b.querySelector("[name=" + n + "]");
+        const save = async (btn, remove) => { btn.disabled = true;
+          try { await R.rpc("owner_set_staff", { p_token: st.sess.token, p_id: isNew ? null : s.id, p_name: g("name").value, p_pin: g("pin").value || null, p_role: g("role").value, p_shop: g("shop").value, p_active: remove ? false : (g("active") ? g("active").checked : null) }); closeSheet(); R.toast(remove ? "Removed ✓" : "Saved ✓"); load(); }
+          catch (er) { R.toast(staffErr(er), 3500); btn.disabled = false; } };
+        f.querySelector("#stSave").onclick = (e) => save(e.currentTarget, false);
+        if (f.querySelector("#stRm")) f.querySelector("#stRm").onclick = (e) => { if (confirm("Remove " + s.name + "? Their PIN stops working; their history stays.")) save(e.currentTarget, true); };
+      });
+  }
+
+  // ===== REPORTS (☰) =====
+  function renderReports() {
+    const x = st.extras;
+    if (!st.monthEl) { st.monthEl = document.createElement("div"); st.monthEl.className = "card"; st.monthEl.id = "monthBox"; window.RORU_MONTHEND.mount(st.monthEl, () => st.sess.token); }
+    const v = $("#v-reports");
+    v.innerHTML = vh("Reports", "Month-end report, downloads and numbers") + '<p class="purpose">Your month-end report for Florencia, spreadsheets to download, and how the extras are doing.</p>' + '<div id="monthSlot"></div>' +
+      sec("Split receipts · last 30 days") + '<p class="hint">Each bill is scanned once. The guest who scanned picks how many people share it (2 to ' + esc((st.data.settings || {}).split_max_people || 6) + ', them included) and types each friend\'s number. Every friend\'s share is the $RORU divided by the number of people, rounded down; the scanner keeps the leftover. Spend splits the same way to the cent, so the rows always add up to the bill. Each friend says yes on their own; a friend who says no or doesn\'t answer within ' + esc((st.data.settings || {}).split_offer_hours || 12) + ' hours leaves their share with the scanner. Yeses stay yeses.</p><div id="splitsAll">' + splitBox(60, true) + '</div>' +
+      sec("Download spreadsheets") + '<p class="hint">Opens in Excel, Numbers or Google Sheets. They include phone numbers, so keep them inside the business (HK privacy law).</p>' +
+      '<div class="qa" id="csvBtns">' + [["members", "👥", "All members"], ["receipts", "🧾", "All bills"], ["visits", "🥢", "All visits"], ["rewards", "🎁", "Free items claimed"], ["consents", "✍️", "Sign-up agreements"], ["marketing_optins", "📣", "Who said yes to messages"]].map(c => '<button data-x="' + c[0] + '"><i>' + c[1] + "</i>" + c[2] + "<small>Spreadsheet</small></button>").join("") + "</div>" +
+      (x ? sec("How the extras are doing") + '<p class="hint">Totals since the programme started.</p><div class="stats">' + [["Gold receipts won ✨⁠", x.gold_receipts], ["Friends who joined 👯", x.referrals_joined], ["Friend bonuses paid", x.referrals_rewarded], ["$RORU given for friends", x.referral_points], ["Birthdays saved 🎂", x.birthdays_on_file], ["Birthday rolls given", x.birthday_rolls]].map(y => '<div class="stat"><b>' + fmt(y[1]) + "</b><span>" + y[0] + "</span></div>").join("") + "</div>" +
+        '<p class="muted" style="font-size:14px;margin:16px 0 10px">Members who brought the most friends</p>' + (x.top_referrers.length ? x.top_referrers.map(b => '<div class="li"><div class="bd"><div class="t1">' + esc(b.name || "—") + '</div><div class="t2">' + esc(b.phone_masked) + " · " + fmt(b.joined) + (+b.joined === 1 ? " friend joined" : " friends joined") + "</div></div></div>").join("") : '<p class="empty">None yet.</p>') : "");
+    $("#monthSlot").appendChild(st.monthEl);
+    $$("#csvBtns [data-x]").forEach(b => b.onclick = async () => {
+      b.disabled = true; try { const rows = await R.rpc("owner_export", { p_token: st.sess.token, p_kind: b.dataset.x }); if (!rows.length) { R.toast("Nothing to export yet"); b.disabled = false; return; }
+        const cols = Object.keys(rows[0]); const csv = "\ufeff" + [cols.map(c => c.replace(/points/g, "roru")).join(",")].concat(rows.map(r => cols.map(c => { let v = r[c]; if (v == null) v = ""; v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(","))).join("\n");
+        const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" })); a.download = R.prog("en").toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + b.dataset.x + "-" + new Date().toISOString().slice(0, 10) + ".csv"; document.body.appendChild(a); a.click(); a.remove(); } catch (e) { R.toast(R.errText(e)); } b.disabled = false; });
+  }
+
+  // ===== SETTINGS (☰) =====
+  // f28: plain label + example for every number. [label, example / what it does]
+  const EDIT = {
+    rolls_per_plate: ["Visits needed for the free visit item", "e.g. 5 → guests see “Free hand roll after 5 visits”"],
+    points_per_hkd: ["$RORU for every HK$1 spent", "e.g. 1 → a HK$300 bill earns 300 $RORU, before the level bonus"],
+    tier_gohan_hkd: ["Spend to reach Gohan (HK$, last 12 months)", "e.g. 5888"],
+    tier_tobiko_hkd: ["Spend to reach Tobiko (HK$, last 12 months)", "e.g. 15888"],
+    kama_eligible_hkd: ["Spend to be invited to Kama (HK$, last 12 months)", "e.g. 25888 · they show up in Guests for you to invite"],
+    tier_window_months: ["Months of spending that count toward a level", "e.g. 12"],
+    tier_mult_nori: ["$RORU bonus at Nori", "e.g. 1 → HK$100 earns 100 $RORU"],
+    tier_mult_gohan: ["$RORU bonus at Gohan", "e.g. 1.25 → HK$100 earns 125 $RORU"],
+    tier_mult_tobiko: ["$RORU bonus at Tobiko", "e.g. 1.5 → HK$100 earns 150 $RORU"],
+    tier_mult_kama: ["$RORU bonus at Kama", "e.g. 2 → HK$100 earns 200 $RORU"],
+    receipts_per_day: ["Bills one guest can scan per day", "e.g. 3"],
+    approve_over_hkd: ["Bills above this need a staff check (HK$)", "e.g. 1500 · smaller bills get $RORU straight away"],
+    receipt_max_age_hours: ["How old a receipt can be to scan (hours)", "e.g. 72 = 3 days"],
+    gold_roll_chance: ["Chance of a gold visit stamp (looks only, no prize)", "0 to 1 · e.g. 0.05 = 1 in 20"],
+    gold_receipt_odds: ["Chance a bill becomes a gold receipt", "0 to 1 · e.g. 0.05 = 1 in 20 bills"],
+    gold_receipt_mult: ["Gold receipt $RORU bonus", "e.g. 2 = double $RORU on that bill"],
+    referral_bonus_points: ["Bring-a-friend $RORU (each person gets)", "e.g. 188"],
+    referral_cap_per_year: ["Most friend bonuses one member can get a year", "e.g. 10"],
+    birthday_window_days: ["Birthday treat works this many days either side", "e.g. 3 → from 3 days before to 3 days after"],
+    birthday_min_days: ["Days a birthday must be saved before the treat works", "e.g. 30 · stops people changing it to get a free roll"],
+    roru_day_points_mult: ["Roru Day $RORU bonus (not built yet)", "e.g. 2 = double $RORU"],
+    hook_mon_on: ["Monday double stamps: 1 = on, 0 = off", "Easier with the switch under Weekly specials"],
+    hook_mon_stamps: ["Monday: visit stamps per visit", "e.g. 2"],
+    hook_tue_on: ["Tuesday friends night: 1 = on, 0 = off", "Easier with the switch under Weekly specials"],
+    hook_tue_bonus_mult: ["Tuesday: friend bonus multiplied by", "e.g. 2 = double friend $RORU"],
+    hook_wed_on: ["Wednesday gold rush: 1 = on, 0 = off", "Easier with the switch under Weekly specials"],
+    hook_wed_gold_odds: ["Wednesday: chance of a gold receipt", "0 to 1 · e.g. 0.2 = 1 in 5"],
+    referral_min_spend: ["Friend bonus only if the friend's first bill is at least (HK$)", "e.g. 388 · the one place to change the bring-a-friend minimum"],
+    referral_visit2_points: ["Come-back bonus: $RORU for a new friend who visits again", "e.g. 88 · 0 = off"],
+    referral_visit2_days: ["Come-back bonus: within this many days of their first visit", "e.g. 30"],
+    roru_day_max_point_rewards: ["Roru Day: $RORU rewards a guest can use per bill (free first drink always stacks)", "e.g. 1 · 0 = no limit"],
+    split_offer_hours: ["Split receipt: hours a friend has to say yes", "e.g. 12 · after that the $RORU stays with the guest who scanned"],
+    split_offers_per_day: ["Split receipt: requests a guest can send per day", "e.g. 5"],
+    split_max_people: ["Split receipt: most people on one bill (scanner included)", "2 to 6 · e.g. 6 = the scanner + 5 friends"],
+    rejoin_cooloff_days: ["Days before a deleted account can rejoin", "15 or 30"],
+    kama_dinner_passes: ["Kama Dinner passes per member per year", "e.g. 2"]
+  };
+  const BUILT = ["gold_receipt", "bring_friend", "birthday_roll"];
+  function renderSettings() {
+    const d = st.data, S0 = d.settings, ul = st.ulog, fs = st.features || [];
+    const on = (k) => String(S0[k]) === "1", oneIn = (v) => { const p = +v || 0; return p > 0 ? Math.round(1 / p) : 0; }, odds = (v) => "1 in " + Math.round(1 / Math.max(0.0001, +v || 0));
+    const grp = (id, title, inner) => '<details class="grp" id="g-' + id + '"><summary><span class="gt">' + title + '</span></summary><div class="in">' + inner + "</div></details>";
+    const setrow = (label, key, val, extra, hint) => '<div class="setrow" data-k="' + key + '">' + fld(label, '<input class="fin" name="v" inputmode="decimal" value="' + esc(val) + '" ' + (extra || "") + ">", hint) + '<button class="btn sm" data-setsave>Save</button></div>';
+    const tmCur = [30, 60, 90, 120].includes(+S0.staff_card_timeout_s) ? +S0.staff_card_timeout_s : 60;
+    const UPR = [["Every claim (normal)", "When no rule below applies", null, "upgrade_chance"], ["Slow nights · Mon–Wed", "Hong Kong time", "upgrade_slow_on", "upgrade_slow_chance"], ["Guest we haven't seen", "Previous visit " + esc(S0.upgrade_lapsed_days) + "+ days ago", "upgrade_lapsed_on", "upgrade_lapsed_chance"], ["Both at once", "Slow night and a guest we haven't seen", null, "upgrade_both_chance"]];
+    const RULE = { base: "Normal", slow_night: "Slow night (Mon–Wed)", lapsed: "Guest we hadn't seen", both: "Slow night + guest we hadn't seen", off: "Switched off" };
+    const NIGHTS = [["mon", "MON · Double stamps", "Every visit counts " + S0.hook_mon_stamps + "× on the plate", "hook_mon_stamps", "Visit stamps per visit"], ["tue", "TUE · Friends night", "Bring-a-friend bonus ×" + S0.hook_tue_bonus_mult, "hook_tue_bonus_mult", "Friend $RORU multiplied by"], ["wed", "WED · Gold rush", "Gold receipt odds " + odds(S0.hook_wed_gold_odds) + " (normal " + odds(S0.gold_receipt_odds) + ")", "hook_wed_gold_odds", "Gold receipt chance (0.2 = 1 in 5)"]];
+    $("#v-settings").innerHTML = vh("Settings", "Tap a section to open it") + '<p class="purpose">The rules of the programme: $RORU per dollar, when guests move up a level, special nights and extras.</p>' +
+      grp("timeout", "🔒 Staff iPad: auto-close guest details", help("After staff open a guest, their card (phone, birthday, spend) closes by itself when nobody taps the iPad for this long. Staff see a countdown in the last 10 seconds; any tap restarts it. \"Done ✓ Next guest\" closes it at once. Staff stay signed in.<br>客人資料喺無人操作一段時間後會自動關閉，最後 10 秒會倒數；按一下就重新計時。店員唔會被登出。") +
+        '<div class="setrow">' + fld("Close a guest's details after · 自動關閉", '<select class="fin" id="tmSel">' + [30, 60, 90, 120].map(v => '<option value="' + v + '"' + (v === tmCur ? " selected" : "") + ">" + v + " s / 秒" + (v === 60 ? " (default 預設)" : "") + "</option>").join("") + "</select>") + '<button class="btn sm" id="tmSave">Save</button></div>') +
+      grp("expiry", "⏳ $RORU expiry", (() => { const rule = S0.points_expiry, y = new Date(Date.now() + 8 * 3600e3).getUTCFullYear();
+        return '<div class="setrow"><div class="lb" style="font-size:16px"><b>' + (rule === "annual_dec31" ? "$RORU expires on 31 Dec each year" : "No expiry rule set") + '</b><small class="muted" style="display:block;font-size:13px">' + (rule === "annual_dec31" ? "RORU幣每年 12 月 31 日到期 · RORU币每年 12 月 31 日到期 · next expiry 31 Dec " + y : "") + "</small></div></div>" +
+          help("Guests see it under their $RORU (\"1,234 $RORU · expire 31 Dec " + y + "\"), in Rewards and in the terms. Stored rule: points_expiry = " + esc(rule || "none") + ". Nothing has expired yet: no balance is touched until the year-end expiry job is built (00:00 HKT on 31 Dec), with a WhatsApp reminder on 1 Dec to members who still have $RORU."); })()) +
+      grp("upgrade", "🎁 Surprise upgrades", '<p class="hint">Now and then, a guest who swaps $RORU gets the next reward up for free. Guests just see the better reward, marked ⬆️.</p>' + help("The draw happens the moment they tap Use and is saved, so reloading the page can't change it. Guests are never told the chances.") +
+        tog("Surprise upgrades", "Turns all of them on or off", 'data-uk="upgrade_on"', on("upgrade_on")) +
+        UPR.map(u => '<div class="card" style="margin:10px 0;padding:12px 14px">' + (u[2] ? tog("<b>" + u[0] + "</b>", u[1], 'data-uk="' + u[2] + '"', on(u[2])) : '<div class="lb" style="font-size:16px"><b>' + u[0] + '</b><small class="muted" style="display:block;font-size:13px">' + u[1] + "</small></div>") +
+          '<div class="setrow" style="border:0;padding-bottom:0">' + fld("Chance: 1 in …", '<input class="fin" data-uo="' + u[3] + '" inputmode="numeric" value="' + oneIn(S0[u[3]]) + '">', "e.g. 10 → about 1 in 10 claims get upgraded") + '<button class="btn sm" data-uosave="' + u[3] + '">Save</button></div></div>').join("") +
+        '<div class="setrow">' + fld("“Haven't seen” = previous visit at least … days ago", '<input class="fin" id="upDays" inputmode="numeric" value="' + esc(S0.upgrade_lapsed_days) + '">') + '<button class="btn sm" id="upDaysSave">Save</button></div>' +
+        (ul && ul.recent.length ? '<p class="muted" style="font-size:14px;margin:14px 0 8px">Latest claims</p>' + rt([{ h: "What happened" }, { h: "Time" }, { h: "Guest" }, { h: "Why" }], ul.recent.slice(0, 8).map(x => ({ cells: [x.upgraded ? "⬆️ " + esc(x.asked) + " → " + esc(x.got) : esc(x.asked) + " (no upgrade)", hkTime(x.earned_at), esc(x.who) + (x.is_test ? " · test" : ""), (RULE[x.rule] || esc(x.rule)) + " · chance 1 in " + oneIn(x.odds)] }))) : "")) +
+      grp("suggest", "✦ “Suggested for you” card on the guest page", help("One card at the top of each guest's page: the reward they can use now, or how close the next one is (in visits, never a $RORU number). Once a guest has 2+ scanned receipts, it also uses what they ordered (read from the receipt text against our menu; no photos are kept).") +
+        tog("Show the card", "", 'data-uk="suggest_card_on"', on("suggest_card_on")) + tog("Use what they ordered", "Reads the items on scanned receipts. Off = suggestions use $RORU only", 'data-uk="suggest_items_on"', on("suggest_items_on"))) +
+      grp("nights", "📅 Weekly specials for slow nights (Mon–Wed)", '<p class="hint">Switch a night on and guests see a banner on their page that day; the bonus applies by itself.</p>' + help("Hong Kong time. Today is " + new Date().toLocaleDateString("en-GB", { timeZone: "Asia/Hong_Kong", weekday: "long" }) + ".") +
+        NIGHTS.map(n => '<div class="card" style="margin:10px 0;padding:12px 14px">' + tog("<b>" + n[1] + "</b>", n[2], 'data-hk="hook_' + n[0] + '_on"', on("hook_" + n[0] + "_on")) + '<div class="setrow" data-k="' + n[3] + '" style="border:0;padding-bottom:0">' + fld(n[4], '<input class="fin" name="v" inputmode="decimal" value="' + esc(S0[n[3]]) + '">') + '<button class="btn sm" data-setsave>Save</button></div></div>').join("")) +
+      grp("cool", "♻️ Wait before a deleted account can rejoin", '<p class="hint">Stops people deleting and rejoining to get the welcome treats again.</p>' + help("They start from zero and never count as a new friend. We keep only a scrambled code of the number (it can't be turned back into the number) and the date they deleted.") +
+        '<div class="bigbtn">' + ["15", "30"].map(v => '<button class="btn' + (String(S0.rejoin_cooloff_days) === v ? "" : " ghost") + '" data-cool="' + v + '">' + v + " days</button>").join("") + "</div>") +
+      grp("kd", "🥢 Kama Dinner", setrow("Passes per Kama member per year", "kama_dinner_passes", S0.kama_dinner_passes, 'inputmode="numeric"', "e.g. 2 · coming alone uses 1 pass, bringing a +1 uses 2")) +
+      grp("features", "🧩 Turn extras on or off", '<p class="hint">Gold receipt, Bring a friend and Birthday roll are ready: on = guests can use them. The rest are teasers: on = guests see a locked “Coming soon” card.</p>' +
+        fs.map(x => tog((x.emoji ? x.emoji + " " : "") + "<b>" + esc(x.name_en) + "</b> " + esc(x.name_zh), (x.status === "on" ? "On · guests can use it" : x.status === "soon" ? "Teaser · shows “Coming soon”" : "Off · hidden") + (x.detail_en ? " · " + esc(x.detail_en) : ""), 'data-fk="' + esc(x.key) + '"', x.status !== "off")).join("")) +
+      grp("nums", "🔢 $RORU, levels and limits", '<p class="hint">Change a number, then tap Save next to it. It applies from the next bill or visit.</p>' +
+        Object.keys(EDIT).map(k => setrow(EDIT[k][0], k, S0[k], "", EDIT[k][1])).join("")) +
+      grp("ro", "Technical settings (read only, for Tab)", rt([{ h: "Setting" }, { h: "Value" }], Object.entries(S0).filter(x => !EDIT[x[0]] && !/^(upgrade_|suggest_|staff_card_timeout_s)/.test(x[0])).sort().map(x => ({ cells: [esc(x[0]), "<b>" + esc(x[1]) + "</b>"] }))));
+    const V = $("#v-settings");
+    $("#tmSave").onclick = () => saveSet("staff_card_timeout_s", $("#tmSel").value, $("#tmSave"));
+    $$("[data-uk]", V).forEach(cb => cb.onchange = () => saveSet(cb.dataset.uk, cb.checked ? 1 : 0, cb));
+    $$("[data-hk]", V).forEach(cb => cb.onchange = () => saveSet(cb.dataset.hk, cb.checked ? 1 : 0, cb));
+    $$("[data-uosave]", V).forEach(b => b.onclick = () => { const n = Math.round(+V.querySelector('[data-uo="' + b.dataset.uosave + '"]').value); if (!(n >= 1 && n <= 1000)) { R.toast("Use a whole number, 1 in 1 to 1 in 1000"); return; } saveSet(b.dataset.uosave, (1 / n).toFixed(6), b); });
+    $("#upDaysSave").onclick = () => saveSet("upgrade_lapsed_days", $("#upDays").value, $("#upDaysSave"));
+    $$("[data-setsave]", V).forEach(b => b.onclick = () => { const row = b.closest("[data-k]"); saveSet(row.dataset.k, row.querySelector("[name=v]").value, b); });
+    $$("[data-cool]", V).forEach(b => b.onclick = () => saveSet("rejoin_cooloff_days", b.dataset.cool, b));
+    $$("[data-fk]", V).forEach(cb => cb.onchange = async () => { const k = cb.dataset.fk; try { await R.rpc("owner_save_feature", { p_token: st.sess.token, p_key: k, p_status: cb.checked ? (BUILT.includes(k) ? "on" : "soon") : "off" }); R.toast("Saved ✓"); load(); } catch (e) { R.toast(R.errText(e)); cb.checked = !cb.checked; } });
+  }
+
+  // ===== first-time tour (Dominic 17:31: "tutorial guide walk through for first time users") =====
+  function tour(force) {
+    if (!R.tour || !st.sess) return;
+    const pick = (a, b) => () => { const x = $(a); return x && x.offsetParent ? x : $(b); };
+    if (st.view !== "today") go("today");
+    const vis = (...sels) => () => { for (const s of sels) { const x = typeof s === "function" ? s() : $(s); if (x && x.offsetParent) return x; } return null; };
+    const secBy = (re) => () => [...document.querySelectorAll("#v-today h2")].map(h => h.closest(".sec") || h).find(h => h.offsetParent && re.test(h.textContent));
+    R.tour("owner_f43", [
+      { before: () => go("today"), el: "#todayKpis",
+        en: "Today's numbers. The big one is guest visits today; the list under it shows $RORU given out, free items claimed and bills waiting. The grey line under each says what it means.",
+        zh: "今日嘅數字。大數字係今日嚟咗幾多位會員；下面列出派咗幾多 RORU幣、換咗幾多免費嘢同有幾多張單等你批。每個下面灰色嗰行講咗佢代表乜。", zhs: "今天的数字。大数字是今天来了多少位会员；下面列出派了多少 RORU币、换了多少免费品和有多少张单等你批。每个下面的灰色小字说明它代表什么。" },
+      { before: () => go("today"), el: vis('#quick [data-q="approve"]', secBy(/Bills waiting/i), "#quick"),
+        en: "Big or unclear bills wait for your OK. Approve the real ones, turn down the rest. Long lists show 5 rows; tap See all for the rest.",
+        zh: "大額或者睇唔清嘅單會等你批。真嘅就批，其他就拒絕。長嘅清單只顯示 5 行，撳「睇晒全部」睇其餘。",
+        zhs: "大额或看不清的单会等你批准。真的就批，其他就拒绝。长清单只显示 5 行，点“查看全部”看其余的。" },
+      { before: () => go("guests"), el: vis("#gq", "#v-guests .vh"),
+        en: "Find a guest: type their name or the last 4 digits of their phone.",
+        zh: "搵客人：輸入名或者電話最後 4 個數字。", zhs: "找客人：输入名字或电话最后 4 位数字。" },
+      { before: () => go("rewards"), el: vis("#rwOwn", () => [...document.querySelectorAll("#v-rewards [data-rw]")].find(x => x.offsetParent), "#v-rewards .vh"),
+        en: "Rewards. Top: $RORU of the week. Pick one dish and it earns 2x $RORU; guests see it on their Card within seconds. Up next: line up to 8 weeks, it switches every Monday 00:00. Tap {edit} to change a price. Below: tap a reward to rename it, change its $RORU or switch it off.",
+        zh: "獎賞。最頂係本週加倍：揀一款菜式，叫佢就賺雙倍 RORU幣，客人幾秒內喺會員卡見到。「下週起」可以排最多 8 個禮拜，每個禮拜一 00:00 自動轉。撳 {edit} 改價錢。下面撳一個獎賞可以改名、改 RORU幣或者關咗佢。", zhs: "奖赏。最上面是本周加倍：选一款菜式，点它就赚双倍 RORU币，客人几秒内在会员卡上看到。“下周起”可以排最多 8 周，每周一 00:00 自动切换。点 {edit} 改价钱。下面点一个奖赏可以改名、改 RORU币或关闭。" },
+      { before: () => go("passport"), el: vis("#v-passport .pp-otog", "#ppOwnerKpis", "#v-passport .vh"),
+        en: "Passport: switch Food | Drinks, like the guest app. Each quarter runs on its own (Q4 ends 31 Dec), stamps don't carry over. Bottle stamps go to whoever scans the receipt, max 6 a bill.",
+        zh: "護照：同客人 app 一樣可以轉食物 | 飲品。每季獨立計（第四季 12 月 31 日完），印花唔會帶過去。酒樽印花歸掃描收據嗰位，每張單最多 6 個。",
+        zhs: "护照：和客人 app 一样可以切换食物 | 饮品。每季独立计算（第四季 12 月 31 日结束），印花不会结转。酒瓶印花归扫描收据的人，每张单最多 6 个。" },
+      { before: () => go("scratch"), el: vis("#scOwnerKpis", "#v-scratch .vh"),
+        en: "Scratch card: Roru Day cards guests got by scanning a receipt of HK$388+, cards a manager gave by hand, what they won and what it cost.",
+        zh: "刮刮卡：客人喺 Roru Day 掃描滿 HK$388 收據攞到嘅卡、經理人手派嘅卡、贏咗乜同成本。",
+        zhs: "刮刮卡：客人在 Roru Day 扫描满 HK$388 收据得到的卡、经理手动发的卡、赢了什么和成本。" },
+      { before: () => go("staff"), el: vis(() => [...document.querySelectorAll("#v-staff [data-st]")].find(x => x.offsetParent), "#v-staff .vh"),
+        en: "Staff & PINs: add staff, change a PIN, and see who looked up which guest (5 rows, then See all).",
+        zh: "員工同 PIN：加員工、改 PIN、睇邊個查過邊位客人（先顯示 5 行，再撳「睇晒全部」）。",
+        zhs: "员工和 PIN：添加员工、改 PIN、查看谁查过哪位客人（先显示 5 行，再点“查看全部”）。" },
+      { before: () => go("reports"), el: vis(() => [...document.querySelectorAll("#v-reports h2")].find(h => h.offsetParent && /Split|分/.test(h.textContent)), "#monthSlot", "#v-reports .vh"),
+        en: "Reports: charts, the month-end PDF for Florencia, and every split receipt (2 to 6 people) in one place. Today only shows the count.",
+        zh: "報告：圖表、俾 Florencia 嘅月結 PDF，同埋所有分單（2 至 6 人）都喺呢度。「今日」只顯示數量。",
+        zhs: "报告：图表、给 Florencia 的月结 PDF，以及所有分单（2 到 6 人）都在这里。“今日”只显示数量。" },
+      { before: () => go("settings"), el: vis("#g-nums", "#v-settings .vh"),
+        en: "Settings: the rules, each with an example: $RORU per HK$1, levels, most people on one split, and $RORU expires on 31 Dec each year.",
+        zh: "設定：所有規則，每條都有例子：每 HK$1 幾多 RORU幣、等級、一張單最多幾多人分，同埋 RORU幣每年 12 月 31 日到期。",
+        zhs: "设置：所有规则，每条都有例子：每 HK$1 多少 RORU币、等级、一张单最多几人分，以及 RORU币每年 12 月 31 日到期。" },
+      { before: () => go("today"), el: vis("#themeBtn", "#side [data-theme]", "#menuBtn"),
+        en: "{theme} switches light and dark (the staff and guest apps have it too). To see this again: menu → How it works.",
+        zh: "{theme} 轉淺色同深色（員工同客人 app 都有）。想再睇：選單 → 點樣用。",
+        zhs: "{theme} 切换浅色和深色（员工和客人 app 也有）。想再看：菜单 → 怎么用。" }
+    ], { force: !!force, lang: R.lang() === "zh" ? "zh" : "en", onEnd: () => go("today") }); // f38: EN / 繁中 / 简中 (the device's language; pick it under How it works)
+  }
+  function chg(cur, prev) {
+    cur = +cur || 0; prev = +prev || 0;
+    if (!prev) return cur ? '<span class="up"><b>New</b></span> vs the week before' : '<span class="flat"><b>No change</b></span> vs the week before';
+    const p = Math.round((cur - prev) / prev * 100);
+    return (p > 0 ? '<span class="up"><b>▲ ' + p + "%</b></span>" : p < 0 ? '<span class="down"><b>▼ ' + Math.abs(p) + "%</b></span>" : '<span class="flat"><b>No change</b></span>') + " vs the week before";
+  }
+  function series(d) {
+    const out = [], today = new Date(d.day + "T00:00:00Z");
+    for (let i = 29; i >= 0; i--) { const dt = new Date(today.getTime() - i * 864e5); out.push({ day: dt.toISOString().slice(0, 10), v: 0, s: 0 }); }
+    const idx = {}; out.forEach((o, i) => idx[o.day] = i);
+    d.per_day.forEach(r => { const i = idx[r.day]; if (i == null) return; if (st.shopSel !== "all" && r.shop !== st.shopSel) return; out[i].v += +r.visits || 0; out[i].s += +r.spend || 0; });
+    return out;
+  }
+  function chartSvg(pts, W) {
+    const H = W < 500 ? 190 : 230, L = 30, Rr = 46, T = 12, B = 26, w = W - L - Rr, h = H - T - B;
+    const nice = (m) => { if (m <= 0) return 1; const p = Math.pow(10, Math.floor(Math.log10(m))), f = m / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p; };
+    const vMax = nice(Math.max(...pts.map(p => p.v))), sMax = nice(Math.max(...pts.map(p => p.s)));
+    const bw = w / pts.length, x = (i) => L + i * bw, yv = (v) => T + h - v / vMax * h, ys = (s) => T + h - s / sMax * h;
+    const kfmt = (n) => n >= 1000 ? (n / 1000).toLocaleString("en-US", { maximumFractionDigits: 1 }) + "k" : String(n);
+    let g = "";
+    for (let k = 0; k <= 2; k++) { const yy = T + h - k / 2 * h; g += '<line x1="' + L + '" x2="' + (L + w) + '" y1="' + yy + '" y2="' + yy + '" stroke="rgba(246,243,231,.08)"/>' +
+      '<text x="' + (L - 6) + '" y="' + (yy + 4) + '" text-anchor="end" font-size="11" fill="rgba(246,243,231,.5)">' + kfmt(Math.round(vMax * k / 2)) + "</text>" +
+      '<text x="' + (L + w + 6) + '" y="' + (yy + 4) + '" font-size="11" fill="rgba(232,184,74,.75)">' + kfmt(Math.round(sMax * k / 2)) + "</text>"; }
+    const bars = pts.map((p, i) => { const bh = Math.max(p.v ? 2 : 0, h - (yv(p.v) - T)); return '<rect x="' + (x(i) + bw * .18).toFixed(1) + '" y="' + (T + h - bh).toFixed(1) + '" width="' + (bw * .64).toFixed(1) + '" height="' + bh.toFixed(1) + '" rx="2" fill="#F64501" opacity=".85"/>'; }).join("");
+    const line = pts.map((p, i) => (i ? "L" : "M") + (x(i) + bw / 2).toFixed(1) + " " + ys(p.s).toFixed(1)).join(" ");
+    const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const xl = pts.map((p, i) => (i % 7 === 1 || i === pts.length - 1) ? '<text x="' + (x(i) + bw / 2).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" font-size="11" fill="rgba(246,243,231,.5)">' + (i === pts.length - 1 ? "Today" : mon[+p.day.slice(5, 7) - 1] + " " + (+p.day.slice(8))) + "</text>" : "").join("");
+    return '<svg viewBox="0 0 ' + W + " " + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Visits and spend, last 30 days">' + g + bars +
+      '<path d="' + line + '" fill="none" stroke="#E8B84A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' + xl + "</svg>";
+  }
+  function drawChart() {
+    const d = st.data, el = $("#dChart"); if (!d || !el) return;
+    const pts = series(d), W = Math.max(280, Math.floor(el.clientWidth || 340));
+    el.innerHTML = chartSvg(pts, W);
+    const tv = pts.reduce((a, p) => a + p.v, 0), ts = pts.reduce((a, p) => a + p.s, 0);
+    $("#dTot").textContent = "30 days: " + fmt(tv) + (tv === 1 ? " visit · " : " visits · ") + hkd(ts) + " spend";
+    document.querySelectorAll("#dSeg button").forEach(b => b.classList.toggle("on", b.dataset.shop === st.shopSel));
+  }
+  function renderDash() {
+    const d = st.data, x = st.dash || {};
+    const kpi = (lbl, val, c, sub, acc) => { const v = typeof val === "object" ? val : { f: val, s: val }; return '<div class="kpi' + (acc ? " k-" + acc : "") + '"><div class="lbl">' + lbl + '</div><div class="val" data-f="' + esc(v.f) + '" data-s="' + esc(v.s) + '">' + v.f + '</div><div class="chg">' + c + "</div>" + (sub ? '<div class="kx">' + sub + "</div>" : "") + "</div>"; };
+    const kv = (n, money) => { n = Math.round(+n || 0); const pre = money ? "<small>HK$</small>" : ""; const a = Math.abs(n); const s = a >= 1e6 ? (n / 1e6).toFixed(2).replace(/\.?0+$/, "") + "M" : a >= 1e5 ? (n / 1e3).toFixed(1).replace(/\.0$/, "") + "k" : fmt(n); return { f: pre + fmt(n), s: pre + s }; };
+    const tierCol = { nori: "#4CC38A", gohan: "#F6F3E7", tobiko: "#F64501", kama: "#E8B84A" }, tierNm = { nori: R.tierName("nori", "en"), gohan: R.tierName("gohan", "en"), tobiko: R.tierName("tobiko", "en"), kama: R.tierName("kama", "en") };
+    const tiers = ["nori", "gohan", "tobiko", "kama"].map(k => [k, +(d.tiers || {})[k] || 0]), tTot = tiers.reduce((a, t) => a + t[1], 0) || 1;
+    let off = 0; const C = 2 * Math.PI * 38;
+    const donut = '<svg viewBox="0 0 100 100" width="104" height="104" style="flex:0 0 auto"><circle cx="50" cy="50" r="38" fill="none" stroke="rgba(246,243,231,.08)" stroke-width="12"/>' +
+      tiers.filter(t => t[1]).map(t => { const len = t[1] / tTot * C, s = '<circle cx="50" cy="50" r="38" fill="none" stroke="' + tierCol[t[0]] + '" stroke-width="12" stroke-dasharray="' + len.toFixed(2) + " " + (C - len).toFixed(2) + '" stroke-dashoffset="' + (-off).toFixed(2) + '" transform="rotate(-90 50 50)"/>'; off += len; return s; }).join("") +
+      '<text x="50" y="49" text-anchor="middle" font-size="' + (fmt(d.members).length <= 5 ? 18 : fmt(d.members).length <= 6 ? 15 : 12) + '" font-weight="700" fill="#F6F3E7">' + fmt(d.members) + '</text><text x="50" y="64" text-anchor="middle" font-size="9" fill="rgba(246,243,231,.6)">members</text></svg>';
+    const items = (x.by_item || []), iMax = Math.max(1, ...items.map(i => +i.n));
+    const pl = +x.pos_logged || 0, pn = +x.pos_not || 0, pt = pl + pn;
+    const days = {}; d.per_day.forEach(r => { (days[r.day] = days[r.day] || []).push(r); });
+    const shopNm = (id) => id === "wanchai" ? "Wan Chai" : id === "central" ? "Central" : "Other";
+    $("#dash").innerHTML =
+      '<h3>Last 7 days</h3><p class="sub">How the past week went, compared with the week before. Green arrows = up.</p>' +
+      '<div class="kpis">' + kpi("Members spent", kv(x.spend_7d != null ? x.spend_7d : d.spend_7d, true), chg(x.spend_7d, x.spend_prev), "bills members scanned · higher is better", "tobiko") + kpi("Guest visits", kv(x.visits_7d != null ? x.visits_7d : d.visits_7d), chg(x.visits_7d, x.visits_prev), "members who came in · higher is better", "nori") +
+        kpi("New members joined", kv(x.members_7d != null ? x.members_7d : d.members_7d), chg(x.members_7d, x.members_prev), "people who signed up · higher is better", "gohan") + kpi("Free items claimed", kv(x.redeemed_7d || 0), chg(x.redeemed_7d, x.redeemed_prev), "rewards guests used · shows they care", "kama") + "</div>" +
+      '<div class="dcard"><div class="dhead"><div><h3>Last 30 days</h3><p class="sub">Bars = guest visits each day · line = what members spent</p></div><div class="seg" id="dSeg"><button data-shop="all">All</button><button data-shop="wanchai">Wan Chai</button><button data-shop="central">Central</button></div></div>' +
+        '<div class="chart" id="dChart"></div><div class="legend"><span><i style="background:#F64501"></i>Guest visits</span><span><i style="background:#E8B84A;height:3px;border-radius:2px;vertical-align:3px"></i>Members spent (HK$, right side)</span></div><div class="dtot" id="dTot"></div></div>' +
+      '<div class="minis">' +
+        '<div class="dcard"><h3>Members by level</h3><p class="sub">Based on what they spent in the last 12 months</p><div class="donut" style="margin-top:12px">' + donut + "<ul>" + tiers.map(t => '<li><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + tierCol[t[0]] + '"></i>' + tierNm[t[0]] + "<span>" + fmt(t[1]) + "</span></li>").join("") + "</ul></div></div>" +
+        '<div class="dcard"><h3>Most claimed free items</h3><p class="sub">Last 30 days</p>' + (items.length ? '<ul class="bars">' + items.slice(0, 6).map(i => '<li><div class="bl">' + esc(i.name_en) + "<span>" + fmt(i.n) + '</span></div><div class="bt"><i style="width:' + (100 * i.n / iMax).toFixed(1) + '%"></i></div></li>').join("") + "</ul>" : '<p class="sub" style="margin-top:12px">None yet</p>') + "</div>" +
+        '<div class="dcard"><h3>Free items rung up on the POS</h3><p class="sub">Last 30 days · staff should ring up every one</p><div class="pbig">' + fmt(pl) + ' <span style="font-size:15px;font-weight:400;color:var(--muted)">of ' + fmt(pt) + "</span></div>" +
+          '<div class="posbar">' + (pt ? '<i style="width:' + (100 * pl / pt).toFixed(1) + '%;background:#4CC38A"></i><i style="width:' + (100 * pn / pt).toFixed(1) + '%;background:#F64501"></i>' : "") + "</div>" +
+          '<div class="legend" style="margin-top:0"><span><i style="background:#4CC38A"></i>Rung up ' + fmt(pl) + '</span><span><i style="background:#F64501"></i>Not rung up ' + fmt(pn) + "</span></div></div>" +
+      "</div>" +
+      '<details><summary>More numbers</summary><div class="in"><div class="nums">' + [["Members", fmt(d.members)], ["Guest visits today", fmt(d.visits_today)], ["Bills scanned today", fmt(d.receipts_today)], ["Bills waiting for approval", fmt(d.pending)], ["Guest visits, all time", fmt(d.visits_all)], ["Visits stamped without a bill", fmt(d.visits_only_all)], ["Free visit items earned", fmt(d.plates_completed)], ["Bills scanned, all time", fmt(d.receipts_all)], ["Bills rejected", fmt(d.rejected)], ["Members spent, all time", hkd(d.spend_all)], ["$RORU given out, all time", fmt(d.points_issued)], ["$RORU guests still hold", fmt(d.points_outstanding)], ["Rewards earned, not used yet", fmt(d.rewards_earned)], ["Free items claimed, all time", fmt(d.rewards_redeemed)], ["Can be invited to Kama", fmt(d.kama_eligible.length)]].map(r => "<div>" + r[0] + "<span>" + r[1] + "</span></div>").join("") + "</div>" +
+        '<h3 style="margin-top:18px">By shop, all time</h3><div style="margin-top:8px"><table class="rt"><tr><th>Shop</th><th class="n">Guest visits</th><th class="n">Bills</th><th class="n">Members spent</th><th class="n">Free items claimed</th></tr>' + d.per_shop.map(s => "<tr><td>" + esc(shopNm(s.shop)) + '</td><td class="n">' + fmt(s.visits) + '</td><td class="n">' + fmt(s.receipts) + '</td><td class="n">' + hkd(s.spend) + '</td><td class="n">' + fmt(s.redeemed) + "</td></tr>").join("") + "</table></div></div></details>" +
+      '<details><summary>Day by day · last 30 days</summary><div class="in"><table class="rt"><tr><th>Day</th><th>Shop</th><th class="n">Guest visits</th><th class="n">Bills</th><th class="n">Members spent</th></tr>' +
+        (Object.keys(days).sort().reverse().map(k => days[k].map((r, n) => "<tr><td>" + (n ? "" : R.fmtDay ? R.fmtDay(k) : k) + "</td><td>" + shopNm(r.shop) + '</td><td class="n">' + fmt(r.visits) + '</td><td class="n">' + fmt(r.receipts) + '</td><td class="n">' + hkd(r.spend) + "</td></tr>").join("")).join("") || '<tr><td colspan="5" class="muted">Nothing yet</td></tr>') + "</table></div></details>";
+    document.querySelectorAll("#dSeg button").forEach(b => b.onclick = () => { st.shopSel = b.dataset.shop; drawChart(); });
+    requestAnimationFrame(() => { drawChart(); fitKpis(); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitKpis);
+    setTimeout(fitKpis, 700); setTimeout(fitKpis, 2000);
+  }
+  if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener("loadingdone", () => fitKpis());
+  function fitKpis() {
+    document.querySelectorAll(".kpi .val[data-f]").forEach(el => {
+      const ok = () => el.scrollWidth <= el.clientWidth + 0.5;
+      const shrink = (min) => { let f = parseFloat(getComputedStyle(el).fontSize); while (!ok() && f > min) { f -= 1; el.style.fontSize = f + "px"; } };
+      el.style.whiteSpace = ""; el.style.fontSize = ""; el.innerHTML = el.dataset.f; el.title = "";
+      if (!el.clientWidth) return;
+      shrink(19);
+      if (!ok() && el.dataset.s !== el.dataset.f) { el.style.fontSize = ""; el.innerHTML = el.dataset.s; el.title = el.dataset.f.replace(/<[^>]+>/g, ""); shrink(16); }
+      shrink(12);
+      if (!ok()) el.style.whiteSpace = "normal";
+    });
+  }
+  window.__ownerRedraw = () => { if (st.data) requestAnimationFrame(() => { try { drawChart(); } catch (e) {} }); };
+  let rzT = null; window.addEventListener("resize", () => { clearTimeout(rzT); rzT = setTimeout(() => { drawChart(); fitKpis(); }, 150); });
+  
+  function render() { const on = !!st.sess; $("#login").classList.toggle("hide", on); $("#main").classList.toggle("hide", !on); ["#logout", "#refresh", "#menuBtn"].forEach(s => $(s).classList.toggle("hide", !on)); }
+  render(); load();
+})();
+</script>
+<script src="/loyalty/owner-glass.js?v=f57"></script>
+</body>
+</html>
