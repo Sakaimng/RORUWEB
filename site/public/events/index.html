@@ -97,15 +97,17 @@ textarea{min-height:96px;resize:vertical}
     <form id="enqForm" novalidate>
       <p><label for="fName" data-en="Name" data-zh="姓名">Name</label><input id="fName" name="name" autocomplete="name" required maxlength="200"></p>
       <p><label for="fEmail" data-en="Email" data-zh="電郵">Email</label><input id="fEmail" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="254"></p>
-      <p><label for="fPhone"><span data-en="Phone / WhatsApp" data-zh="電話 / WhatsApp">Phone / WhatsApp</span> <span class="opt" data-en="(optional)" data-zh="（選填）">(optional)</span></label><input id="fPhone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="40"></p>
+      <p><label for="fPhone" data-en="Phone / WhatsApp" data-zh="電話 / WhatsApp">Phone / WhatsApp</label><input id="fPhone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required maxlength="40"></p>
       <p><label for="fDate"><span data-en="Preferred date" data-zh="首選日期">Preferred date</span> <span class="opt" data-en="(flexible is fine)" data-zh="（有彈性都得）">(flexible is fine)</span></label><input id="fDate" name="event_date" type="date"></p>
-      <p><label for="fHead" data-en="Headcount" data-zh="人數">Headcount</label><input id="fHead" name="headcount" type="number" min="1" max="500" inputmode="numeric" placeholder="e.g. 20"></p>
-      <p><label for="fBudget" data-en="Your budget" data-zh="預算">Your budget</label><select id="fBudget" name="budget">
-        <option value="Not sure" data-en="Not sure yet" data-zh="未定">Not sure yet</option>
-        <option value="Under HK$10,000" data-en="Under HK$10,000" data-zh="HK$10,000 以下">Under HK$10,000</option>
-        <option value="HK$10,000–30,000" data-en="HK$10,000–30,000" data-zh="HK$10,000–30,000">HK$10,000–30,000</option>
-        <option value="Over HK$30,000" data-en="Over HK$30,000" data-zh="HK$30,000 以上">Over HK$30,000</option>
+      <p><label for="fHead" data-en="Headcount" data-zh="人數">Headcount</label><select id="fHead" name="headcount">
+        <option value="" data-en="Select" data-zh="選擇">Select</option>
+        <option value="Up to 10" data-en="Up to 10" data-zh="10位以下">Up to 10</option>
+        <option value="11-20">11-20</option>
+        <option value="21-30">21-30</option>
+        <option value="31-50">31-50</option>
+        <option value="More than 50" data-en="More than 50" data-zh="50位以上">More than 50</option>
       </select></p>
+      <p><label for="fBudget" data-en="Your budget" data-zh="預算">Your budget</label><input id="fBudget" name="budget" maxlength="120" data-en-ph="e.g. HK$20,000, or not sure yet" data-zh-ph="例如 HK$20,000，未定都得"></p>
       <p class="wide"><label for="fMsg" data-en="What are you planning?" data-zh="你計劃緊咩？">What are you planning?</label><textarea id="fMsg" name="message" required minlength="8" maxlength="5000" data-en-ph="Occasion, style of event, anything else we should know" data-zh-ph="場合、活動形式、其他想我哋知道嘅嘢"></textarea></p>
       <p class="hp" aria-hidden="true"><label>Company <input name="company" tabindex="-1" autocomplete="off"></label></p>
       <p class="err" id="enqErr" role="alert" hidden></p>
@@ -184,13 +186,14 @@ form.addEventListener("submit", ev => {
   const fail = m => { err.textContent = m; err.hidden = false; };
   if (!get("name")) return fail(zh ? "請填姓名" : "Please add your name");
   if (!EMAIL_RE.test(get("email"))) return fail(zh ? "請填正確電郵" : "Please add a valid email");
+  if (!get("phone")) return fail(zh ? "請填電話或 WhatsApp" : "Please add your phone or WhatsApp");
   if (get("message").length < 8) return fail(zh ? "講多少少你嘅計劃" : "Tell us a little about what you're planning");
   const btn = document.getElementById("enqSend");
   btn.disabled = true;
   RORU_ENQUIRIES.submitLocal({
     kind: "event",
     name: get("name"), email: get("email"), phone: get("phone"),
-    event_date: get("event_date"), headcount: +get("headcount") || null,
+    event_date: get("event_date"), headcount: get("headcount") || null,
     budget: get("budget"), message: get("message"), lang: zh ? "zh" : "en"
   });
   form.style.display = "none";
