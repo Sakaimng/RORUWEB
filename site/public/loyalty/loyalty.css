@@ -717,8 +717,9 @@ details.gmore>summary{font-weight:800}
 .rchips-k{width:100%;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
 .rchip{display:flex;flex-direction:column;align-items:flex-start;gap:1px;border:1.5px solid var(--gold);background:rgba(232,184,74,.12);color:var(--cream);border-radius:14px;padding:10px 14px;font:inherit;font-weight:900;font-size:15px;cursor:pointer;text-align:left;touch-action:manipulation}
 .rchip small{font-size:11px;font-weight:600;color:var(--muted)}
-.ltabs{display:flex;gap:4px;background:var(--ink2);border:1px solid var(--line);border-radius:999px;padding:3px;margin:16px 0 10px}
-.ltabs button{flex:1;background:none;border:0;border-radius:999px;padding:10px 6px;font:inherit;font-size:14px;color:var(--muted);cursor:pointer;font-weight:700;white-space:nowrap}
+.ltabs{display:flex;gap:4px;background:var(--ink2);border:1px solid var(--line);border-radius:999px;padding:3px;margin:16px 0 10px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.ltabs::-webkit-scrollbar{display:none}
+.ltabs button{flex:1 0 auto;background:none;border:0;border-radius:999px;padding:10px 6px;font:inherit;font-size:14px;color:var(--muted);cursor:pointer;font-weight:700;white-space:nowrap}
 .ltabs button.on{background:var(--cream);color:var(--ink);font-weight:900}
 .ltabs .badge{display:inline-block;background:var(--orange);color:#fff;border-radius:999px;font-size:11px;padding:1px 7px;margin-left:3px}
 .ltabs .badge.hide{display:none}
