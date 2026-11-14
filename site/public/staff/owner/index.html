@@ -846,13 +846,13 @@ body.thB{--muted:rgba(22,24,31,.64)}
     $$("[data-st]", $("#v-staff")).forEach(tr => tr.onclick = () => staffSheet(d.staff[+tr.dataset.st]));
     $("#alRefresh").onclick = async () => { try { st.alog = await R.rpc("owner_access_log", { p_token: st.sess.token, p_limit: 30 }); renderStaff(); labelTables($("#v-staff")); R.toast("Updated"); } catch (e) { R.toast(R.errText(e)); } };
   }
-  const staffErr = (e) => ({ pin_must_be_6_digits_no_4: "The PIN needs 6 digits, with no 4 in it", pin_already_used: "Someone already has that PIN", pin_required: "Type a PIN for the new person", cannot_demote_self: "You can't remove or demote yourself" }[e.code] || R.errText(e));
+  const staffErr = (e) => ({ pin_must_be_6_digits_no_4: "Use their birthday MMDD (4 digits) or 6 digits with no 4", pin_already_used: "Someone already has that PIN", pin_required: "Type a PIN for the new person", cannot_demote_self: "You can't remove or demote yourself" }[e.code] || R.errText(e));
   function staffSheet(s) {
     const isNew = !s; s = s || { name: "", role: "staff", shop: "wanchai", active: true };
     openSheet(isNew ? "Add a person" : s.name, fld("Name", inp("name", s.name, isNew ? 'placeholder="e.g. Florencia"' : ""), "How it shows in the records") +
       '<div class="f2">' + fld("Role", roleSel(s.role)) + fld("Shop", shopSel(s.shop)) + "</div>" +
       '<p class="hint" style="margin:-2px 0 14px">Staff: counter work · Manager: + month-end report · Owner: everything</p>' +
-      fld(isNew ? "PIN (6 digits, no 4)" : "New PIN", '<input class="fin" name="pin" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="' + (isNew ? "e.g. 135790" : "leave empty to keep the current PIN") + '">', isNew ? "Tell them the PIN in person. Everything they do is saved under their name." : "Only type one if you want to change their PIN.") +
+      fld(isNew ? "PIN (birthday MMDD, or 6 digits with no 4)" : "New PIN", '<input class="fin" name="pin" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="' + (isNew ? "e.g. 0201 or 135790" : "leave empty to keep the current PIN") + '">', isNew ? "Tell them the PIN in person. Everything they do is saved under their name." : "Only type one if you want to change their PIN.") +
       (isNew ? "" : tog("Can sign in", "Off = their PIN stops working; their history stays", 'name="active"', s.active)),
       (isNew ? "" : (s.active ? '<button class="btn ghost" id="stRm" style="color:#ff8a6a">Remove</button>' : "")) + '<button class="btn" id="stSave">' + (isNew ? "Add" : "Save") + "</button>", (b, f) => {
         const g = (n) => b.querySelector("[name=" + n + "]");
