@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Catering & corporate · RORUBARU</title>
+<meta name="description" content="RORUBARU catering and corporate orders: hand rolls for offices, launches and parties in Hong Kong. Send one enquiry with quantities, timing and delivery details - the team replies with options and a quote.">
+<meta name="theme-color" content="#0b0d12">
+<link rel="icon" href="/icons/icon-512.png">
+<style>
+@font-face{font-family:Geist;src:url(/fonts/geist-300.woff2) format("woff2");font-weight:300;font-display:swap}
+@font-face{font-family:Geist;src:url(/fonts/geist-500.woff2) format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:Geist;src:url(/fonts/geist-900.woff2) format("woff2");font-weight:900;font-display:swap}
+:root{--orange:#F64501;--cream:#F6F3E7;--ink:#0b0d12;--ink2:#14161d;--line:rgba(246,243,231,.14);--muted:rgba(246,243,231,.62)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--ink);color:var(--cream);font-family:Geist,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+:lang(zh-Hant){font-family:Geist,"PingFang HK","PingFang TC","Noto Sans CJK HK","Noto Sans CJK TC","Microsoft JhengHei",system-ui,sans-serif}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+body{min-height:100vh}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px calc(80px + env(safe-area-inset-bottom))}
+.preview-bar{position:sticky;top:0;z-index:50;background:var(--orange);color:#fff;font-size:12px;font-weight:700;letter-spacing:.04em;text-align:center;padding:7px 12px}
+.top{display:flex;align-items:center;gap:14px;padding:18px 0 6px}
+.top .home{display:flex;align-items:center;gap:10px;text-decoration:none}
+.top .home img{height:26px;width:auto}
+.top .lang{margin-left:auto;display:flex;gap:4px;font-size:12px}
+.top .lang a{padding:5px 10px;border:1px solid var(--line);border-radius:99px;text-decoration:none;color:var(--muted)}
+.top .lang a.on{color:var(--cream);border-color:var(--cream);font-weight:700}
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);font-weight:700;margin:26px 0 6px}
+h1{font-weight:900;font-size:clamp(30px,6vw,44px);line-height:1.08;letter-spacing:-.01em}
+h2{font-weight:900;font-size:22px;margin:34px 0 8px}
+.lede{color:var(--muted);font-size:16px;line-height:1.55;margin-top:10px;max-width:56ch}
+.card{background:var(--ink2);border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:16px}
+.steps{display:grid;gap:10px;margin-top:16px}
+.step{display:flex;gap:12px;align-items:flex-start;background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.step b.n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--orange);color:#fff;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.step p{font-size:14px;line-height:1.5;color:var(--muted)}
+.step p b{color:var(--cream)}
+form{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+form p{display:flex;flex-direction:column;gap:6px}
+form p.wide{grid-column:1/-1}
+label{font-size:13px;font-weight:700}
+label .opt{color:var(--muted);font-weight:500}
+input,select,textarea{appearance:none;background:rgba(246,243,231,.05);border:1px solid var(--line);border-radius:12px;color:var(--cream);font:inherit;font-size:15px;padding:11px 13px;width:100%}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23F6F3E7' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+input:focus,select:focus,textarea:focus{border-color:var(--orange);outline:none}
+textarea{min-height:96px;resize:vertical}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.btn{appearance:none;border:0;background:var(--orange);color:#fff;font:inherit;font-weight:800;font-size:15px;padding:13px 22px;border-radius:99px;cursor:pointer}
+.btn:disabled{opacity:.55;cursor:default}
+.actions{display:flex;gap:10px;grid-column:1/-1;align-items:center;flex-wrap:wrap}
+.err{color:#ff9a7a;font-size:13px;grid-column:1/-1}
+.done{display:none;text-align:center;padding:34px 10px}
+.done.on{display:block}
+.done .tick{font-size:40px}
+.done h3{font-size:20px;font-weight:900;margin:10px 0 6px}
+.done p{color:var(--muted);font-size:14px;line-height:1.6;max-width:44ch;margin:0 auto}
+.pv-note{font-size:12px;color:var(--muted);margin-top:10px;grid-column:1/-1}
+.facts{margin-top:40px;border-top:1px solid var(--line);padding-top:22px;display:grid;gap:10px;font-size:14px}
+.facts div{display:flex;gap:10px}
+.facts dt{color:var(--muted);min-width:86px;font-weight:500}
+.facts dd{margin:0}
+.fineprint{margin-top:26px;color:var(--muted);font-size:12px;line-height:1.6}
+[hidden]{display:none!important}
+@media (max-width:560px){form{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="preview-bar" id="pvBar">PREVIEW — this page is not live yet; enquiries are stored only in this browser.</div>
+<div class="wrap">
+  <header class="top">
+    <a class="home" href="/" aria-label="RORUBARU home"><img src="/logo-line.svg" alt="RORUBARU"></a>
+    <nav class="lang" aria-label="Language">
+      <a href="/catering" id="lEn">EN</a>
+      <a href="/zh-Hant/catering" id="lZh" lang="zh-Hant">繁中</a>
+    </nav>
+  </header>
+
+  <p class="eyebrow" data-en="Catering &amp; corporate" data-zh="到會 · 公司訂單">Catering &amp; corporate</p>
+  <h1 data-en="Hand rolls for the whole office." data-zh="手卷到會，成個公司一齊食。">Hand rolls for the whole office.</h1>
+  <p class="lede" data-en="Office lunches, launches and parties — hand cut rolls, boxed up for you. One enquiry with quantities, timing and delivery details; the team replies with options and a quote. This is an enquiry, not an automatic order." data-zh="公司午餐、發佈會、派對 — 手切卷打包送到你手。一次過話我哋知數量、時間同送貨詳情，團隊會回覆方案同報價。呢度係查詢，唔係自動落單。">Office lunches, launches and parties — hand cut rolls, boxed up for you. One enquiry with quantities, timing and delivery details; the team replies with options and a quote. This is an enquiry, not an automatic order.</p>
+
+  <div class="steps">
+    <div class="step"><b class="n">1</b><p data-en="&lt;b&gt;Tell us what you need&lt;/b&gt; — date, headcount, delivery or pickup." data-zh="&lt;b&gt;話我哋知你需要咩&lt;/b&gt; — 日期、人數、送貨定自取。"><b>Tell us what you need</b> — date, headcount, delivery or pickup.</p></div>
+    <div class="step"><b class="n">2</b><p data-en="&lt;b&gt;We reply with options and a quote&lt;/b&gt; — a real person, usually within a day." data-zh="&lt;b&gt;我哋回覆方案同報價&lt;/b&gt; — 真人回覆，通常一日內。"><b>We reply with options and a quote</b> — a real person, usually within a day.</p></div>
+    <div class="step"><b class="n">3</b><p data-en="&lt;b&gt;We make it happen&lt;/b&gt; — fresh hand rolls, ready when you are." data-zh="&lt;b&gt;我哋準備好一切&lt;/b&gt; — 新鮮手卷，準時交到。"><b>We make it happen</b> — fresh hand rolls, ready when you are.</p></div>
+  </div>
+
+  <h2 data-en="Send an enquiry" data-zh="送出查詢">Send an enquiry</h2>
+  <div class="card">
+    <form id="enqForm" novalidate>
+      <p><label for="fCo" data-en="Company" data-zh="公司">Company</label><input id="fCo" name="company_name" autocomplete="organization" maxlength="200"></p>
+      <p><label for="fName" data-en="Contact name" data-zh="聯絡人">Contact name</label><input id="fName" name="name" autocomplete="name" required maxlength="200"></p>
+      <p><label for="fEmail" data-en="Email" data-zh="電郵">Email</label><input id="fEmail" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="254"></p>
+      <p><label for="fPhone"><span data-en="Phone / WhatsApp" data-zh="電話 / WhatsApp">Phone / WhatsApp</span> <span class="opt" data-en="(optional)" data-zh="（選填）">(optional)</span></label><input id="fPhone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="40"></p>
+      <p><label for="fDate"><span data-en="Date needed" data-zh="需要日期">Date needed</span> <span class="opt" data-en="(flexible is fine)" data-zh="（有彈性都得）">(flexible is fine)</span></label><input id="fDate" name="event_date" type="date"></p>
+      <p><label for="fHead" data-en="Headcount" data-zh="人數">Headcount</label><input id="fHead" name="headcount" type="number" min="1" max="2000" inputmode="numeric" placeholder="e.g. 30"></p>
+      <p><label for="fFulfil" data-en="Delivery or pickup" data-zh="送貨或自取">Delivery or pickup</label><select id="fFulfil" name="fulfil">
+        <option value="Delivery" data-en="Delivery" data-zh="送貨">Delivery</option>
+        <option value="Pickup" data-en="Pickup (Wan Chai)" data-zh="自取（灣仔）">Pickup (Wan Chai)</option>
+        <option value="Not sure" data-en="Not sure yet" data-zh="未定">Not sure yet</option>
+      </select></p>
+      <p><label for="fBudget" data-en="Your budget" data-zh="預算">Your budget</label><select id="fBudget" name="budget">
+        <option value="Not sure" data-en="Not sure yet" data-zh="未定">Not sure yet</option>
+        <option value="Under HK$5,000" data-en="Under HK$5,000" data-zh="HK$5,000 以下">Under HK$5,000</option>
+        <option value="HK$5,000–15,000" data-en="HK$5,000–15,000" data-zh="HK$5,000–15,000">HK$5,000–15,000</option>
+        <option value="Over HK$15,000" data-en="Over HK$15,000" data-zh="HK$15,000 以上">Over HK$15,000</option>
+      </select></p>
+      <p class="wide"><label for="fMsg" data-en="What do you need?" data-zh="你需要咩？">What do you need?</label><textarea id="fMsg" name="message" required minlength="8" maxlength="5000" data-en-ph="Rough quantities, dietary needs, delivery address or timing — anything that helps us quote" data-zh-ph="大概數量、飲食需要、送貨地址或時間 — 任何有助報價嘅資料"></textarea></p>
+      <p class="hp" aria-hidden="true"><label>Company <input name="company" tabindex="-1" autocomplete="off"></label></p>
+      <p class="err" id="enqErr" role="alert" hidden></p>
+      <div class="actions"><button class="btn" type="submit" id="enqSend" data-en="Send enquiry" data-zh="送出查詢">Send enquiry</button></div>
+      <p class="pv-note" data-en="Preview build: your enquiry is saved only in this browser so the flow can be reviewed. Nothing is sent yet." data-zh="預覽版本：你嘅查詢只會儲存喺呢個瀏覽器，方便檢視流程，暫時唔會送出。">Preview build: your enquiry is saved only in this browser so the flow can be reviewed. Nothing is sent yet.</p>
+    </form>
+    <div class="done" id="enqDone" role="status">
+      <div class="tick">🎉</div>
+      <h3 data-en="Enquiry noted" data-zh="已記低你嘅查詢">Enquiry noted</h3>
+      <p data-en="Thanks — the team will be in touch. (Preview: saved in this browser only.)" data-zh="多謝 — 團隊會盡快聯絡你。（預覽版本：只儲存喺呢個瀏覽器。）">Thanks — the team will be in touch. (Preview: saved in this browser only.)</p>
+    </div>
+  </div>
+
+  <dl class="facts">
+    <div><dt data-en="Email" data-zh="電郵">Email</dt><dd><a href="mailto:hello@rorubaru.com">hello@rorubaru.com</a></dd></div>
+    <div><dt data-en="Phone" data-zh="電話">Phone</dt><dd><a href="tel:+85263175675">+852 6317 5675</a></dd></div>
+    <div><dt data-en="Pickup" data-zh="自取">Pickup</dt><dd>G/F, 100–102 Queen's Road East, Wan Chai</dd></div>
+  </dl>
+  <p class="fineprint" data-en="RORUBARU · Hong Kong's original hand roll bar · Enquiries are answered by the team, usually within a day." data-zh="RORUBARU · 香港手卷吧 · 所有查詢均由團隊親自回覆，通常一日內回覆。">RORUBARU · Hong Kong's original hand roll bar · Enquiries are answered by the team, usually within a day.</p>
+</div>
+
+<script src="/loyalty/enquiries.js"></script>
+<script>
+(function () {
+  const zh = location.pathname.indexOf("/zh-Hant") === 0;
+  document.documentElement.lang = zh ? "zh-Hant" : "en";
+  document.querySelectorAll("[data-en]").forEach(el => { const v = el.getAttribute(zh ? "data-zh" : "data-en"); if (v) el.innerHTML = v; });
+  document.querySelectorAll("[data-en-ph]").forEach(el => { el.placeholder = el.getAttribute(zh ? "data-zh-ph" : "data-en-ph") || ""; });
+  document.getElementById("lEn").classList.toggle("on", !zh);
+  document.getElementById("lZh").classList.toggle("on", zh);
+  document.getElementById("pvBar").textContent = zh
+    ? "預覽 — 呢版未正式推出；查詢只會儲存喺呢個瀏覽器。"
+    : "PREVIEW — this page is not live yet; enquiries are stored only in this browser.";
+  document.title = zh ? "到會 · 公司訂單 · RORUBARU" : "Catering & corporate · RORUBARU";
+
+  const form = document.getElementById("enqForm");
+  const err = document.getElementById("enqErr");
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  form.addEventListener("submit", ev => {
+    ev.preventDefault();
+    err.hidden = true;
+    const d = new FormData(form);
+    const get = k => (d.get(k) || "").toString().trim();
+    if (get("company")) return; // honeypot
+    const fail = m => { err.textContent = m; err.hidden = false; };
+    if (!get("name")) return fail(zh ? "請填聯絡人姓名" : "Please add a contact name");
+    if (!EMAIL_RE.test(get("email"))) return fail(zh ? "請填正確電郵" : "Please add a valid email");
+    if (get("message").length < 8) return fail(zh ? "講多少少你需要咩" : "Tell us a little about what you need");
+    const btn = document.getElementById("enqSend");
+    btn.disabled = true;
+    RORU_ENQUIRIES.submitLocal({
+      kind: "catering",
+      name: get("name"), email: get("email"), phone: get("phone"),
+      event_date: get("event_date"), headcount: +get("headcount") || null,
+      budget: get("budget"), message: get("message"), lang: zh ? "zh" : "en",
+      details: { company: get("company_name"), fulfil: get("fulfil") }
+    });
+    form.style.display = "none";
+    document.getElementById("enqDone").classList.add("on");
+  });
+})();
+</script>
+</body>
+</html>
