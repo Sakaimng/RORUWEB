@@ -80,7 +80,7 @@ pre_title: "One receipt, one scan", pre_flair: "Like the last hand roll: it only
       added_points: "+{n} $RORU!", queued: "$RORU lands once staff approve it (usually same day).", pending_hint: "{n} receipts waiting for staff approval", pending_hint_1: "1 receipt waiting for staff approval",
       ladder: "Rewards", ladder_sub: "Use your $RORU on any reward you've unlocked. $RORU comes off when you tap Use; show the code at the counter. $RORU expires on 31 Dec each year.", lad_unlocked: "Unlocked", lad_locked: "Locked", lad_use: "Use", claim: "Use {n} $RORU", need_more: "{n} more", claimed: "Reward unlocked — scratch to reveal", upgrade: "Upgraded! The nori hid something better 🎉",
       receipts: "Your receipts", tier_line: "{spend} spent · {next}", tier_next: "{n} to {name}", kama_note: "{t_kama} is by invitation only",
-      err_receipt_already_used: "This receipt has already been added", err_receipt_photo_already_used: "You've already sent this photo", err_receipt_too_old: "Receipts count on their own date only (Hong Kong time)", err_daily_receipt_limit: "Daily receipt limit reached — staff can add it for you", err_receipt_no_required: "Please add the date & time and table no. from the receipt", err_bad_total: "Please check the total", err_not_enough_points: "Not enough $RORU yet", err_receipt_in_future: "That date is in the future",
+      err_receipt_already_used: "This receipt has already been added", err_receipt_photo_already_used: "You've already sent this photo", err_receipt_too_old: "Receipts count on their own date only (Hong Kong time)", err_daily_receipt_limit: "Daily receipt limit reached — staff can add it for you", err_receipt_no_required: "Please add the date & time and table no. from the receipt", err_bad_total: "Please check the total", err_not_enough_points: "Not enough $RORU yet", err_receipt_in_future: "That date is in the future", err_receipt_no_date: "Receipt date missing - ask the guest to resend it with the date",
       install_tip: "Tip: add this page to your home screen"
     },
     zh: {
@@ -137,7 +137,7 @@ pre_title: "一張收據，掃一次", pre_flair: "就好似最後一條手卷�
       added_points: "+{n} RORU幣！", queued: "店員批核後 RORU幣即到（通常當日）。", pending_hint: "{n} 張收據等待店員批核",
       ladder: "獎賞", ladder_sub: "已解鎖的獎賞可隨時用 RORU幣換領。按「換領」即扣 RORU幣，到櫃枱出示代碼即可。RORU幣每年 12 月 31 日到期。", lad_unlocked: "已解鎖", lad_locked: "未解鎖", lad_use: "換領", claim: "用 {n} RORU幣", need_more: "尚差 {n} RORU幣", claimed: "獎賞解鎖 — 刮開紫菜看看", upgrade: "升級了！紫菜下有更好的 🎉",
       receipts: "你的收據", tier_line: "已消費 {spend} · {next}", tier_next: "再 {n} 升至 {name}", kama_note: "{t_kama}只限邀請",
-      err_receipt_already_used: "此收據已經加過 RORU幣", err_receipt_photo_already_used: "你已經上載過這張相", err_receipt_too_old: "收據只限收據日期當日計（香港時間）", err_daily_receipt_limit: "已達每日收據上限 — 可請店員代為加入", err_receipt_no_required: "請填上收據上的日期時間及枱號", err_bad_total: "請核對總額", err_not_enough_points: "RORU幣尚未足夠", err_receipt_in_future: "日期在未來",
+      err_receipt_already_used: "此收據已經加過 RORU幣", err_receipt_photo_already_used: "你已經上載過這張相", err_receipt_too_old: "收據只限收據日期當日計（香港時間）", err_daily_receipt_limit: "已達每日收據上限 — 可請店員代為加入", err_receipt_no_required: "請填上收據上的日期時間及枱號", err_bad_total: "請核對總額", err_not_enough_points: "RORU幣尚未足夠", err_receipt_in_future: "日期在未來", err_receipt_no_date: "收據未見日期，請客人重新傳送有日期嘅收據",
       install_tip: "提示：可將此頁加到主畫面"
     }
   };
