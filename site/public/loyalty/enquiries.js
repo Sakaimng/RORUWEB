@@ -94,7 +94,7 @@ window.RORU_ENQUIRIES = (function () {
 .enq .tag{font-size:10px;font-weight:800;letter-spacing:.05em;padding:1px 6px;border-radius:99px;border:1px dashed rgba(246,69,1,.7);color:#ff8a5c}
 .enq .acts2{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .enq .acts2 button{appearance:none;border:1px solid var(--line,rgba(246,243,231,.16));background:transparent;color:inherit;font:inherit;font-size:12px;font-weight:700;padding:6px 12px;border-radius:99px;cursor:pointer}
-.enq .acts2 button.on{background:var(--cream,#f6f3e7);color:#16181f;border-color:var(--cream,#f6f3e7)}
+.enq .acts2 button.on{background:#f6f3e7;color:#16181f;border-color:#f6f3e7}
 .enq textarea{width:100%;margin-top:8px;background:transparent;border:1px solid var(--line,rgba(246,243,231,.16));border-radius:10px;color:inherit;font:inherit;font-size:13px;padding:8px 10px;min-height:34px}
 .enq .sample-note{font-size:11px;color:var(--muted,#a8a49a);margin-top:6px}
 `;
