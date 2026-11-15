@@ -583,7 +583,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
       '<div class="ig qa o-qa" id="quick"><button data-q="approve"' + (waiting ? ' class="hot"' : "") + '>' + OI.ok + '<span class="ig-t"><b>Approve bills' + (waiting ? " (" + waiting + ")" : "") + '</b><small>' + (waiting ? waiting + (waiting === 1 ? " bill needs" : " bills need") + " a check" : "Nothing waiting") + '</small></span><span class="c-go">›</span></button>' +
         '<button data-q="find">' + OI.find + '<span class="ig-t"><b>Find a guest</b><small>By name or last 4 digits</small></span><span class="c-go">›</span></button>' +
         '<button data-q="rewards">' + OI.gift + '<span class="ig-t"><b>Change rewards</b><small>Names, $RORU, on/off</small></span><span class="c-go">›</span></button>' +
-        '<button data-q="month">' + OI.doc + '<span class="ig-t"><b>Month-end report</b><small>PDF for Florencia</small></span><span class="c-go">›</span></button></div>' +
+        '<button data-q="month">' + OI.doc + '<span class="ig-t"><b>Month-end report</b><small>Monthly loyalty report</small></span><span class="c-go">›</span></button></div>' +
       '<div class="cols2"><div>' +
       sec("Bills waiting for your OK", waiting ? '<span class="opill warn">' + waiting + "</span>" : "") + '<p class="hint">Big bills or unclear receipts stop here. Approve gives the guest their $RORU; Reject gives none.</p><div id="apList">' +
         (waiting ? q.map(r => '<div class="li" data-rid="' + r.id + '"><div class="bd"><div class="t1">' + esc(r.who || "Guest") + ' <span class="amt">' + hkd2(r.total_hkd) + '</span></div><div class="t2">' + [r.at ? hkTime(r.at) : "", r.shop ? shopNm(r.shop) : "", srcNm(r.source)].filter(Boolean).map(esc).join(" · ") + (r.receipt_no ? ' <span class="idc">receipt ' + esc(r.receipt_no) + "</span>" : "") + "</div>" +
@@ -710,10 +710,10 @@ body.thB{--muted:rgba(22,24,31,.64)}
   async function guestSheet(code) {
     if (!code || !st.sess) return;
     openSheet("Guest", '<p class="muted small" style="margin:0">Loading…</p>', '<button class="btn ghost" id="gClose">Close</button>', (b, f) => { f.querySelector("#gClose").onclick = closeSheet; });
-    let d = null;
-    try { d = await R.rpc("owner_guest_detail", { p_token: st.sess.token, p_who: code }); } catch (e) { d = null; }
+    let d = null, err = null;
+    try { d = await R.rpc("owner_guest_detail", { p_token: st.sess.token, p_who: code }); } catch (e) { d = null; err = e; }
     if (!$("#sheet").classList.contains("show")) return;
-    if (!d) { $("#sheetT").textContent = "Guest"; $("#sheetB").innerHTML = "<p class='empty'>Couldn't load this guest - try again.</p>"; return; }
+    if (!d) { $("#sheetT").textContent = "Guest"; $("#sheetB").innerHTML = "<p class='empty'>Couldn't load this guest - try again." + (err && err.code ? " (" + esc(err.code) + ")" : "") + "</p>"; return; }
     renderGuestSheet(d);
   }
   function histRow(h) {
@@ -984,7 +984,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
     const x = st.extras;
     if (!st.monthEl) { st.monthEl = document.createElement("div"); st.monthEl.className = "card"; st.monthEl.id = "monthBox"; window.RORU_MONTHEND.mount(st.monthEl, () => st.sess.token); }
     const v = $("#v-reports");
-    v.innerHTML = vh("Reports", "Month-end report, downloads and numbers") + '<p class="purpose">Your month-end report for Florencia, spreadsheets to download, and how the extras are doing.</p>' + '<div id="monthSlot"></div>' +
+    v.innerHTML = vh("Reports", "Month-end report, downloads and numbers") + '<p class="purpose">Your month-end report, spreadsheets to download, and how the extras are doing.</p>' + '<div id="monthSlot"></div>' +
       sec("Split receipts · last 30 days") + '<p class="hint">Each bill is scanned once. The guest who scanned picks how many people share it (2 to ' + esc((st.data.settings || {}).split_max_people || 6) + ', them included) and types each friend\'s number. Every friend\'s share is the $RORU divided by the number of people, rounded down; the scanner keeps the leftover. Spend splits the same way to the cent, so the rows always add up to the bill. Each friend says yes on their own; a friend who says no or doesn\'t answer within ' + esc((st.data.settings || {}).split_offer_hours || 12) + ' hours leaves their share with the scanner. Yeses stay yeses.</p><div id="splitsAll">' + splitBox(60, true) + '</div>' +
       sec("Download spreadsheets") + '<p class="hint">Opens in Excel, Numbers or Google Sheets. They include phone numbers, so keep them inside the business (HK privacy law).</p>' +
       '<div class="qa" id="csvBtns">' + [["members", "👥", "All members"], ["receipts", "🧾", "All bills"], ["visits", "🥢", "All visits"], ["rewards", "🎁", "Free items claimed"], ["consents", "✍️", "Sign-up agreements"], ["marketing_optins", "📣", "Who said yes to messages"]].map(c => '<button data-x="' + c[0] + '"><i>' + c[1] + "</i>" + c[2] + "<small>Spreadsheet</small></button>").join("") + "</div>" +
@@ -1116,9 +1116,9 @@ body.thB{--muted:rgba(22,24,31,.64)}
         zh: "員工同 PIN：加員工、改 PIN、睇邊個查過邊位客人（先顯示 5 行，再撳「睇晒全部」）。",
         zhs: "员工和 PIN：添加员工、改 PIN、查看谁查过哪位客人（先显示 5 行，再点“查看全部”）。" },
       { before: () => go("reports"), el: vis(() => [...document.querySelectorAll("#v-reports h2")].find(h => h.offsetParent && /Split|分/.test(h.textContent)), "#monthSlot", "#v-reports .vh"),
-        en: "Reports: charts, the month-end PDF for Florencia, and every split receipt (2 to 6 people) in one place. Today only shows the count.",
-        zh: "報告：圖表、俾 Florencia 嘅月結 PDF，同埋所有分單（2 至 6 人）都喺呢度。「今日」只顯示數量。",
-        zhs: "报告：图表、给 Florencia 的月结 PDF，以及所有分单（2 到 6 人）都在这里。“今日”只显示数量。" },
+        en: "Reports: charts, the month-end PDF, and every split receipt (2 to 6 people) in one place. Today only shows the count.",
+        zh: "報告：圖表、月結 PDF，同埋所有分單（2 至 6 人）都喺呢度。「今日」只顯示數量。",
+        zhs: "报告：图表、月结 PDF，以及所有分单（2 到 6 人）都在这里。“今日”只显示数量。" },
       { before: () => go("settings"), el: vis("#g-nums", "#v-settings .vh"),
         en: "Settings: the rules, each with an example: $RORU per HK$1, levels, most people on one split, and $RORU expires on 31 Dec each year.",
         zh: "設定：所有規則，每條都有例子：每 HK$1 幾多 RORU幣、等級、一張單最多幾多人分，同埋 RORU幣每年 12 月 31 日到期。",
