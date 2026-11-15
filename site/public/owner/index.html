@@ -20,7 +20,7 @@
 <script src="/loyalty/scratch.js?v=f55"></script>
 <script src="/loyalty/monthend.js?v=f55"></script>
 <style>
-/* v57 owner dashboard */
+/* v58 owner dashboard */
 .dash{margin:16px 0 18px}
 .dash h3{margin:0;font-size:15px;font-weight:600;color:var(--cream)}
 .dash .sub{font-size:13px;color:var(--muted);margin:2px 0 0}
@@ -632,9 +632,10 @@ body.thB{--muted:rgba(22,24,31,.64)}
   }
 
   // ===== GUESTS =====
-  // v57: complete guest view. Search covers every member (name, phone digits or member ID) and
+  // v58: complete guest view. Search covers every member (name, phone digits or member ID) and
   // "All guests" pages through the whole membership via owner_guests; each guest opens a full sheet
-  // (details, rewards, history, passport) from owner_guest_detail. Both RPCs are owner-only
+  // (details, rewards, passport, full history) from owner_guest_detail. History is paged
+  // ("Show earlier") so no event is hidden. Both RPCs are owner-only
   // server-side, and opening a guest is written to the staff access log, same as the iPad.
   const fmtMd = (md) => { const p = String(md || "").split("-"); if (p.length < 2 || !(+p[1]) || !(+p[2])) return md ? esc(md) : ""; return (+p[2]) + " " + ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][(+p[1]) - 1]; };
   function gRow(m) {
@@ -715,6 +716,36 @@ body.thB{--muted:rgba(22,24,31,.64)}
     if (!d) { $("#sheetT").textContent = "Guest"; $("#sheetB").innerHTML = "<p class='empty'>Couldn't load this guest - try again.</p>"; return; }
     renderGuestSheet(d);
   }
+  function histRow(h) {
+    let txt;
+    if (h.kind === "receipt") txt = "🧾 Bill " + (h.no ? "#" + esc(h.no) + " · " : "") + hkd(h.total) + " · +" + fmt(h.points) + " $RORU" + (h.status && h.status !== "approved" ? " · " + esc(h.status) : "") + (h.gold ? " · ✨ gold" : "") + (h.event ? " · 🎪 event" : "");
+    else if (h.kind === "visit") txt = "🥢 Visit stamp" + (h.gold ? " · ✨ gold" : "");
+    else txt = "🎁 " + esc(h.name_en || "Reward") + (h.status === "undone" ? " · undone" : h.status === "redeemed" ? " · used" : h.status ? " · " + esc(h.status) : "") + (h.points ? " · " + fmt(h.points) + " $RORU" : "");
+    return '<div class="hist"><span>' + esc(when(h.at)) + "</span><span>" + txt + "</span></div>";
+  }
+  // Paged history: the server returns the newest page first; "Show earlier" appends the next
+  // page via owner_guest_detail(p_hist_offset) until hist_total is reached. No hard cap.
+  function wireHistMore() {
+    const g = st.gsheet, box = $("#ghistMore");
+    if (!g || !box) return;
+    const left = (g.total || 0) - g.loaded;
+    if (left <= 0) { box.innerHTML = ""; return; }
+    box.innerHTML = '<button class="btn ghost sm" id="ghistBtn" style="width:100%">Show earlier · ' + fmt(left) + " more</button>";
+    $("#ghistBtn").onclick = async (e) => {
+      const btn = e.currentTarget;
+      btn.disabled = true; btn.textContent = "Loading…";
+      let d = null;
+      try { d = await R.rpc("owner_guest_detail", { p_token: st.sess.token, p_who: g.code, p_hist_limit: 60, p_hist_offset: g.loaded }); } catch (er) { d = null; }
+      if (!d) { btn.disabled = false; btn.textContent = "Couldn't load - tap to try again"; return; }
+      const rows = (d.history || []).map(histRow).join("");
+      const wrap = $("#ghist"), empty = wrap.querySelector("p.empty");
+      if (empty && rows) empty.remove();
+      wrap.insertAdjacentHTML("beforeend", rows);
+      g.loaded += (d.history || []).length;
+      if (d.hist_total != null) g.total = d.hist_total;
+      wireHistMore();
+    };
+  }
   function renderGuestSheet(d) {
     const p = d.profile || {};
     const row = (l, v) => v === undefined || v === null || v === "" ? "" : '<div><span>' + l + "</span><b>" + v + "</b></div>";
@@ -732,13 +763,8 @@ body.thB{--muted:rgba(22,24,31,.64)}
     } else {
       pp = sec("Passport") + '<p class="empty">The passport is switched off right now.</p>';
     }
-    const hist = (d.history || []).map(h => {
-      let txt;
-      if (h.kind === "receipt") txt = "🧾 Bill " + (h.no ? "#" + esc(h.no) + " · " : "") + hkd(h.total) + " · +" + fmt(h.points) + " $RORU" + (h.status && h.status !== "approved" ? " · " + esc(h.status) : "") + (h.gold ? " · ✨ gold" : "") + (h.event ? " · 🎪 event" : "");
-      else if (h.kind === "visit") txt = "🥢 Visit stamp" + (h.gold ? " · ✨ gold" : "");
-      else txt = "🎁 " + esc(h.name_en || "Reward") + (h.status === "undone" ? " · undone" : h.status === "redeemed" ? " · used" : h.status ? " · " + esc(h.status) : "") + (h.points ? " · " + fmt(h.points) + " $RORU" : "");
-      return '<div class="hist"><span>' + esc(when(h.at)) + "</span><span>" + txt + "</span></div>";
-    }).join("");
+    const hist = (d.history || []).map(histRow).join("");
+    st.gsheet = { code: d.member_code, loaded: (d.history || []).length, total: d.hist_total != null ? d.hist_total : (d.history || []).length };
     openSheet(d.name || "Guest",
       '<div style="margin:0 0 14px">' + tchip(d.tier) + ' <span class="idc">member ID ' + esc(d.member_code || "") + "</span></div>" +
       '<div class="nums">' +
@@ -759,10 +785,11 @@ body.thB{--muted:rgba(22,24,31,.64)}
       (p.favourites && p.favourites.length ? '<p class="muted" style="font-size:14px;margin:12px 0 0">Favourites: ' + p.favourites.map(f => esc(f.name_en || "") + (f.n ? " ×" + f.n : "")).join(", ") + "</p>" : "") +
       sec("Rewards ready to use · " + ready.length + (d.used_rewards ? " · " + fmt(d.used_rewards) + " used before" : "")) + rwd +
       pp +
-      sec("History") +
-      (hist || '<p class="empty">Nothing yet.</p>') +
+      sec("History" + (st.gsheet.total ? " · " + fmt(st.gsheet.total) : "")) +
+      '<div id="ghist">' + (hist || '<p class="empty">Nothing yet.</p>') + "</div>" +
+      '<div id="ghistMore" style="margin:10px 0 0"></div>' +
       '<p class="muted" style="font-size:13px;margin-top:16px">Opening a guest is written to the access log, same as the staff iPad.</p>',
-      '<button class="btn ghost" id="gClose">Close</button>', (b, f) => { f.querySelector("#gClose").onclick = closeSheet; });
+      '<button class="btn ghost" id="gClose">Close</button>', (b, f) => { f.querySelector("#gClose").onclick = closeSheet; wireHistMore(); });
   }
 
   // ===== REWARDS =====
