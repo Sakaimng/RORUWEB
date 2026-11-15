@@ -20,7 +20,7 @@
 <script src="/loyalty/scratch.js?v=f55"></script>
 <script src="/loyalty/monthend.js?v=f55"></script>
 <style>
-/* v36 owner dashboard */
+/* v57 owner dashboard */
 .dash{margin:16px 0 18px}
 .dash h3{margin:0;font-size:15px;font-weight:600;color:var(--cream)}
 .dash .sub{font-size:13px;color:var(--muted);margin:2px 0 0}
@@ -614,7 +614,7 @@ body.thB{--muted:rgba(22,24,31,.64)}
     $$("[data-no]", T).forEach(b => b.onclick = async () => { if (!confirm("Reject this receipt? The guest gets no $RORU for it.")) return; b.disabled = true; try { await R.rpc("staff_review", { p_token: st.sess.token, p_receipt_id: +b.dataset.no, p_approve: false }); R.toast("Rejected"); } catch (e) { R.toast(R.errText(e)); } load(); });
     $$("[data-bok],[data-bno]", T).forEach(b => b.onclick = async () => { b.disabled = true; try { await R.rpc("staff_review_bonus", { p_token: st.sess.token, p_receipt_id: +(b.dataset.bok || b.dataset.bno), p_approve: !!b.dataset.bok }); R.toast(b.dataset.bok ? "Approved ✓" : "Rejected"); } catch (e) { R.toast(R.errText(e)); } load(); });
     $$("[data-undo]", T).forEach(b => b.onclick = () => undoSheet(b.dataset.undo, b.dataset.nm));
-    $$("[data-guest]", T).forEach(el => el.onclick = () => guestSheet(st.data.top[+el.dataset.guest]));
+    $$("[data-guest]", T).forEach(el => el.onclick = () => openTopGuest(st.data.top[+el.dataset.guest]));
   }
   function undoSheet(code, nm) {
     openSheet("Undo a used reward", '<p style="font-size:16px;margin:0 0 14px"><b>' + esc(nm || code) + '</b><br><span class="muted">Code ' + esc(code) + "</span></p>" +
@@ -632,11 +632,49 @@ body.thB{--muted:rgba(22,24,31,.64)}
   }
 
   // ===== GUESTS =====
+  // v57: complete guest view. Search covers every member (name, phone digits or member ID) and
+  // "All guests" pages through the whole membership via owner_guests; each guest opens a full sheet
+  // (details, rewards, history, passport) from owner_guest_detail. Both RPCs are owner-only
+  // server-side, and opening a guest is written to the staff access log, same as the iPad.
+  const fmtMd = (md) => { const p = String(md || "").split("-"); if (p.length < 2 || !(+p[1]) || !(+p[2])) return md ? esc(md) : ""; return (+p[2]) + " " + ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][(+p[1]) - 1]; };
+  function gRow(m) {
+    return '<div class="li tap" data-code="' + esc(m.member_code || "") + '"><div class="bd"><div class="t1">' + esc(m.name || "—") + '</div><div class="t2">' + esc(m.phone_masked || "") + (m.member_code ? ' <span class="idc">member ID ' + esc(m.member_code) + "</span>" : "") + '</div><div class="t3">' + tchip(m.tier) + (m.year_spend != null ? "<span>Spent <b>" + hkd(m.year_spend) + "</b></span>" : "") + "<span><b>" + fmt(m.points) + '</b> $RORU</span></div></div><span class="chev">›</span></div>';
+  }
+  function wireGuestRows(root) { $$("[data-code]", root).forEach(el => el.onclick = () => { if (el.dataset.code) guestSheet(el.dataset.code); }); }
+  async function browseGuests(append) {
+    const box = $("#gall"); if (!box || !st.sess) return;
+    st.glist = append && st.glist ? st.glist : { offset: 0, rows: [], total: null };
+    try {
+      const r = await R.rpc("owner_guests", { p_token: st.sess.token, p_query: "", p_limit: 40, p_offset: st.glist.offset });
+      if (!r || !$("#gall")) return;
+      st.glist.rows = append ? st.glist.rows.concat(r.rows || []) : (r.rows || []); st.glist.total = r.total; st.glist.offset = st.glist.rows.length;
+    } catch (e) { if (!append && $("#gall")) $("#gall").innerHTML = ""; return; }
+    const gl = st.glist;
+    box.innerHTML = sec("All guests · " + fmt(gl.total == null ? gl.rows.length : gl.total)) +
+      (gl.rows.length ? gl.rows.map(gRow).join("") : '<p class="empty">No members yet.</p>') +
+      (gl.total != null && gl.rows.length < gl.total ? '<button class="btn ghost" id="gmore" style="width:100%;margin-top:10px">Show more (' + fmt(gl.total - gl.rows.length) + " left)</button>" : "");
+    wireGuestRows(box);
+    const mb = $("#gmore"); if (mb) mb.onclick = () => { mb.disabled = true; browseGuests(true); };
+  }
+  async function openTopGuest(m) {
+    if (!m) return;
+    const hit = ((st.glist && st.glist.rows) || []).find(x => x.name === m.name && x.phone_masked === m.phone_masked);
+    if (hit) return guestSheet(hit.member_code);
+    const dig = String(m.phone_masked || "").replace(/\D/g, "");
+    try {
+      const r = await R.rpc("owner_guests", { p_token: st.sess.token, p_query: dig.slice(-4), p_limit: 20, p_offset: 0 });
+      const rows = (r && r.rows) || [];
+      const exact = rows.filter(x => x.name === m.name && x.phone_masked === m.phone_masked);
+      const pick = exact[0] || (rows.length === 1 ? rows[0] : null);
+      if (pick) return guestSheet(pick.member_code);
+    } catch (e) {}
+    R.toast("Couldn't open this guest - search their name above.");
+  }
   function renderGuests() {
     const d = st.data, S0 = d.settings, x = st.extras;
-    const statusHelp = "Guests move up a level by themselves, based on what they spent in the last " + (S0.tier_window_months || 12) + " months: " + TN("nori") + " to start, " + TN("gohan") + " from HK$" + fmt(S0.tier_gohan_hkd) + ", " + TN("tobiko") + " from HK$" + fmt(S0.tier_tobiko_hkd) + ". " + TN("kama") + " is invite only: anyone who spends HK$" + fmt(S0.kama_eligible_hkd) + "+ shows up under Kama below, and you tap Invite.<br>Higher levels earn more $RORU for each HK$1: Nori " + S0.tier_mult_nori + "×, Gohan " + S0.tier_mult_gohan + "×, Tobiko " + S0.tier_mult_tobiko + "×, Kama " + S0.tier_mult_kama + "× (change it in ☰ Settings). Looking a guest up by phone number is noted in the staff access log.";
-    $("#v-guests").innerHTML = vh("Guests", fmt(d.members) + " members") + '<p class="purpose">Look up any member, see your best guests, and invite top spenders to Kama.</p>' +
-      '<div class="search"><input id="gq" type="search" placeholder="Name or last 4 digits of phone" autocomplete="off" enterkeyhint="search"></div><div id="gres"></div>' +
+    const statusHelp = "Guests move up a level by themselves, based on what they spent in the last " + (S0.tier_window_months || 12) + " months: " + TN("nori") + " to start, " + TN("gohan") + " from HK$" + fmt(S0.tier_gohan_hkd) + ", " + TN("tobiko") + " from HK$" + fmt(S0.tier_tobiko_hkd) + ". " + TN("kama") + " is invite only: anyone who spends HK$" + fmt(S0.kama_eligible_hkd) + "+ shows up under Kama below, and you tap Invite.<br>Higher levels earn more $RORU for each HK$1: Nori " + S0.tier_mult_nori + "×, Gohan " + S0.tier_mult_gohan + "×, Tobiko " + S0.tier_mult_tobiko + "×, Kama " + S0.tier_mult_kama + "× (change it in ☰ Settings). Search covers every member; opening a guest is noted in the staff access log, same as the staff iPad.";
+    $("#v-guests").innerHTML = vh("Guests", fmt(d.members) + " members") + '<p class="purpose">Look up any member to see their details, rewards, history and passport in one place, and invite top spenders to Kama.</p>' +
+      '<div class="search"><input id="gq" type="search" placeholder="Name, phone digits or member ID" autocomplete="off" enterkeyhint="search"></div><div id="gres"></div><div id="gall"></div>' +
       sec("Best guests · last 12 months") + help(statusHelp) +
       (d.top.length ? rt([{ h: "Name" }, { h: "Level" }, { h: "Spent (12 months)", c: "n" }, { h: "$RORU balance", c: "n" }, { h: "Visits", c: "n" }, { h: "Visit stamps", c: "desk" }, { h: "Bills scanned", c: "desk n" }, { h: "Last visit" }, { h: "Phone", c: "desk" }, { h: "", c: "desk", l: "" }],
         d.top.map((m, i) => ({ attrs: 'data-open="' + i + '"', cells: [esc(m.name || "—"), tchip(m.tier), hkd(m.year_spend), fmt(m.points), fmt(m.visits), m.stamps + " of " + (S0.rolls_per_plate || 5) + (m.plates ? " (+" + m.plates + " earned)" : ""), fmt(m.receipts), m.last ? R.fmtDay(m.last) : "", esc(m.phone_masked), '<span class="muted">›</span>'] }))) : '<p class="empty">No members yet.</p>') +
@@ -647,35 +685,84 @@ body.thB{--muted:rgba(22,24,31,.64)}
       (d.kama_members.length ? d.kama_members.map(m => '<div class="li"><div class="bd"><div class="t1">' + esc(m.name || "—") + '</div><div class="t2">' + esc(m.phone_masked) + " · spent " + hkd(m.year_spend) + '</div></div><button class="btn ghost sm" data-kama="' + esc(m.phone) + '" data-on="0">Remove</button></div>').join("") : '<p class="empty">None yet.</p>') +
       (x ? sec("Birthdays this week 🎂") + (x.birthdays_this_week.length ? x.birthdays_this_week.map(b => '<div class="li"><div class="bd"><div class="t1">' + esc(b.name || "—") + '</div><div class="t2">' + esc(b.phone_masked) + " · " + esc(b.md) + '</div></div><button class="btn ghost sm" data-clearbd="' + esc(b.phone) + '">Clear date</button></div>').join("") : '<p class="empty">None this week.</p>') : "");
     const G = $("#v-guests");
-    $$("tr[data-open]", G).forEach(tr => tr.onclick = () => guestSheet(d.top[+tr.dataset.open]));
+    $$("tr[data-open]", G).forEach(tr => tr.onclick = () => openTopGuest(d.top[+tr.dataset.open]));
     $$("[data-kama]", G).forEach(b => b.onclick = async () => { if (b.dataset.on === "0" && !confirm("Remove from Kama?")) return; b.disabled = true; try { await R.rpc("owner_set_kama", { p_token: st.sess.token, p_phone: b.dataset.kama, p_on: b.dataset.on === "1" }); R.toast(b.dataset.on === "1" ? "Invited to Kama ✓" : "Removed ✓"); load(); } catch (e) { R.toast(R.errText(e)); b.disabled = false; } });
     $$("[data-clearbd]", G).forEach(b => b.onclick = async () => { if (!confirm("Reset this guest's birthday? They can set it again.")) return; b.disabled = true; try { await R.rpc("owner_clear_birthday", { p_token: st.sess.token, p_phone: b.dataset.clearbd }); R.toast("Reset ✓"); load(); } catch (e) { R.toast(R.errText(e)); } });
     let tq = null; const q = $("#gq"); if (st.gq) { q.value = st.gq; search(st.gq); }
     q.oninput = () => { clearTimeout(tq); tq = setTimeout(() => search(q.value), 350); };
+    browseGuests();
   }
   async function search(raw) {
     const s = String(raw || "").trim(); st.gq = s; const box = $("#gres"); if (!box) return;
-    if (!s) { box.innerHTML = ""; return; }
-    const low = s.toLowerCase(), dig = s.replace(/\D/g, "");
-    const local = st.data.top.map((m, i) => [m, i]).filter(([m]) => (m.name || "").toLowerCase().includes(low) || (dig.length >= 2 && String(m.phone_masked || "").replace(/\D/g, "").endsWith(dig.slice(-4))));
-    let found = [];
-    if (dig.length >= 4 || /^[A-Z0-9]{8}$/i.test(s)) { try { found = await R.rpc("staff_lookup", { p_token: st.sess.token, p_query: /^[A-Z0-9]{8}$/i.test(s) && dig.length < 4 ? s.toUpperCase() : s }); } catch (e) { found = []; } }
+    const all = $("#gall");
+    if (!s) { box.innerHTML = ""; if (all) all.classList.remove("hide"); return; }
+    if (all) all.classList.add("hide");
+    box.innerHTML = '<p class="muted small">Searching…</p>';
+    let r = null;
+    try { r = await R.rpc("owner_guests", { p_token: st.sess.token, p_query: s, p_limit: 40, p_offset: 0 }); } catch (e) { r = null; }
     if (st.gq !== s) return;
-    const seen = new Set(); const rows = [];
-    found.forEach(f => { const i = st.data.top.findIndex(m => m.phone_masked === f.phone_masked && (m.name || "") === (f.name || "")); seen.add(i); rows.push({ m: Object.assign({}, i >= 0 ? st.data.top[i] : {}, f), i }); });
-    local.forEach(([m, i]) => { if (!seen.has(i)) rows.push({ m, i }); });
-    box.innerHTML = '<div class="sec" style="margin-top:4px"><h2>' + (rows.length ? rows.length + (rows.length === 1 ? " guest found" : " guests found") : "No match") + "</h2></div>" +
-      (rows.length ? rows.map((r, k) => '<div class="li tap" data-res="' + k + '"><div class="bd"><div class="t1">' + esc(r.m.name || "—") + '</div><div class="t2">' + esc(r.m.phone_masked || "") + (r.m.member_code ? ' <span class="idc">member ID ' + esc(r.m.member_code) + "</span>" : "") + '</div><div class="t3">' + tchip(r.m.tier) + (r.m.year_spend != null ? "<span>Spent <b>" + hkd(r.m.year_spend) + "</b></span>" : "") + "<span><b>" + fmt(r.m.points) + '</b> $RORU</span></div></div><span class="chev">›</span></div>').join("") : '<p class="empty">Try the last 4 digits of their phone number.</p>');
-    $$("[data-res]", box).forEach(el => el.onclick = () => guestSheet(rows[+el.dataset.res].m));
+    const rows = (r && r.rows) || [];
+    box.innerHTML = '<div class="sec" style="margin-top:4px"><h2>' + (r ? (r.total > rows.length ? rows.length + " of " + fmt(r.total) + " guests" : rows.length + (rows.length === 1 ? " guest found" : " guests found")) : "Search failed - try again") + "</h2></div>" +
+      (rows.length ? rows.map(gRow).join("") : '<p class="empty">No match. Try their name, phone digits or member ID.</p>');
+    wireGuestRows(box);
   }
-  function guestSheet(m) {
-    if (!m) return; const S0 = st.data.settings;
+  async function guestSheet(code) {
+    if (!code || !st.sess) return;
+    openSheet("Guest", '<p class="muted small" style="margin:0">Loading…</p>', '<button class="btn ghost" id="gClose">Close</button>', (b, f) => { f.querySelector("#gClose").onclick = closeSheet; });
+    let d = null;
+    try { d = await R.rpc("owner_guest_detail", { p_token: st.sess.token, p_who: code }); } catch (e) { d = null; }
+    if (!$("#sheet").classList.contains("show")) return;
+    if (!d) { $("#sheetT").textContent = "Guest"; $("#sheetB").innerHTML = "<p class='empty'>Couldn't load this guest - try again.</p>"; return; }
+    renderGuestSheet(d);
+  }
+  function renderGuestSheet(d) {
+    const p = d.profile || {};
     const row = (l, v) => v === undefined || v === null || v === "" ? "" : '<div><span>' + l + "</span><b>" + v + "</b></div>";
-    openSheet(m.name || "Guest", '<div style="margin:0 0 14px">' + tchip(m.tier) + "</div>" +
-      '<div class="nums">' + row("Phone", esc(m.phone_masked)) + row("Spent in the last 12 months", m.year_spend != null ? hkd(m.year_spend) : null) + row("$RORU balance", fmt(m.points)) +
-        row("Visits", m.visits != null ? fmt(m.visits) : null) + row("Visit stamps toward the next free item", m.stamps != null ? m.stamps + " of " + (S0.rolls_per_plate || 5) + (m.plates ? " · " + m.plates + " earned so far" : "") : null) + row("Bills scanned", m.receipts != null ? fmt(m.receipts) : null) +
-        row("Rewards ready to use", m.pending_rewards != null ? fmt(m.pending_rewards) : null) + row("Bills waiting for approval", m.pending_receipts ? fmt(m.pending_receipts) : null) + row("Last visit", m.last ? R.fmtDay(m.last) : null) + row("Here today", m.visited_today ? "Yes" : null) + row('<span class="idc" style="margin:0">Member ID</span>', m.member_code ? '<span class="idc" style="margin:0">' + esc(m.member_code) + "</span>" : null) + "</div>" +
-      '<p class="muted" style="font-size:14px;margin-top:16px">To add a bill, stamp a visit or hand over a reward, use the staff iPad (it shows the full number, birthday and history, and logs who looked).</p>', '<button class="btn ghost" id="gClose">Close</button>', (b, f) => { f.querySelector("#gClose").onclick = closeSheet; });
+    const ago = p.days_since_visit == null ? "" : p.days_since_visit === 0 ? "today" : p.days_since_visit === 1 ? "yesterday" : p.days_since_visit + " days ago";
+    const ready = (d.rewards || []).filter(r => r.status === "earned" || r.status === "revealed");
+    const rwd = ready.length ? ready.map(r => '<div class="li"><div class="bd"><div class="t1">' + esc(r.name_en || "") + '</div><div class="t2">' + esc(r.name_zh || "") + " · " + esc(r.code) + (r.status === "earned" ? " · not scratched yet" : "") + (r.upgraded ? " · upgraded ✨" : "") + '</div></div></div>').join("") : '<p class="empty">No rewards waiting.</p>';
+    let pp = "";
+    const ps = d.passport;
+    if (ps && ps.on) {
+      const items = ps.items || [];
+      pp = sec("Passport · " + esc((ps.season && ps.season.name_en) || "this season")) +
+        '<p class="muted" style="font-size:14px;margin:0 0 10px"><b>' + fmt(ps.count) + " of " + fmt(ps.total) + "</b> dishes stamped" + (ps.season && ps.season.status && ps.season.status !== "live" ? " · season " + esc(ps.season.status) : "") + "</p>" +
+        ((ps.tiers || []).length ? '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px">' + ps.tiers.map(t => '<span class="opill' + (t.reached ? "" : " no") + '">' + esc(t.en || (t.n + " stamps")) + (t.reached ? " ✓" : " · " + t.n + " stamps") + "</span>").join("") + "</div>" : "") +
+        (items.length ? items.map(i => '<div class="li"' + (i.sid ? "" : ' style="opacity:.55"') + '><div class="bd"><div class="t1">' + (i.sid ? "✅ " : "◻️ ") + esc(i.en || "") + '</div><div class="t2">' + esc(i.zh || "") + (i.sid ? " · stamped " + esc(R.fmtDay(i.at)) : " · not yet") + '</div></div></div>').join("") : '<p class="empty">No dishes in this season yet.</p>');
+    } else {
+      pp = sec("Passport") + '<p class="empty">The passport is switched off right now.</p>';
+    }
+    const hist = (d.history || []).map(h => {
+      let txt;
+      if (h.kind === "receipt") txt = "🧾 Bill " + (h.no ? "#" + esc(h.no) + " · " : "") + hkd(h.total) + " · +" + fmt(h.points) + " $RORU" + (h.status && h.status !== "approved" ? " · " + esc(h.status) : "") + (h.gold ? " · ✨ gold" : "") + (h.event ? " · 🎪 event" : "");
+      else if (h.kind === "visit") txt = "🥢 Visit stamp" + (h.gold ? " · ✨ gold" : "");
+      else txt = "🎁 " + esc(h.name_en || "Reward") + (h.status === "undone" ? " · undone" : h.status === "redeemed" ? " · used" : h.status ? " · " + esc(h.status) : "") + (h.points ? " · " + fmt(h.points) + " $RORU" : "");
+      return '<div class="hist"><span>' + esc(when(h.at)) + "</span><span>" + txt + "</span></div>";
+    }).join("");
+    openSheet(d.name || "Guest",
+      '<div style="margin:0 0 14px">' + tchip(d.tier) + ' <span class="idc">member ID ' + esc(d.member_code || "") + "</span></div>" +
+      '<div class="nums">' +
+        row("Phone", esc(p.phone)) +
+        row("Birthday", p.birthday_md ? fmtMd(p.birthday_md) : null) +
+        row("Member since", p.member_since ? R.fmtDay(p.member_since) : null) +
+        row("$RORU balance", fmt(d.points)) +
+        row("Spent in the last 12 months", p.spend_12m != null ? hkd(p.spend_12m) : null) +
+        row("Lifetime spend", p.spend_lifetime != null ? hkd(p.spend_lifetime) : null) +
+        row("Visits", p.visits != null ? fmt(p.visits) : null) +
+        row("Average per visit", p.avg_per_visit ? hkd(p.avg_per_visit) : null) +
+        row("Visit stamps toward the next free item", d.stamps != null ? d.stamps + " of " + (d.per_plate || 5) : null) +
+        row("Bills scanned", p.receipts != null ? fmt(p.receipts) : null) +
+        row("Last visit", p.last_visit ? R.fmtDay(p.last_visit) + (ago ? " (" + ago + ")" : "") : "Never") +
+        row("Here today", d.visited_today ? "Yes" : null) +
+        row("Bills waiting for approval", d.pending_receipts ? fmt(d.pending_receipts) : null) +
+      "</div>" +
+      (p.favourites && p.favourites.length ? '<p class="muted" style="font-size:14px;margin:12px 0 0">Favourites: ' + p.favourites.map(f => esc(f.name_en || "") + (f.n ? " ×" + f.n : "")).join(", ") + "</p>" : "") +
+      sec("Rewards ready to use · " + ready.length + (d.used_rewards ? " · " + fmt(d.used_rewards) + " used before" : "")) + rwd +
+      pp +
+      sec("History") +
+      (hist || '<p class="empty">Nothing yet.</p>') +
+      '<p class="muted" style="font-size:13px;margin-top:16px">Opening a guest is written to the access log, same as the staff iPad.</p>',
+      '<button class="btn ghost" id="gClose">Close</button>', (b, f) => { f.querySelector("#gClose").onclick = closeSheet; });
   }
 
   // ===== REWARDS =====
