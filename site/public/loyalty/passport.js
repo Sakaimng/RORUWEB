@@ -35,9 +35,17 @@
     const s = p.season || {}, end = fmtD(ymd(s.ends_on), z), start = fmtD(ymd(s.starts_on), z), nm = z ? (s.name_zh || s.name_en) : s.name_en, q = qOf(s);
     if (s.status === "upcoming") return nm + W(" · starts " + start, " · " + start + "開始", " · " + start + "开始");
     if (s.status === "ended") return nm + W(" · ended " + end, " · 已於" + end + "完結", " · 已于" + end + "结束");
-    const rng = fmtD(ymd(s.starts_on), z, true) + W(" – ", "至", "至") + fmtD(ymd(s.ends_on), z, true), left = daysLeft(s);
-    return nm + " · " + rng + " · " + W(left + (left === 1 ? " day" : " days") + " left in Q" + q, "Q" + q + " 仲有 " + left + " 日", "Q" + q + " 还剩 " + left + " 天");
+    const rng = fmtD(ymd(s.starts_on), z, true) + W(" – ", "至", "至") + fmtD(ymd(s.ends_on), z, true);
+    return nm + " · " + rng;
   }
+  // Countdown on its own line, smaller + italic in brackets (Dominic Nov 15: it ran into the dates)
+  function seasonLeft(p, z) {
+    const s = p.season || {};
+    if (s.status !== "live") return "";
+    const q = qOf(s), left = daysLeft(s);
+    return W("(" + left + (left === 1 ? " day" : " days") + " left in Q" + q + ")", "(Q" + q + " 仲有 " + left + " 日)", "(Q" + q + " 还剩 " + left + " 天)");
+  }
+  const seasonHtml = (p, z) => { const l = seasonLeft(p, z); return '<div class="pp-season">' + esc(seasonLine(p, z)) + "</div>" + (l ? '<div class="pp-left">' + esc(l) + "</div>" : ""); };
   function nextLine(p, z) {
     const nx = tierFor(p);
     if (!nx) return z ? "全部 " + p.total + " 款都試齊！你係 Roru Master。" : "All " + p.total + " tried. You're a Roru Master.";
@@ -141,7 +149,7 @@
     }).join("");
     const how = z ? ["掃描收據：每款付咗錢嘅食物蓋一個印花（每張單每款一次）。", "每張單最多 " + p.max_per_bill + " 個新印花。", "只有埋單嗰位有印花，同枱朋友冇。", "免費嘢食、獎賞同飲品都唔計。套餐會蓋入面嘅手卷。", "收據讀唔到？埋單時叫店員幫你蓋。", QRULE()]
       : ["Scan your receipt: every food item you paid for gets a stamp (once per item per bill).", "Up to " + p.max_per_bill + " new stamps a bill.", "Only the person who paid gets stamps, not the rest of the table.", "Free items, rewards and drinks don't count. A roll set stamps the rolls in it.", "Receipt won't read? Ask staff to stamp it when you pay.", QRULE()];
-    const foodHtml = '<div class="pp-hero"><div class="pp-top">' + CARD + INFO_BTN() + '<div><div class="pp-k">' + W("Menu Passport", "菜單護照") + " · " + W("菜單護照", "Menu Passport") + '</div><div class="pp-season">' + esc(seasonLine(p, z)) + "</div></div></div>" +
+    const foodHtml = '<div class="pp-hero"><div class="pp-top">' + CARD + INFO_BTN() + '<div><div class="pp-k">' + W("Menu Passport", "菜單護照") + " · " + W("菜單護照", "Menu Passport") + '</div>' + seasonHtml(p, z) + "</div></div>" +
       '<div class="pp-count"><b>' + p.count + "</b><span>/" + p.total + '</span></div><div class="pp-sub">' + W("dishes tried this quarter", "今季試過嘅菜式", "本季已尝菜式") + "</div>" + track(p) +
       togo(p.count, p.tiers, z, "dish", "dishes", "款") + (p.season && p.season.status !== "live" ? '<div class="pp-off">' + W("Stamps are paused outside the quarter's dates.", "季度以外暫停蓋印花。", "季度以外暂停盖印花。") + "</div>" : "") +
       '<div class="pp-badges">' + ["roll", "app", "dessert"].map(g => { const its = p.items.filter(x => x.grp === g); if (!its.length) return ""; const got = its.filter(x => x.sid).length;
@@ -192,7 +200,7 @@
     const how = !z ? ["Every bottle you pay for counts. Scan your receipt and it stamps itself. Glasses don't count.", "One stamp for each different bottle; ordering a favourite again still counts toward the rewards.", "Rewards at 3, 6 and 10 bottles, once each a quarter. Show staff before you pay.", shareRule, "Receipt won't read? Staff can stamp it on the iPad.", QRULE()]
       : hans() ? ["每瓶付费的酒（整瓶）都算：扫描收据就会自动盖印。杯装不算。", "每款不同的酒一个印花；同一款再点也会计入奖赏进度。", "奖赏：3 瓶、6 瓶、10 瓶，每季每项兑换一次，结账前出示给店员。", shareRule, "收据读不到？请店员帮你在 iPad 上盖印。", QRULE()]
       : ["每支付咗錢嘅酒（整支）都計：掃描收據就自動蓋印。杯裝唔計。", "每款唔同嘅酒一個印花；同一款再叫都計入獎賞進度。", "獎賞：3 支、6 支、10 支，每季每樣換一次，埋單前俾店員睇。", shareRule, "收據讀唔到？叫店員幫你喺 iPad 蓋。", QRULE()];
-    return '<div class="pp-hero dk-hero"><div class="pp-top"><span class="dk-hero-ic">' + BOT_SAKE + BOT_WINE + '</span>' + INFO_BTN() + '<div><div class="pp-k">' + W("Bottle Passport", "酒瓶護照") + " · " + W("酒瓶護照", "Bottle Passport") + '</div><div class="pp-season">' + esc(seasonLine(d, z)) + "</div></div></div>" +
+    return '<div class="pp-hero dk-hero"><div class="pp-top"><span class="dk-hero-ic">' + BOT_SAKE + BOT_WINE + '</span>' + INFO_BTN() + '<div><div class="pp-k">' + W("Bottle Passport", "酒瓶護照") + " · " + W("酒瓶護照", "Bottle Passport") + '</div>' + seasonHtml(d, z) + "</div></div>" +
       '<div class="pp-count"><b>' + d.count + '</b><span>' + W(d.count === 1 ? " bottle" : " bottles", " 支", " 瓶") + '</span></div><div class="pp-sub">' + W(d.different + " of " + d.total + " different bottles tried", "試咗 " + d.total + " 款之中 " + d.different + " 款", d.total + " 款中已尝 " + d.different + " 款") + "</div>" + track(tr) +
       togo(d.count, tiers, z, "bottle", "bottles", "支", "瓶") +
       (d.season && d.season.status !== "live" ? '<div class="pp-off">' + W("Stamps are paused outside the quarter's dates.", "季度以外暫停蓋印花。", "季度以外暂停盖印花。") + "</div>" : "") +
