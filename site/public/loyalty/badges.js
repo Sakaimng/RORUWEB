@@ -47,24 +47,24 @@ const IMGS = {
 
   // The 8 approved badges (names + one-liners from Dominic's badge art).
   const BADGES = [
-    { id: "ten-rolls",       name: "Ten Rolls",       rule: "Your 10th visit" },
-    { id: "regular",         name: "Regular",         rule: "Visited 3 months in a row" },
-    { id: "four-seasons",    name: "Four Seasons",    rule: "Came in every quarter of the year" },
+    { id: "ten-rolls",       name: "Ten Rolls",       rule: "10 approved bills" },
+    { id: "regular",         name: "Regular",         rule: "An approved bill 3 months in a row" },
+    { id: "four-seasons",    name: "Four Seasons",    rule: "An approved bill every quarter this year" },
     { id: "full-roll-call",  name: "Full Roll Call",  rule: "All 27 core dishes stamped" },
     { id: "bottle-explorer", name: "Bottle Explorer", rule: "Worked through the drinks list" },
     { id: "kama-club",       name: "Kama Club",       rule: "Had a kama (fish collar) dinner" },
     { id: "bring-a-friend",  name: "Bring a Friend",  rule: "A friend signed up with your link" },
-    { id: "night-owl",       name: "Night Owl",       rule: "Placed the last order of the night" }
+    { id: "night-owl",       name: "Night Owl",       rule: "Coming soon" }
   ];
   const ZH = {
-    "ten-rolls":       { name: "Ten Rolls",       rule: "第 10 次光顧" },
-    "regular":         { name: "Regular",         rule: "連續 3 個月都來過" },
-    "four-seasons":    { name: "Four Seasons",    rule: "今年每季都來過" },
+    "ten-rolls":       { name: "Ten Rolls",       rule: "10 張已批核單據" },
+    "regular":         { name: "Regular",         rule: "連續 3 個月都有已批核單據" },
+    "four-seasons":    { name: "Four Seasons",    rule: "今年每季都有已批核單據" },
     "full-roll-call":  { name: "Full Roll Call",  rule: "集齊 27 款核心菜式印花" },
     "bottle-explorer": { name: "Bottle Explorer", rule: "飲遍今季酒單" },
     "kama-club":       { name: "Kama Club",       rule: "吃過魚下巴晚餐" },
     "bring-a-friend":  { name: "Bring a Friend",  rule: "朋友用你的連結加入" },
-    "night-owl":       { name: "Night Owl",       rule: "點了當晚最後一單" }
+    "night-owl":       { name: "Night Owl",       rule: "即將推出" }
   };
 
   const data = { loaded: false, earned: {}, earnedList: [], progress: {}, token: null };
