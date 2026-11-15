@@ -125,8 +125,8 @@ const IMGS = {
       const sub = g ? (z ? "於 " : "Earned ") + esc(fmtAt(g.at)) : (progressFor(b.id) || esc(rl));
       html += '<div class="shelf-cell' + (g ? '' : ' locked') + '">'
         + '<img src="' + img(b.id) + '" alt="' + esc(nm) + ' badge' + (g ? '' : ' (locked)') + '" loading="lazy">'
-        + '<div class="sc-name">' + esc(nm) + (g ? '' : '<span class="shelf-lock">🔒</span>') + '</div>'
-        + '<div class="sc-when">' + sub + '</div>'
+        + '<div class="shf-name">' + esc(nm) + (g ? '' : '<span class="shelf-lock">🔒</span>') + '</div>'
+        + '<div class="shf-when">' + sub + '</div>'
         + '</div>';
     });
     html += '</div>'
