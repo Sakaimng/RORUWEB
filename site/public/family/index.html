@@ -17,8 +17,8 @@
 <link rel="stylesheet" href="/loyalty/otp.css?v=l4">
 <link rel="stylesheet" href="/loyalty/calm.css?v=n12c">
 <link rel="stylesheet" href="/loyalty/seasonal.css?v=s4">
-<script src="/loyalty/phonelib.js?v=p1" defer></script>
-<script src="/loyalty/dialcode.js?v=d2" defer></script>
+<script src="/loyalty/phonelib.js?v=p2" defer></script>
+<script src="/loyalty/dialcode.js?v=d3" defer></script>
 <script defer src="/loyalty/seasonal.js?v=s4" data-season-buttons=".btn:not(.ghost)" data-season-full=".btn:not(.ghost):not(.sm)" data-season-wash="off" data-season-pad="on"></script>
 <script src="/loyalty/vendor/qrcode.js"></script>
 <script src="/loyalty/loyalty.js?v=l4"></script>
@@ -593,7 +593,9 @@
     await trySetReferrer(false);
   }
   $("#btnSend").onclick = async () => {
-    const ph = (window.roruDialPhone ? window.roruDialPhone($("#phone").value) : $("#phone").value); $("#err1").classList.add("hide"); $("#btnSend").disabled = true;
+    const ph = (window.roruDialPhone ? window.roruDialPhone($("#phone").value) : $("#phone").value); $("#err1").classList.add("hide");
+    if (ph === null) { $("#err1").textContent = tt("err_bad_phone"); $("#err1").classList.remove("hide"); return false; }
+    $("#btnSend").disabled = true;
     try { const r = await R.rpc("family_request_code", { p_phone: ph, p_lang: R.lang() }); state.phone = ph; $("#sentTo").textContent = r.phone_masked; showDemo(r); rsNew(); $("#step1").classList.add("hide"); $("#step2").classList.remove("hide"); $("#signin").classList.add("otp-on"); otpReset(true); rsStart(); return true; }
     catch (e) { $("#err1").textContent = otpErrT(e); $("#err1").classList.remove("hide"); return false; }
     finally { $("#btnSend").disabled = false; }
