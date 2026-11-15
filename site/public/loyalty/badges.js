@@ -54,7 +54,7 @@ const IMGS = {
     { id: "bottle-explorer", name: "Bottle Explorer", rule: "Worked through the drinks list" },
     { id: "kama-club",       name: "Kama Club",       rule: "Had a kama (fish collar) dinner" },
     { id: "bring-a-friend",  name: "Bring a Friend",  rule: "A friend signed up with your link" },
-    { id: "night-owl",       name: "Night Owl",       rule: "Coming soon" }
+    { id: "night-owl",       name: "Night Owl",       rule: "Bill opened after 9pm" }
   ];
   const ZH = {
     "ten-rolls":       { name: "Ten Rolls",       rule: "10 張已批核單據" },
@@ -64,7 +64,7 @@ const IMGS = {
     "bottle-explorer": { name: "Bottle Explorer", rule: "飲遍今季酒單" },
     "kama-club":       { name: "Kama Club",       rule: "吃過魚下巴晚餐" },
     "bring-a-friend":  { name: "Bring a Friend",  rule: "朋友用你的連結加入" },
-    "night-owl":       { name: "Night Owl",       rule: "即將推出" }
+    "night-owl":       { name: "Night Owl",       rule: "晚上 9 點後開單" }
   };
 
   const data = { loaded: false, earned: {}, earnedList: [], progress: {}, token: null };
