@@ -1,8 +1,8 @@
 /* Country-code picker for the sign-up phone field (needs /loyalty/phonelib.js = libphonenumber-js "min" metadata).
    Hong Kong is the default and keeps the old behaviour: the number is sent exactly as typed (the server reads 8 bare digits as HK).
-   Any other country is parsed with libphonenumber's rules for that country and sent as E.164 ("+447911123456").
+   Any other country is parsed with libphonenumber's rules for that country and sent as E.164 ("+447911123456"); a number that is not valid for that country is not sent at all.
    A number typed with its own "+" (or 00) is authoritative: it is sent as "+digits" and the picker follows it.
-   "Other" sends whatever was typed. The code request, resend and verify all reuse the same string. */
+   "Other" needs the number typed with + and the country code. The code request, resend and verify all reuse the same string. */
 (function () {
   const P = window.RoruPhone;
   function init() {
@@ -25,15 +25,16 @@
     });
     sel.addEventListener("change", () => input.focus());
   }
+  // returns the string to send, or null when the number is not valid for the chosen country (the page then shows the "enter a valid number" message and sends nothing)
   window.roruDialPhone = function (raw) {
     raw = String(raw == null ? "" : raw);
-    const t = raw.trim(); if (t[0] === "+" || /^00/.test(t)) return "+" + t.replace(/\D/g, "").replace(/^0+/, "");
-    const sel = document.getElementById("dialSel"); if (!sel || !P) return raw;
-    if (sel.value === "HK" || sel.value === "XX") return raw;
-    const digits = t.replace(/\D/g, ""); if (!digits) return raw;
+    const t = raw.trim(), sel = document.getElementById("dialSel");
+    if (!sel || !P) return raw;
+    if (t[0] === "+" || /^00/.test(t)) { const p = P.parse("+" + t.replace(/\D/g, "").replace(/^0+/, "")); return p && p.valid ? p.e164 : null; }
+    if (sel.value === "HK") return raw;
+    if (sel.value === "XX") return null;
     const p = P.parse(t, sel.value);
-    if (p && p.e164) return p.e164;
-    return "+" + sel.options[sel.selectedIndex].dataset.d + digits;
+    return p && p.valid ? p.e164 : null;
   };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
