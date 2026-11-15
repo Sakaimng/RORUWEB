@@ -189,3 +189,4 @@ body.lt .pp-err{color:#B3261E}
 .thB .pp-otog{background:#fff;border-color:rgba(22,24,31,.1)}
 .thB .pp-otog button em{background:rgba(22,24,31,.08)}
 .thB .pp-otog button.on em{background:rgba(255,255,255,.25)}
+.pp-left{font-size:12px;font-style:italic;opacity:.55;margin-top:1px}
