@@ -53,7 +53,7 @@
   }
   window.RORU_MONTHEND = {
     mount(el, token) {
-      el.innerHTML = '<h2 style="margin-top:0">📅 Month-end report</h2><p class="muted small">Pick a month and download. It lists every free item handed over that month (rewards, upgrades, birthday rolls, visit rewards, gold receipts) so Florencia can match it against the POS. Anything staff forgot to ring up is listed first.</p>' +
+      el.innerHTML = '<h2 style="margin-top:0">📅 Month-end report</h2><p class="muted small">Pick a month and download. It lists every free item handed over that month (rewards, upgrades, birthday rolls, visit rewards, gold receipts) to match against the POS. Anything staff forgot to ring up is listed first.</p>' +
         '<div class="row" style="gap:8px;flex-wrap:wrap;align-items:center"><input type="month" id="meMonth" value="' + thisMonth() + '" style="font-size:16px;padding:8px;border-radius:10px;color:#111;background:#fff;border:0"><button class="btn sm" id="mePdf">⬇︎ Download PDF</button><button class="btn sm ghost" id="meCsv">⬇︎ Spreadsheet</button></div><div id="meInfo" class="small muted" style="margin-top:10px"></div>';
       const info = el.querySelector("#meInfo");
       const get = async (fmt) => R.rpc("staff_month_end", { p_token: token(), p_month: el.querySelector("#meMonth").value, p_format: fmt });
