@@ -594,7 +594,7 @@
   }
   $("#btnSend").onclick = async () => {
     const ph = (window.roruDialPhone ? window.roruDialPhone($("#phone").value) : $("#phone").value); $("#err1").classList.add("hide");
-    if (ph === null) { $("#err1").textContent = tt("err_bad_phone"); $("#err1").classList.remove("hide"); return false; }
+    if (ph === null) { $("#err1").textContent = otpErrT({ code: "bad_phone" }); $("#err1").classList.remove("hide"); return false; }
     $("#btnSend").disabled = true;
     try { const r = await R.rpc("family_request_code", { p_phone: ph, p_lang: R.lang() }); state.phone = ph; $("#sentTo").textContent = r.phone_masked; showDemo(r); rsNew(); $("#step1").classList.add("hide"); $("#step2").classList.remove("hide"); $("#signin").classList.add("otp-on"); otpReset(true); rsStart(); return true; }
     catch (e) { $("#err1").textContent = otpErrT(e); $("#err1").classList.remove("hide"); return false; }
