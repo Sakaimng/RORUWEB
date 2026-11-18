@@ -1,4 +1,7 @@
-/* RORUBARU trophy shelf - LIVE (Nov 15 2026).
+/* PREVIEW A (Nov 17 2026, not live): trophy row on the passport card; the full shelf opens as a sheet.
+   Presentation only: same family_badges RPC, same badge list and rules, same share text, same privacy note.
+   Original header follows.
+   RORUBARU trophy shelf - LIVE (Nov 15 2026).
    Earned badges come from the family_badges RPC (server-side award rules on
    approved bills, stamps, staff check-ins and sign-ups). No sample data:
    a member sees only badges they really earned. Badges carry no points,
@@ -42,6 +45,37 @@ const IMGS = {
 .shelf-cell.locked .shf-name{color:var(--muted,#a8a49a)}
 .shelf-lock{display:inline-block;font-size:10px;margin-left:3px}
 .shelf-note{font-size:12px;color:var(--muted,#a8a49a);margin-top:14px;line-height:1.5}
+/* ---- preview A: the trophy row that lives on the passport card ---- */
+.tstrip{appearance:none;display:block;width:100%;text-align:left;font:inherit;color:inherit;background:transparent;border:0;border-top:1.5px dashed rgba(246,69,1,.45);margin:14px 0 0;padding:12px 0 2px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ts-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:9px}
+.ts-k{font-family:Megazoid,RoruCJK,Roru,system-ui,sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--orange,#F64501)}
+.ts-k small{font-family:RoruCJK,Roru,system-ui,sans-serif;letter-spacing:.04em;font-size:11px;color:var(--muted,#a8a49a);margin-left:6px;text-transform:none}
+.ts-n{font-size:13px;font-weight:800;white-space:nowrap}
+.ts-n b{font-family:Roru,system-ui,sans-serif;font-size:17px;color:var(--orange,#F64501)}
+.ts-n i{font-style:normal;margin-left:6px;font-size:15px;color:var(--muted,#a8a49a)}
+.ts-row{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;align-items:center}
+.ts-b{position:relative;display:grid;place-items:center;aspect-ratio:1;border-radius:50%;background:rgba(246,69,1,.07)}
+.ts-b img{width:100%;height:100%;object-fit:contain;display:block}
+.ts-b.off{background:rgba(127,127,127,.08)}
+.ts-b.off img{filter:grayscale(1) brightness(1.1);opacity:.38}
+.ts-b.new::after{content:"";position:absolute;top:0;right:0;width:9px;height:9px;border-radius:50%;background:var(--orange,#F64501);box-shadow:0 0 0 2px var(--ink2,#fff)}
+.ts-sub{display:block;margin-top:9px;font-size:12px;line-height:1.35;color:var(--muted,#a8a49a)}
+.ts-sub em{font-style:normal;display:inline-block;background:var(--orange,#F64501);color:#fff;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:99px;margin-right:6px;vertical-align:1px}
+.ts-sub b{color:inherit}
+body.lt .ts-sub b{color:#16181F}
+.shelf-sheet .shelf{padding-bottom:4px}
+.shelf-sheet .shelf-hero{padding:12px 14px;border-radius:16px}
+.shelf-sheet .shelf-hero img{width:68px;height:68px}
+.shelf-sheet .shelf-hero h3{font-size:20px;margin:6px 0 2px}
+.shelf-sheet .shelf-grid{grid-template-columns:repeat(4,1fr);gap:12px 6px}
+.shelf-sheet .shelf-cell img{max-width:64px}
+.shelf-sheet .shelf-cell .shf-name{font-size:11px;text-wrap:balance}
+.shelf-sheet .shelf-cell .shf-when{font-size:10px;line-height:1.25;text-wrap:balance}
+.shelf-sheet .shelf-lock{font-size:9px;margin-left:2px}
+.shelf-sheet .shelf-count{display:none}
+.shelf-sheet .shelf-bar{margin:12px 0 16px}
+.shelf-sheet .fs-h h2 b{color:var(--orange,#F64501);margin-left:8px}
+.shelf-sheet .fs-h h2{margin:0}
 .shelf-share{appearance:none;border:1px solid var(--line,rgba(246,243,231,.16));background:transparent;color:inherit;font:inherit;font-size:13px;font-weight:700;padding:9px 16px;border-radius:99px;cursor:pointer;margin-top:10px}
 `;
 
@@ -138,6 +172,34 @@ const IMGS = {
     return html;
   }
 
+
+  function nameOf(id) { const z = zh(); const b = BADGES.find(x => x.id === id) || {}; return z && ZH[id] ? ZH[id].name : (b.name || id); }
+  function stripHtml() {
+    const z = zh();
+    const got = data.earned;
+    const fresh = data.earnedList.find(b => isFresh(b.at));
+    const n = BADGES.filter(b => got[b.id]).length;
+    const order = BADGES.filter(b => got[b.id]).concat(BADGES.filter(b => !got[b.id]));
+    const sub = fresh
+      ? '<em>' + (z ? "新徽章" : "New") + '</em><b>' + esc(nameOf(fresh.id)) + '</b>' + (z ? " · 撳一下睇你的珍藏架" : " · tap to see your shelf")
+      : n ? (z ? "撳一下睇全部徽章同點樣獲得" : "Tap to see every trophy and how to earn it")
+          : (z ? "嚟食飯就會慢慢集齊 · 撳一下睇點樣獲得" : "Collected as you visit · tap to see how");
+    return '<span class="ts-h"><span class="ts-k">' + (z ? "珍藏架" : "Trophy shelf") + '<small>' + (z ? "Trophy shelf" : "珍藏架") + '</small></span>'
+      + '<span class="ts-n"><b>' + n + '</b>/' + BADGES.length + '<i>›</i></span></span>'
+      + '<span class="ts-row">' + order.map(b => '<span class="ts-b ' + (got[b.id] ? "on" : "off") + (fresh && fresh.id === b.id ? " new" : "") + '"><img src="' + img(b.id) + '" alt="' + esc(nameOf(b.id)) + (got[b.id] ? "" : (z ? "（未解鎖）" : " (locked)")) + '"></span>').join("") + '</span>'
+      + '<span class="ts-sub">' + sub + '</span>';
+  }
+  function openSheet() {
+    const z = zh();
+    const ov = document.createElement("div"); ov.className = "ask-sheet f38-sheet"; ov.setAttribute("role", "dialog");
+    ov.setAttribute("aria-label", z ? "珍藏架" : "Trophy shelf");
+    const n = BADGES.filter(b => data.earned[b.id]).length;
+    ov.innerHTML = '<div class="card fs-card shelf-sheet"><div class="fs-h"><h2>' + (z ? "珍藏架" : "Trophy shelf") + '<b>' + n + ' / ' + BADGES.length + '</b></h2><button type="button" class="fs-x" aria-label="Close">✕</button></div><div class="fs-b"></div></div>';
+    ov.addEventListener("click", e => { if (e.target === ov || e.target.closest(".fs-x")) ov.remove(); });
+    document.body.appendChild(ov);
+    paint(ov.querySelector(".fs-b"));        // the same shelf, the same share button and note as before
+  }
+
   function paint(root) {
     root.innerHTML = shelfHtml();
     const shareBtn = root.querySelector(".shelf-share");
@@ -160,13 +222,18 @@ const IMGS = {
       st.textContent = CSS;
       document.head.appendChild(st);
     }
+    const hero = sec.querySelector(".pp-hero");      // food or drinks passport card, whichever is showing
+    if (!hero) return;
     let box = document.getElementById("shelfLive");
-    if (box && box.parentNode === sec) return;
+    if (box && box.parentNode === hero) { box.innerHTML = stripHtml(); return; }
     if (box) box.remove();
-    box = document.createElement("div");
+    box = document.createElement("button");
+    box.type = "button";
     box.id = "shelfLive";
-    sec.insertBefore(box, sec.firstChild);
-    paint(box);
+    box.className = "tstrip";
+    box.innerHTML = stripHtml();
+    box.onclick = openSheet;
+    hero.appendChild(box);
   }
 
   async function boot() {
@@ -178,7 +245,6 @@ const IMGS = {
       boot.obs = new MutationObserver(() => {
         const s = document.getElementById("ppSec");
         if (!s) return;
-        if (s.firstChild && s.firstChild.id !== "shelfLive" && data.loaded) mountInto(s);
         if (s.firstChild && !document.getElementById("shelfLive") && data.loaded) mountInto(s);
       });
       boot.obs.observe(sec, { childList: true });
@@ -197,5 +263,5 @@ const IMGS = {
     if (tries > 240) clearInterval(iv);
   }, 5000);
 
-  return { reload: async () => { data.loaded = false; data.token = null; await load(); const b = document.getElementById("shelfLive"); if (b) paint(b); }, BADGES: BADGES };
+  return { reload: async () => { data.loaded = false; data.token = null; await load(); const b = document.getElementById("shelfLive"); if (b) b.innerHTML = stripHtml(); }, BADGES: BADGES };
 })();
